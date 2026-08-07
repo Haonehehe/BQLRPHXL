@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu Tổng hợp Kết quả Xử lý Vi phạm Lâm nghiệp - Google Sheets Exporter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        sheets: {
+                            50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e',
+                            600: '#16a34a', 700: '#15803d', 800: '#0f9d58', 900: '#0c6b37'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 2px 15px -3px rgba(0,0,0,0.07), 0 10px 20px -2px rgba(0,0,0,0.04)',
+                        'card': '0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.08); }
+        .table-row-hover:hover { background-color: #f8fafc; }
+        .badge-pulse { animation: pulse-soft 2s infinite; }
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sheets-700 to-sheets-900 flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-tree text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Công cụ Đồng bộ Google Trang tính</h1>
+                    <p class="text-[11px] text-slate-500">Ban Quản lý Rừng phòng hộ Xuân Lộc • Báo cáo Vi phạm Hợp đồng Khoán</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="reloadData()" id="btnReload" class="inline-flex items-center px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Tải lại dữ liệu từ Google Sheets">
+                    <i class="fa-solid fa-arrows-rotate mr-1.5" id="reloadIcon"></i>
+                    <span class="hidden sm:inline">Làm mới</span>
+                </button>
+                <button onclick="openSyncModal()" class="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                    <i class="fa-solid fa-link mr-1.5" id="syncIcon"></i>
+                    <span class="hidden sm:inline">Đổi link Sheet</span>
+                    <span class="sm:hidden">Link</span>
+                </button>
+                <button onclick="copyForGoogleSheets()" class="inline-flex items-center px-3 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all">
+                    <i class="fa-regular fa-copy mr-1.5"></i>
+                    <span class="hidden sm:inline">Chép dán Sheets</span>
+                    <span class="sm:hidden">Copy</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+
+        <!-- Stats Cards - Total + 5 groups -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="stat-card bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-card flex items-center space-x-3">
+                <div class="p-2.5 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+                    <i class="fa-solid fa-users text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider truncate">Tổng hộ</p>
+                    <p class="text-xl font-bold text-slate-800" id="statTotalCases">0</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-card flex items-center space-x-3">
+                <div class="p-2.5 bg-violet-50 text-violet-600 rounded-lg shrink-0">
+                    <i class="fa-solid fa-file-circle-plus text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider truncate">VP mới chưa mời</p>
+                    <p class="text-xl font-bold text-violet-600" id="statVpMoi">0 hộ</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-card flex items-center space-x-3">
+                <div class="p-2.5 bg-sky-50 text-sky-600 rounded-lg shrink-0">
+                    <i class="fa-solid fa-envelope-open-text text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider truncate">Đang mời LV</p>
+                    <p class="text-xl font-bold text-sky-600" id="statMoiLamViec">0 hộ</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-card flex items-center space-x-3">
+                <div class="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg shrink-0">
+                    <i class="fa-solid fa-user-check text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider truncate">Tự giác / KP</p>
+                    <p class="text-xl font-bold text-emerald-600" id="statKhacPhuc">0 hộ</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-card flex items-center space-x-3">
+                <div class="p-2.5 bg-amber-50 text-amber-600 rounded-lg shrink-0">
+                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider truncate">Đã niêm yết</p>
+                    <p class="text-xl font-bold text-amber-600" id="statNiemYet">0 hộ</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-card flex items-center space-x-3">
+                <div class="p-2.5 bg-rose-50 text-rose-600 rounded-lg shrink-0">
+                    <i class="fa-solid fa-ban text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider truncate">Chấm dứt HĐ</p>
+                    <p class="text-xl font-bold text-rose-600" id="statChamDut">0 hộ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-100">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-800">Biểu tổng hợp Tiến độ & Kết quả Xử lý Vi phạm Hợp đồng Khoán</h2>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Dữ liệu quản lý chi tiết các hộ nhận khoán vi phạm trên lâm phận Ban Quản lý</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="copyForGoogleSheets()" class="px-3 py-1.5 bg-sheets-800 hover:bg-sheets-900 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
+                            <i class="fa-solid fa-copy mr-1.5"></i> Chép Sheets
+                        </button>
+                        <button onclick="exportToExcel()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
+                            <i class="fa-solid fa-file-excel mr-1.5 text-emerald-400"></i> Excel
+                        </button>
+                        <button onclick="exportToCSV()" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
+                            <i class="fa-solid fa-file-csv mr-1.5 text-blue-500"></i> CSV
+                        </button>
+                        <button onclick="addNewRowModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
+                            <i class="fa-solid fa-plus mr-1.5"></i> Thêm hộ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Tabs -->
+            <div class="flex border-b border-slate-200 bg-slate-50/50 text-xs font-medium">
+                <button id="viewSummaryBtn" onclick="switchMainView('summary')" class="py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-layer-group text-[11px]"></i>
+                    <span>Chế độ 1: Tổng hợp 5 Nhóm xử lý</span>
+                </button>
+                <button id="viewDetailBtn" onclick="switchMainView('detail')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-table-list text-[11px]"></i>
+                    <span>Chế độ 2: Bảng chi tiết từng hộ</span>
+                </button>
+                <button id="viewStatsBtn" onclick="switchMainView('stats')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-chart-line text-[11px]"></i>
+                    <span>Chế độ 3: Thống kê & Báo cáo</span>
+                </button>
+            </div>
+
+            <!-- Instruction -->
+            <div class="bg-emerald-50/80 border-b border-emerald-100 px-4 py-2.5 flex items-start space-x-2.5">
+                <i class="fa-solid fa-circle-info text-sheets-700 text-sm mt-0.5"></i>
+                <div class="text-[11px] text-emerald-900 leading-relaxed">
+                    <span class="font-semibold">Tự động kết nối sheet gốc:</span> Phân nhóm từ cột <strong>AL</strong>, tình trạng từ <strong>AM</strong>. Mỗi hộ chỉ 1 nhóm (đã đến+cam kết/tháo dỡ → Tự giác; đã thông báo → Niêm yết; AL trống → VP mới; mời 1-3 → Đang mời; QĐ chấm dứt → Chấm dứt). Biểu đồ theo Phân trường &amp; Xã.
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="chartsSection">
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
+                <h3 class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-pie text-emerald-600"></i> Phân bố theo Nhóm xử lý
+                </h3>
+                <div class="h-48"><canvas id="chartNhom"></canvas></div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
+                <h3 class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-bar text-sky-600"></i> Theo Phân trường
+                </h3>
+                <div class="h-48"><canvas id="chartPhanTruong"></canvas></div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
+                <h3 class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-chart-column text-amber-600"></i> Theo Xã / Địa bàn
+                </h3>
+                <div class="h-48"><canvas id="chartXa"></canvas></div>
+            </div>
+        </div>
+
+        
+        <!-- Stats & Report Panel -->
+        <div id="statsPanel" class="hidden space-y-4">
+            <!-- Time filters -->
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
+                <div class="flex flex-wrap items-end gap-3">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Lọc thời gian</label>
+                        <select id="statsTimeMode" onchange="onStatsTimeModeChange()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                            <option value="all">Toàn bộ</option>
+                            <option value="month">Theo tháng</option>
+                            <option value="quarter">Theo quý</option>
+                            <option value="custom">Tùy chỉnh</option>
+                        </select>
+                    </div>
+                    <div id="statsMonthWrap" class="hidden">
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Tháng</label>
+                        <input type="month" id="statsMonth" onchange="renderStats()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs">
+                    </div>
+                    <div id="statsQuarterWrap" class="hidden flex gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quý</label>
+                            <select id="statsQuarter" onchange="renderStats()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                                <option value="1">Quý 1 (T1–T3)</option>
+                                <option value="2">Quý 2 (T4–T6)</option>
+                                <option value="3">Quý 3 (T7–T9)</option>
+                                <option value="4">Quý 4 (T10–T12)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Năm</label>
+                            <input type="number" id="statsYear" value="2026" onchange="renderStats()" class="w-20 px-3 py-1.5 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                    </div>
+                    <div id="statsCustomWrap" class="hidden flex gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Từ ngày</label>
+                            <input type="date" id="statsFrom" onchange="renderStats()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Đến ngày</label>
+                            <input type="date" id="statsTo" onchange="renderStats()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs">
+                        </div>
+                    </div>
+                    <button onclick="exportStatsReport()" class="ml-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-export"></i> Xuất báo cáo đẹp
+                    </button>
+                    <button onclick="exportStatsExcel()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-excel text-emerald-400"></i> Excel thống kê
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="statsKpiCards"></div>
+
+            <!-- Tables -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                        <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-list-check text-indigo-500 mr-1.5"></i>Thống kê theo Hành vi</h3>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-xs" id="statsHanhViTable"><thead></thead><tbody></tbody></table></div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                        <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-tree text-emerald-500 mr-1.5"></i>Thống kê theo Loài cây</h3>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-xs" id="statsLoaiCayTable"><thead></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+                    <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-calendar-days text-amber-500 mr-1.5"></i>Thống kê theo tháng</h3>
+                </div>
+                <div class="p-4 h-56"><canvas id="chartByMonth"></canvas></div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                    <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-table text-slate-500 mr-1.5"></i>Chi tiết hộ trong kỳ (đã gộp loài / cộng dồn)</h3>
+                </div>
+                <div class="overflow-x-auto max-h-96 custom-scrollbar">
+                    <table class="w-full text-xs" id="statsDetailTable"><thead></thead><tbody></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div id="dataTableWrap" class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+            <div class="p-3.5 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div class="relative max-w-xs w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="tableSearchInput" onkeyup="filterTable()" placeholder="Tìm tên hộ, đối tượng, tình trạng..." class="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-sheets-500 focus:border-sheets-500 outline-none shadow-sm">
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span id="syncStatusBadge" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 badge-pulse"></span>
+                        Sẵn sàng 56 hồ sơ
+                    </span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table id="dataTable" class="w-full text-left border-collapse">
+                    <thead id="tableHeader"></thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="rowModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+            <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-800" id="modalTitle">Thêm hộ vi phạm mới</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Họ và tên hộ nhận khoán</label>
+                    <input type="text" id="inputHoTen" placeholder="VD: Nguyễn Văn A" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Đối tượng liên quan (nếu có)</label>
+                    <input type="text" id="inputDoiTuong" placeholder="VD: Trần Văn B" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nhóm xử lý</label>
+                    <select id="inputNhomId" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none bg-white">
+                        <option value="1">1. Vi phạm mới (chưa mời)</option>
+                        <option value="2">2. Đang mời làm việc (lần 1–3)</option>
+                        <option value="3">3. Chấp hành làm việc / Khắc phục hậu quả</option>
+                        <option value="4" selected>4. Đã niêm yết Thông báo xác định trách nhiệm</option>
+                        <option value="5">5. Đã ban hành Quyết định chấm dứt, thu hồi HĐ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Tình trạng thực hiện chi tiết</label>
+                    <textarea id="inputTinhTrang" rows="3" placeholder="Mô tả chi tiết tiến độ xử lý..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none"></textarea>
+                </div>
+            </div>
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end space-x-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-medium rounded-lg">Hủy</button>
+                <button onclick="saveRow()" class="px-4 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs font-semibold rounded-lg shadow-sm">Lưu dữ liệu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync Modal -->
+    <div id="syncModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200">
+            <div class="px-5 py-3.5 bg-gradient-to-r from-emerald-700 to-sheets-800 text-white flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-link"></i>
+                    <h3 class="text-sm font-bold">Kết nối Google Sheets Trực tuyến</h3>
+                </div>
+                <button onclick="closeSyncModal()" class="text-emerald-100 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="flex border-b border-slate-200 bg-slate-50 text-xs font-medium text-slate-600">
+                <button id="tabBtn1" onclick="switchSyncTab(1)" class="flex-1 py-2.5 px-3 text-center border-b-2 border-emerald-600 text-emerald-800 font-bold bg-white transition">
+                    <i class="fa-solid fa-globe mr-1"></i> Link Trực tiếp
+                </button>
+                <button id="tabBtn2" onclick="switchSyncTab(2)" class="flex-1 py-2.5 px-3 text-center border-b-2 border-transparent hover:text-slate-900 transition">
+                    <i class="fa-solid fa-paste mr-1"></i> Dán dữ liệu
+                </button>
+            </div>
+
+            <div id="tabContent1" class="p-5 space-y-3.5 text-xs">
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-900 text-[11px] leading-relaxed">
+                    <p class="font-bold flex items-center mb-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5"></i> Lưu ý để kết nối thành công:</p>
+                    <ol class="list-decimal list-inside space-y-0.5 pl-0.5 text-slate-700">
+                        <li>Mở tệp Google Trang tính → nút <strong>Chia sẻ</strong></li>
+                        <li>Đổi quyền thành: <strong>“Bất kỳ ai có liên kết đều có thể xem”</strong></li>
+                    </ol>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Đường link Google Sheets:</label>
+                    <input type="url" id="sheetCsvUrl" value="https://docs.google.com/spreadsheets/d/1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU/edit?gid=528762373#gid=528762373" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none text-xs">
+                </div>
+                <div class="pt-1 flex justify-between items-center">
+                    <button onclick="loadSampleData()" class="text-[11px] text-slate-500 hover:text-slate-800 underline">Khôi phục dữ liệu gốc</button>
+                    <button onclick="fetchViaJSONP()" class="px-4 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center">
+                        <i class="fa-solid fa-cloud-arrow-down mr-1.5"></i> Tải dữ liệu
+                    </button>
+                </div>
+            </div>
+
+            <div id="tabContent2" class="p-5 space-y-3.5 text-xs hidden">
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-[11px] text-slate-700">
+                    <p class="font-bold text-slate-900 mb-0.5">Dán trực tiếp (không cần chia sẻ public):</p>
+                    <p>Mở Google Sheet → <strong>Ctrl+A</strong> → <strong>Ctrl+C</strong> → dán vào khung dưới.</p>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Dán nội dung từ Google Sheet:</label>
+                    <textarea id="pastedDataInput" rows="5" placeholder="Dán nội dung bảng dữ liệu vào đây..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none font-mono text-[11px]"></textarea>
+                </div>
+                <div class="pt-1 flex justify-between items-center">
+                    <button onclick="loadSampleData()" class="text-[11px] text-slate-500 hover:text-slate-800 underline">Khôi phục dữ liệu gốc</button>
+                    <button onclick="parsePastedTextData()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center">
+                        <i class="fa-solid fa-file-import mr-1.5"></i> Nhập dữ liệu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl z-50 flex items-center space-x-3 transform transition-all duration-300 translate-y-12 opacity-0 pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage" class="text-xs font-medium">Đã sao chép!</span>
+    </div>
+
+    <footer class="bg-white/80 border-t border-slate-200 py-3 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-[11px] text-slate-500">
+            Ban Quản lý Rừng phòng hộ Xuân Lộc • Phòng Lâm nghiệp • Định dạng chuẩn Google Trang tính
+        </div>
+    </footer>
+
+    <script>
+        // Master Dataset - 56 cases (nhomId: 1=đang mời, 2=chấp hành, 3=niêm yết, 4=chấm dứt)
+        let detailedCases = [
+            { id: 1, hoTen: "Lầu Cún Khiềng", doiTuong: "Lầu Cún Sáng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời làm việc lần 1 và lần 2. Hộ chưa đến làm việc." },
+            { id: 2, hoTen: "Thân Văn Hiệp", doiTuong: "Nguyễn Thị Phượng", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã làm việc, cam kết tháo dỡ công trình cơi nới trái phép." },
+            { id: 3, hoTen: "Lê Văn Hiệp", doiTuong: "Nguyễn Văn Hướng", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã tự giác tháo dỡ hoàn toàn công trình nhà tạm trên đất lâm nghiệp." },
+            { id: 4, hoTen: "Võ Văn Lộc", doiTuong: "Tôn Nàm Hứng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 3. Đang chờ hộ chấp hành đến làm việc." },
+            { id: 5, hoTen: "Tăng Xây Hưng", doiTuong: "Tăng Xây Hưng", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Hồ sơ cưa hạ cây rừng trồng; đã lập biên bản và niêm yết TB 15 ngày." },
+            { id: 6, hoTen: "Trần Đặng Du Lam", doiTuong: "Nguyễn Thị Quả", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 1. Hộ vắng mặt, sẽ gửi lần 2." },
+            { id: 7, hoTen: "Chìu Thị Tâm", doiTuong: "Phan Hữu Thành", nhomId: 4, nhomTen: "Đã ban hành QĐ chấm dứt, thu hồi HĐ", tinhTrang: "Quá 15 ngày không đến làm việc; đã ban hành QĐ chấm dứt HĐ #175 và thu hồi đất." },
+            { id: 8, hoTen: "Trần Hữu Đức", doiTuong: "Trần Hữu Đức", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã chấp hành làm việc, thừa nhận trách nhiệm và cam kết khắc phục." },
+            { id: 9, hoTen: "Nguyễn Thị Làng", doiTuong: "Phan Hữu Thành", nhomId: 4, nhomTen: "Đã ban hành QĐ chấm dứt, thu hồi HĐ", tinhTrang: "Đã ban hành Quyết định chấm dứt hợp đồng giao khoán và thu hồi đất." },
+            { id: 10, hoTen: "Lầu Cún Sáng", doiTuong: "Lầu Cún Khiềng", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết công khai Thông báo làm việc 15 ngày tại Ban Ấp & Phân trường." },
+            { id: 11, hoTen: "Võ Văn Dũng", doiTuong: "Võ Văn Dũng", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã làm việc, cam kết khắc phục hiện trạng sử dụng đất." },
+            { id: 12, hoTen: "Nguyễn Hữu Thành", doiTuong: "Nguyễn Hữu Thành", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời làm việc lần 2. Chưa có phản hồi." },
+            { id: 13, hoTen: "Lê Thành Phụng", doiTuong: "Đinh Ngọc Tân", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đang trong giai đoạn mời làm việc lần 1." },
+            { id: 14, hoTen: "Lý Văn Ba", doiTuong: "Lý Thị Ca", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời 2 lần. Hộ chưa chấp hành đến làm việc." },
+            { id: 15, hoTen: "Lý Sồi Cóng", doiTuong: "Sú Chống Hìn", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đang niêm yết Thông báo xác định trách nhiệm tại UBND xã." },
+            { id: 16, hoTen: "Lý Thị Hồng Kiều", doiTuong: "Lý Văn Tư", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 1. Đang chờ phản hồi của hộ." },
+            { id: 17, hoTen: "Lý Văn Tư", doiTuong: "Lý Văn Tư", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết Thông báo xác định trách nhiệm." },
+            { id: 18, hoTen: "Lý Phúc Vinh", doiTuong: "Lý Phúc Vinh", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 2. Hộ vắng mặt." },
+            { id: 19, hoTen: "Lý Viết Mông", doiTuong: "Lý Viết Mông", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm hợp đồng." },
+            { id: 20, hoTen: "Nguyễn Phú Vấn", doiTuong: "Nguyễn Phú Vấn", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "VP mới / Đang mời lần 3. Chưa đến làm việc." },
+            { id: 21, hoTen: "Lý Tài Thanh", doiTuong: "Lý Tài Thanh", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đang niêm yết Thông báo làm việc xác định trách nhiệm." },
+            { id: 22, hoTen: "Vòng A Cẩu", doiTuong: "Vòng A Cẩu", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 1. Hộ chưa chấp hành." },
+            { id: 23, hoTen: "Đặng Thanh Tuấn", doiTuong: "Đặng Thanh Tuấn", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã phát hành Thông báo làm việc 15 ngày." },
+            { id: 24, hoTen: "Phùn Tài Múi", doiTuong: "Phùn Tài Múi", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 2. Đang chờ hộ đến." },
+            { id: 25, hoTen: "Hoàng Văn Sinh", doiTuong: "Hoàng Văn Sinh", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết công khai Thông báo làm việc." },
+            { id: 26, hoTen: "Mai Văn Xuân", doiTuong: "Mai Văn Xuân", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết Thông báo làm việc xác định trách nhiệm." },
+            { id: 27, hoTen: "Trần Minh Hùng", doiTuong: "Triệu Thị Nhịt", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời làm việc lần 1 và lần 2." },
+            { id: 28, hoTen: "Trần Minh Cường", doiTuong: "Trần Minh Cường", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã phát hành Thông báo xác định trách nhiệm." },
+            { id: 29, hoTen: "Vy Chung Chắn", doiTuong: "Bàn Văn Triều", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đang trong giai đoạn mời làm việc lần 3." },
+            { id: 30, hoTen: "Nguyễn Văn Thêm", doiTuong: "Nguyễn Văn Thêm", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết công khai TB 15 ngày." },
+            { id: 31, hoTen: "Nguyễn Thị Sáu", doiTuong: "Nguyễn Thị Sáu", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm hợp đồng." },
+            { id: 32, hoTen: "Lý Thị Hương", doiTuong: "Lý Thị Hương", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 1. Chưa có phản hồi." },
+            { id: 33, hoTen: "Lê Thị Huệ", doiTuong: "Lê Thị Huệ", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB làm việc xác định trách nhiệm." },
+            { id: 34, hoTen: "Nguyễn Thị Thanh Bình", doiTuong: "Nguyễn Thị Thanh Bình", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm." },
+            { id: 35, hoTen: "Trần Thị Kim Linh", doiTuong: "Trần Thị Kim Linh", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 2. Hộ vắng mặt." },
+            { id: 36, hoTen: "Thạch Thanh", doiTuong: "Thạch Thanh", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB làm việc xác định trách nhiệm." },
+            { id: 37, hoTen: "Đặng Thị Bốn", doiTuong: "Đặng Thị Bốn", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết công khai Thông báo xác định trách nhiệm." },
+            { id: 38, hoTen: "Phạm Thị Thanh Xuân", doiTuong: "Phạm Thị Thanh Xuân", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm hợp đồng." },
+            { id: 39, hoTen: "Nguyễn Văn Mạnh", doiTuong: "Nguyễn Văn Mạnh", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 3. Đang chờ hộ chấp hành." },
+            { id: 40, hoTen: "Phạm Văn Trường", doiTuong: "Phạm Văn Trường", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm." },
+            { id: 41, hoTen: "Lý Say Khì", doiTuong: "Lý Say Khì", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết Thông báo làm việc xác định trách nhiệm." },
+            { id: 42, hoTen: "Sú Cẩu Múi", doiTuong: "Dìn A Cún", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 1. Chưa đến làm việc." },
+            { id: 43, hoTen: "Đỗ Văn Thỏa", doiTuong: "Đỗ Văn Thỏa", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm hợp đồng." },
+            { id: 44, hoTen: "Nguyễn Thị Mỹ Lệ", doiTuong: "Nguyễn Thị Mỹ Lệ", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết Thông báo xác định trách nhiệm." },
+            { id: 45, hoTen: "Trần Văn Đoàn", doiTuong: "Trần Văn Đoàn", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết công khai Thông báo làm việc." },
+            { id: 46, hoTen: "Hồ Đắc Thành", doiTuong: "Hồ Đắc Thành", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm." },
+            { id: 47, hoTen: "Lương Văn Hùng", doiTuong: "Lương Văn Hùng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "VP mới / Đang mời lần 2. Hộ chưa phản hồi." },
+            { id: 48, hoTen: "Hoàng Xuân Hòa", doiTuong: "Hoàng Xuân Hòa", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB làm việc xác định trách nhiệm." },
+            { id: 49, hoTen: "Nguyễn Hồng Quân", doiTuong: "Nguyễn Hồng Quân", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết Thông báo xác định trách nhiệm vi phạm hợp đồng." },
+            { id: 50, hoTen: "Nguyễn Phương Nhã Uyên", doiTuong: "Nguyễn Phương Nhã Uyên", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết công khai Thông báo 15 ngày." },
+            { id: 51, hoTen: "Lê Thị Kim Nhi", doiTuong: "Lộc Khánh Sáng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 1 và lần 2. Chưa chấp hành." },
+            { id: 52, hoTen: "Nguyễn Công Khanh", doiTuong: "Nguyễn Công Khanh", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết Thông báo xác định trách nhiệm." },
+            { id: 53, hoTen: "Đặng Minh Lộc", doiTuong: "Đặng Minh Lộc", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Đã niêm yết TB xác định trách nhiệm vi phạm hợp đồng." },
+            { id: 54, hoTen: "Âu Phùng Lần", doiTuong: "Âu Phùng Lần", nhomId: 3, nhomTen: "Đã niêm yết TB xác định trách nhiệm", tinhTrang: "Vi phạm đào múc hồ; đã niêm yết TB xác định trách nhiệm." },
+            { id: 55, hoTen: "Hoàng Thiên Phong", doiTuong: "Hoàng Thiên Phong", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã làm việc, cam kết tháo dỡ công trình vi phạm." },
+            { id: 56, hoTen: "Võ Văn Hùng", doiTuong: "Võ Văn Hùng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 3. Đang chờ hộ đến làm việc." }
+        ];
+
+        let currentViewMode = "summary";
+        let activeEditIndex = -1;
+
+        const NHOM_MAP = {
+            1: { ten: "Vi phạm mới (chưa mời)", badge: "bg-violet-50 text-violet-700 border-violet-200", short: "VP mới chưa mời" },
+            2: { ten: "Đang mời làm việc (lần 1–3)", badge: "bg-sky-50 text-sky-700 border-sky-200", short: "Đang mời LV" },
+            3: { ten: "Chấp hành làm việc / Khắc phục", badge: "bg-emerald-50 text-emerald-700 border-emerald-200", short: "Chấp hành / KP" },
+            4: { ten: "Đã niêm yết TB xác định trách nhiệm", badge: "bg-amber-50 text-amber-700 border-amber-200", short: "Đã niêm yết" },
+            5: { ten: "Đã ban hành QĐ chấm dứt, thu hồi HĐ", badge: "bg-rose-50 text-rose-700 border-rose-200", short: "Chấm dứt HĐ" }
+        };
+
+        function detectNhom(alText, amText) {
+            // 1 = VP mới chưa mời (AL trống)
+            // 2 = Đang mời lần 1–3
+            // 3 = Chấp hành / Khắc phục
+            // 4 = Đã niêm yết
+            // 5 = Chấm dứt HĐ
+            const al = (alText || "").toLowerCase().trim();
+            const am = (amText || "").toLowerCase().trim();
+            const both = al + " " + am;
+
+            if (al.includes("chấm dứt") || al.includes("thu hồi") || both.includes("quyết định chấm")) return 5;
+
+            if (am.includes("đến làm việc") && (
+                am.includes("cam kết") || am.includes("khắc phục") || am.includes("tháo dỡ") ||
+                am.includes("chấp hành") || am.includes("ký biên bản") || am.includes("thừa nhận") ||
+                am.includes("nhìn nhận") || am.includes("chủ động")
+            )) return 3;
+            if (am.includes("cam kết khắc phục") || am.includes("chủ động tháo dỡ") || am.includes("đã khắc phục")) return 3;
+
+            if (al.includes("thông báo") || al.includes("niêm yết") || al.includes("xác định trách nhiệm")) return 4;
+
+            // AL có mời lần 1/2/3 → Đang mời
+            if (al.includes("mời làm việc") || al.includes("đã mời") || /lần\s*[123]/.test(al)) return 2;
+
+            if (am.includes("không đến")) {
+                if (al.includes("thông báo")) return 4;
+                return 2; // đã mời nhưng không đến
+            }
+
+            // AL trống → Vi phạm mới (chưa mời)
+            if (!al) return 1;
+
+            return 1;
+        }
+
+
+        function switchMainView(mode) {
+            currentViewMode = mode;
+            const btnSummary = document.getElementById('viewSummaryBtn');
+            const btnDetail = document.getElementById('viewDetailBtn');
+            const btnStats = document.getElementById('viewStatsBtn');
+            const activeCls = "py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5";
+            const inactiveCls = "py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5";
+            if (btnSummary) btnSummary.className = mode === 'summary' ? activeCls : inactiveCls;
+            if (btnDetail) btnDetail.className = mode === 'detail' ? activeCls : inactiveCls;
+            if (btnStats) btnStats.className = mode === 'stats' ? activeCls : inactiveCls;
+
+            const tableWrap = document.getElementById('dataTableWrap');
+            const chartsSec = document.getElementById('chartsSection');
+            const statsPanel = document.getElementById('statsPanel');
+
+            if (mode === 'stats') {
+                if (tableWrap) tableWrap.classList.add('hidden');
+                if (chartsSec) chartsSec.classList.add('hidden');
+                if (statsPanel) statsPanel.classList.remove('hidden');
+                renderStats();
+            } else {
+                if (tableWrap) tableWrap.classList.remove('hidden');
+                if (chartsSec) chartsSec.classList.remove('hidden');
+                if (statsPanel) statsPanel.classList.add('hidden');
+                renderTable();
+            }
+        }
+
+        function renderTable() {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+
+            const countVpMoi = detailedCases.filter(c => c.nhomId === 1).length;
+            const countMoi = detailedCases.filter(c => c.nhomId === 2).length;
+            const countKhacPhuc = detailedCases.filter(c => c.nhomId === 3).length;
+            const countNiemYet = detailedCases.filter(c => c.nhomId === 4).length;
+            const countChamDut = detailedCases.filter(c => c.nhomId === 5).length;
+
+            document.getElementById('statTotalCases').innerText = detailedCases.length;
+            const elVp = document.getElementById('statVpMoi'); if (elVp) elVp.innerText = countVpMoi + " hộ";
+            document.getElementById('statMoiLamViec').innerText = countMoi + " hộ";
+            document.getElementById('statKhacPhuc').innerText = countKhacPhuc + " hộ";
+            document.getElementById('statNiemYet').innerText = countNiemYet + " hộ";
+            document.getElementById('statChamDut').innerText = countChamDut + " hộ";
+
+            const badge = document.getElementById('syncStatusBadge');
+            if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 badge-pulse"></span> Sẵn sàng ${detailedCases.length} hồ sơ`;
+
+            if (currentViewMode === 'summary') {
+                thead.innerHTML = `
+                    <tr class="bg-slate-100/80 text-slate-600 text-[11px] uppercase font-semibold tracking-wider border-b border-slate-200">
+                        <th class="py-3 px-3 w-12 text-center border-r border-slate-200">STT</th>
+                        <th class="py-3 px-3 w-1/4 border-r border-slate-200">Nhóm kết quả xử lý</th>
+                        <th class="py-3 px-3 w-1/3 border-r border-slate-200">Tình trạng thực hiện</th>
+                        <th class="py-3 px-3 border-r border-slate-200">Các trường hợp điển hình</th>
+                        <th class="py-3 px-2 w-16 text-center no-export">Thao tác</th>
+                    </tr>`;
+
+                const summaryGroups = [
+                    {
+                        stt: 1, nhomId: 1,
+                        nhom: "Vi phạm mới (chưa mời)",
+                        tinhTrang: "Hộ có STT trên sheet nhưng cột AL (Mời làm việc) còn trống – vi phạm mới, chưa gửi giấy mời.",
+                        cases: detailedCases.filter(c => c.nhomId === 1),
+                        badgeClass: NHOM_MAP[1].badge
+                    },
+                    {
+                        stt: 2, nhomId: 2,
+                        nhom: "Đang mời làm việc (lần 1–3)",
+                        tinhTrang: "Đã gửi giấy mời lần 1, 2 hoặc 3. Hộ chưa đến làm việc / chưa có phản hồi chính thức.",
+                        cases: detailedCases.filter(c => c.nhomId === 2),
+                        badgeClass: NHOM_MAP[2].badge
+                    },
+                    {
+                        stt: 3, nhomId: 3,
+                        nhom: "Chấp hành làm việc / Khắc phục hậu quả",
+                        tinhTrang: "Hộ đã đến làm việc, cam kết khắc phục hoặc tự nguyện tháo dỡ công trình vi phạm.",
+                        cases: detailedCases.filter(c => c.nhomId === 3),
+                        badgeClass: NHOM_MAP[3].badge
+                    },
+                    {
+                        stt: 4, nhomId: 4,
+                        nhom: "Đã phát hành & niêm yết Thông báo xác định trách nhiệm",
+                        tinhTrang: "Mời 03 lần không đến; đã niêm yết Thông báo làm việc 15 ngày.",
+                        cases: detailedCases.filter(c => c.nhomId === 4),
+                        badgeClass: NHOM_MAP[4].badge
+                    },
+                    {
+                        stt: 5, nhomId: 5,
+                        nhom: "Đã ban hành Quyết định chấm dứt, thu hồi hợp đồng",
+                        tinhTrang: "Quá thời hạn thông báo; đã ban hành QĐ chấm dứt HĐ và thu hồi đất.",
+                        cases: detailedCases.filter(c => c.nhomId === 5),
+                        badgeClass: NHOM_MAP[5].badge
+                    }
+                ];
+
+                tbody.innerHTML = '';
+                summaryGroups.forEach(grp => {
+                    const tr = document.createElement('tr');
+                    tr.className = "table-row-hover transition-colors";
+                    const casesHtml = grp.cases.length
+                        ? grp.cases.map(item => `
+                            <li class="flex items-start gap-1.5 py-0.5">
+                                <span class="text-sheets-700 font-bold text-[10px] mt-0.5">•</span>
+                                <span class="text-[11px] leading-snug"><strong>${escapeHtml(item.hoTen)}</strong>${item.doiTuong && item.doiTuong !== item.hoTen ? ' <span class="text-slate-500">(' + escapeHtml(item.doiTuong) + ')</span>' : ''}: ${escapeHtml(item.tinhTrang)}</span>
+                            </li>`).join('')
+                        : '<li class="text-[11px] text-slate-400 italic">Chưa có hộ nào trong nhóm này</li>';
+
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-3 text-center font-bold text-slate-600 border-r border-slate-100 bg-slate-50/50 align-top">${grp.stt}</td>
+                        <td class="py-3.5 px-3 border-r border-slate-100 align-top">
+                            <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-semibold border ${grp.badgeClass}">
+                                ${escapeHtml(grp.nhom)} <span class="opacity-80">(${grp.cases.length})</span>
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-3 border-r border-slate-100 text-slate-600 align-top text-[12px] leading-relaxed">${escapeHtml(grp.tinhTrang)}</td>
+                        <td class="py-3.5 px-3 border-r border-slate-100 text-slate-700 align-top">
+                            <ul class="space-y-0.5 max-h-52 overflow-y-auto custom-scrollbar pr-1">${casesHtml}</ul>
+                        </td>
+                        <td class="py-3.5 px-2 text-center align-top no-export">
+                            <button onclick="switchMainView('detail')" class="text-[11px] text-blue-600 hover:bg-blue-50 px-2 py-1 rounded transition font-medium">Chi tiết</button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                thead.innerHTML = `
+                    <tr class="bg-slate-100/80 text-slate-600 text-[11px] uppercase font-semibold tracking-wider border-b border-slate-200">
+                        <th class="py-3 px-3 w-12 text-center border-r border-slate-200">STT</th>
+                        <th class="py-3 px-3 w-1/5 border-r border-slate-200">Hộ nhận khoán</th>
+                        <th class="py-3 px-3 w-1/5 border-r border-slate-200">Đối tượng liên quan</th>
+                        <th class="py-3 px-3 w-1/4 border-r border-slate-200">Nhóm xử lý</th>
+                        <th class="py-3 px-3 border-r border-slate-200">Tình trạng chi tiết</th>
+                        <th class="py-3 px-2 w-16 text-center no-export">Thao tác</th>
+                    </tr>`;
+
+                tbody.innerHTML = '';
+                detailedCases.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "table-row-hover transition-colors";
+                    const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[3];
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 text-center font-bold text-slate-600 border-r border-slate-100 bg-slate-50/40">${index + 1}</td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-100 align-top text-[13px]">${escapeHtml(item.hoTen)}</td>
+                        <td class="py-2.5 px-3 text-slate-600 border-r border-slate-100 align-top text-[12px]">${escapeHtml(item.doiTuong || '—')}</td>
+                        <td class="py-2.5 px-3 border-r border-slate-100 align-top">
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${meta.badge}">${escapeHtml(meta.short)}</span>
+                        </td>
+                        <td class="py-2.5 px-3 border-r border-slate-100 text-slate-600 align-top text-[12px] leading-relaxed">${escapeHtml(item.tinhTrang)}</td>
+                        <td class="py-2.5 px-2 text-center align-top no-export">
+                            <div class="flex items-center justify-center gap-0.5">
+                                <button onclick="editDetailRow(${index})" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition" title="Sửa"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                                <button onclick="deleteDetailRow(${index})" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            </div>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        function copyForGoogleSheets() {
+            let tsv = "";
+            if (currentViewMode === 'summary') {
+                tsv = "STT\tNhóm kết quả xử lý\tTình trạng thực hiện\tCác trường hợp vi phạm điển hình\n";
+                const groups = [
+                    { stt: 1, nhom: "Vi phạm mới (chưa mời)", tinhTrang: "AL trống – chưa gửi giấy mời.", cases: detailedCases.filter(c => c.nhomId === 1) },
+                    { stt: 2, nhom: "Đang mời làm việc (lần 1–3)", tinhTrang: "Đã gửi giấy mời lần 1–3.", cases: detailedCases.filter(c => c.nhomId === 2) },
+                    { stt: 3, nhom: "Chấp hành / Khắc phục", tinhTrang: "Đã đến làm việc, cam kết khắc phục.", cases: detailedCases.filter(c => c.nhomId === 3) },
+                    { stt: 4, nhom: "Đã niêm yết TB", tinhTrang: "Đã niêm yết Thông báo 15 ngày.", cases: detailedCases.filter(c => c.nhomId === 4) },
+                    { stt: 5, nhom: "Đã chấm dứt HĐ", tinhTrang: "Đã ban hành QĐ thu hồi đất.", cases: detailedCases.filter(c => c.nhomId === 5) }
+                ];
+                groups.forEach(g => {
+                    const casesText = g.cases.map(c => `- ${c.hoTen}${c.doiTuong ? ' (' + c.doiTuong + ')' : ''}: ${c.tinhTrang}`).join("\n");
+                    tsv += `${g.stt}\t"${g.nhom.replace(/"/g, '""')}"\t"${g.tinhTrang.replace(/"/g, '""')}"\t"${casesText.replace(/"/g, '""')}"\n`;
+                });
+            } else {
+                tsv = "STT\tHộ nhận khoán vi phạm\tĐối tượng liên quan\tNhóm kết quả xử lý\tTình trạng thực hiện chi tiết\n";
+                detailedCases.forEach((item, idx) => {
+                    tsv += `${idx + 1}\t"${item.hoTen.replace(/"/g, '""')}"\t"${(item.doiTuong || '').replace(/"/g, '""')}"\t"${item.nhomTen.replace(/"/g, '""')}"\t"${item.tinhTrang.replace(/"/g, '""')}"\n`;
+                });
+            }
+            const ta = document.createElement('textarea');
+            ta.value = tsv;
+            ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast("Đã chép! Mở Google Sheets → Ctrl+V để dán.", "success");
+            } catch (e) {
+                showToast("Lỗi sao chép. Thử lại.", "error");
+            }
+            document.body.removeChild(ta);
+        }
+
+        function exportToExcel() {
+            let data = [];
+            if (currentViewMode === 'summary') {
+                data = [
+                    { STT: 1, "Nhóm": "VP mới (chưa mời)", "Tình trạng": "AL trống", "Các hộ": detailedCases.filter(c => c.nhomId === 1).map(c => c.hoTen).join("; ") },
+                    { STT: 2, "Nhóm": "Đang mời LV (lần 1–3)", "Tình trạng": "Đã gửi giấy mời", "Các hộ": detailedCases.filter(c => c.nhomId === 2).map(c => c.hoTen).join("; ") },
+                    { STT: 3, "Nhóm": "Chấp hành / Khắc phục", "Tình trạng": "Đã làm việc & cam kết", "Các hộ": detailedCases.filter(c => c.nhomId === 3).map(c => c.hoTen).join("; ") },
+                    { STT: 4, "Nhóm": "Đã niêm yết TB", "Tình trạng": "Đã niêm yết Thông báo", "Các hộ": detailedCases.filter(c => c.nhomId === 4).map(c => c.hoTen).join("; ") },
+                    { STT: 5, "Nhóm": "Đã chấm dứt HĐ", "Tình trạng": "Đã ban hành QĐ thu hồi", "Các hộ": detailedCases.filter(c => c.nhomId === 5).map(c => c.hoTen).join("; ") }
+                ];
+            } else {
+                data = detailedCases.map((item, idx) => ({
+                    STT: idx + 1,
+                    "Hộ nhận khoán": item.hoTen,
+                    "Đối tượng liên quan": item.doiTuong,
+                    "Nhóm xử lý": item.nhomTen,
+                    "Tình trạng": item.tinhTrang
+                }));
+            }
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "ViPhamLamNghiep");
+            XLSX.writeFile(wb, "BaoCao_XuLyViPham.xlsx");
+            showToast("Đã xuất file Excel thành công!");
+        }
+
+        function exportToCSV() {
+            let csv = "\uFEFFSTT,Hộ nhận khoán,Đối tượng liên quan,Nhóm xử lý,Tình trạng chi tiết\n";
+            detailedCases.forEach((item, idx) => {
+                csv += `"${idx + 1}","${item.hoTen.replace(/"/g, '""')}","${(item.doiTuong || '').replace(/"/g, '""')}","${item.nhomTen.replace(/"/g, '""')}","${item.tinhTrang.replace(/"/g, '""')}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "BaoCao_XuLyViPham.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Đã tải file CSV!");
+        }
+
+        function openSyncModal() { document.getElementById('syncModal').classList.remove('hidden'); }
+        function closeSyncModal() { document.getElementById('syncModal').classList.add('hidden'); }
+
+        function switchSyncTab(tab) {
+            const b1 = document.getElementById('tabBtn1'), b2 = document.getElementById('tabBtn2');
+            const c1 = document.getElementById('tabContent1'), c2 = document.getElementById('tabContent2');
+            if (tab === 1) {
+                b1.className = "flex-1 py-2.5 px-3 text-center border-b-2 border-emerald-600 text-emerald-800 font-bold bg-white transition";
+                b2.className = "flex-1 py-2.5 px-3 text-center border-b-2 border-transparent hover:text-slate-900 transition";
+                c1.classList.remove('hidden'); c2.classList.add('hidden');
+            } else {
+                b2.className = "flex-1 py-2.5 px-3 text-center border-b-2 border-emerald-600 text-emerald-800 font-bold bg-white transition";
+                b1.className = "flex-1 py-2.5 px-3 text-center border-b-2 border-transparent hover:text-slate-900 transition";
+                c2.classList.remove('hidden'); c1.classList.add('hidden');
+            }
+        }
+
+        function parseGoogleSheetParams(url) {
+            const idMatch = url.trim().match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (!idMatch) throw new Error("Link Google Sheets không đúng định dạng!");
+            let gid = "0";
+            const gidMatch = url.match(/gid=([0-9]+)/);
+            if (gidMatch) gid = gidMatch[1];
+            return { spreadsheetId: idMatch[1], gid };
+        }
+
+        async function fetchViaJSONP(silent = false) {
+            const rawUrl = document.getElementById('sheetCsvUrl').value.trim();
+            if (!rawUrl) {
+                if (!silent) showToast("Vui lòng nhập link Google Sheets!", "error");
+                return;
+            }
+            const icon = document.getElementById('syncIcon');
+            if (icon) icon.classList.add('fa-spin');
+            try {
+                const { spreadsheetId, gid } = parseGoogleSheetParams(rawUrl);
+                const table = await executeJSONPQuery(spreadsheetId, gid);
+                parseGVizDataToRows(table);
+                lastSyncTime = new Date();
+                updateSyncBadge();
+                if (!silent) {
+                    showToast("Đã đồng bộ thành công từ Google Sheets!");
+                    closeSyncModal();
+                }
+            } catch (err) {
+                if (!silent) showToast(err.message || "Không thể truy cập. Kiểm tra quyền chia sẻ!", "error");
+                console.warn("Sync error:", err.message);
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
+            }
+        }
+
+        function executeJSONPQuery(spreadsheetId, gid) {
+            return new Promise((resolve, reject) => {
+                const cb = 'gviz_cb_' + Math.floor(Math.random() * 1e6);
+                const script = document.createElement('script');
+                const timeout = setTimeout(() => {
+                    delete window[cb];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                    reject(new Error("Hết thời gian chờ. Kiểm tra quyền 'Anyone with the link can view'!"));
+                }, 12000);
+                window[cb] = function(resp) {
+                    clearTimeout(timeout);
+                    delete window[cb];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                    if (resp && resp.status === 'error') reject(new Error(resp.errors?.[0]?.detailed_message || "Chưa cấp quyền xem"));
+                    else if (resp && resp.table) resolve(resp.table);
+                    else reject(new Error("Dữ liệu rỗng hoặc sai cấu trúc"));
+                };
+                script.src = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?gid=${gid}&tqx=responseHandler:${cb}`;
+                script.onerror = () => {
+                    clearTimeout(timeout);
+                    delete window[cb];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                    reject(new Error("Lỗi tải. Đảm bảo sheet được chia sẻ công khai!"));
+                };
+                document.body.appendChild(script);
+            });
+        }
+
+        // Chỉ lấy dòng có STT số; dòng phụ (cùng hộ, loài cây khác) được gộp metrics
+        // AL(37)=nhóm, AM(38)=tình trạng, Y(24)=hành vi, AB(27)=m2, AC(28)=ha
+        // AD(29)=loài cây, AF(31)=số lượng, AG(32)=khối lượng m3, V(21)=ngày BB
+        function parseNum(s) {
+            if (!s) return 0;
+            const n = parseFloat(String(s).replace(/,/g, '.').replace(/[^\d.\-]/g, ''));
+            return isNaN(n) ? 0 : n;
+        }
+
+        
+        // Quy tắc tính thiệt hại theo hành vi:
+        // - Xây dựng / Đào múc hồ: chỉ m² (AB), KHÔNG tính cây
+        // - Phá hoại: số cây (AF) + m² (AB)
+        // - Khai thác gỗ lớn (Sao, Dầu, Xà cừ…): số cây (AF) + m³ (AG)
+        // - Khai thác Điều / Keo lai / Cao su: CHỈ ha (AC)
+        function isCropSpecies(loai) {
+            const L = (loai || "").toLowerCase();
+            return L.includes("điều") || L.includes("dieu") || L.includes("keo") || L.includes("cao su");
+        }
+
+        function computeCaseMetrics(c) {
+            const hv = (c.hanhVi || "").toLowerCase();
+            let cayGoLon = 0, khoiLuongM3 = 0, dienTichM2 = 0;
+            let haDieu = 0, haKeo = 0, haCaoSu = 0, haKhac = 0;
+
+            const isXayDung = hv.includes("xây dựng") || hv.includes("xay dung");
+            const isDaoMuc = hv.includes("đào") || hv.includes("múc hồ") || hv.includes("dao muc");
+            const isPhaHoai = hv.includes("phá hoại") || hv.includes("pha hoai");
+            const isKhaiThac = hv.includes("khai thác") || hv.includes("khai thac");
+
+            (c.species || []).forEach(s => {
+                const loai = s.loai || "";
+                const crop = isCropSpecies(loai);
+                const L = loai.toLowerCase();
+
+                if (isXayDung || isDaoMuc) {
+                    dienTichM2 += s.dienTichM2 || 0;
+                } else if (isPhaHoai) {
+                    cayGoLon += s.soLuong || 0;
+                    dienTichM2 += s.dienTichM2 || 0;
+                } else if (isKhaiThac) {
+                    if (crop) {
+                        const ha = s.dienTichHa || 0;
+                        if (L.includes("điều") || L.includes("dieu")) haDieu += ha;
+                        else if (L.includes("keo")) haKeo += ha;
+                        else if (L.includes("cao su")) haCaoSu += ha;
+                        else haKhac += ha;
+                    } else {
+                        cayGoLon += s.soLuong || 0;
+                        khoiLuongM3 += s.khoiLuongM3 || 0;
+                    }
+                } else {
+                    // fallback
+                    if (crop) {
+                        haKhac += s.dienTichHa || 0;
+                    } else {
+                        cayGoLon += s.soLuong || 0;
+                        khoiLuongM3 += s.khoiLuongM3 || 0;
+                        dienTichM2 += s.dienTichM2 || 0;
+                    }
+                }
+            });
+
+            return {
+                cayGoLon, khoiLuongM3, dienTichM2,
+                dienTichHa: haDieu + haKeo + haCaoSu + haKhac,
+                haDieu, haKeo, haCaoSu,
+                isXayDung, isDaoMuc, isPhaHoai, isKhaiThac
+            };
+        }
+
+
+        function parseGVizDataToRows(table) {
+            if (!table?.rows?.length) throw new Error("Không tìm thấy dữ liệu!");
+            const newCases = [];
+            let current = null;
+            const hasWideCols = (table.cols && table.cols.length > 38);
+
+            table.rows.forEach((r, idx) => {
+                if (!r.c) return;
+                const getVal = (i) => (r.c[i] ? (r.c[i].f || r.c[i].v || "") : "").toString().trim();
+
+                const colSTT = getVal(0);
+                const colHo1 = getVal(1);
+                const colHo2 = getVal(2);
+                const colDoiTuong = getVal(40) || getVal(3);
+                const colPhanTruong = getVal(16);
+                const colXa = getVal(18);
+                const colNgay = getVal(21);
+                const colHanhVi = getVal(24);
+                const colHanhViCT = getVal(25);
+                const colM2 = getVal(27);
+                const colHa = getVal(28);
+                const colLoai = getVal(29);
+                const colSL = getVal(31);
+                const colM3 = getVal(32);
+                const colAL = hasWideCols ? getVal(37) : (getVal(3) || getVal(4));
+                const colAM = hasWideCols ? getVal(38) : (getVal(4) || getVal(3));
+
+                if (idx === 0 && (colSTT.toUpperCase() === 'STT' || colSTT === '3' || colHo1.toLowerCase().includes('hộ') || colHo1 === '2')) return;
+                if (!colSTT && !colHo1 && !colHo2 && !colAL && !colAM && !colLoai && !colSL && !colM3 && !colHa && !colM2) return;
+
+                const isNumbered = /^\d+$/.test(colSTT);
+                const speciesLine = {
+                    loai: colLoai || "",
+                    soLuong: parseNum(colSL),
+                    khoiLuongM3: parseNum(colM3),
+                    dienTichHa: parseNum(colHa),
+                    dienTichM2: parseNum(colM2)
+                };
+
+                if (isNumbered) {
+                    if (current) newCases.push(current);
+                    const hoTen = colHo1 || colHo2 || ("Hộ #" + colSTT);
+                    const nhomId = detectNhom(colAL, colAM);
+                    current = {
+                        id: newCases.length + 1,
+                        hoTen: hoTen,
+                        doiTuong: colDoiTuong || hoTen,
+                        nhomId: nhomId,
+                        nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[1].ten,
+                        tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
+                        phanTruong: colPhanTruong || "—",
+                        xa: colXa || "—",
+                        hanhVi: colHanhVi || colHanhViCT || "—",
+                        ngayViPham: colNgay || "",
+                        species: (colLoai || colSL || colM3 || colHa || colM2) ? [speciesLine] : [],
+                        // totals
+                        soLuong: speciesLine.soLuong,
+                        khoiLuongM3: speciesLine.khoiLuongM3,
+                        dienTichHa: speciesLine.dienTichHa,
+                        dienTichM2: speciesLine.dienTichM2
+                    };
+                } else if (current) {
+                    // Dòng phụ: cùng hộ, loài khác hoặc thông tin bổ sung → cộng dồn
+                    if (colLoai || colSL || colM3 || colHa || colM2) {
+                        current.species.push(speciesLine);
+                        current.soLuong += speciesLine.soLuong;
+                        current.khoiLuongM3 += speciesLine.khoiLuongM3;
+                        current.dienTichHa += speciesLine.dienTichHa;
+                        current.dienTichM2 += speciesLine.dienTichM2;
+                    }
+                    const extras = [colHo1, colHo2, colAL, colAM].filter(v => v && v !== current.hoTen);
+                    if (extras.length) current.tinhTrang += (current.tinhTrang ? "\n" : "") + extras.join(" | ");
+                    if (colPhanTruong && current.phanTruong === "—") current.phanTruong = colPhanTruong;
+                    if (colXa && current.xa === "—") current.xa = colXa;
+                    if (colHanhVi && current.hanhVi === "—") current.hanhVi = colHanhVi;
+                    if (colNgay && !current.ngayViPham) current.ngayViPham = colNgay;
+                }
+            });
+            if (current) newCases.push(current);
+
+            if (newCases.length === 0) throw new Error("Không trích xuất được dòng có STT hợp lệ!");
+            detailedCases = newCases;
+            renderTable();
+            renderCharts();
+            if (typeof renderStats === 'function') renderStats();
+        }
+
+function parsePastedTextData() {
+            const text = document.getElementById('pastedDataInput').value.trim();
+            if (!text) { showToast("Vui lòng dán nội dung từ Google Sheets!", "error"); return; }
+            try {
+                const wb = XLSX.read(text, { type: 'string' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                if (!rows?.length) throw new Error("Dữ liệu rỗng!");
+
+                let idxAL = 37, idxAM = 38, idxHo = 1, idxDoiTuong = 40, idxPT = 16, idxXa = 18;
+                const header = (rows[0] || []).map(c => String(c || '').toLowerCase().replace(/\\n/g, ' ').trim());
+                header.forEach((h, i) => {
+                    if (h.includes('mời làm việc') || h.includes('xử lý theo hợp đồng')) idxAL = i;
+                    if (h === 'kết quả' || (h.includes('kết quả') && !h.includes('xử lý'))) idxAM = i;
+                    if (h.includes('hộ canh tác') || h.includes('hộ vi phạm') || h.includes('hộ nhận')) idxHo = i;
+                    if (h.includes('đối tượng') && !h.includes('rừng')) idxDoiTuong = i;
+                    if (h.includes('phân trường') || h.includes('phân  trường')) idxPT = i;
+                    if (h.includes('địa bàn') || h.includes('xã')) idxXa = i;
+                });
+
+                const newCases = [];
+                let current = null;
+
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i] || [];
+                    const get = (idx) => String(row[idx] ?? '').trim();
+
+                    const colSTT = get(0);
+                    const colHo = get(idxHo) || get(1) || get(2);
+                    const colAL = get(idxAL);
+                    const colAM = get(idxAM);
+                    const colDoiTuong = get(idxDoiTuong) || get(3);
+                    const colPT = get(idxPT);
+                    const colXa = get(idxXa);
+
+                    if (i === 0 && (colSTT.toUpperCase() === 'STT' || colHo.toLowerCase().includes('hộ'))) continue;
+                    if (!colSTT && !colHo && !colAL && !colAM) continue;
+
+                    const isNumbered = /^\\d+$/.test(colSTT);
+
+                    if (isNumbered) {
+                        if (current) newCases.push(current);
+                        const nhomId = detectNhom(colAL, colAM);
+                        current = {
+                            id: newCases.length + 1,
+                            hoTen: colHo || ("Hộ #" + colSTT),
+                            doiTuong: colDoiTuong || colHo,
+                            nhomId,
+                            nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[3].ten,
+                            tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
+                            phanTruong: colPT || "—",
+                            xa: colXa || "—"
+                        };
+                    } else if (current) {
+                        const extras = [colHo, colAL, colAM].filter(v => v && v !== current.hoTen);
+                        if (extras.length) current.tinhTrang += (current.tinhTrang ? "\\n" : "") + extras.join(" | ");
+                        if (colPT && current.phanTruong === "—") current.phanTruong = colPT;
+                        if (colXa && current.xa === "—") current.xa = colXa;
+                    }
+                }
+                if (current) newCases.push(current);
+
+                if (newCases.length === 0) { showToast("Không tìm thấy dòng có STT hợp lệ!", "error"); return; }
+                detailedCases = newCases;
+                renderTable();
+                renderCharts();
+                closeSyncModal();
+                showToast(`Đã nhập thành công ${newCases.length} hộ (AL→nhóm, AM→tình trạng)!`);
+            } catch (e) {
+                console.error(e);
+                showToast("Lỗi phân tích dữ liệu. Thử lại!", "error");
+            }
+        }
+
+function filterTable() {
+            const q = document.getElementById('tableSearchInput').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#tableBody tr');
+            if (currentViewMode !== 'detail') return;
+            detailedCases.forEach((item, idx) => {
+                const row = rows[idx];
+                if (!row) return;
+                const match = item.hoTen.toLowerCase().includes(q) ||
+                    (item.doiTuong && item.doiTuong.toLowerCase().includes(q)) ||
+                    item.tinhTrang.toLowerCase().includes(q) ||
+                    item.nhomTen.toLowerCase().includes(q);
+                row.style.display = match ? '' : 'none';
+            });
+        }
+
+        function addNewRowModal() {
+            activeEditIndex = -1;
+            document.getElementById('modalTitle').innerText = "Thêm hộ vi phạm mới";
+            document.getElementById('inputHoTen').value = "";
+            document.getElementById('inputDoiTuong').value = "";
+            document.getElementById('inputNhomId').value = "1";
+            document.getElementById('inputTinhTrang').value = "";
+            document.getElementById('rowModal').classList.remove('hidden');
+        }
+
+        function editDetailRow(index) {
+            activeEditIndex = index;
+            const item = detailedCases[index];
+            document.getElementById('modalTitle').innerText = "Chỉnh sửa hộ #" + (index + 1);
+            document.getElementById('inputHoTen').value = item.hoTen;
+            document.getElementById('inputDoiTuong').value = item.doiTuong || "";
+            document.getElementById('inputNhomId').value = item.nhomId;
+            document.getElementById('inputTinhTrang').value = item.tinhTrang;
+            document.getElementById('rowModal').classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('rowModal').classList.add('hidden'); }
+
+        function saveRow() {
+            const hoTen = document.getElementById('inputHoTen').value.trim();
+            const doiTuong = document.getElementById('inputDoiTuong').value.trim();
+            const nhomId = parseInt(document.getElementById('inputNhomId').value) || 1;
+            const tinhTrang = document.getElementById('inputTinhTrang').value.trim();
+            if (!hoTen) { showToast("Vui lòng nhập tên hộ!", "error"); return; }
+
+            const itemData = {
+                id: activeEditIndex >= 0 ? detailedCases[activeEditIndex].id : detailedCases.length + 1,
+                hoTen,
+                doiTuong: doiTuong || hoTen,
+                nhomId,
+                nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[3].ten,
+                tinhTrang: tinhTrang || "Đang xử lý theo quy định.",
+                phanTruong: activeEditIndex >= 0 ? (detailedCases[activeEditIndex].phanTruong || "—") : "—",
+                xa: activeEditIndex >= 0 ? (detailedCases[activeEditIndex].xa || "—") : "—"
+            };
+
+            if (activeEditIndex >= 0) {
+                detailedCases[activeEditIndex] = itemData;
+                showToast("Đã cập nhật hộ vi phạm!");
+            } else {
+                detailedCases.push(itemData);
+                showToast("Đã thêm hộ mới!");
+            }
+            closeModal();
+            renderTable();
+            renderCharts();
+        }
+
+        function deleteDetailRow(index) {
+            if (detailedCases.length <= 1) { showToast("Phải giữ tối thiểu 1 dòng!", "error"); return; }
+            detailedCases.splice(index, 1);
+            renderTable();
+            renderCharts();
+            showToast("Đã xóa hồ sơ!");
+        }
+
+        function loadSampleData() { location.reload(); }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMessage');
+            const icon = document.getElementById('toastIcon');
+            msgEl.innerText = msg;
+            icon.className = type === "error" ? "fa-solid fa-circle-exclamation text-rose-400" : "fa-solid fa-circle-check text-emerald-400";
+            toast.classList.remove('translate-y-12', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => toast.classList.add('translate-y-12', 'opacity-0', 'pointer-events-none'), 3200);
+        }
+
+        function escapeHtml(t) {
+            if (!t) return "";
+            return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        
+        let chartNhom = null, chartPhanTruong = null, chartXa = null;
+
+        function renderCharts() {
+            if (typeof Chart === 'undefined') return;
+
+            // --- Chart 1: by Nhóm ---
+            const nhomCounts = [1,2,3,4,5].map(id => detailedCases.filter(c => c.nhomId === id).length);
+            const nhomLabels = ['VP mới chưa mời', 'Đang mời LV', 'Tự giác/KP', 'Đã niêm yết', 'Chấm dứt HĐ'];
+            const nhomColors = ['#8b5cf6', '#0ea5e9', '#10b981', '#f59e0b', '#f43f5e'];
+
+            if (chartNhom) chartNhom.destroy();
+            const ctx1 = document.getElementById('chartNhom');
+            if (ctx1) {
+                chartNhom = new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: { labels: nhomLabels, datasets: [{ data: nhomCounts, backgroundColor: nhomColors, borderWidth: 0 }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                    }
+                });
+            }
+
+            // --- Chart 2: by Phân trường ---
+            const ptMap = {};
+            detailedCases.forEach(c => {
+                const k = (c.phanTruong && c.phanTruong !== '—') ? c.phanTruong : 'Khác';
+                ptMap[k] = (ptMap[k] || 0) + 1;
+            });
+            const ptLabels = Object.keys(ptMap);
+            const ptData = Object.values(ptMap);
+
+            if (chartPhanTruong) chartPhanTruong.destroy();
+            const ctx2 = document.getElementById('chartPhanTruong');
+            if (ctx2) {
+                chartPhanTruong = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ptLabels,
+                        datasets: [{ label: 'Số hộ', data: ptData, backgroundColor: '#0ea5e9', borderRadius: 4 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+                    }
+                });
+            }
+
+            // --- Chart 3: by Xã ---
+            const xaMap = {};
+            detailedCases.forEach(c => {
+                const k = (c.xa && c.xa !== '—') ? c.xa : 'Khác';
+                xaMap[k] = (xaMap[k] || 0) + 1;
+            });
+            const xaLabels = Object.keys(xaMap);
+            const xaData = Object.values(xaMap);
+
+            if (chartXa) chartXa.destroy();
+            const ctx3 = document.getElementById('chartXa');
+            if (ctx3) {
+                chartXa = new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: xaLabels,
+                        datasets: [{ label: 'Số hộ', data: xaData, backgroundColor: '#f59e0b', borderRadius: 4 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+                    }
+                });
+            }
+        }
+
+
+        
+        let chartByMonth = null;
+
+        function parseVNDate(s) {
+            if (!s) return null;
+            // dd/MM/yyyy or Date object string
+            const m = String(s).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+            const d = new Date(s);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function getFilteredCases() {
+            const mode = document.getElementById('statsTimeMode')?.value || 'all';
+            if (mode === 'all') return detailedCases;
+
+            return detailedCases.filter(c => {
+                const d = parseVNDate(c.ngayViPham);
+                if (!d) return mode === 'all';
+                if (mode === 'month') {
+                    const ym = document.getElementById('statsMonth')?.value; // YYYY-MM
+                    if (!ym) return true;
+                    const [y, m] = ym.split('-').map(Number);
+                    return d.getFullYear() === y && (d.getMonth() + 1) === m;
+                }
+                if (mode === 'quarter') {
+                    const q = +document.getElementById('statsQuarter')?.value || 1;
+                    const y = +document.getElementById('statsYear')?.value || 2026;
+                    const month = d.getMonth() + 1;
+                    const qStart = (q - 1) * 3 + 1;
+                    return d.getFullYear() === y && month >= qStart && month < qStart + 3;
+                }
+                if (mode === 'custom') {
+                    const from = document.getElementById('statsFrom')?.value;
+                    const to = document.getElementById('statsTo')?.value;
+                    if (from && d < new Date(from)) return false;
+                    if (to && d > new Date(to + 'T23:59:59')) return false;
+                    return true;
+                }
+                return true;
+            });
+        }
+
+        function onStatsTimeModeChange() {
+            const mode = document.getElementById('statsTimeMode').value;
+            document.getElementById('statsMonthWrap').classList.toggle('hidden', mode !== 'month');
+            document.getElementById('statsQuarterWrap').classList.toggle('hidden', mode !== 'quarter');
+            document.getElementById('statsCustomWrap').classList.toggle('hidden', mode !== 'custom');
+            renderStats();
+        }
+
+        function fmtNum(n, dec = 2) {
+            if (!n) return '0';
+            return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: dec });
+        }
+
+        function renderStats() {
+            const cases = getFilteredCases();
+            const kpi = document.getElementById('statsKpiCards');
+            if (!kpi) return;
+
+            let totalHa = 0, totalM2PhaHoai = 0, totalM2XayDung = 0, totalCay = 0, totalM3 = 0;
+            let phaHoaiVu = 0, phaHoaiCay = 0, khaiThacVu = 0, khaiThacCay = 0;
+            let xayDungVu = 0, daoMucVu = 0, haDieu = 0, haKeo = 0, haCaoSu = 0;
+            cases.forEach(c => {
+                const m = computeCaseMetrics(c);
+                totalHa += m.dienTichHa;
+                totalCay += m.cayGoLon;
+                totalM3 += m.khoiLuongM3;
+                haDieu += m.haDieu; haKeo += m.haKeo; haCaoSu += m.haCaoSu;
+                if (m.isPhaHoai) {
+                    phaHoaiVu++;
+                    phaHoaiCay += m.cayGoLon;
+                    totalM2PhaHoai += m.dienTichM2;
+                }
+                if (m.isKhaiThac) { khaiThacVu++; khaiThacCay += m.cayGoLon; }
+                if (m.isXayDung) { xayDungVu++; totalM2XayDung += m.dienTichM2; }
+                if (m.isDaoMuc) { daoMucVu++; totalM2XayDung += m.dienTichM2; }
+            });
+            const totalM2XD = totalM2XayDung;
+            const vuXDDao = xayDungVu + daoMucVu;
+
+            kpi.innerHTML = `
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card col-span-2 sm:col-span-3 lg:col-span-6">
+                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                        <span class="font-semibold text-slate-800">Từ ngày 01/01/2026 đến nay</span> trên lâm phận BQL xảy ra
+                        <strong class="text-indigo-700">${cases.length} vụ</strong> vi phạm QLBVR gây thiệt hại
+                        <strong class="text-sky-700">${fmtNum(totalCay, 0)} cây gỗ lớn</strong>
+                        (<strong class="text-indigo-600">${fmtNum(totalM3)} m³</strong>), cụ thể:
+                        <br/>+ <strong>${phaHoaiVu} vụ</strong> phá hoại cây rừng trồng, gây thiệt hại <strong>${fmtNum(phaHoaiCay, 0)} cây</strong> gỗ lớn (diện tích <strong>${fmtNum(totalM2PhaHoai)} m²</strong>);
+                        <br/>+ <strong>${khaiThacVu} vụ</strong> tự ý khai thác cây rừng trồng, gây thiệt hại <strong>${fmtNum(khaiThacCay, 0)} cây</strong> gỗ lớn;
+                        <br/>+ <strong>${vuXDDao} vụ</strong> xây dựng / đào múc hồ trái phép (diện tích <strong>${fmtNum(totalM2XD)} m²</strong>).
+                    </p>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card">
+                    <p class="text-[10px] text-slate-500 uppercase font-medium">Số vụ trong kỳ</p>
+                    <p class="text-2xl font-bold text-slate-800">${cases.length}</p>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card">
+                    <p class="text-[10px] text-slate-500 uppercase font-medium">Cây gỗ lớn thiệt hại</p>
+                    <p class="text-2xl font-bold text-sky-600">${fmtNum(totalCay, 0)} <span class="text-sm">cây</span></p>
+                    <p class="text-sm font-semibold text-indigo-600">${fmtNum(totalM3)} m³</p>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card">
+                    <p class="text-[10px] text-slate-500 uppercase font-medium">KT Điều/Keo/Cao su (ha)</p>
+                    <p class="text-2xl font-bold text-emerald-600">${fmtNum(totalHa)}</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Điều ${fmtNum(haDieu)} · Keo ${fmtNum(haKeo)} · Cao su ${fmtNum(haCaoSu)}</p>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-rose-200 shadow-card">
+                    <p class="text-[10px] text-rose-600 uppercase font-medium">Phá hoại cây rừng</p>
+                    <p class="text-2xl font-bold text-rose-600">${phaHoaiVu} <span class="text-sm">vụ</span></p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">${fmtNum(phaHoaiCay, 0)} cây · ${fmtNum(totalM2PhaHoai)} m²</p>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-amber-200 shadow-card">
+                    <p class="text-[10px] text-amber-700 uppercase font-medium">Xây dựng / Đào hồ</p>
+                    <p class="text-2xl font-bold text-amber-600">${vuXDDao} <span class="text-sm">vụ</span></p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">${fmtNum(totalM2XD)} m² · không tính cây</p>
+                </div>`;
+
+            // Hành vi table (theo quy tắc tính)
+            const hvMap = {};
+            cases.forEach(c => {
+                const k = c.hanhVi || '—';
+                const m = computeCaseMetrics(c);
+                if (!hvMap[k]) hvMap[k] = { count: 0, ha: 0, m2: 0, cay: 0, m3: 0 };
+                hvMap[k].count++;
+                hvMap[k].ha += m.dienTichHa;
+                hvMap[k].m2 += m.dienTichM2;
+                hvMap[k].cay += m.cayGoLon;
+                hvMap[k].m3 += m.khoiLuongM3;
+            });
+            const hvTable = document.getElementById('statsHanhViTable');
+            if (hvTable) {
+                hvTable.querySelector('thead').innerHTML = `<tr class="bg-slate-50 text-slate-600">
+                    <th class="py-2 px-3 text-left">Hành vi</th><th class="py-2 px-3 text-right">Số hộ</th>
+                    <th class="py-2 px-3 text-right">ha</th><th class="py-2 px-3 text-right">m²</th>
+                    <th class="py-2 px-3 text-right">Cây</th><th class="py-2 px-3 text-right">m³</th></tr>`;
+                hvTable.querySelector('tbody').innerHTML = Object.entries(hvMap).map(([k, v]) =>
+                    `<tr class="border-t border-slate-100 hover:bg-slate-50">
+                        <td class="py-2 px-3 font-medium">${escapeHtml(k)}</td>
+                        <td class="py-2 px-3 text-right">${v.count}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.ha)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.m2)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.cay, 0)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.m3)}</td></tr>`
+                ).join('') || '<tr><td colspan="6" class="py-4 text-center text-slate-400">Không có dữ liệu</td></tr>';
+            }
+
+            // Loài cây table — Điều/Keo/Cao su chỉ ha; gỗ lớn chỉ cây+m3; phá hoại: cây+m2
+            const loaiMap = {};
+            cases.forEach(c => {
+                const hv = (c.hanhVi || "").toLowerCase();
+                const isXD = hv.includes("xây dựng") || hv.includes("đào") || hv.includes("múc hồ");
+                const isPH = hv.includes("phá hoại");
+                (c.species || []).forEach(s => {
+                    const k = s.loai || 'Không rõ';
+                    if (!loaiMap[k]) loaiMap[k] = { ha: 0, m2: 0, cay: 0, m3: 0 };
+                    const crop = isCropSpecies(s.loai);
+                    if (isXD) {
+                        loaiMap[k].m2 += s.dienTichM2 || 0;
+                    } else if (isPH) {
+                        loaiMap[k].cay += s.soLuong || 0;
+                        loaiMap[k].m2 += s.dienTichM2 || 0;
+                    } else if (crop) {
+                        loaiMap[k].ha += s.dienTichHa || 0;
+                    } else {
+                        loaiMap[k].cay += s.soLuong || 0;
+                        loaiMap[k].m3 += s.khoiLuongM3 || 0;
+                    }
+                });
+            });
+            const loaiTable = document.getElementById('statsLoaiCayTable');
+            if (loaiTable) {
+                loaiTable.querySelector('thead').innerHTML = `<tr class="bg-slate-50 text-slate-600">
+                    <th class="py-2 px-3 text-left">Loài cây</th>
+                    <th class="py-2 px-3 text-right">ha</th><th class="py-2 px-3 text-right">m²</th>
+                    <th class="py-2 px-3 text-right">Số cây</th><th class="py-2 px-3 text-right">m³</th></tr>`;
+                loaiTable.querySelector('tbody').innerHTML = Object.entries(loaiMap).sort((a,b) => b[1].m3 - a[1].m3).map(([k, v]) =>
+                    `<tr class="border-t border-slate-100 hover:bg-slate-50">
+                        <td class="py-2 px-3 font-medium">${escapeHtml(k)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.ha)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.m2)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(v.cay, 0)}</td>
+                        <td class="py-2 px-3 text-right font-semibold text-indigo-700">${fmtNum(v.m3)}</td></tr>`
+                ).join('') || '<tr><td colspan="5" class="py-4 text-center text-slate-400">Không có dữ liệu</td></tr>';
+            }
+
+            // Detail table
+            const det = document.getElementById('statsDetailTable');
+            if (det) {
+                det.querySelector('thead').innerHTML = `<tr class="bg-slate-50 text-slate-600 sticky top-0">
+                    <th class="py-2 px-3">STT</th><th class="py-2 px-3 text-left">Hộ</th><th class="py-2 px-3 text-left">Hành vi</th>
+                    <th class="py-2 px-3 text-left">Loài (chi tiết)</th><th class="py-2 px-3 text-right">ha</th>
+                    <th class="py-2 px-3 text-right">m²</th><th class="py-2 px-3 text-right">Cây</th>
+                    <th class="py-2 px-3 text-right">m³</th><th class="py-2 px-3">Ngày BB</th></tr>`;
+                det.querySelector('tbody').innerHTML = cases.map((c, i) => {
+                    const m = computeCaseMetrics(c);
+                    const loaiStr = (c.species || []).filter(s => s.loai).map(s => {
+                        const crop = isCropSpecies(s.loai);
+                        let parts = [s.loai];
+                        if (crop && s.dienTichHa) parts.push(fmtNum(s.dienTichHa) + ' ha');
+                        else {
+                            if (s.soLuong) parts.push(fmtNum(s.soLuong, 0) + ' cây');
+                            if (s.khoiLuongM3) parts.push(fmtNum(s.khoiLuongM3) + ' m³');
+                            if (s.dienTichM2) parts.push(fmtNum(s.dienTichM2) + ' m²');
+                        }
+                        return parts.length > 1 ? parts[0] + ' (' + parts.slice(1).join(', ') + ')' : parts[0];
+                    }).join('; ') || '—';
+                    return `<tr class="border-t border-slate-100 hover:bg-slate-50">
+                        <td class="py-2 px-3 text-center">${i + 1}</td>
+                        <td class="py-2 px-3 font-medium">${escapeHtml(c.hoTen)}</td>
+                        <td class="py-2 px-3">${escapeHtml(c.hanhVi || '—')}</td>
+                        <td class="py-2 px-3 text-[11px] text-slate-600 max-w-xs">${escapeHtml(loaiStr)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(m.dienTichHa)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(m.dienTichM2)}</td>
+                        <td class="py-2 px-3 text-right">${fmtNum(m.cayGoLon, 0)}</td>
+                        <td class="py-2 px-3 text-right font-semibold">${fmtNum(m.khoiLuongM3)}</td>
+                        <td class="py-2 px-3 text-center whitespace-nowrap">${escapeHtml(c.ngayViPham || '—')}</td></tr>`;
+                }).join('') || '<tr><td colspan="9" class="py-6 text-center text-slate-400">Không có dữ liệu trong kỳ</td></tr>';
+            }
+
+            // Chart by month
+            const monthMap = {};
+            cases.forEach(c => {
+                const d = parseVNDate(c.ngayViPham);
+                if (!d) return;
+                const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                const m = computeCaseMetrics(c);
+                if (!monthMap[key]) monthMap[key] = { count: 0, m3: 0, ha: 0, cay: 0 };
+                monthMap[key].count++;
+                monthMap[key].m3 += m.khoiLuongM3;
+                monthMap[key].ha += m.dienTichHa;
+                monthMap[key].cay += m.cayGoLon;
+            });
+            const months = Object.keys(monthMap).sort();
+            if (typeof Chart !== 'undefined') {
+                if (chartByMonth) chartByMonth.destroy();
+                const ctx = document.getElementById('chartByMonth');
+                if (ctx) {
+                    chartByMonth = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: months.map(m => { const [y, mo] = m.split('-'); return 'T' + mo + '/' + y; }),
+                            datasets: [
+                                { label: 'Số hộ', data: months.map(m => monthMap[m].count), backgroundColor: '#8b5cf6', borderRadius: 4, yAxisID: 'y' },
+                                { label: 'Khối lượng m³', data: months.map(m => monthMap[m].m3), backgroundColor: '#0ea5e9', borderRadius: 4, yAxisID: 'y1' }
+                            ]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+                            scales: {
+                                y: { position: 'left', beginAtZero: true, ticks: { font: { size: 10 } } },
+                                y1: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { font: { size: 10 } } }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function exportStatsExcel() {
+            const cases = getFilteredCases();
+            const rows = cases.map((c, i) => ({
+                STT: i + 1,
+                'Hộ nhận khoán': c.hoTen,
+                'Hành vi': c.hanhVi,
+                'Loài cây (chi tiết)': (c.species || []).map(s => s.loai).filter(Boolean).join('; '),
+                'Diện tích ha': c.dienTichHa || 0,
+                'Diện tích m2': c.dienTichM2 || 0,
+                'Số lượng cây': c.soLuong || 0,
+                'Khối lượng m3': c.khoiLuongM3 || 0,
+                'Ngày BB': c.ngayViPham || '',
+                'Nhóm xử lý': c.nhomTen,
+                'Phân trường': c.phanTruong,
+                'Xã': c.xa
+            }));
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "ThongKeViPham");
+            XLSX.writeFile(wb, "ThongKe_ViPham_LamNghiep.xlsx");
+            showToast("Đã xuất Excel thống kê!");
+        }
+
+        function exportStatsReport() {
+            const cases = getFilteredCases();
+            let totalHa = 0, totalM2 = 0, totalCay = 0, totalM3 = 0;
+            cases.forEach(c => {
+                totalHa += c.dienTichHa || 0; totalM2 += c.dienTichM2 || 0;
+                totalCay += c.soLuong || 0; totalM3 += c.khoiLuongM3 || 0;
+            });
+            const mode = document.getElementById('statsTimeMode')?.value || 'all';
+            let periodLabel = 'Toàn bộ thời gian';
+            if (mode === 'month') periodLabel = 'Tháng ' + (document.getElementById('statsMonth')?.value || '');
+            if (mode === 'quarter') periodLabel = 'Quý ' + document.getElementById('statsQuarter')?.value + '/' + document.getElementById('statsYear')?.value;
+            if (mode === 'custom') periodLabel = (document.getElementById('statsFrom')?.value || '…') + ' → ' + (document.getElementById('statsTo')?.value || '…');
+
+            const hvRows = {};
+            cases.forEach(c => {
+                const k = c.hanhVi || '—';
+                if (!hvRows[k]) hvRows[k] = { n: 0, ha: 0, m2: 0, cay: 0, m3: 0 };
+                hvRows[k].n++; hvRows[k].ha += c.dienTichHa||0; hvRows[k].m2 += c.dienTichM2||0;
+                hvRows[k].cay += c.soLuong||0; hvRows[k].m3 += c.khoiLuongM3||0;
+            });
+
+            const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Báo cáo Vi phạm Lâm nghiệp</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+  *{box-sizing:border-box} body{font-family:'Be Vietnam Pro',sans-serif;margin:0;padding:32px;color:#1e293b;background:#f8fafc}
+  .header{background:linear-gradient(135deg,#065f46,#0f9d58);color:#fff;padding:28px 32px;border-radius:16px;margin-bottom:24px}
+  .header h1{margin:0;font-size:22px} .header p{margin:6px 0 0;opacity:.85;font-size:13px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .kpi{background:#fff;border-radius:12px;padding:16px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .kpi .label{font-size:11px;color:#64748b;text-transform:uppercase;font-weight:600}
+  .kpi .value{font-size:26px;font-weight:700;margin-top:4px}
+  .kpi .sub{font-size:11px;color:#94a3b8;margin-top:2px}
+  .card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;margin-bottom:20px}
+  .card h2{margin:0 0 14px;font-size:15px;color:#0f172a}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{background:#f1f5f9;text-align:left;padding:8px 10px;font-weight:600;color:#475569}
+  td{padding:8px 10px;border-top:1px solid #f1f5f9}
+  tr:hover td{background:#f8fafc}
+  .right{text-align:right} .center{text-align:center}
+  .footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:32px}
+  @media print{body{padding:12px;background:#fff} .header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style></head><body>
+<div class="header">
+  <h1>BÁO CÁO THỐNG KÊ VI PHẠM HỢP ĐỒNG KHOÁN LÂM NGHIỆP</h1>
+  <p>Ban Quản lý Rừng phòng hộ Xuân Lộc · Kỳ: ${periodLabel} · Xuất ngày ${new Date().toLocaleDateString('vi-VN')}</p>
+</div>
+<div class="kpis">
+  <div class="kpi"><div class="label">Số hộ vi phạm</div><div class="value" style="color:#1e293b">${cases.length}</div></div>
+  <div class="kpi"><div class="label">Diện tích (ha)</div><div class="value" style="color:#059669">${fmtNum(totalHa)}</div><div class="sub">Điều / Keo lai / Cao su</div></div>
+  <div class="kpi"><div class="label">Phá hoại / XD (m²)</div><div class="value" style="color:#d97706">${fmtNum(totalM2)}</div></div>
+  <div class="kpi"><div class="label">Gỗ lớn</div><div class="value" style="color:#0284c7">${fmtNum(totalCay,0)} cây</div><div class="sub">${fmtNum(totalM3)} m³ thiệt hại</div></div>
+</div>
+<div class="card"><h2>Theo hành vi</h2>
+<table><thead><tr><th>Hành vi</th><th class="right">Số hộ</th><th class="right">ha</th><th class="right">m²</th><th class="right">Cây</th><th class="right">m³</th></tr></thead>
+<tbody>${Object.entries(hvRows).map(([k,v])=>`<tr><td>${k}</td><td class="right">${v.n}</td><td class="right">${fmtNum(v.ha)}</td><td class="right">${fmtNum(v.m2)}</td><td class="right">${fmtNum(v.cay,0)}</td><td class="right">${fmtNum(v.m3)}</td></tr>`).join('')}</tbody></table></div>
+<div class="card"><h2>Chi tiết từng hộ (đã cộng dồn loài)</h2>
+<table><thead><tr><th class="center">STT</th><th>Hộ</th><th>Hành vi</th><th>Loài</th><th class="right">ha</th><th class="right">m²</th><th class="right">Cây</th><th class="right">m³</th><th class="center">Ngày</th></tr></thead>
+<tbody>${cases.map((c,i)=>{
+  const loai=(c.species||[]).filter(s=>s.loai).map(s=>s.loai+(s.soLuong?' ('+s.soLuong+')':'')).join(', ')||'—';
+  return `<tr><td class="center">${i+1}</td><td><b>${c.hoTen}</b></td><td>${c.hanhVi||'—'}</td><td style="font-size:11px">${loai}</td>
+  <td class="right">${fmtNum(c.dienTichHa)}</td><td class="right">${fmtNum(c.dienTichM2)}</td>
+  <td class="right">${fmtNum(c.soLuong,0)}</td><td class="right"><b>${fmtNum(c.khoiLuongM3)}</b></td>
+  <td class="center">${c.ngayViPham||'—'}</td></tr>`;
+}).join('')}</tbody></table></div>
+<div class="footer">Ban Quản lý Rừng phòng hộ Xuân Lộc · Phòng Lâm nghiệp · Báo cáo tự động từ Google Sheets</div>
+<script>setTimeout(()=>window.print(),600)<\/script>
+</body></html>`;
+
+            const w = window.open('', '_blank');
+            w.document.write(html);
+            w.document.close();
+            showToast("Đã mở báo cáo — dùng Ctrl+P để in/PDF!");
+        }
+
+
+        let autoRefreshTimer = null;
+        let lastSyncTime = null;
+
+        function reloadData(silent = false) {
+            const icon = document.getElementById('reloadIcon');
+            if (icon) icon.classList.add('fa-spin');
+            fetchViaJSONP(silent).finally(() => {
+                if (icon) icon.classList.remove('fa-spin');
+            });
+            if (!silent) {
+                // toast đã được xử lý trong fetchViaJSONP khi silent=false
+            }
+        }
+
+        function updateSyncBadge() {
+            const badge = document.getElementById('syncStatusBadge');
+            if (!badge) return;
+            const timeStr = lastSyncTime
+                ? lastSyncTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                : '—';
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 badge-pulse"></span> ${detailedCases.length} hồ sơ • Cập nhật ${timeStr}`;
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+            // Làm mới mỗi 2 phút (120000 ms)
+            autoRefreshTimer = setInterval(() => {
+                reloadData(true); // silent = true, không hiện toast mỗi lần
+            }, 2 * 60 * 1000);
+        }
+
+        window.onload = function() {
+            renderTable();
+            renderCharts();
+            // Mặc định kết nối sheet cố định ngay khi mở trang
+            setTimeout(() => {
+                reloadData(true);
+                startAutoRefresh();
+            }, 500);
+        };
+    </script>
+</body>
+</html>
