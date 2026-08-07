@@ -1340,10 +1340,40 @@ function filterTable() {
             const totalM2XD = totalM2XayDung;
             const vuXDDao = xayDungVu + daoMucVu;
 
+            // Nhãn thời gian linh hoạt theo bộ lọc
+            const timeMode = document.getElementById('statsTimeMode')?.value || 'all';
+            let periodLabel = 'Từ ngày 01/01/2026 đến nay';
+            if (timeMode === 'month') {
+                const ym = document.getElementById('statsMonth')?.value;
+                if (ym) {
+                    const [y, m] = ym.split('-');
+                    periodLabel = `Trong tháng ${m}/${y}`;
+                } else {
+                    periodLabel = 'Theo tháng (chưa chọn tháng)';
+                }
+            } else if (timeMode === 'quarter') {
+                const q = document.getElementById('statsQuarter')?.value || '1';
+                const y = document.getElementById('statsYear')?.value || '2026';
+                const qNames = { '1': 'Quý 1 (T1–T3)', '2': 'Quý 2 (T4–T6)', '3': 'Quý 3 (T7–T9)', '4': 'Quý 4 (T10–T12)' };
+                periodLabel = `Trong ${qNames[q] || 'Quý ' + q}/${y}`;
+            } else if (timeMode === 'custom') {
+                const from = document.getElementById('statsFrom')?.value;
+                const to = document.getElementById('statsTo')?.value;
+                const fmt = (s) => {
+                    if (!s) return '…';
+                    const [y, m, d] = s.split('-');
+                    return `${d}/${m}/${y}`;
+                };
+                if (from || to) periodLabel = `Từ ngày ${fmt(from)} đến ${fmt(to)}`;
+                else periodLabel = 'Khoảng thời gian tùy chỉnh (chưa chọn ngày)';
+            } else {
+                periodLabel = 'Toàn bộ thời gian (từ 01/01/2026 đến nay)';
+            }
+
             kpi.innerHTML = `
                 <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-card col-span-2 sm:col-span-3 lg:col-span-6">
                     <p class="text-[11px] text-slate-600 leading-relaxed">
-                        <span class="font-semibold text-slate-800">Từ ngày 01/01/2026 đến nay</span> trên lâm phận BQL xảy ra
+                        <span class="font-semibold text-slate-800">${periodLabel}</span> trên lâm phận BQL xảy ra
                         <strong class="text-indigo-700">${cases.length} vụ</strong> vi phạm QLBVR gây thiệt hại
                         <strong class="text-sky-700">${fmtNum(totalCay, 0)} cây gỗ lớn</strong>
                         (<strong class="text-indigo-600">${fmtNum(totalM3)} m³</strong>), cụ thể:
