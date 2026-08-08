@@ -3,31 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biểu Tổng hợp Kết quả Xử lý Vi phạm Lâm nghiệp - Google Sheets Exporter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Báo cáo vi phạm công tác QLBVR tại BQLRPH Xuân Lộc</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        sheets: {
-                            50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e',
-                            600: '#16a34a', 700: '#15803d', 800: '#0f9d58', 900: '#0c6b37'
-                        }
-                    },
-                    boxShadow: {
-                        'soft': '0 2px 15px -3px rgba(0,0,0,0.07), 0 10px 20px -2px rgba(0,0,0,0.04)',
-                        'card': '0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px -1px rgba(0,0,0,0.05)'
-                    }
-                }
-            }
-        }
-    </script>
+    <style id="tailwind-built">
+/* Tailwind CSS (built, production — no Play CDN) */
+*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:Inter,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.collapse{visibility:collapse}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0}.bottom-5{bottom:1.25rem}.left-3{left:.75rem}.right-5{right:1.25rem}.top-0{top:0}.top-1\/2{top:50%}.z-30{z-index:30}.z-50{z-index:50}.col-span-2{grid-column:span 2/span 2}.mx-auto{margin-left:auto;margin-right:auto}.mb-0\.5{margin-bottom:.125rem}.mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.ml-auto{margin-left:auto}.mr-1{margin-right:.25rem}.mr-1\.5{margin-right:.375rem}.mt-0\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-auto{margin-top:auto}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.\!table{display:table!important}.table{display:table}.grid{display:grid}.hidden{display:none}.h-1\.5{height:.375rem}.h-11{height:2.75rem}.h-16{height:4rem}.h-48{height:12rem}.h-52{height:13rem}.h-56{height:14rem}.h-full{height:100%}.max-h-52{max-height:13rem}.max-h-64{max-height:16rem}.max-h-96{max-height:24rem}.min-h-screen{min-height:100vh}.w-1\.5{width:.375rem}.w-1\/3{width:33.333333%}.w-1\/4{width:25%}.w-1\/5{width:20%}.w-11{width:2.75rem}.w-12{width:3rem}.w-16{width:4rem}.w-20{width:5rem}.w-24{width:6rem}.w-full{width:100%}.min-w-0{min-width:0}.max-w-7xl{max-width:80rem}.max-w-\[110px\]{max-width:110px}.max-w-\[70\%\]{max-width:70%}.max-w-lg{max-width:32rem}.max-w-xl{max-width:36rem}.max-w-xs{max-width:20rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.border-collapse{border-collapse:collapse}.-translate-y-1\/2{--tw-translate-y:-50%}.-translate-y-1\/2,.translate-y-12{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.translate-y-12{--tw-translate-y:3rem}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.list-inside{list-style-position:inside}.list-decimal{list-style-type:decimal}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0\.5{gap:.125rem}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.space-x-1\.5>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-right:calc(.375rem*var(--tw-space-x-reverse));margin-left:calc(.375rem*(1 - var(--tw-space-x-reverse)))}.space-x-2>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-right:calc(.5rem*var(--tw-space-x-reverse));margin-left:calc(.5rem*(1 - var(--tw-space-x-reverse)))}.space-x-2\.5>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-right:calc(.625rem*var(--tw-space-x-reverse));margin-left:calc(.625rem*(1 - var(--tw-space-x-reverse)))}.space-x-3>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-right:calc(.75rem*var(--tw-space-x-reverse));margin-left:calc(.75rem*(1 - var(--tw-space-x-reverse)))}.space-y-0\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.125rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.125rem*var(--tw-space-y-reverse))}.space-y-1\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.375rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.375rem*var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.75rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem*var(--tw-space-y-reverse))}.space-y-3\.5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.875rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.875rem*var(--tw-space-y-reverse))}.space-y-4>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem*var(--tw-space-y-reverse))}.space-y-5>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem*var(--tw-space-y-reverse))}.divide-y>:not([hidden])~:not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px*(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px*var(--tw-divide-y-reverse))}.divide-slate-100>:not([hidden])~:not([hidden]){--tw-divide-opacity:1;border-color:rgb(241 245 249/var(--tw-divide-opacity,1))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis}.truncate,.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:.5rem}.rounded-md{border-radius:.375rem}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138/var(--tw-border-opacity,1))}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254/var(--tw-border-opacity,1))}.border-emerald-100{--tw-border-opacity:1;border-color:rgb(209 250 229/var(--tw-border-opacity,1))}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208/var(--tw-border-opacity,1))}.border-emerald-600{--tw-border-opacity:1;border-color:rgb(5 150 105/var(--tw-border-opacity,1))}.border-indigo-200{--tw-border-opacity:1;border-color:rgb(199 210 254/var(--tw-border-opacity,1))}.border-rose-200{--tw-border-opacity:1;border-color:rgb(254 205 211/var(--tw-border-opacity,1))}.border-sky-200{--tw-border-opacity:1;border-color:rgb(186 230 253/var(--tw-border-opacity,1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249/var(--tw-border-opacity,1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240/var(--tw-border-opacity,1))}.border-slate-200\/80{border-color:rgba(226,232,240,.8)}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225/var(--tw-border-opacity,1))}.border-transparent{border-color:transparent}.border-violet-200{--tw-border-opacity:1;border-color:rgb(221 214 254/var(--tw-border-opacity,1))}.bg-amber-100{--tw-bg-opacity:1;background-color:rgb(254 243 199/var(--tw-bg-opacity,1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235/var(--tw-bg-opacity,1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255/var(--tw-bg-opacity,1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235/var(--tw-bg-opacity,1))}.bg-blue-700{--tw-bg-opacity:1;background-color:rgb(29 78 216/var(--tw-bg-opacity,1))}.bg-emerald-100{--tw-bg-opacity:1;background-color:rgb(209 250 229/var(--tw-bg-opacity,1))}.bg-emerald-50{--tw-bg-opacity:1;background-color:rgb(236 253 245/var(--tw-bg-opacity,1))}.bg-emerald-50\/80{background-color:rgba(236,253,245,.8)}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129/var(--tw-bg-opacity,1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105/var(--tw-bg-opacity,1))}.bg-emerald-700{--tw-bg-opacity:1;background-color:rgb(4 120 87/var(--tw-bg-opacity,1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255/var(--tw-bg-opacity,1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229/var(--tw-bg-opacity,1))}.bg-rose-100{--tw-bg-opacity:1;background-color:rgb(255 228 230/var(--tw-bg-opacity,1))}.bg-rose-50{--tw-bg-opacity:1;background-color:rgb(255 241 242/var(--tw-bg-opacity,1))}.bg-sheets-800{--tw-bg-opacity:1;background-color:rgb(15 157 88/var(--tw-bg-opacity,1))}.bg-sky-100{--tw-bg-opacity:1;background-color:rgb(224 242 254/var(--tw-bg-opacity,1))}.bg-sky-50{--tw-bg-opacity:1;background-color:rgb(240 249 255/var(--tw-bg-opacity,1))}.bg-sky-600{--tw-bg-opacity:1;background-color:rgb(2 132 199/var(--tw-bg-opacity,1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249/var(--tw-bg-opacity,1))}.bg-slate-100\/80{background-color:rgba(241,245,249,.8)}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240/var(--tw-bg-opacity,1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252/var(--tw-bg-opacity,1))}.bg-slate-50\/40{background-color:rgba(248,250,252,.4)}.bg-slate-50\/50{background-color:rgba(248,250,252,.5)}.bg-slate-50\/70{background-color:rgba(248,250,252,.7)}.bg-slate-50\/80{background-color:rgba(248,250,252,.8)}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59/var(--tw-bg-opacity,1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42/var(--tw-bg-opacity,1))}.bg-slate-900\/40{background-color:rgba(15,23,42,.4)}.bg-violet-100{--tw-bg-opacity:1;background-color:rgb(237 233 254/var(--tw-bg-opacity,1))}.bg-violet-50{--tw-bg-opacity:1;background-color:rgb(245 243 255/var(--tw-bg-opacity,1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255/var(--tw-bg-opacity,1))}.bg-white\/80{background-color:hsla(0,0%,100%,.8)}.bg-white\/90{background-color:hsla(0,0%,100%,.9)}.bg-gradient-to-br{background-image:linear-gradient(to bottom right,var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right,var(--tw-gradient-stops))}.from-emerald-600{--tw-gradient-from:#059669 var(--tw-gradient-from-position);--tw-gradient-to:rgba(5,150,105,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.from-emerald-700{--tw-gradient-from:#047857 var(--tw-gradient-from-position);--tw-gradient-to:rgba(4,120,87,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.from-slate-50{--tw-gradient-from:#f8fafc var(--tw-gradient-from-position);--tw-gradient-to:rgba(248,250,252,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.via-sheets-700{--tw-gradient-to:rgba(21,128,61,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),#15803d var(--tw-gradient-via-position),var(--tw-gradient-to)}.via-white{--tw-gradient-to:hsla(0,0%,100%,0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from),#fff var(--tw-gradient-via-position),var(--tw-gradient-to)}.to-emerald-50\/30{--tw-gradient-to:rgba(236,253,245,.3) var(--tw-gradient-to-position)}.to-sheets-800{--tw-gradient-to:#0f9d58 var(--tw-gradient-to-position)}.to-teal-900{--tw-gradient-to:#134e4a var(--tw-gradient-to-position)}.p-1{padding:.25rem}.p-1\.5{padding:.375rem}.p-2{padding:.5rem}.p-2\.5{padding:.625rem}.p-3{padding:.75rem}.p-3\.5{padding:.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.px-1\.5{padding-left:.375rem;padding-right:.375rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-2\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-0\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\.5{padding-top:.625rem;padding-bottom:.625rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-3\.5{padding-top:.875rem;padding-bottom:.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-5{padding-top:1.25rem;padding-bottom:1.25rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pl-0\.5{padding-left:.125rem}.pl-9{padding-left:2.25rem}.pr-1{padding-right:.25rem}.pr-3{padding-right:.75rem}.pt-1{padding-top:.25rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.align-top{vertical-align:top}.font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}.font-sans{font-family:Inter,sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[12px\]{font-size:12px}.text-\[13px\]{font-size:13px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.leading-snug{line-height:1.375}.leading-tight{line-height:1.25}.tracking-wider{letter-spacing:.05em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36/var(--tw-text-opacity,1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11/var(--tw-text-opacity,1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6/var(--tw-text-opacity,1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9/var(--tw-text-opacity,1))}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14/var(--tw-text-opacity,1))}.text-amber-900{--tw-text-opacity:1;color:rgb(120 53 15/var(--tw-text-opacity,1))}.text-blue-500{--tw-text-opacity:1;color:rgb(59 130 246/var(--tw-text-opacity,1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235/var(--tw-text-opacity,1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216/var(--tw-text-opacity,1))}.text-emerald-100{--tw-text-opacity:1;color:rgb(209 250 229/var(--tw-text-opacity,1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153/var(--tw-text-opacity,1))}.text-emerald-500{--tw-text-opacity:1;color:rgb(16 185 129/var(--tw-text-opacity,1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105/var(--tw-text-opacity,1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87/var(--tw-text-opacity,1))}.text-emerald-800{--tw-text-opacity:1;color:rgb(6 95 70/var(--tw-text-opacity,1))}.text-emerald-900{--tw-text-opacity:1;color:rgb(6 78 59/var(--tw-text-opacity,1))}.text-indigo-500{--tw-text-opacity:1;color:rgb(99 102 241/var(--tw-text-opacity,1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229/var(--tw-text-opacity,1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202/var(--tw-text-opacity,1))}.text-indigo-800{--tw-text-opacity:1;color:rgb(55 48 163/var(--tw-text-opacity,1))}.text-indigo-900{--tw-text-opacity:1;color:rgb(49 46 129/var(--tw-text-opacity,1))}.text-rose-400{--tw-text-opacity:1;color:rgb(251 113 133/var(--tw-text-opacity,1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72/var(--tw-text-opacity,1))}.text-rose-700{--tw-text-opacity:1;color:rgb(190 18 60/var(--tw-text-opacity,1))}.text-rose-800{--tw-text-opacity:1;color:rgb(159 18 57/var(--tw-text-opacity,1))}.text-sheets-700{--tw-text-opacity:1;color:rgb(21 128 61/var(--tw-text-opacity,1))}.text-sky-600{--tw-text-opacity:1;color:rgb(2 132 199/var(--tw-text-opacity,1))}.text-sky-700{--tw-text-opacity:1;color:rgb(3 105 161/var(--tw-text-opacity,1))}.text-sky-800{--tw-text-opacity:1;color:rgb(7 89 133/var(--tw-text-opacity,1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184/var(--tw-text-opacity,1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139/var(--tw-text-opacity,1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105/var(--tw-text-opacity,1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85/var(--tw-text-opacity,1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59/var(--tw-text-opacity,1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42/var(--tw-text-opacity,1))}.text-violet-600{--tw-text-opacity:1;color:rgb(124 58 237/var(--tw-text-opacity,1))}.text-violet-700{--tw-text-opacity:1;color:rgb(109 40 217/var(--tw-text-opacity,1))}.text-violet-800{--tw-text-opacity:1;color:rgb(91 33 182/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.underline{text-decoration-line:underline}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-0{opacity:0}.opacity-60{opacity:.6}.opacity-80{opacity:.8}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgba(0,0,0,.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color)}.shadow-2xl,.shadow-card{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-card{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.05),0 1px 2px -1px rgba(0,0,0,.05);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color),0 4px 6px -4px var(--tw-shadow-color)}.shadow-lg,.shadow-sm{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgba(0,0,0,.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color)}.outline-none{outline:2px solid transparent;outline-offset:2px}.ring-2{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.ring-emerald-100{--tw-ring-opacity:1;--tw-ring-color:rgb(209 250 229/var(--tw-ring-opacity,1))}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px)}.backdrop-blur-md,.backdrop-blur-sm{-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-300{transition-duration:.3s}.hover\:bg-blue-100:hover{--tw-bg-opacity:1;background-color:rgb(219 234 254/var(--tw-bg-opacity,1))}.hover\:bg-blue-50:hover{--tw-bg-opacity:1;background-color:rgb(239 246 255/var(--tw-bg-opacity,1))}.hover\:bg-blue-700:hover{--tw-bg-opacity:1;background-color:rgb(29 78 216/var(--tw-bg-opacity,1))}.hover\:bg-blue-800:hover{--tw-bg-opacity:1;background-color:rgb(30 64 175/var(--tw-bg-opacity,1))}.hover\:bg-emerald-100:hover{--tw-bg-opacity:1;background-color:rgb(209 250 229/var(--tw-bg-opacity,1))}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87/var(--tw-bg-opacity,1))}.hover\:bg-emerald-800:hover{--tw-bg-opacity:1;background-color:rgb(6 95 70/var(--tw-bg-opacity,1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202/var(--tw-bg-opacity,1))}.hover\:bg-rose-50:hover{--tw-bg-opacity:1;background-color:rgb(255 241 242/var(--tw-bg-opacity,1))}.hover\:bg-sheets-900:hover{--tw-bg-opacity:1;background-color:rgb(12 107 55/var(--tw-bg-opacity,1))}.hover\:bg-sky-700:hover{--tw-bg-opacity:1;background-color:rgb(3 105 161/var(--tw-bg-opacity,1))}.hover\:bg-slate-300:hover{--tw-bg-opacity:1;background-color:rgb(203 213 225/var(--tw-bg-opacity,1))}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252/var(--tw-bg-opacity,1))}.hover\:bg-slate-900:hover{--tw-bg-opacity:1;background-color:rgb(15 23 42/var(--tw-bg-opacity,1))}.hover\:text-blue-600:hover{--tw-text-opacity:1;color:rgb(37 99 235/var(--tw-text-opacity,1))}.hover\:text-rose-600:hover{--tw-text-opacity:1;color:rgb(225 29 72/var(--tw-text-opacity,1))}.hover\:text-slate-600:hover{--tw-text-opacity:1;color:rgb(71 85 105/var(--tw-text-opacity,1))}.hover\:text-slate-800:hover{--tw-text-opacity:1;color:rgb(30 41 59/var(--tw-text-opacity,1))}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42/var(--tw-text-opacity,1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.focus\:border-sheets-500:focus{--tw-border-opacity:1;border-color:rgb(34 197 94/var(--tw-border-opacity,1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.focus\:ring-emerald-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(16 185 129/var(--tw-ring-opacity,1))}.focus\:ring-sheets-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(34 197 94/var(--tw-ring-opacity,1))}.focus\:ring-offset-2:focus{--tw-ring-offset-width:2px}@media (min-width:640px){.sm\:col-span-3{grid-column:span 3/span 3}.sm\:inline{display:inline}.sm\:hidden{display:none}.sm\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:p-5{padding:1.25rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:.875rem;line-height:1.25rem}}@media (min-width:768px){.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}@media (min-width:1024px){.lg\:col-span-1{grid-column:span 1/span 1}.lg\:col-span-2{grid-column:span 2/span 2}.lg\:col-span-6{grid-column:span 6/span 6}.lg\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.lg\:grid-cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}.lg\:px-8{padding-left:2rem;padding-right:2rem}}@media (min-width:1280px){.xl\:grid-cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}}
+    </style>
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -41,6 +25,29 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
+        html.dark body, body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark .bg-white, body.dark-mode .bg-white { background-color: #1e293b !important; color: #e2e8f0 !important; }
+        html.dark .bg-slate-50, html.dark .bg-slate-50\/50, html.dark .bg-slate-50\/70, html.dark .bg-slate-50\/80,
+        body.dark-mode .bg-slate-50 { background-color: #0f172a !important; }
+        html.dark .text-slate-800, html.dark .text-slate-900, body.dark-mode .text-slate-800 { color: #f1f5f9 !important; }
+        html.dark .text-slate-600, html.dark .text-slate-700, body.dark-mode .text-slate-600 { color: #cbd5e1 !important; }
+        html.dark .text-slate-500, body.dark-mode .text-slate-500 { color: #94a3b8 !important; }
+        html.dark .border-slate-200, html.dark .border-slate-100, body.dark-mode .border-slate-200 { border-color: #334155 !important; }
+        html.dark .table-row-hover:hover { background-color: #334155 !important; }
+        html.dark header { background: rgba(15,23,42,.92) !important; border-color: #334155 !important; }
+        html.dark .bg-emerald-50\/80 { background-color: rgba(6,78,59,.35) !important; }
+        html.dark .text-emerald-900 { color: #a7f3d0 !important; }
+        /* Mobile cards */
+        @media (max-width: 640px) {
+            .desktop-only-table { display: none !important; }
+            .mobile-cards { display: block !important; }
+        }
+        @media (min-width: 641px) {
+            .mobile-cards { display: none !important; }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
@@ -49,15 +56,23 @@
     <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sheets-700 to-sheets-900 flex items-center justify-center text-white shadow-md">
-                    <i class="fa-solid fa-tree text-lg"></i>
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 via-sheets-700 to-teal-900 flex items-center justify-center text-white shadow-lg ring-2 ring-emerald-100">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
-                <div>
-                    <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Công cụ Đồng bộ Google Trang tính</h1>
-                    <p class="text-[11px] text-slate-500">Ban Quản lý Rừng phòng hộ Xuân Lộc • Báo cáo Vi phạm Hợp đồng Khoán</p>
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">Báo cáo vi phạm công tác QLBVR</h1>
+                    <p class="text-[11px] text-slate-500 truncate">Ban Quản lý Rừng phòng hộ Xuân Lộc · Đồng bộ Google Sheets</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
+                <button onclick="toggleDarkMode()" id="btnDarkMode" class="inline-flex items-center px-2.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs rounded-lg shadow-sm transition-all" title="Sáng / Tối">
+                    <i class="fa-solid fa-moon" id="darkModeIcon"></i>
+                </button>
+                <a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener"
+                   class="inline-flex items-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Mở thư mục mẹ túi hồ sơ trên Drive">
+                    <i class="fa-solid fa-folder-tree mr-1.5 text-amber-500"></i>
+                    <span class="hidden sm:inline">Thư mục hồ sơ</span>
+                </a>
                 <button onclick="reloadData()" id="btnReload" class="inline-flex items-center px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Tải lại dữ liệu từ Google Sheets">
                     <i class="fa-solid fa-arrows-rotate mr-1.5" id="reloadIcon"></i>
                     <span class="hidden sm:inline">Làm mới</span>
@@ -162,18 +177,22 @@
             </div>
 
             <!-- View Tabs -->
-            <div class="flex border-b border-slate-200 bg-slate-50/50 text-xs font-medium">
-                <button id="viewSummaryBtn" onclick="switchMainView('summary')" class="py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5">
+            <div class="flex border-b border-slate-200 bg-slate-50/50 text-xs font-medium overflow-x-auto">
+                <button id="viewDashBtn" onclick="switchMainView('dashboard')" class="py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-gauge-high text-[11px]"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button id="viewSummaryBtn" onclick="switchMainView('summary')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-layer-group text-[11px]"></i>
-                    <span>Chế độ 1: Tổng hợp 5 Nhóm xử lý</span>
+                    <span>5 Nhóm xử lý</span>
                 </button>
-                <button id="viewDetailBtn" onclick="switchMainView('detail')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5">
+                <button id="viewDetailBtn" onclick="switchMainView('detail')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-table-list text-[11px]"></i>
-                    <span>Chế độ 2: Bảng chi tiết từng hộ</span>
+                    <span>Chi tiết hộ</span>
                 </button>
-                <button id="viewStatsBtn" onclick="switchMainView('stats')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5">
+                <button id="viewStatsBtn" onclick="switchMainView('stats')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-chart-line text-[11px]"></i>
-                    <span>Chế độ 3: Thống kê & Báo cáo</span>
+                    <span>Thống kê & Báo cáo</span>
                 </button>
             </div>
 
@@ -187,8 +206,50 @@
         </div>
 
         
+        
+        <!-- Dashboard Lãnh đạo -->
+        <div id="dashboardPanel" class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Tổng quan xử lý vi phạm QLBVR</h2>
+                    <p class="text-[11px] text-slate-500" id="dashPeriodLabel">Toàn bộ thời gian · Cập nhật tự động</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="printDashboardReport()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> In / PDF báo cáo
+                    </button>
+                    <button onclick="switchMainView('stats')" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg">
+                        Chi tiết thống kê →
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="dashKpiRow"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl border border-rose-200 shadow-card p-4 lg:col-span-1">
+                    <h3 class="text-xs font-semibold text-rose-700 mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-bell"></i> Cần xử lý / Cảnh báo
+                    </h3>
+                    <div id="dashAlertsList" class="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar text-xs"></div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4 lg:col-span-2">
+                    <h3 class="text-xs font-semibold text-slate-700 mb-2">Phân bố nhóm xử lý</h3>
+                    <div class="h-52"><canvas id="chartDashNhom"></canvas></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top phân trường (số vụ)</div>
+                    <div id="dashTopPT" class="p-3 text-xs space-y-1.5"></div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top xã / địa bàn (số vụ)</div>
+                    <div id="dashTopXa" class="p-3 text-xs space-y-1.5"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="chartsSection">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 hidden" id="chartsSection">
             <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
                 <h3 class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-chart-pie text-emerald-600"></i> Phân bố theo Nhóm xử lý
@@ -254,16 +315,27 @@
                         </div>
                     </div>
                     <button onclick="exportStatsReport()" class="ml-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-export"></i> Xuất báo cáo đẹp
+                        <i class="fa-solid fa-print"></i> In / PDF theo kỳ lọc
                     </button>
                     <button onclick="exportStatsExcel()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-excel text-emerald-400"></i> Excel thống kê
+                        <i class="fa-solid fa-file-excel text-emerald-400"></i> Excel
+                    </button>
+                    <button onclick="exportWordND30()" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-word"></i> Word NĐ 30
                     </button>
                 </div>
             </div>
 
+            <!-- So sánh quý -->
+            <div id="quarterCompareBox" class="bg-white rounded-xl border border-indigo-200 shadow-card p-4 hidden">
+                <h3 class="text-xs font-semibold text-indigo-800 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-code-compare"></i> So sánh quý này / quý trước
+                </h3>
+                <div id="quarterCompareContent" class="overflow-x-auto"></div>
+            </div>
+
             <!-- KPI cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="statsKpiCards"></div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3" id="statsKpiCards"></div>
 
             <!-- Tables -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -299,7 +371,7 @@
         </div>
 
         <!-- Data Table -->
-        <div id="dataTableWrap" class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+        <div id="dataTableWrap" class="hidden bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
             <div class="p-3.5 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div class="relative max-w-xs w-full">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -314,7 +386,8 @@
             </div>
 
             <div class="overflow-x-auto custom-scrollbar">
-                <table id="dataTable" class="w-full text-left border-collapse">
+                <div id="mobileCardsList" class="mobile-cards p-3 space-y-3"></div>
+                <table id="dataTable" class="w-full text-left border-collapse desktop-only-table">
                     <thead id="tableHeader"></thead>
                     <tbody id="tableBody" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
@@ -427,7 +500,7 @@
 
     <footer class="bg-white/80 border-t border-slate-200 py-3 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center text-[11px] text-slate-500">
-            Ban Quản lý Rừng phòng hộ Xuân Lộc • Phòng Lâm nghiệp • Định dạng chuẩn Google Trang tính
+            Báo cáo vi phạm công tác QLBVR tại BQLRPH Xuân Lộc • Phòng Lâm nghiệp
         </div>
     </footer>
 
@@ -492,8 +565,36 @@
             { id: 56, hoTen: "Võ Văn Hùng", doiTuong: "Võ Văn Hùng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã mời làm việc lần 3. Đang chờ hộ đến làm việc." }
         ];
 
-        let currentViewMode = "summary";
+        let currentViewMode = "dashboard";
         let activeEditIndex = -1;
+
+        const DRIVE_PARENT_FOLDER_ID = "1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ";
+        const DRIVE_PARENT_URL = "https://drive.google.com/drive/folders/" + DRIVE_PARENT_FOLDER_ID;
+
+        /** Ưu tiên link trực tiếp cột AS; fallback tìm theo tên trong thư mục mẹ */
+        function buildHoSoUrl(linkOrName, tuiName) {
+            const link = (linkOrName || "").trim();
+            if (/^https?:\/\//i.test(link)) return link;
+            if (!tuiName && link) tuiName = link;
+            if (!tuiName) return DRIVE_PARENT_URL;
+            const q = encodeURIComponent('"' + tuiName + '" parent:' + DRIVE_PARENT_FOLDER_ID);
+            return "https://drive.google.com/drive/search?q=" + q;
+        }
+
+        function hoSoButtonHtml(tuiName, linkUrl) {
+            const name = (tuiName || "").trim();
+            const url = buildHoSoUrl(linkUrl || "", name);
+            if (!name && !linkUrl) return "";
+            const label = name || "Hồ sơ";
+            const isDirect = /^https?:\/\//i.test((linkUrl || "").trim());
+            return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${isDirect ? 'text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200'} border transition shadow-sm"
+                title="${isDirect ? 'Mở thẳng túi hồ sơ Drive' : 'Tìm túi hồ sơ trên Drive'}: ${label.replace(/"/g, '&quot;')}">
+                <i class="fa-solid fa-folder-open text-[10px]"></i>
+                <span class="max-w-[110px] truncate">${escapeHtml(label)}</span>
+                ${isDirect ? '<i class="fa-solid fa-arrow-up-right-from-square text-[8px] opacity-60"></i>' : ''}
+            </a>`;
+        }
 
         const NHOM_MAP = {
             1: { ten: "Vi phạm mới (chưa mời)", badge: "bg-violet-50 text-violet-700 border-violet-200", short: "VP mới chưa mời" },
@@ -539,31 +640,282 @@
         }
 
 
-        function switchMainView(mode) {
+
+        let chartDashNhom = null;
+
+        /** Cảnh báo tiến độ theo nhóm / từ khóa (không cần cột ngày) */
+        function getAlertForCase(c) {
+            const al = ((c.tinhTrang || "") + " " + (c.alRaw || "") + " " + (c.amRaw || "") + " " + (c.nhomTen || "")).toLowerCase();
+            const nhom = c.nhomId;
+            if (nhom === 1) {
+                return { level: "warn", label: "VP mới · Chưa mời", color: "bg-violet-100 text-violet-800 border-violet-200" };
+            }
+            if (nhom === 2) {
+                if (/lần\s*3|lan\s*3|mời\s*3|3\s*lần/.test(al)) {
+                    return { level: "danger", label: "Mời lần 3 · Ưu tiên", color: "bg-rose-100 text-rose-800 border-rose-200" };
+                }
+                if (/lần\s*2|lan\s*2|mời\s*2|2\s*lần/.test(al)) {
+                    return { level: "warn", label: "Mời lần 2", color: "bg-amber-100 text-amber-800 border-amber-200" };
+                }
+                return { level: "info", label: "Đang mời", color: "bg-sky-100 text-sky-800 border-sky-200" };
+            }
+            if (nhom === 4) {
+                return { level: "warn", label: "Đã niêm yết · Theo dõi 15 ngày", color: "bg-amber-100 text-amber-900 border-amber-200" };
+            }
+            if (nhom === 5) {
+                return { level: "ok", label: "Đã chấm dứt HĐ", color: "bg-slate-100 text-slate-600 border-slate-200" };
+            }
+            if (nhom === 3) {
+                return { level: "ok", label: "Đã khắc phục", color: "bg-emerald-100 text-emerald-800 border-emerald-200" };
+            }
+            return null;
+        }
+
+        function alertBadgeHtml(c) {
+            const a = getAlertForCase(c);
+            if (!a) return "";
+            return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold border ${a.color} whitespace-nowrap">${a.label}</span>`;
+        }
+
+        function getActionNeededCases(cases) {
+            return (cases || detailedCases).filter(c => {
+                const a = getAlertForCase(c);
+                return a && (a.level === "danger" || a.level === "warn" || c.nhomId === 1 || c.nhomId === 2);
+            }).sort((a, b) => {
+                const la = getAlertForCase(a)?.level, lb = getAlertForCase(b)?.level;
+                const rank = { danger: 0, warn: 1, info: 2, ok: 3 };
+                return (rank[la] ?? 9) - (rank[lb] ?? 9);
+            });
+        }
+
+        function renderDashboard() {
+            const cases = detailedCases;
+            const kpi = document.getElementById("dashKpiRow");
+            const alertsEl = document.getElementById("dashAlertsList");
+            if (!kpi) return;
+
+            const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            let totalCay = 0, totalM3 = 0;
+            cases.forEach(c => {
+                counts[c.nhomId] = (counts[c.nhomId] || 0) + 1;
+                const m = typeof computeCaseMetrics === "function" ? computeCaseMetrics(c) : {};
+                totalCay += m.cayGoLon || 0;
+                totalM3 += m.khoiLuongM3 || 0;
+            });
+            const need = getActionNeededCases(cases);
+            const moi3 = cases.filter(c => {
+                const a = getAlertForCase(c);
+                return a && a.level === "danger";
+            }).length;
+
+            kpi.innerHTML = `
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-card">
+                    <p class="text-[10px] text-slate-500 uppercase font-medium">Tổng vụ</p>
+                    <p class="text-2xl font-bold text-slate-800">${cases.length}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-rose-200 shadow-card">
+                    <p class="text-[10px] text-rose-600 uppercase font-medium">Cần xử lý</p>
+                    <p class="text-2xl font-bold text-rose-600">${need.length}</p>
+                    <p class="text-[10px] text-slate-400">${moi3} mời lần 3</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-violet-200 shadow-card">
+                    <p class="text-[10px] text-violet-600 uppercase font-medium">VP mới chưa mời</p>
+                    <p class="text-2xl font-bold text-violet-600">${counts[1] || 0}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-sky-200 shadow-card">
+                    <p class="text-[10px] text-sky-600 uppercase font-medium">Đang mời</p>
+                    <p class="text-2xl font-bold text-sky-600">${counts[2] || 0}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-amber-200 shadow-card">
+                    <p class="text-[10px] text-amber-700 uppercase font-medium">Đã niêm yết</p>
+                    <p class="text-2xl font-bold text-amber-600">${counts[4] || 0}</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-card">
+                    <p class="text-[10px] text-slate-500 uppercase font-medium">Gỗ lớn thiệt hại</p>
+                    <p class="text-xl font-bold text-indigo-600">${Number(totalCay).toLocaleString("vi-VN")} cây</p>
+                    <p class="text-[10px] text-slate-400">${Number(totalM3).toLocaleString("vi-VN", {maximumFractionDigits:2})} m³</p>
+                </div>`;
+
+            if (alertsEl) {
+                if (!need.length) {
+                    alertsEl.innerHTML = `<p class="text-slate-400 py-4 text-center">Không có hộ cần ưu tiên xử lý</p>`;
+                } else {
+                    alertsEl.innerHTML = need.slice(0, 25).map(c => {
+                        const a = getAlertForCase(c);
+                        return `<div class="flex items-start justify-between gap-2 p-2 rounded-lg border border-slate-100 hover:bg-slate-50">
+                            <div class="min-w-0">
+                                <div class="font-semibold text-slate-800 truncate">${escapeHtml(c.hoTen)}</div>
+                                <div class="mt-0.5">${alertBadgeHtml(c)}</div>
+                            </div>
+                            <div class="shrink-0 flex flex-col items-end gap-1">
+                                ${(c.tuiHoSo || c.linkHoSo) ? hoSoButtonHtml(c.tuiHoSo, c.linkHoSo) : ""}
+                            </div>
+                        </div>`;
+                    }).join("");
+                }
+            }
+
+            // Top PT / Xa
+            function topN(field, elId) {
+                const map = {};
+                cases.forEach(c => {
+                    const k = (c[field] || "—").trim() || "—";
+                    map[k] = (map[k] || 0) + 1;
+                });
+                const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
+                const max = sorted[0]?.[1] || 1;
+                const el = document.getElementById(elId);
+                if (!el) return;
+                el.innerHTML = sorted.map(([k, v]) => `
+                    <div>
+                        <div class="flex justify-between mb-0.5"><span class="font-medium text-slate-700 truncate max-w-[70%]">${escapeHtml(k)}</span><span class="text-slate-500">${v}</span></div>
+                        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:${Math.round(v / max * 100)}%"></div></div>
+                    </div>`).join("") || `<p class="text-slate-400">Chưa có dữ liệu</p>`;
+            }
+            topN("phanTruong", "dashTopPT");
+            topN("xa", "dashTopXa");
+
+            // Chart
+            if (typeof Chart !== "undefined") {
+                if (chartDashNhom) chartDashNhom.destroy();
+                const ctx = document.getElementById("chartDashNhom");
+                if (ctx) {
+                    chartDashNhom = new Chart(ctx, {
+                        type: "doughnut",
+                        data: {
+                            labels: [1, 2, 3, 4, 5].map(id => NHOM_MAP[id]?.short || id),
+                            datasets: [{
+                                data: [1, 2, 3, 4, 5].map(id => counts[id] || 0),
+                                backgroundColor: ["#8b5cf6", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e"],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { position: "right", labels: { boxWidth: 10, font: { size: 10 } } } }
+                        }
+                    });
+                }
+            }
+        }
+
+        function printDashboardReport() {
+            const cases = detailedCases;
+            const need = getActionNeededCases(cases);
+            let totalCay = 0, totalM3 = 0;
+            cases.forEach(c => {
+                const m = typeof computeCaseMetrics === "function" ? computeCaseMetrics(c) : {};
+                totalCay += m.cayGoLon || 0;
+                totalM3 += m.khoiLuongM3 || 0;
+            });
+            const today = new Date().toLocaleDateString("vi-VN");
+            const rows = cases.map((c, i) => {
+                const a = getAlertForCase(c);
+                const m = typeof computeCaseMetrics === "function" ? computeCaseMetrics(c) : {};
+                const link = (c.linkHoSo || "").trim();
+                const hoSoCell = link
+                    ? `<a href="${link}">${escapeHtml(c.tuiHoSo || "Mở hồ sơ")}</a>`
+                    : escapeHtml(c.tuiHoSo || "—");
+                return `<tr>
+                    <td class="c">${i + 1}</td>
+                    <td><b>${escapeHtml(c.hoTen)}</b></td>
+                    <td>${escapeHtml(c.hanhVi || "—")}</td>
+                    <td>${escapeHtml(NHOM_MAP[c.nhomId]?.short || "")}</td>
+                    <td>${a ? escapeHtml(a.label) : "—"}</td>
+                    <td class="r">${m.cayGoLon || 0}</td>
+                    <td class="r">${(m.khoiLuongM3 || 0).toLocaleString("vi-VN", {maximumFractionDigits: 2})}</td>
+                    <td>${hoSoCell}</td>
+                </tr>`;
+            }).join("");
+
+            const needRows = need.slice(0, 40).map((c, i) => {
+                const a = getAlertForCase(c);
+                return `<tr><td class="c">${i + 1}</td><td><b>${escapeHtml(c.hoTen)}</b></td><td>${a ? escapeHtml(a.label) : ""}</td>
+                    <td>${c.linkHoSo ? `<a href="${c.linkHoSo}">${escapeHtml(c.tuiHoSo || "Hồ sơ")}</a>` : escapeHtml(c.tuiHoSo || "—")}</td></tr>`;
+            }).join("");
+
+            const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">
+<title>Báo cáo vi phạm QLBVR - BQLRPH Xuân Lộc</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+*{box-sizing:border-box} body{font-family:'Be Vietnam Pro',sans-serif;margin:0;padding:24px;color:#1e293b;font-size:12px}
+.header{background:linear-gradient(135deg,#065f46,#0f9d58);color:#fff;padding:22px 28px;border-radius:14px;margin-bottom:18px}
+.header h1{margin:0;font-size:18px} .header p{margin:4px 0 0;opacity:.9;font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px}
+.kpi .l{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:600}
+.kpi .v{font-size:22px;font-weight:700;margin-top:2px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:13px}
+table{width:100%;border-collapse:collapse} th{background:#f1f5f9;text-align:left;padding:6px 8px;font-size:11px}
+td{padding:6px 8px;border-top:1px solid #f1f5f9;vertical-align:top} .c{text-align:center} .r{text-align:right}
+a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;font-size:10px;margin-top:20px}
+@media print{body{padding:8px} .header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<div class="header">
+  <h1>BÁO CÁO VI PHẠM CÔNG TÁC QLBVR</h1>
+  <p>Ban Quản lý Rừng phòng hộ Xuân Lộc · Xuất ngày ${today} · ${cases.length} hồ sơ</p>
+</div>
+<div class="kpis">
+  <div class="kpi"><div class="l">Tổng vụ</div><div class="v">${cases.length}</div></div>
+  <div class="kpi"><div class="l">Cần xử lý</div><div class="v" style="color:#e11d48">${need.length}</div></div>
+  <div class="kpi"><div class="l">Cây gỗ lớn</div><div class="v" style="color:#0284c7">${totalCay.toLocaleString("vi-VN")}</div></div>
+  <div class="kpi"><div class="l">Khối lượng m³</div><div class="v" style="color:#4f46e5">${totalM3.toLocaleString("vi-VN",{maximumFractionDigits:2})}</div></div>
+</div>
+<div class="card"><h2>Danh sách cần ưu tiên xử lý</h2>
+<table><thead><tr><th class="c">STT</th><th>Hộ</th><th>Cảnh báo</th><th>Túi hồ sơ</th></tr></thead>
+<tbody>${needRows || '<tr><td colspan="4" class="c">Không có</td></tr>'}</tbody></table></div>
+<div class="card"><h2>Phụ lục toàn bộ hộ (kèm link hồ sơ)</h2>
+<table><thead><tr><th class="c">STT</th><th>Hộ</th><th>Hành vi</th><th>Nhóm</th><th>Cảnh báo</th><th class="r">Cây</th><th class="r">m³</th><th>Hồ sơ</th></tr></thead>
+<tbody>${rows}</tbody></table></div>
+<div class="footer">BQLRPH Xuân Lộc · Phòng Lâm nghiệp · Báo cáo tự động</div>
+<script>setTimeout(function(){window.print()},500)<\\/script>
+</body></html>`;
+
+            const w = window.open("", "_blank");
+            w.document.write(html);
+            w.document.close();
+            if (typeof showToast === "function") showToast("Đã mở báo cáo — Ctrl+P để lưu PDF");
+        }
+
+
+                function switchMainView(mode) {
             currentViewMode = mode;
-            const btnSummary = document.getElementById('viewSummaryBtn');
-            const btnDetail = document.getElementById('viewDetailBtn');
-            const btnStats = document.getElementById('viewStatsBtn');
-            const activeCls = "py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5";
-            const inactiveCls = "py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5";
-            if (btnSummary) btnSummary.className = mode === 'summary' ? activeCls : inactiveCls;
-            if (btnDetail) btnDetail.className = mode === 'detail' ? activeCls : inactiveCls;
-            if (btnStats) btnStats.className = mode === 'stats' ? activeCls : inactiveCls;
+            const activeCls = "py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5 whitespace-nowrap";
+            const inactiveCls = "py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap";
+            const map = { dashboard: "viewDashBtn", summary: "viewSummaryBtn", detail: "viewDetailBtn", stats: "viewStatsBtn" };
+            Object.entries(map).forEach(([m, id]) => {
+                const el = document.getElementById(id);
+                if (el) el.className = (mode === m) ? activeCls : inactiveCls;
+            });
 
             const tableWrap = document.getElementById('dataTableWrap');
             const chartsSec = document.getElementById('chartsSection');
             const statsPanel = document.getElementById('statsPanel');
+            const dashPanel = document.getElementById('dashboardPanel');
 
             if (mode === 'stats') {
                 if (tableWrap) tableWrap.classList.add('hidden');
                 if (chartsSec) chartsSec.classList.add('hidden');
+                if (dashPanel) dashPanel.classList.add('hidden');
                 if (statsPanel) statsPanel.classList.remove('hidden');
                 renderStats();
+            } else if (mode === 'dashboard') {
+                if (tableWrap) tableWrap.classList.add('hidden');
+                if (chartsSec) chartsSec.classList.add('hidden');
+                if (statsPanel) statsPanel.classList.add('hidden');
+                if (dashPanel) dashPanel.classList.remove('hidden');
+                renderDashboard();
             } else {
                 if (tableWrap) tableWrap.classList.remove('hidden');
                 if (chartsSec) chartsSec.classList.remove('hidden');
                 if (statsPanel) statsPanel.classList.add('hidden');
+                if (dashPanel) dashPanel.classList.add('hidden');
                 renderTable();
+                // Vẽ lại biểu đồ sau khi section hiện (canvas cần có kích thước)
+                requestAnimationFrame(() => {
+                    setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 50);
+                });
             }
         }
 
@@ -588,13 +940,15 @@
             if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 badge-pulse"></span> Sẵn sàng ${detailedCases.length} hồ sơ`;
 
             if (currentViewMode === 'summary') {
+                const mobClear = document.getElementById('mobileCardsList');
+                if (mobClear) mobClear.innerHTML = '';
                 thead.innerHTML = `
                     <tr class="bg-slate-100/80 text-slate-600 text-[11px] uppercase font-semibold tracking-wider border-b border-slate-200">
                         <th class="py-3 px-3 w-12 text-center border-r border-slate-200">STT</th>
                         <th class="py-3 px-3 w-1/4 border-r border-slate-200">Nhóm kết quả xử lý</th>
                         <th class="py-3 px-3 w-1/3 border-r border-slate-200">Tình trạng thực hiện</th>
                         <th class="py-3 px-3 border-r border-slate-200">Các trường hợp điển hình</th>
-                        <th class="py-3 px-2 w-16 text-center no-export">Thao tác</th>
+                        <th class="py-3 px-2 w-24 text-center no-export">Hồ sơ / Thao tác</th>
                     </tr>`;
 
                 const summaryGroups = [
@@ -671,7 +1025,7 @@
                         <th class="py-3 px-3 w-1/5 border-r border-slate-200">Đối tượng liên quan</th>
                         <th class="py-3 px-3 w-1/4 border-r border-slate-200">Nhóm xử lý</th>
                         <th class="py-3 px-3 border-r border-slate-200">Tình trạng chi tiết</th>
-                        <th class="py-3 px-2 w-16 text-center no-export">Thao tác</th>
+                        <th class="py-3 px-2 w-16 text-center no-export">Hồ sơ / Thao tác</th>
                     </tr>`;
 
                 tbody.innerHTML = '';
@@ -681,20 +1035,48 @@
                     const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[3];
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 text-center font-bold text-slate-600 border-r border-slate-100 bg-slate-50/40">${index + 1}</td>
-                        <td class="py-2.5 px-3 font-semibold text-slate-800 border-r border-slate-100 align-top text-[13px]">${escapeHtml(item.hoTen)}</td>
+                        <td class="py-2.5 px-3 border-r border-slate-100 align-top">
+                            <div class="font-semibold text-slate-800 text-[13px]">${escapeHtml(item.hoTen)}</div>
+                            ${(item.tuiHoSo || item.linkHoSo) ? `<div class="mt-1">${hoSoButtonHtml(item.tuiHoSo, item.linkHoSo)}</div>` : ''}
+                        </td>
                         <td class="py-2.5 px-3 text-slate-600 border-r border-slate-100 align-top text-[12px]">${escapeHtml(item.doiTuong || '—')}</td>
                         <td class="py-2.5 px-3 border-r border-slate-100 align-top">
                             <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${meta.badge}">${escapeHtml(meta.short)}</span>
+                            <div class="mt-1">${alertBadgeHtml(item)}</div>
                         </td>
                         <td class="py-2.5 px-3 border-r border-slate-100 text-slate-600 align-top text-[12px] leading-relaxed">${escapeHtml(item.tinhTrang)}</td>
                         <td class="py-2.5 px-2 text-center align-top no-export">
-                            <div class="flex items-center justify-center gap-0.5">
-                                <button onclick="editDetailRow(${index})" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition" title="Sửa"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
-                                <button onclick="deleteDetailRow(${index})" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            <div class="flex flex-col items-center gap-1">
+                                ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
+                                <div class="flex items-center justify-center gap-0.5">
+                                    <button onclick="editDetailRow(${index})" class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition" title="Sửa"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                                    <button onclick="deleteDetailRow(${index})" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
                             </div>
                         </td>`;
                     tbody.appendChild(tr);
                 });
+                const mob = document.getElementById('mobileCardsList');
+                if (mob) {
+                    mob.innerHTML = detailedCases.map((item, index) => {
+                        const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[1];
+                        return `<div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                            <div class="flex justify-between items-start gap-2">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">${escapeHtml(item.hoTen)}</div>
+                                    <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(item.doiTuong || '')}</div>
+                                </div>
+                                <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badge}">${escapeHtml(meta.short)}</span>
+                            </div>
+                            <div class="mt-2">${typeof alertBadgeHtml === 'function' ? alertBadgeHtml(item) : ''}</div>
+                            <p class="text-[11px] text-slate-600 mt-2">${escapeHtml((item.tinhTrang || '').slice(0, 180))}${(item.tinhTrang || '').length > 180 ? '…' : ''}</p>
+                            <div class="mt-2 flex flex-wrap gap-2 items-center">
+                                ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
+                                <button onclick="editDetailRow(${index})" class="text-[11px] text-blue-600 font-medium">Sửa</button>
+                            </div>
+                        </div>`;
+                    }).join('') || '<p class="text-center text-slate-400 text-sm py-6">Không có dữ liệu</p>';
+                }
             }
         }
 
@@ -952,6 +1334,8 @@
                 const colM3 = getVal(32);
                 const colAL = hasWideCols ? getVal(37) : (getVal(3) || getVal(4));
                 const colAM = hasWideCols ? getVal(38) : (getVal(4) || getVal(3));
+                const colTuiHoSo = getVal(43); // AR - tên túi hồ sơ
+                const colLinkHoSo = getVal(44); // AS - link Drive trực tiếp
 
                 if (idx === 0 && (colSTT.toUpperCase() === 'STT' || colSTT === '3' || colHo1.toLowerCase().includes('hộ') || colHo1 === '2')) return;
                 if (!colSTT && !colHo1 && !colHo2 && !colAL && !colAM && !colLoai && !colSL && !colM3 && !colHa && !colM2) return;
@@ -976,10 +1360,14 @@
                         nhomId: nhomId,
                         nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[1].ten,
                         tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
+                        alRaw: colAL || "",
+                        amRaw: colAM || "",
                         phanTruong: colPhanTruong || "—",
                         xa: colXa || "—",
                         hanhVi: colHanhVi || colHanhViCT || "—",
                         ngayViPham: colNgay || "",
+                        tuiHoSo: colTuiHoSo || "",
+                        linkHoSo: colLinkHoSo || "",
                         species: (colLoai || colSL || colM3 || colHa || colM2) ? [speciesLine] : [],
                         // totals
                         soLuong: speciesLine.soLuong,
@@ -1008,9 +1396,13 @@
 
             if (newCases.length === 0) throw new Error("Không trích xuất được dòng có STT hợp lệ!");
             detailedCases = newCases;
-            renderTable();
-            renderCharts();
-            if (typeof renderStats === 'function') renderStats();
+            if (currentViewMode === 'dashboard') renderDashboard();
+            else if (currentViewMode === 'stats') renderStats();
+            else {
+                renderTable();
+                requestAnimationFrame(() => setTimeout(() => renderCharts(), 50));
+            }
+            if (typeof renderStats === 'function' && currentViewMode !== 'stats') { /* keep data ready */ }
         }
 
 function parsePastedTextData() {
@@ -1320,7 +1712,7 @@ function filterTable() {
             if (!kpi) return;
 
             let totalHa = 0, totalM2PhaHoai = 0, totalM2XayDung = 0, totalCay = 0, totalM3 = 0;
-            let phaHoaiVu = 0, phaHoaiCay = 0, khaiThacVu = 0, khaiThacCay = 0;
+            let phaHoaiVu = 0, phaHoaiCay = 0, khaiThacVu = 0, khaiThacCay = 0, khaiThacM3 = 0;
             let xayDungVu = 0, daoMucVu = 0, haDieu = 0, haKeo = 0, haCaoSu = 0;
             cases.forEach(c => {
                 const m = computeCaseMetrics(c);
@@ -1333,7 +1725,11 @@ function filterTable() {
                     phaHoaiCay += m.cayGoLon;
                     totalM2PhaHoai += m.dienTichM2;
                 }
-                if (m.isKhaiThac) { khaiThacVu++; khaiThacCay += m.cayGoLon; }
+                if (m.isKhaiThac) {
+                    khaiThacVu++;
+                    khaiThacCay += m.cayGoLon;
+                    khaiThacM3 += m.khoiLuongM3;
+                }
                 if (m.isXayDung) { xayDungVu++; totalM2XayDung += m.dienTichM2; }
                 if (m.isDaoMuc) { daoMucVu++; totalM2XayDung += m.dienTichM2; }
             });
@@ -1395,6 +1791,11 @@ function filterTable() {
                     <p class="text-[10px] text-slate-500 uppercase font-medium">KT Điều/Keo/Cao su (ha)</p>
                     <p class="text-2xl font-bold text-emerald-600">${fmtNum(totalHa)}</p>
                     <p class="text-[10px] text-slate-400 mt-0.5">Điều ${fmtNum(haDieu)} · Keo ${fmtNum(haKeo)} · Cao su ${fmtNum(haCaoSu)}</p>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-indigo-200 shadow-card">
+                    <p class="text-[10px] text-indigo-700 uppercase font-medium">Tự ý khai thác cây rừng</p>
+                    <p class="text-2xl font-bold text-indigo-600">${khaiThacVu} <span class="text-sm">vụ</span></p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">${fmtNum(khaiThacCay, 0)} cây · ${fmtNum(khaiThacM3)} m³</p>
                 </div>
                 <div class="bg-white p-3.5 rounded-xl border border-rose-200 shadow-card">
                     <p class="text-[10px] text-rose-600 uppercase font-medium">Phá hoại cây rừng</p>
@@ -1479,7 +1880,7 @@ function filterTable() {
             const det = document.getElementById('statsDetailTable');
             if (det) {
                 det.querySelector('thead').innerHTML = `<tr class="bg-slate-50 text-slate-600 sticky top-0">
-                    <th class="py-2 px-3">STT</th><th class="py-2 px-3 text-left">Hộ</th><th class="py-2 px-3 text-left">Hành vi</th>
+                    <th class="py-2 px-3">STT</th><th class="py-2 px-3 text-left">Hộ</th><th class="py-2 px-3 text-left">Hồ sơ</th><th class="py-2 px-3 text-left">Hành vi</th>
                     <th class="py-2 px-3 text-left">Loài (chi tiết)</th><th class="py-2 px-3 text-right">ha</th>
                     <th class="py-2 px-3 text-right">m²</th><th class="py-2 px-3 text-right">Cây</th>
                     <th class="py-2 px-3 text-right">m³</th><th class="py-2 px-3">Ngày BB</th></tr>`;
@@ -1499,6 +1900,7 @@ function filterTable() {
                     return `<tr class="border-t border-slate-100 hover:bg-slate-50">
                         <td class="py-2 px-3 text-center">${i + 1}</td>
                         <td class="py-2 px-3 font-medium">${escapeHtml(c.hoTen)}</td>
+                        <td class="py-2 px-3">${(c.tuiHoSo || c.linkHoSo) ? hoSoButtonHtml(c.tuiHoSo, c.linkHoSo) : '—'}</td>
                         <td class="py-2 px-3">${escapeHtml(c.hanhVi || '—')}</td>
                         <td class="py-2 px-3 text-[11px] text-slate-600 max-w-xs">${escapeHtml(loaiStr)}</td>
                         <td class="py-2 px-3 text-right">${fmtNum(m.dienTichHa)}</td>
@@ -1506,7 +1908,7 @@ function filterTable() {
                         <td class="py-2 px-3 text-right">${fmtNum(m.cayGoLon, 0)}</td>
                         <td class="py-2 px-3 text-right font-semibold">${fmtNum(m.khoiLuongM3)}</td>
                         <td class="py-2 px-3 text-center whitespace-nowrap">${escapeHtml(c.ngayViPham || '—')}</td></tr>`;
-                }).join('') || '<tr><td colspan="9" class="py-6 text-center text-slate-400">Không có dữ liệu trong kỳ</td></tr>';
+                }).join('') || '<tr><td colspan="10" class="py-6 text-center text-slate-400">Không có dữ liệu trong kỳ</td></tr>';
             }
 
             // Chart by month
@@ -1547,7 +1949,261 @@ function filterTable() {
                     });
                 }
             }
+            if (typeof renderQuarterCompare === 'function') renderQuarterCompare();
         }
+
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const on = html.classList.toggle('dark');
+            document.body.classList.toggle('dark-mode', on);
+            localStorage.setItem('qlbvr_dark', on ? '1' : '0');
+            const icon = document.getElementById('darkModeIcon');
+            if (icon) icon.className = on ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
+        }
+        (function initDark() {
+            if (localStorage.getItem('qlbvr_dark') === '1') {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark-mode');
+                setTimeout(() => {
+                    const icon = document.getElementById('darkModeIcon');
+                    if (icon) icon.className = 'fa-solid fa-sun text-amber-400';
+                }, 100);
+            }
+        })();
+
+        function getQuarterRange(q, year) {
+            const startM = (q - 1) * 3; // 0-based month
+            const from = new Date(year, startM, 1);
+            const to = new Date(year, startM + 3, 0, 23, 59, 59);
+            return { from, to };
+        }
+
+        function casesInRange(from, to) {
+            return detailedCases.filter(c => {
+                const d = parseVNDate(c.ngayViPham);
+                if (!d) return false;
+                return d >= from && d <= to;
+            });
+        }
+
+        function summarizeCases(cases) {
+            let cay = 0, m3 = 0, ha = 0, m2 = 0;
+            const hv = {};
+            cases.forEach(c => {
+                const m = typeof computeCaseMetrics === 'function' ? computeCaseMetrics(c) : {};
+                cay += m.cayGoLon || 0;
+                m3 += m.khoiLuongM3 || 0;
+                ha += m.dienTichHa || 0;
+                m2 += m.dienTichM2 || 0;
+                const k = c.hanhVi || '—';
+                hv[k] = (hv[k] || 0) + 1;
+            });
+            return { n: cases.length, cay, m3, ha, m2, hv };
+        }
+
+        function renderQuarterCompare() {
+            const box = document.getElementById('quarterCompareBox');
+            const el = document.getElementById('quarterCompareContent');
+            if (!box || !el) return;
+
+            const mode = document.getElementById('statsTimeMode')?.value;
+            // Hiện khi lọc theo quý hoặc toàn bộ (lấy quý hiện tại)
+            let q = +(document.getElementById('statsQuarter')?.value || 0);
+            let y = +(document.getElementById('statsYear')?.value || new Date().getFullYear());
+            if (mode === 'all' || mode === 'month' || mode === 'custom') {
+                // Mặc định: quý hiện tại theo ngày hệ thống
+                const now = new Date();
+                q = Math.floor(now.getMonth() / 3) + 1;
+                y = now.getFullYear();
+            }
+            if (!q) { box.classList.add('hidden'); return; }
+            box.classList.remove('hidden');
+
+            let prevQ = q - 1, prevY = y;
+            if (prevQ < 1) { prevQ = 4; prevY = y - 1; }
+
+            const curR = getQuarterRange(q, y);
+            const prevR = getQuarterRange(prevQ, prevY);
+            const cur = summarizeCases(casesInRange(curR.from, curR.to));
+            const prev = summarizeCases(casesInRange(prevR.from, prevR.to));
+
+            function delta(a, b, dec = 0) {
+                const d = a - b;
+                const pct = b ? ((d / b) * 100) : (a ? 100 : 0);
+                const cls = d > 0 ? 'text-rose-600' : (d < 0 ? 'text-emerald-600' : 'text-slate-500');
+                const sign = d > 0 ? '+' : '';
+                return `<span class="${cls} font-semibold">${sign}${d.toLocaleString('vi-VN', { maximumFractionDigits: dec })}</span>
+                    <span class="text-[10px] ${cls}">(${sign}${pct.toFixed(0)}%)</span>`;
+            }
+
+            el.innerHTML = `
+                <p class="text-[11px] text-slate-500 mb-2">Quý ${q}/${y} so với Quý ${prevQ}/${prevY}</p>
+                <table class="w-full text-xs">
+                    <thead><tr class="bg-indigo-50 text-indigo-900">
+                        <th class="py-2 px-3 text-left">Chỉ tiêu</th>
+                        <th class="py-2 px-3 text-right">Quý ${prevQ}/${prevY}</th>
+                        <th class="py-2 px-3 text-right">Quý ${q}/${y}</th>
+                        <th class="py-2 px-3 text-right">Chênh lệch</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr class="border-t border-slate-100"><td class="py-2 px-3 font-medium">Số vụ</td>
+                            <td class="py-2 px-3 text-right">${prev.n}</td><td class="py-2 px-3 text-right font-bold">${cur.n}</td>
+                            <td class="py-2 px-3 text-right">${delta(cur.n, prev.n)}</td></tr>
+                        <tr class="border-t border-slate-100"><td class="py-2 px-3 font-medium">Cây gỗ lớn</td>
+                            <td class="py-2 px-3 text-right">${prev.cay.toLocaleString('vi-VN')}</td>
+                            <td class="py-2 px-3 text-right font-bold">${cur.cay.toLocaleString('vi-VN')}</td>
+                            <td class="py-2 px-3 text-right">${delta(cur.cay, prev.cay)}</td></tr>
+                        <tr class="border-t border-slate-100"><td class="py-2 px-3 font-medium">Khối lượng (m³)</td>
+                            <td class="py-2 px-3 text-right">${prev.m3.toLocaleString('vi-VN', {maximumFractionDigits:2})}</td>
+                            <td class="py-2 px-3 text-right font-bold">${cur.m3.toLocaleString('vi-VN', {maximumFractionDigits:2})}</td>
+                            <td class="py-2 px-3 text-right">${delta(cur.m3, prev.m3, 2)}</td></tr>
+                        <tr class="border-t border-slate-100"><td class="py-2 px-3 font-medium">Diện tích KT (ha)</td>
+                            <td class="py-2 px-3 text-right">${prev.ha.toLocaleString('vi-VN', {maximumFractionDigits:2})}</td>
+                            <td class="py-2 px-3 text-right font-bold">${cur.ha.toLocaleString('vi-VN', {maximumFractionDigits:2})}</td>
+                            <td class="py-2 px-3 text-right">${delta(cur.ha, prev.ha, 2)}</td></tr>
+                        <tr class="border-t border-slate-100"><td class="py-2 px-3 font-medium">Phá hoại / XD (m²)</td>
+                            <td class="py-2 px-3 text-right">${prev.m2.toLocaleString('vi-VN', {maximumFractionDigits:1})}</td>
+                            <td class="py-2 px-3 text-right font-bold">${cur.m2.toLocaleString('vi-VN', {maximumFractionDigits:1})}</td>
+                            <td class="py-2 px-3 text-right">${delta(cur.m2, prev.m2, 1)}</td></tr>
+                    </tbody>
+                </table>`;
+        }
+
+        /** Xuất Word theo bố cục văn bản hành chính (NĐ 30/2020) */
+        function exportWordND30() {
+            const cases = typeof getFilteredCases === 'function' ? getFilteredCases() : detailedCases;
+            let totalCay = 0, totalM3 = 0, totalHa = 0, totalM2 = 0;
+            cases.forEach(c => {
+                const m = typeof computeCaseMetrics === 'function' ? computeCaseMetrics(c) : {};
+                totalCay += m.cayGoLon || 0;
+                totalM3 += m.khoiLuongM3 || 0;
+                totalHa += m.dienTichHa || 0;
+                totalM2 += m.dienTichM2 || 0;
+            });
+            const mode = document.getElementById('statsTimeMode')?.value || 'all';
+            let periodLabel = 'toàn bộ thời gian';
+            if (mode === 'month') periodLabel = 'tháng ' + (document.getElementById('statsMonth')?.value || '');
+            if (mode === 'quarter') periodLabel = 'Quý ' + document.getElementById('statsQuarter')?.value + '/' + document.getElementById('statsYear')?.value;
+            if (mode === 'custom') periodLabel = 'từ ' + (document.getElementById('statsFrom')?.value || '…') + ' đến ' + (document.getElementById('statsTo')?.value || '…');
+
+            const today = new Date();
+            const dd = String(today.getDate()).padStart(2, '0');
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const yyyy = today.getFullYear();
+
+            const rows = cases.map((c, i) => {
+                const m = typeof computeCaseMetrics === 'function' ? computeCaseMetrics(c) : {};
+                return `<tr>
+                    <td style="border:1px solid #000;padding:4px;text-align:center">${i + 1}</td>
+                    <td style="border:1px solid #000;padding:4px">${c.hoTen || ''}</td>
+                    <td style="border:1px solid #000;padding:4px">${c.hanhVi || ''}</td>
+                    <td style="border:1px solid #000;padding:4px;text-align:center">${m.cayGoLon || 0}</td>
+                    <td style="border:1px solid #000;padding:4px;text-align:center">${(m.khoiLuongM3 || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</td>
+                    <td style="border:1px solid #000;padding:4px;text-align:center">${(m.dienTichHa || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</td>
+                    <td style="border:1px solid #000;padding:4px;text-align:center">${(m.dienTichM2 || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}</td>
+                    <td style="border:1px solid #000;padding:4px">${(NHOM_MAP[c.nhomId] || {}).short || ''}</td>
+                </tr>`;
+            }).join('');
+
+            const html = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+  body { font-family: 'Times New Roman', Times, serif; font-size: 13pt; color: #000; }
+  .qh { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 13pt; }
+  .tn { text-align: center; font-weight: bold; font-size: 13pt; }
+  .line { border-bottom: 1px solid #000; width: 40%; margin: 2px auto 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 11pt; }
+  p { margin: 6px 0; text-align: justify; }
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .bold { font-weight: bold; }
+  .mt { margin-top: 18px; }
+</style></head>
+<body>
+<table width="100%" style="border:none;margin-bottom:8px;border-collapse:collapse"><tr>
+  <td width="42%" style="border:none;vertical-align:top;text-align:center;font-family:'Times New Roman',Times,serif">
+    <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.35">BQL RỪNG PHÒNG HỘ XUÂN LỘC</div>
+    <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.35;text-decoration:underline">PHÒNG LÂM NGHIỆP</div>
+    <div style="margin-top:10px;font-size:13pt">Số:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/BC-PLN</div>
+  </td>
+  <td width="58%" style="border:none;vertical-align:top;text-align:center;font-family:'Times New Roman',Times,serif">
+    <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.35">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+    <div style="font-weight:bold;font-size:13pt;line-height:1.35;text-decoration:underline">Độc lập – Tự do – Hạnh phúc</div>
+    <div style="margin-top:10px;font-size:13pt;font-style:italic">Xuân Hòa, ngày ${dd} tháng ${mm} năm ${yyyy}</div>
+  </td>
+</tr></table>
+
+<p class="center bold" style="font-size:14pt;margin-top:22px;letter-spacing:1px">BÁO CÁO</p>
+<p class="center bold" style="font-size:13pt;margin-top:6px">Tình hình vi phạm công tác quản lý bảo vệ rừng (QLBVR)<br>trên lâm phận Ban Quản lý Rừng phòng hộ Xuân Lộc</p>
+<p class="center" style="font-style:italic;margin-top:4px">(Kỳ báo cáo: ${periodLabel})</p>
+<div style="width:80px;border-bottom:1.5px solid #000;margin:10px auto 16px"></div>
+
+<p style="text-align:left"><b>Kính gửi:</b> Giám đốc Ban Quản lý rừng phòng hộ Xuân Lộc.</p>
+
+<p>Căn cứ chức năng, nhiệm vụ được giao; căn cứ dữ liệu theo dõi vi phạm hợp đồng khoán lâm nghiệp, Phòng Lâm nghiệp kính báo cáo như sau:</p>
+
+<p class="bold">I. TÌNH HÌNH CHUNG</p>
+<p>Trong kỳ báo cáo (${periodLabel}), trên lâm phận BQLRPH Xuân Lộc ghi nhận <b>${cases.length}</b> vụ vi phạm liên quan công tác QLBVR, gây thiệt hại ước tính <b>${totalCay.toLocaleString('vi-VN')}</b> cây gỗ lớn (khoảng <b>${totalM3.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> m³); diện tích khai thác Điều/Keo lai/Cao su khoảng <b>${totalHa.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> ha; diện tích phá hoại/xây dựng/đào hồ khoảng <b>${totalM2.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}</b> m².</p>
+
+<p class="bold">II. PHÂN LOẠI THEO NHÓM XỬ LÝ</p>
+<p>Các hộ vi phạm được phân nhóm theo tiến độ xử lý hợp đồng (mời làm việc, chấp hành khắc phục, niêm yết thông báo, chấm dứt thu hồi HĐ) và theo dõi trên hệ thống báo cáo đồng bộ dữ liệu.</p>
+
+<p class="bold">III. DANH SÁCH CHI TIẾT</p>
+<table>
+  <thead>
+    <tr>
+      <th style="border:1px solid #000;padding:4px">STT</th>
+      <th style="border:1px solid #000;padding:4px">Hộ nhận khoán</th>
+      <th style="border:1px solid #000;padding:4px">Hành vi</th>
+      <th style="border:1px solid #000;padding:4px">Cây</th>
+      <th style="border:1px solid #000;padding:4px">m³</th>
+      <th style="border:1px solid #000;padding:4px">ha</th>
+      <th style="border:1px solid #000;padding:4px">m²</th>
+      <th style="border:1px solid #000;padding:4px">Nhóm xử lý</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+
+<p class="bold mt">IV. KIẾN NGHỊ</p>
+<p>1. Tiếp tục đôn đốc các hộ thuộc nhóm đang mời làm việc và đã niêm yết thông báo đến làm việc, cam kết khắc phục.</p>
+<p>2. Đối với trường hợp cố tình không chấp hành, đề nghị xem xét trình ban hành quyết định chấm dứt, thu hồi hợp đồng theo quy định.</p>
+<p>3. Tăng cường tuần tra, phối hợp Kiểm lâm và chính quyền địa phương để ngăn chặn vi phạm mới.</p>
+
+<p>Trên đây là báo cáo tình hình vi phạm công tác QLBVR kỳ <b>${periodLabel}</b>, kính trình Giám đốc Ban xem xét, chỉ đạo./.</p>
+
+<table width="100%" style="border:none;margin-top:28px"><tr>
+  <td width="50%" style="border:none;text-align:center;vertical-align:top">
+    <div style="font-style:italic">Nơi nhận:</div>
+    <div style="text-align:left;display:inline-block;font-size:11pt;margin-top:4px">
+      - Như trên;<br>
+      - Lưu: VT, PLN.
+    </div>
+  </td>
+  <td width="50%" style="border:none;text-align:center;vertical-align:top">
+    <div class="bold">KT. TRƯỞNG PHÒNG</div>
+    <div class="bold">PHÓ TRƯỞNG PHÒNG</div>
+    <div style="font-style:italic;margin-top:4px">(Ký, ghi rõ họ tên)</div>
+    <div style="height:70px"></div>
+  </td>
+</tr></table>
+</body></html>`;
+
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `BaoCao_QLBVR_BQLRPH_XuanLoc_${yyyy}${mm}${dd}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            if (typeof showToast === 'function') showToast('Đã tải file Word (mẫu NĐ 30/2020)!');
+        }
+
 
         function exportStatsExcel() {
             const cases = getFilteredCases();
@@ -1576,8 +2232,9 @@ function filterTable() {
             const cases = getFilteredCases();
             let totalHa = 0, totalM2 = 0, totalCay = 0, totalM3 = 0;
             cases.forEach(c => {
-                totalHa += c.dienTichHa || 0; totalM2 += c.dienTichM2 || 0;
-                totalCay += c.soLuong || 0; totalM3 += c.khoiLuongM3 || 0;
+                const m = typeof computeCaseMetrics === 'function' ? computeCaseMetrics(c) : {};
+                totalHa += m.dienTichHa || 0; totalM2 += m.dienTichM2 || 0;
+                totalCay += m.cayGoLon || 0; totalM3 += m.khoiLuongM3 || 0;
             });
             const mode = document.getElementById('statsTimeMode')?.value || 'all';
             let periodLabel = 'Toàn bộ thời gian';
@@ -1615,7 +2272,7 @@ function filterTable() {
   @media print{body{padding:12px;background:#fff} .header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style></head><body>
 <div class="header">
-  <h1>BÁO CÁO THỐNG KÊ VI PHẠM HỢP ĐỒNG KHOÁN LÂM NGHIỆP</h1>
+  <h1>BÁO CÁO VI PHẠM CÔNG TÁC QLBVR — BQLRPH XUÂN LỘC</h1>
   <p>Ban Quản lý Rừng phòng hộ Xuân Lộc · Kỳ: ${periodLabel} · Xuất ngày ${new Date().toLocaleDateString('vi-VN')}</p>
 </div>
 <div class="kpis">
@@ -1627,14 +2284,16 @@ function filterTable() {
 <div class="card"><h2>Theo hành vi</h2>
 <table><thead><tr><th>Hành vi</th><th class="right">Số hộ</th><th class="right">ha</th><th class="right">m²</th><th class="right">Cây</th><th class="right">m³</th></tr></thead>
 <tbody>${Object.entries(hvRows).map(([k,v])=>`<tr><td>${k}</td><td class="right">${v.n}</td><td class="right">${fmtNum(v.ha)}</td><td class="right">${fmtNum(v.m2)}</td><td class="right">${fmtNum(v.cay,0)}</td><td class="right">${fmtNum(v.m3)}</td></tr>`).join('')}</tbody></table></div>
-<div class="card"><h2>Chi tiết từng hộ (đã cộng dồn loài)</h2>
-<table><thead><tr><th class="center">STT</th><th>Hộ</th><th>Hành vi</th><th>Loài</th><th class="right">ha</th><th class="right">m²</th><th class="right">Cây</th><th class="right">m³</th><th class="center">Ngày</th></tr></thead>
+<div class="card"><h2>Chi tiết từng hộ (đã cộng dồn loài · kèm hồ sơ)</h2>
+<table><thead><tr><th class="center">STT</th><th>Hộ</th><th>Hành vi</th><th>Loài</th><th class="right">ha</th><th class="right">m²</th><th class="right">Cây</th><th class="right">m³</th><th class="center">Ngày</th><th>Hồ sơ</th></tr></thead>
 <tbody>${cases.map((c,i)=>{
+  const m = typeof computeCaseMetrics === 'function' ? computeCaseMetrics(c) : {};
   const loai=(c.species||[]).filter(s=>s.loai).map(s=>s.loai+(s.soLuong?' ('+s.soLuong+')':'')).join(', ')||'—';
+  const hs = c.linkHoSo ? '<a href="'+c.linkHoSo+'">'+(c.tuiHoSo||'Mở hồ sơ')+'</a>' : (c.tuiHoSo||'—');
   return `<tr><td class="center">${i+1}</td><td><b>${c.hoTen}</b></td><td>${c.hanhVi||'—'}</td><td style="font-size:11px">${loai}</td>
-  <td class="right">${fmtNum(c.dienTichHa)}</td><td class="right">${fmtNum(c.dienTichM2)}</td>
-  <td class="right">${fmtNum(c.soLuong,0)}</td><td class="right"><b>${fmtNum(c.khoiLuongM3)}</b></td>
-  <td class="center">${c.ngayViPham||'—'}</td></tr>`;
+  <td class="right">${fmtNum(m.dienTichHa||0)}</td><td class="right">${fmtNum(m.dienTichM2||0)}</td>
+  <td class="right">${fmtNum(m.cayGoLon||0,0)}</td><td class="right"><b>${fmtNum(m.khoiLuongM3||0)}</b></td>
+  <td class="center">${c.ngayViPham||'—'}</td><td style="font-size:10px">${hs}</td></tr>`;
 }).join('')}</tbody></table></div>
 <div class="footer">Ban Quản lý Rừng phòng hộ Xuân Lộc · Phòng Lâm nghiệp · Báo cáo tự động từ Google Sheets</div>
 <script>setTimeout(()=>window.print(),600)<\/script>
@@ -1679,13 +2338,12 @@ function filterTable() {
         }
 
         window.onload = function() {
-            renderTable();
-            renderCharts();
-            // Mặc định kết nối sheet cố định ngay khi mở trang
+            // Mặc định Dashboard lãnh đạo + đồng bộ sheet
             setTimeout(() => {
                 reloadData(true);
                 startAutoRefresh();
-            }, 500);
+                if (typeof switchMainView === 'function') switchMainView('dashboard');
+            }, 400);
         };
     </script>
 </body>
