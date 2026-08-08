@@ -48,6 +48,16 @@
         @media (min-width: 641px) {
             .mobile-cards { display: none !important; }
         }
+        @media (max-width: 640px) {
+            header .max-w-7xl { padding-left: 0.75rem; padding-right: 0.75rem; }
+            header h1 { font-size: 0.8rem !important; }
+            #advFilterPanel.collapsed-mobile { display: none !important; }
+            main { padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0.75rem; }
+            .stat-card p.text-xl, .stat-card p.text-2xl { font-size: 1.15rem; }
+        }
+        @media (min-width: 641px) {
+            #advFilterPanel.collapsed-mobile { display: grid !important; }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
@@ -236,20 +246,24 @@
                     <div class="h-52"><canvas id="chartDashNhom"></canvas></div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
-                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top phân trường (số vụ)</div>
-                    <div id="dashTopPT" class="p-3 text-xs space-y-1.5"></div>
+                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top tiểu khu</div>
+                    <div id="dashTopTK" class="p-3 text-xs space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar"></div>
                 </div>
                 <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
-                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top xã / địa bàn (số vụ)</div>
-                    <div id="dashTopXa" class="p-3 text-xs space-y-1.5"></div>
+                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top phân trường</div>
+                    <div id="dashTopPT" class="p-3 text-xs space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar"></div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/80 text-xs font-semibold text-slate-700">Top xã / địa bàn</div>
+                    <div id="dashTopXa" class="p-3 text-xs space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar"></div>
                 </div>
             </div>
         </div>
 
         <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 hidden" id="chartsSection">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 hidden" id="chartsSection">
             <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
                 <h3 class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
                     <i class="fa-solid fa-chart-pie text-emerald-600"></i> Phân bố theo Nhóm xử lý
@@ -267,6 +281,12 @@
                     <i class="fa-solid fa-chart-column text-amber-600"></i> Theo Xã / Địa bàn
                 </h3>
                 <div class="h-48"><canvas id="chartXa"></canvas></div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card p-4">
+                <h3 class="text-xs font-semibold text-slate-700 mb-3 flex items-center gap-1.5">
+                    <i class="fa-solid fa-map-location-dot text-violet-600"></i> Theo Tiểu khu
+                </h3>
+                <div class="h-48"><canvas id="chartTieuKhu"></canvas></div>
             </div>
         </div>
 
@@ -373,9 +393,43 @@
         <!-- Data Table -->
         <div id="dataTableWrap" class="hidden bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
             <div class="p-3.5 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div class="relative max-w-xs w-full">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="tableSearchInput" onkeyup="filterTable()" placeholder="Tìm tên hộ, đối tượng, tình trạng..." class="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-sheets-500 focus:border-sheets-500 outline-none shadow-sm">
+                <div class="w-full space-y-2">
+                    <div class="flex flex-col sm:flex-row gap-2 w-full">
+                        <div class="relative flex-1 min-w-0">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="search" id="tableSearchInput" oninput="filterTable()" placeholder="Tên hộ, đối tượng, hồ sơ..."
+                                class="w-full pl-9 pr-3 py-2.5 sm:py-1.5 bg-white border border-slate-200 rounded-lg text-sm sm:text-xs focus:ring-2 focus:ring-sheets-500 outline-none shadow-sm">
+                        </div>
+                        <button type="button" onclick="toggleAdvFilter()" class="sm:hidden px-3 py-2.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 bg-white flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-sliders"></i> Lọc thêm
+                        </button>
+                    </div>
+                    <div id="advFilterPanel" class="collapsed-mobile grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                        <select id="filterNhom" onchange="filterTable()" class="px-2 py-2 sm:py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                            <option value="">Tất cả nhóm</option>
+                            <option value="1">VP mới chưa mời</option>
+                            <option value="2">Đang mời</option>
+                            <option value="3">Khắc phục</option>
+                            <option value="4">Niêm yết</option>
+                            <option value="5">Chấm dứt HĐ</option>
+                        </select>
+                        <select id="filterHanhVi" onchange="filterTable()" class="px-2 py-2 sm:py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                            <option value="">Tất cả hành vi</option>
+                        </select>
+                        <select id="filterTieuKhu" onchange="filterTable()" class="px-2 py-2 sm:py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                            <option value="">Tất cả tiểu khu</option>
+                        </select>
+                        <select id="filterPhanTruong" onchange="filterTable()" class="px-2 py-2 sm:py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                            <option value="">Tất cả phân trường</option>
+                        </select>
+                        <select id="filterXa" onchange="filterTable()" class="px-2 py-2 sm:py-1.5 border border-slate-200 rounded-lg text-xs bg-white">
+                            <option value="">Tất cả xã</option>
+                        </select>
+                        <button type="button" onclick="clearFilters()" class="px-2 py-2 sm:py-1.5 border border-slate-200 rounded-lg text-xs text-slate-600 bg-slate-50 hover:bg-slate-100">
+                            <i class="fa-solid fa-xmark mr-1"></i>Xóa lọc
+                        </button>
+                    </div>
+                    <p id="filterResultCount" class="text-[11px] text-slate-500"></p>
                 </div>
                 <div class="flex items-center space-x-2">
                     <span id="syncStatusBadge" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
@@ -772,6 +826,7 @@
                         <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:${Math.round(v / max * 100)}%"></div></div>
                     </div>`).join("") || `<p class="text-slate-400">Chưa có dữ liệu</p>`;
             }
+            topN("tieuKhu", "dashTopTK");
             topN("phanTruong", "dashTopPT");
             topN("xa", "dashTopXa");
 
@@ -1058,6 +1113,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                 });
                 const mob = document.getElementById('mobileCardsList');
                 if (mob) {
+                    if (typeof populateFilterOptions === 'function') populateFilterOptions();
                     mob.innerHTML = detailedCases.map((item, index) => {
                         const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[1];
                         return `<div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
@@ -1322,6 +1378,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                 const colHo1 = getVal(1);
                 const colHo2 = getVal(2);
                 const colDoiTuong = getVal(40) || getVal(3);
+                const colTieuKhu = getVal(14) || getVal(15);
                 const colPhanTruong = getVal(16);
                 const colXa = getVal(18);
                 const colNgay = getVal(21);
@@ -1362,6 +1419,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                         tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
                         alRaw: colAL || "",
                         amRaw: colAM || "",
+                        tieuKhu: colTieuKhu || "—",
                         phanTruong: colPhanTruong || "—",
                         xa: colXa || "—",
                         hanhVi: colHanhVi || colHanhViCT || "—",
@@ -1376,26 +1434,43 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                         dienTichM2: speciesLine.dienTichM2
                     };
                 } else if (current) {
-                    // Dòng phụ: cùng hộ, loài khác hoặc thông tin bổ sung → cộng dồn
-                    if (colLoai || colSL || colM3 || colHa || colM2) {
-                        current.species.push(speciesLine);
-                        current.soLuong += speciesLine.soLuong;
-                        current.khoiLuongM3 += speciesLine.khoiLuongM3;
-                        current.dienTichHa += speciesLine.dienTichHa;
-                        current.dienTichM2 += speciesLine.dienTichM2;
+                    // Dòng phụ: chỉ gộp khi cùng hộ (tên trống hoặc trùng tên).
+                    // Bỏ qua dòng tổng/cộng cuối sheet (tên là số, hoặc không liên quan hộ đang mở).
+                    const subName = (colHo1 || colHo2 || "").trim();
+                    // Dòng tổng cuối sheet (số cây ~1010, m³ ~1250, m² hàng trăm…) không gắn tên hộ thật
+                    const looksLikeSheetTotal = !colLoai && (
+                        speciesLine.soLuong >= 100 ||
+                        speciesLine.khoiLuongM3 >= 100 ||
+                        speciesLine.dienTichM2 >= 500 ||
+                        speciesLine.dienTichHa >= 10
+                    );
+                    const isJunkTotal = /^\d+([.,]\d+)?$/.test(subName)
+                        || (subName && subName !== current.hoTen && !subName.includes(current.hoTen) && !current.hoTen.includes(subName))
+                        || looksLikeSheetTotal;
+                    if (isJunkTotal) {
+                        // Bỏ qua dòng tổng hợp / rác cuối sheet
+                    } else {
+                        if (colLoai || colSL || colM3 || colHa || colM2) {
+                            current.species.push(speciesLine);
+                            current.soLuong += speciesLine.soLuong;
+                            current.khoiLuongM3 += speciesLine.khoiLuongM3;
+                            current.dienTichHa += speciesLine.dienTichHa;
+                            current.dienTichM2 += speciesLine.dienTichM2;
+                        }
+                        const extras = [colHo1, colHo2, colAL, colAM].filter(v => v && v !== current.hoTen);
+                        if (extras.length) current.tinhTrang += (current.tinhTrang ? "\n" : "") + extras.join(" | ");
+                        if (colPhanTruong && current.phanTruong === "—") current.phanTruong = colPhanTruong;
+                        if (colXa && current.xa === "—") current.xa = colXa;
+                        if (colHanhVi && current.hanhVi === "—") current.hanhVi = colHanhVi;
+                        if (colNgay && !current.ngayViPham) current.ngayViPham = colNgay;
                     }
-                    const extras = [colHo1, colHo2, colAL, colAM].filter(v => v && v !== current.hoTen);
-                    if (extras.length) current.tinhTrang += (current.tinhTrang ? "\n" : "") + extras.join(" | ");
-                    if (colPhanTruong && current.phanTruong === "—") current.phanTruong = colPhanTruong;
-                    if (colXa && current.xa === "—") current.xa = colXa;
-                    if (colHanhVi && current.hanhVi === "—") current.hanhVi = colHanhVi;
-                    if (colNgay && !current.ngayViPham) current.ngayViPham = colNgay;
                 }
             });
             if (current) newCases.push(current);
 
             if (newCases.length === 0) throw new Error("Không trích xuất được dòng có STT hợp lệ!");
             detailedCases = newCases;
+            if (typeof populateFilterOptions === 'function') populateFilterOptions();
             if (currentViewMode === 'dashboard') renderDashboard();
             else if (currentViewMode === 'stats') renderStats();
             else {
@@ -1479,19 +1554,97 @@ function parsePastedTextData() {
             }
         }
 
-function filterTable() {
-            const q = document.getElementById('tableSearchInput').value.toLowerCase().trim();
-            const rows = document.querySelectorAll('#tableBody tr');
-            if (currentViewMode !== 'detail') return;
-            detailedCases.forEach((item, idx) => {
-                const row = rows[idx];
-                if (!row) return;
-                const match = item.hoTen.toLowerCase().includes(q) ||
-                    (item.doiTuong && item.doiTuong.toLowerCase().includes(q)) ||
-                    item.tinhTrang.toLowerCase().includes(q) ||
-                    item.nhomTen.toLowerCase().includes(q);
-                row.style.display = match ? '' : 'none';
+function toggleAdvFilter() {
+            const p = document.getElementById('advFilterPanel');
+            if (!p) return;
+            p.classList.toggle('collapsed-mobile');
+        }
+
+        function clearFilters() {
+            ['tableSearchInput', 'filterNhom', 'filterHanhVi', 'filterTieuKhu', 'filterPhanTruong', 'filterXa'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
             });
+            filterTable();
+        }
+
+        function populateFilterOptions() {
+            function fill(selId, values) {
+                const sel = document.getElementById(selId);
+                if (!sel) return;
+                const cur = sel.value;
+                const first = sel.querySelector('option') ? sel.querySelector('option').outerHTML : '<option value="">Tất cả</option>';
+                const opts = [...values].filter(v => v && v !== '—').sort((a, b) => String(a).localeCompare(String(b), 'vi'));
+                sel.innerHTML = first + opts.map(v => `<option value="${String(v).replace(/"/g, '&quot;')}">${escapeHtml(String(v))}</option>`).join('');
+                if (cur) sel.value = cur;
+            }
+            const hv = new Set(), tk = new Set(), pt = new Set(), xa = new Set();
+            detailedCases.forEach(c => {
+                if (c.hanhVi) hv.add(c.hanhVi);
+                if (c.tieuKhu) tk.add(c.tieuKhu);
+                if (c.phanTruong) pt.add(c.phanTruong);
+                if (c.xa) xa.add(c.xa);
+            });
+            fill('filterHanhVi', hv);
+            fill('filterTieuKhu', tk);
+            fill('filterPhanTruong', pt);
+            fill('filterXa', xa);
+        }
+
+        function caseMatchesFilters(item) {
+            const q = (document.getElementById('tableSearchInput')?.value || '').toLowerCase().trim();
+            const fNhom = document.getElementById('filterNhom')?.value || '';
+            const fHV = document.getElementById('filterHanhVi')?.value || '';
+            const fTK = document.getElementById('filterTieuKhu')?.value || '';
+            const fPT = document.getElementById('filterPhanTruong')?.value || '';
+            const fXa = document.getElementById('filterXa')?.value || '';
+            const textBlob = [
+                item.hoTen, item.doiTuong, item.tinhTrang, item.nhomTen,
+                item.hanhVi, item.tieuKhu, item.phanTruong, item.xa, item.tuiHoSo
+            ].join(' ').toLowerCase();
+            const matchQ = !q || q.split(/\s+/).filter(Boolean).every(w => textBlob.includes(w));
+            return matchQ
+                && (!fNhom || String(item.nhomId) === fNhom)
+                && (!fHV || item.hanhVi === fHV)
+                && (!fTK || String(item.tieuKhu) === fTK)
+                && (!fPT || item.phanTruong === fPT)
+                && (!fXa || item.xa === fXa);
+        }
+
+        function filterTable() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            let visible = 0;
+            detailedCases.forEach((item, idx) => {
+                const ok = caseMatchesFilters(item);
+                if (ok) visible++;
+                if (rows[idx]) rows[idx].style.display = ok ? '' : 'none';
+            });
+            const mob = document.getElementById('mobileCardsList');
+            if (mob && currentViewMode === 'detail') {
+                const filtered = detailedCases.filter(caseMatchesFilters);
+                visible = filtered.length;
+                mob.innerHTML = filtered.map(item => {
+                    const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[1];
+                    return `<div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <div class="font-semibold text-slate-800 text-sm">${escapeHtml(item.hoTen)}</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">TK ${escapeHtml(String(item.tieuKhu || '—'))} · ${escapeHtml(item.phanTruong || '')} · ${escapeHtml(item.xa || '')}</div>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badge}">${escapeHtml(meta.short)}</span>
+                        </div>
+                        <div class="mt-2">${typeof alertBadgeHtml === 'function' ? alertBadgeHtml(item) : ''}</div>
+                        <p class="text-[11px] text-slate-600 mt-2">${escapeHtml((item.tinhTrang || '').slice(0, 160))}</p>
+                        <div class="mt-2 flex flex-wrap gap-2">${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}</div>
+                    </div>`;
+                }).join('') || '<p class="text-center text-slate-400 text-sm py-6">Không có kết quả</p>';
+            }
+            const cnt = document.getElementById('filterResultCount');
+            if (cnt && currentViewMode === 'detail') {
+                const active = ['tableSearchInput','filterNhom','filterHanhVi','filterTieuKhu','filterPhanTruong','filterXa']
+                    .some(id => (document.getElementById(id)?.value || '').trim());
+                cnt.textContent = active ? `Hiển thị ${visible}/${detailedCases.length} hộ` : `${detailedCases.length} hộ`;
+            }
         }
 
         function addNewRowModal() {
@@ -1573,7 +1726,7 @@ function filterTable() {
         }
 
         
-        let chartNhom = null, chartPhanTruong = null, chartXa = null;
+        let chartNhom = null, chartPhanTruong = null, chartXa = null, chartTieuKhu = null;
 
         function renderCharts() {
             if (typeof Chart === 'undefined') return;
@@ -1639,6 +1792,30 @@ function filterTable() {
                     data: {
                         labels: xaLabels,
                         datasets: [{ label: 'Số hộ', data: xaData, backgroundColor: '#f59e0b', borderRadius: 4 }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+                    }
+                });
+            }
+
+            // --- Chart 4: by Tiểu khu ---
+            const tkMap = {};
+            detailedCases.forEach(c => {
+                const k = (c.tieuKhu && c.tieuKhu !== '—') ? String(c.tieuKhu) : 'Khác';
+                tkMap[k] = (tkMap[k] || 0) + 1;
+            });
+            const tkSorted = Object.entries(tkMap).sort((a, b) => b[1] - a[1]);
+            if (chartTieuKhu) chartTieuKhu.destroy();
+            const ctx4 = document.getElementById('chartTieuKhu');
+            if (ctx4) {
+                chartTieuKhu = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: tkSorted.map(x => x[0]),
+                        datasets: [{ label: 'Số hộ', data: tkSorted.map(x => x[1]), backgroundColor: '#8b5cf6', borderRadius: 4 }]
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
@@ -1953,23 +2130,31 @@ function filterTable() {
         }
 
 
+        function safeLocalStorageGet(key) {
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+        function safeLocalStorageSet(key, val) {
+            try { localStorage.setItem(key, val); } catch (e) { /* sandbox / private mode */ }
+        }
         function toggleDarkMode() {
             const html = document.documentElement;
             const on = html.classList.toggle('dark');
             document.body.classList.toggle('dark-mode', on);
-            localStorage.setItem('qlbvr_dark', on ? '1' : '0');
+            safeLocalStorageSet('qlbvr_dark', on ? '1' : '0');
             const icon = document.getElementById('darkModeIcon');
             if (icon) icon.className = on ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
         }
         (function initDark() {
-            if (localStorage.getItem('qlbvr_dark') === '1') {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark-mode');
-                setTimeout(() => {
-                    const icon = document.getElementById('darkModeIcon');
-                    if (icon) icon.className = 'fa-solid fa-sun text-amber-400';
-                }, 100);
-            }
+            try {
+                if (safeLocalStorageGet('qlbvr_dark') === '1') {
+                    document.documentElement.classList.add('dark');
+                    document.body.classList.add('dark-mode');
+                    setTimeout(() => {
+                        const icon = document.getElementById('darkModeIcon');
+                        if (icon) icon.className = 'fa-solid fa-sun text-amber-400';
+                    }, 100);
+                }
+            } catch (e) { /* ignore */ }
         })();
 
         function getQuarterRange(q, year) {
