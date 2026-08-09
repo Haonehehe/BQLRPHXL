@@ -783,8 +783,12 @@
                     </ol>
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Đường link Google Sheets:</label>
+                    <label class="block font-semibold text-slate-700 mb-1">Link sheet chính (vi phạm QLBVR):</label>
                     <input type="url" id="sheetCsvUrl" value="https://docs.google.com/spreadsheets/d/1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU/edit?gid=528762373#gid=528762373" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none text-xs">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Link tab <span class="text-rose-600">Thu hồi HĐ</span> <span class="font-normal text-slate-500">(để trống = tự tìm sheet tên “Thu hồi HĐ”)</span>:</label>
+                    <input type="url" id="sheetThuHoiUrl" value="https://docs.google.com/spreadsheets/d/1ph0E3aUEo10pxE7SAKHISgfSvl7OqHPt/edit?gid=1234509617#gid=1234509617" placeholder="Link sheet/tab Thu hồi HĐ (cùng file hoặc file khác)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-400 outline-none text-xs">
                 </div>
                 <div class="pt-1 flex justify-between items-center">
                     <button onclick="loadSampleData()" class="text-[11px] text-slate-500 hover:text-slate-800 underline">Khôi phục dữ liệu gốc</button>
@@ -1631,8 +1635,8 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             if (typeof renderTable === 'function') renderTable();
         }
 
-        /** Danh sách HĐ đã chấm dứt / thu hồi — tab riêng, không gắn KPI */
-        const thuHoiCases = [
+        /** Danh sách HĐ đã chấm dứt / thu hồi — đọc từ sheet “Thu hồi HĐ”, fallback dữ liệu mẫu */
+        let thuHoiCases = [
             { stt:1, hoTen:"Đoàn Hồng Đức", diaDiem:"TK 150A, PT Trản Táo", dienTich:1.20, soHD:"", ngayKyHD:"", soQĐ:"79/QĐ.LT", ngayQĐ:"01/6/2001", soToa:"", ngayToa:"", viPham:"Vi phạm HĐ, vi phạm cam kết PCCR nhiều lần", ketQua:"BQL đã thu hồi diện tích giao khoán", ghiChu:"Đã thu hồi diện tích khoán" },
             { stt:2, hoTen:"Phạm Thị Điệp", diaDiem:"TK 147, PT Gia Huynh", dienTich:1.30, soHD:"", ngayKyHD:"", soQĐ:"62/QĐ.BQLRPHXL", ngayQĐ:"28/7/2008", soToa:"", ngayToa:"", viPham:"Chuyển nhượng đất trái phép, gây tranh chấp kéo dài", ketQua:"BQL đã thu hồi diện tích giao khoán, giao PT Gia Huynh trực tiếp sản xuất", ghiChu:"Đã thu hồi diện tích khoán" },
             { stt:3, hoTen:"Nguyễn Thế Truyền", diaDiem:"TK 204, PT Trản Táo", dienTich:3.08, soHD:"364", ngayKyHD:"20/4/2012", soQĐ:"456/TB-BQLRPH", ngayQĐ:"27/6/2022", soToa:"26/2023/TB-TLVA", ngayToa:"13/2/2023", viPham:"Sang nhượng trái phép; đào múc hồ; dựng hàng rào", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 27/01/2026 (BA 07/2026/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang kháng cáo" },
@@ -1663,6 +1667,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             { stt:28, hoTen:"Nguyễn Thị Kim Hương", diaDiem:"TK 205, PT Trản Táo", dienTich:1.94, soHD:"139", ngayKyHD:"4/6/2004", soQĐ:"67/QĐ-BQLRPHXL", ngayQĐ:"27/10/2025", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Sang nhượng trái phép cho ông Vi Chung Bảo" },
             { stt:29, hoTen:"Phan Hữu Thành (Làng)", diaDiem:"TK 204, PT Trản Táo", dienTich:2.78, soHD:"175", ngayKyHD:"27/11/2004", soQĐ:"58/QĐ-BQLRPHXL", ngayQĐ:"29/4/2026", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, xây dựng công trình trái phép, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" }
         ];
+        const THU_HOI_FALLBACK = thuHoiCases.slice();
 
         function classifyThuHoiStatus(c) {
             const k = ((c.ketQua || '') + ' ' + (c.ghiChu || '')).toLowerCase();
@@ -1704,7 +1709,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         <td class="py-2.5 px-3"><span class="inline-block px-2 py-0.5 rounded border text-[10px] font-semibold ${s.cls}">${s.label}</span>
                             ${c.ghiChu ? `<div class="text-[10px] text-slate-500 mt-1 max-w-[180px] leading-snug">${escapeHtml(c.ghiChu)}</div>` : ''}</td>
                         <td class="py-2.5 px-3 text-center">
-                            <button type="button" onclick="openThuHoiDetail(${c.stt - 1})" class="btn-action-sm btn-danger" title="Xem chi tiết"><i class="fa-solid fa-eye text-[9px]"></i> Chi tiết</button>
+                            <button type="button" onclick="openThuHoiDetailByStt(${c.stt})" class="btn-action-sm btn-danger" title="Xem chi tiết"><i class="fa-solid fa-eye text-[9px]"></i> Chi tiết</button>
                         </td>
                     </tr>`;
                 }).join('') || '<tr><td colspan="8" class="py-8 text-center text-slate-400">Không có hồ sơ phù hợp.</td></tr>';
@@ -1724,12 +1729,17 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         <div class="mt-2 text-[11px] text-slate-600"><b>TB/QĐ:</b> ${escapeHtml(c.soQĐ || '—')}${c.ngayQĐ ? ' (' + escapeHtml(c.ngayQĐ) + ')' : ''}</div>
                         ${c.soToa ? `<div class="text-[11px] text-slate-600"><b>Tòa:</b> ${escapeHtml(c.soToa)}${c.ngayToa ? ' (' + escapeHtml(c.ngayToa) + ')' : ''}</div>` : ''}
                         <p class="text-[11px] text-slate-500 mt-1.5 line-clamp-2">${escapeHtml(c.viPham || '')}</p>
-                        <button type="button" onclick="openThuHoiDetail(${c.stt - 1})" class="btn-action-sm btn-danger mt-2 w-full"><i class="fa-solid fa-eye text-[10px]"></i> Xem chi tiết</button>
+                        <button type="button" onclick="openThuHoiDetailByStt(${c.stt})" class="btn-action-sm btn-danger mt-2 w-full"><i class="fa-solid fa-eye text-[10px]"></i> Xem chi tiết</button>
                     </div>`;
                 }).join('') || '<p class="text-center text-slate-400 text-sm py-6">Không có hồ sơ phù hợp.</p>';
             }
         }
 
+        function openThuHoiDetailByStt(stt) {
+            const c = thuHoiCases.find(x => Number(x.stt) === Number(stt)) || thuHoiCases[stt - 1];
+            if (!c) return;
+            openThuHoiDetail(thuHoiCases.indexOf(c));
+        }
         function openThuHoiDetail(index) {
             const c = thuHoiCases[index];
             if (!c) return;
@@ -2082,8 +2092,11 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                 const { spreadsheetId, gid } = parseGoogleSheetParams(rawUrl);
                 const table = await executeJSONPQuery(spreadsheetId, gid);
                 parseGVizDataToRows(table);
+                // Đồng bộ tab Thu hồi HĐ (sheet riêng)
+                await fetchThuHoiSheet(spreadsheetId, silent);
                 lastSyncTime = new Date();
                 updateSyncBadge();
+                if (typeof renderThuHoiPanel === 'function') renderThuHoiPanel();
                 if (!silent) {
                     showToast("Đã đồng bộ thành công từ Google Sheets!");
                     closeSyncModal();
@@ -2098,7 +2111,149 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             }
         }
 
-        function executeJSONPQuery(spreadsheetId, gid) {
+        /** Tải sheet/tab Thu hồi HĐ — ưu tiên link riêng, không có thì tìm sheet tên “Thu hồi HĐ” */
+        async function fetchThuHoiSheet(mainSpreadsheetId, silent = false) {
+            const thuUrl = (document.getElementById('sheetThuHoiUrl')?.value || '').trim();
+            const tryLoad = async (sid, gid, sheetName) => {
+                const table = await executeJSONPQuery(sid, gid, sheetName);
+                const rows = parseThuHoiGVizTable(table);
+                if (rows.length) {
+                    thuHoiCases = rows;
+                    return true;
+                }
+                return false;
+            };
+            try {
+                if (thuUrl) {
+                    const p = parseGoogleSheetParams(thuUrl);
+                    const ok = await tryLoad(p.spreadsheetId, p.gid, null);
+                    if (ok) {
+                        if (!silent) console.info('[Thu hồi HĐ] Đã tải', thuHoiCases.length, 'hồ sơ từ link riêng');
+                        return;
+                    }
+                }
+                // Thử theo tên sheet phổ biến trong cùng file
+                const names = ['Thu hồi HĐ', 'Thu hồi HD', 'Thu hoi HD', 'Thu hồi', 'THU HOI HD', 'Chấm dứt HĐ'];
+                for (const name of names) {
+                    try {
+                        const ok = await tryLoad(mainSpreadsheetId, null, name);
+                        if (ok) {
+                            if (!silent) console.info('[Thu hồi HĐ] Đã tải', thuHoiCases.length, 'hồ sơ từ sheet "' + name + '"');
+                            return;
+                        }
+                    } catch (_) { /* thử tên khác */ }
+                }
+                // Không tìm thấy → giữ fallback
+                if (!thuHoiCases.length) thuHoiCases = THU_HOI_FALLBACK.slice();
+                if (!silent) console.warn('[Thu hồi HĐ] Không tìm thấy sheet — dùng dữ liệu mẫu');
+            } catch (e) {
+                console.warn('[Thu hồi HĐ] Lỗi tải:', e.message);
+                if (!thuHoiCases.length) thuHoiCases = THU_HOI_FALLBACK.slice();
+            }
+        }
+
+        /** Map header linh hoạt (tiếng Việt) → field — khớp sheet Thu hồi HĐ */
+        function parseThuHoiGVizTable(table) {
+            if (!table || !table.rows) return [];
+            const cols = (table.cols || []).map(c => String(c.label || c.id || '').trim());
+            const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+            const headers = cols.map(norm);
+
+            // Chấm điểm khớp header (ưu tiên cụ thể hơn)
+            const scoreCol = (h, rules) => {
+                let best = 0;
+                for (const [key, pts] of rules) {
+                    if (h === key) best = Math.max(best, pts + 5);
+                    else if (h.includes(key)) best = Math.max(best, pts);
+                }
+                return best;
+            };
+            const pick = (rules, used) => {
+                let bi = -1, bs = 0;
+                headers.forEach((h, i) => {
+                    if (used.has(i)) return;
+                    const s = scoreCol(h, rules);
+                    if (s > bs) { bs = s; bi = i; }
+                });
+                if (bi >= 0 && bs > 0) { used.add(bi); return bi; }
+                return -1;
+            };
+            const used = new Set();
+            // Thứ tự quan trọng: các cột đặc thù trước
+            const iQD = pick([['tb/qd', 20], ['tb / qd', 20], ['thu hoi hd', 18], ['qd thu hoi', 18], ['so qd', 12], ['so tb', 12], ['quyet dinh', 10]], used);
+            const iToa = pick([['toa an', 20], ['thu ly', 14], ['so toa', 12]], used);
+            const iVP = pick([['noi dung vi pham', 20], ['vi pham', 16], ['hanh vi', 10]], used);
+            const iKQ = pick([['ket qua xu ly', 20], ['ket qua', 16], ['tinh trang', 10], ['trang thai', 8]], used);
+            const iGC = pick([['ghi chu', 18], ['chu thich', 10]], used);
+            const iHo = pick([['ten ho nhan khoan', 22], ['ho nhan khoan', 20], ['ten ho', 14], ['ho ten', 14], ['ho vi pham', 12]], used);
+            const iDia = pick([['dia diem nhan khoan', 20], ['dia diem', 16], ['tieu khu', 10]], used);
+            const iDt = pick([['dien tich nhan khoan', 20], ['dien tich', 16], ['dt (ha)', 12], ['dt ha', 10]], used);
+            const iHD = pick([['thong tin hop dong', 18], ['so hop dong', 16], ['so hd', 14], ['hop dong', 12]], used);
+            const iStt = pick([['stt', 15], ['so tt', 12]], used);
+            // Ngày: có thể có 2 cột "Ngày ký" — lần 1 = HĐ, lần 2 = QĐ; "Ngày" gần Tòa = ngày tòa
+            const dateIdx = headers.map((h, i) => ({ h, i })).filter(x => !used.has(x.i) && (x.h.includes('ngay') || x.h === 'ngay'));
+            let iNgayHD = -1, iNgayQD = -1, iNgayToa = -1;
+            dateIdx.forEach(({ h, i }) => {
+                if (iNgayHD < 0 && (h.includes('ky') || h.includes('hop dong'))) { iNgayHD = i; used.add(i); }
+                else if (iNgayQD < 0 && (h.includes('qd') || h.includes('tb') || h.includes('ban hanh'))) { iNgayQD = i; used.add(i); }
+                else if (iNgayToa < 0 && (h.includes('toa') || h === 'ngay')) { iNgayToa = i; used.add(i); }
+            });
+            // Còn lại: gán theo thứ tự xuất hiện (HĐ rồi QĐ rồi Tòa)
+            dateIdx.forEach(({ i }) => {
+                if (used.has(i)) return;
+                if (iNgayHD < 0) { iNgayHD = i; used.add(i); }
+                else if (iNgayQD < 0) { iNgayQD = i; used.add(i); }
+                else if (iNgayToa < 0) { iNgayToa = i; used.add(i); }
+            });
+
+            // Fallback cố định theo layout sheet BQL (A..M) nếu map yếu
+            const weak = iHo < 0 || iQD < 0;
+            const idx = weak
+                ? { stt: 0, ho: 1, dia: 2, dt: 3, hd: 4, ngayHD: 5, qd: 6, ngayQD: 7, toa: 8, ngayToa: 9, vp: 10, kq: 11, gc: 12 }
+                : { stt: iStt, ho: iHo, dia: iDia, dt: iDt, hd: iHD, ngayHD: iNgayHD, qd: iQD, ngayQD: iNgayQD, toa: iToa, ngayToa: iNgayToa, vp: iVP, kq: iKQ, gc: iGC };
+
+            const cell = (row, i) => {
+                if (i < 0 || !row.c || !row.c[i]) return '';
+                const v = row.c[i];
+                if (v.f != null && String(v.f).trim() !== '') return String(v.f).trim();
+                if (v.v == null) return '';
+                // Date(2012,3,20) → dd/mm/yyyy
+                if (typeof v.v === 'string' && /^Date\(/.test(v.v)) {
+                    const m = v.v.match(/Date\((\d+),(\d+),(\d+)/);
+                    if (m) {
+                        const y = m[1], mo = String(+m[2] + 1).padStart(2, '0'), d = String(+m[3]).padStart(2, '0');
+                        return `${d}/${mo}/${y}`;
+                    }
+                }
+                return String(v.v).trim();
+            };
+            const out = [];
+            (table.rows || []).forEach((row, ri) => {
+                const hoTen = cell(row, idx.ho >= 0 ? idx.ho : 1);
+                if (!hoTen) return;
+                if (/danh sach|ten ho|ho nhan khoan|^stt$/i.test(hoTen)) return;
+                const sttRaw = cell(row, idx.stt >= 0 ? idx.stt : 0);
+                const stt = parseInt(String(sttRaw).replace(/[^\d]/g, ''), 10) || (ri + 1);
+                out.push({
+                    stt,
+                    hoTen,
+                    diaDiem: cell(row, idx.dia),
+                    dienTich: parseNum(cell(row, idx.dt)),
+                    soHD: cell(row, idx.hd),
+                    ngayKyHD: cell(row, idx.ngayHD),
+                    soQĐ: cell(row, idx.qd),
+                    ngayQĐ: cell(row, idx.ngayQD),
+                    soToa: cell(row, idx.toa),
+                    ngayToa: cell(row, idx.ngayToa),
+                    viPham: cell(row, idx.vp),
+                    ketQua: cell(row, idx.kq),
+                    ghiChu: cell(row, idx.gc)
+                });
+            });
+            return out;
+        }
+
+        function executeJSONPQuery(spreadsheetId, gid, sheetName) {
             return new Promise((resolve, reject) => {
                 const cb = 'gviz_cb_' + Math.floor(Math.random() * 1e6);
                 const script = document.createElement('script');
@@ -2115,7 +2270,10 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                     else if (resp && resp.table) resolve(resp.table);
                     else reject(new Error("Dữ liệu rỗng hoặc sai cấu trúc"));
                 };
-                script.src = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?gid=${gid}&tqx=responseHandler:${cb}`;
+                let q = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=responseHandler:${cb}`;
+                if (sheetName) q += `&sheet=${encodeURIComponent(sheetName)}`;
+                else q += `&gid=${gid || '0'}`;
+                script.src = q;
                 script.onerror = () => {
                     clearTimeout(timeout);
                     delete window[cb];
