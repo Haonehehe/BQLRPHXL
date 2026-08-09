@@ -133,6 +133,59 @@
         @media (min-width: 641px) {
             #advFilterPanel.collapsed-mobile { display: grid !important; }
         }
+
+        /* Tra cứu nhanh + chi tiết hồ sơ — mobile */
+        #quickSearchModal { z-index: 999999 !important; }
+        #caseDetailModal { z-index: 1000000 !important; }
+        @media (max-width: 640px) {
+            #quickSearchModal {
+                align-items: flex-start !important;
+                padding: calc(env(safe-area-inset-top, 0px) + 0.75rem) 0.5rem calc(env(safe-area-inset-bottom, 0px) + 0.75rem) !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            #quickSearchModal > div {
+                max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 1.5rem) !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 14px !important;
+                display: flex;
+                flex-direction: column;
+            }
+            #quickSearchResults {
+                max-height: none !important;
+                flex: 1 1 auto;
+                min-height: 0;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+            #quickSearchResults .qs-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.5rem !important;
+            }
+            #quickSearchResults .qs-actions {
+                width: 100%;
+                justify-content: space-between !important;
+            }
+            #quickSearchResults .qs-actions button {
+                flex: 1;
+                min-height: 40px;
+                justify-content: center;
+            }
+            #quickSearchInput {
+                font-size: 16px !important; /* tránh zoom iOS */
+            }
+            #caseDetailModal {
+                align-items: flex-end !important;
+                padding: 0 !important;
+            }
+            #caseDetailModal > div {
+                max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 0.5rem) !important;
+                border-radius: 16px 16px 0 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
     </style>
 
 <style id="upgrade-v3-css">
@@ -1124,21 +1177,33 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
             const row = (label, val) => val ? `<div class="grid grid-cols-[7rem_1fr] gap-x-2 gap-y-0.5 py-1 border-b border-slate-50 last:border-0"><span class="text-[10px] text-slate-500">${label}</span><span class="text-[12px] text-slate-800 leading-snug">${escapeHtml(String(val))}</span></div>` : '';
             const hasHDK = !!(c.soHDKhoan || c.ngayKyHDKhoan || c.dienTichHDKhoan);
             const hasHDTR = !!(c.soHDTrongRung || c.ngayKyHDTrongRung || c.dienTichHDTrongRung);
+            const loaiStr = (c.species||[]).filter(s=>s.loai).map(s=>{
+                const parts=[s.loai];
+                if(s.soLuong) parts.push(fmt(s.soLuong)+' cây');
+                if(s.khoiLuongM3) parts.push(fmt(s.khoiLuongM3,2)+' m³');
+                if(s.dienTichHa) parts.push(fmt(s.dienTichHa,2)+' ha');
+                if(s.dienTichM2) parts.push(fmt(s.dienTichM2,1)+' m²');
+                return parts.join(' · ');
+            }).join('; ') || '';
             document.getElementById('caseDetailContent').innerHTML=`
               <div class="space-y-3">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
                     <h3 class="text-[15px] font-bold text-slate-900 leading-tight">${escapeHtml(c.hoTen)}</h3>
-                    <p class="text-[11px] text-slate-500 mt-0.5 truncate">${escapeHtml([c.doiTuong, c.tieuKhu && ('TK '+c.tieuKhu), c.phanTruong, c.xa].filter(Boolean).join(' · '))}</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">${escapeHtml([c.tieuKhu && ('TK '+c.tieuKhu), c.phanTruong, c.xa].filter(Boolean).join(' · '))}</p>
                   </div>
                   <span class="shrink-0 px-2 py-0.5 rounded-md border text-[10px] font-semibold ${meta.badge}">${escapeHtml(meta.short)}</span>
                 </div>
+                ${c.doiTuong ? `<div class="rounded-lg border border-slate-100 bg-slate-50/80 p-2"><div class="text-[9px] text-slate-500 mb-0.5">Đối tượng liên quan</div><div class="text-[11px] text-slate-700 leading-snug">${escapeHtml(c.doiTuong)}</div></div>` : ''}
                 <div class="grid grid-cols-2 gap-1.5">
-                  <div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Hành vi</div><div class="text-[12px] font-semibold text-slate-800 truncate">${escapeHtml(c.hanhVi||'—')}</div></div>
+                  <div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Hành vi</div><div class="text-[12px] font-semibold text-slate-800">${escapeHtml(c.hanhVi||'—')}</div></div>
                   <div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Ngày BB</div><div class="text-[12px] font-semibold text-slate-800">${escapeHtml(c.ngayViPham||'—')}</div></div>
                   <div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Cây gỗ lớn</div><div class="text-[12px] font-semibold text-slate-800">${fmt(m.cayGoLon)}</div></div>
                   <div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Khối lượng</div><div class="text-[12px] font-semibold text-slate-800">${fmt(m.khoiLuongM3,2)} m³</div></div>
+                  ${(m.dienTichHa||0) > 0 ? `<div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Diện tích (ha)</div><div class="text-[12px] font-semibold text-slate-800">${fmt(m.dienTichHa,2)} ha</div></div>` : ''}
+                  ${(m.dienTichM2||0) > 0 ? `<div class="rounded-lg bg-slate-50 px-2 py-1.5"><div class="text-[9px] text-slate-500">Phá hoại / XD (m²)</div><div class="text-[12px] font-semibold text-slate-800">${fmt(m.dienTichM2,1)} m²</div></div>` : ''}
                 </div>
+                ${loaiStr ? `<div class="rounded-lg border border-indigo-100/80 bg-indigo-50/30 p-2"><div class="text-[10px] font-semibold text-indigo-800 mb-0.5">Loài cây / chi tiết thiệt hại</div><div class="text-[11px] text-slate-700 leading-snug">${escapeHtml(loaiStr)}</div></div>` : ''}
                 ${c.nguonGocDat || c.diaChi ? `<div class="rounded-lg border border-slate-100 p-2"><div class="text-[10px] font-semibold text-slate-600 mb-1">Nguồn gốc đất</div><div class="text-[11px] text-slate-700 whitespace-pre-line leading-relaxed">${escapeHtml(c.nguonGocDat||'—')}</div>${c.diaChi?`<div class="text-[11px] text-slate-500 mt-1">${escapeHtml(c.diaChi)}</div>`:''}</div>` : ''}
                 <div class="rounded-lg border border-emerald-100/80 bg-emerald-50/30 p-2">
                   <div class="text-[10px] font-semibold text-emerald-800 mb-1">Hợp đồng giao khoán</div>
@@ -1160,7 +1225,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                   <div class="text-[10px] font-semibold text-amber-800 mb-0.5">Tình trạng xử lý</div>
                   <div class="text-[11px] text-slate-700 whitespace-pre-line leading-relaxed">${escapeHtml(c.tinhTrang||'—')}</div>
                 </div>
-                <div class="flex flex-wrap gap-2 justify-end pt-1">
+                <div class="flex flex-wrap gap-2 justify-end pt-1 pb-1">
                   ${(c.linkHoSo||c.tuiHoSo)?hoSoButtonHtml(c.tuiHoSo,c.linkHoSo):''}
                   <button type="button" onclick="printCaseDetail(${index})" class="px-2.5 py-1.5 bg-slate-800 text-white rounded-md text-[11px] font-semibold"><i class="fa-solid fa-print mr-1"></i>In</button>
                   <button type="button" onclick="closeCaseDetail()" class="px-2.5 py-1.5 border border-slate-200 rounded-md text-[11px] text-slate-600">Đóng</button>
@@ -1173,7 +1238,9 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
         function closeCaseDetail(){
             document.getElementById('caseDetailModal')?.classList.add('hidden');
             const qs = document.getElementById('quickSearchModal');
+            // Giữ khóa cuộn nếu vẫn đang mở tra cứu nhanh
             if (!qs || qs.classList.contains('hidden')) document.body.style.overflow = '';
+            else document.body.style.overflow = 'hidden';
         }
         function printCaseDetail(index){
             if (typeof index !== 'number') index = window._caseDetailIndex;
@@ -1290,15 +1357,16 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                     c.dienTichHDTrongRung ? (c.dienTichHDTrongRung + ' ha') : ''
                 ].filter(Boolean).join(' · ') : (hasHDK ? 'Không có hợp đồng trồng rừng' : '');
                 return `<div class="w-full px-3 py-2.5 border-b border-slate-50 hover:bg-emerald-50/70 transition">
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="min-w-0 flex-1 cursor-pointer" onclick="closeQuickSearch();openCaseDetail(${i})">
-                            <div class="flex items-center gap-1.5"><b class="text-[13px] text-slate-900 truncate">${escapeHtml(c.hoTen||'Chưa xác định')}</b><span class="text-[9px] text-slate-400">#${i+1}</span></div>
-                            <div class="text-[10px] text-slate-500 mt-0.5 truncate">${escapeHtml([c.tieuKhu && ('TK '+c.tieuKhu), c.phanTruong, c.xa, c.hanhVi].filter(Boolean).join(' · '))}</div>
-                            <div class="text-[10px] ${hasHDK?'text-emerald-700':'text-amber-600/90'} mt-0.5 truncate">${escapeHtml(hdLine)}</div>
+                    <div class="qs-row flex items-center justify-between gap-2">
+                        <div class="min-w-0 flex-1 cursor-pointer" onclick="openCaseDetail(${i})">
+                            <div class="flex items-center gap-1.5 flex-wrap"><b class="text-[13px] text-slate-900 truncate max-w-[70%]">${escapeHtml(c.hoTen||'Chưa xác định')}</b><span class="text-[9px] text-slate-400">#${i+1}</span></div>
+                            <div class="text-[10px] text-slate-500 mt-0.5">${escapeHtml([c.tieuKhu && ('TK '+c.tieuKhu), c.phanTruong, c.xa, c.hanhVi].filter(Boolean).join(' · '))}</div>
+                            <div class="text-[10px] ${hasHDK?'text-emerald-700':'text-amber-600/90'} mt-0.5">${escapeHtml(hdLine)}</div>
+                            ${trLine ? `<div class="text-[10px] text-sky-700 mt-0.5">${escapeHtml(trLine)}</div>` : ''}
                         </div>
-                        <div class="shrink-0 flex items-center gap-1.5">
+                        <div class="qs-actions shrink-0 flex items-center gap-1.5">
                             <span class="px-1.5 py-0.5 rounded border text-[9px] ${g.badge}">${escapeHtml(g.short)}</span>
-                            <button type="button" onclick="closeQuickSearch();openCaseDetail(${i})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm hover:bg-emerald-700 active:scale-95 transition whitespace-nowrap" aria-label="Xem thông tin hồ sơ ${escapeAttr(c.hoTen||'')}">
+                            <button type="button" onclick="event.stopPropagation();openCaseDetail(${i})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm hover:bg-emerald-700 active:scale-95 transition whitespace-nowrap" aria-label="Xem thông tin hồ sơ ${escapeAttr(c.hoTen||'')}">
                                 <i class="fa-solid fa-eye text-[9px]"></i><span>Xem thông tin</span>
                             </button>
                         </div>
@@ -1568,7 +1636,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 text-center font-bold text-slate-600 border-r border-slate-100 bg-slate-50/40">${index + 1}</td>
                         <td class="py-2.5 px-3 border-r border-slate-100 align-top">
-                            <div class="font-semibold text-slate-800 text-[13px]">${escapeHtml(item.hoTen)}</div>
+                            <button type="button" onclick="openCaseDetail(${index})" class="font-semibold text-slate-800 text-[13px] text-left hover:text-emerald-700 hover:underline">${escapeHtml(item.hoTen)}</button>
                             ${(item.tuiHoSo || item.linkHoSo) ? `<div class="mt-1">${hoSoButtonHtml(item.tuiHoSo, item.linkHoSo)}</div>` : ''}
                         </td>
                         <td class="py-2.5 px-3 text-slate-600 border-r border-slate-100 align-top text-[12px]">${escapeHtml(item.doiTuong || '—')}</td>
@@ -1578,11 +1646,11 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         </td>
                         <td class="py-2.5 px-3 border-r border-slate-100 text-slate-600 align-top text-[12px] leading-relaxed">${escapeHtml(item.tinhTrang)}</td>
                         <td class="py-2.5 px-2 text-center align-top no-export">
-                            <div class="flex flex-col items-center gap-1">
+                            <div class="flex flex-col items-center gap-1.5">
                                 ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
-                                <div class="flex items-center justify-center gap-0.5">
-                                    
-                                </div>
+                                <button type="button" onclick="openCaseDetail(${index})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm hover:bg-emerald-700 active:scale-95 transition whitespace-nowrap" title="Xem thông tin hồ sơ">
+                                    <i class="fa-solid fa-eye text-[9px]"></i><span>Xem thông tin</span>
+                                </button>
                             </div>
                         </td>`;
                     tbody.appendChild(tr);
@@ -1595,17 +1663,19 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[1];
                         return `<div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
                             <div class="flex justify-between items-start gap-2">
-                                <div>
+                                <div class="min-w-0">
                                     <div class="font-semibold text-slate-800 text-sm">${escapeHtml(item.hoTen)}</div>
                                     <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(item.doiTuong || '')}</div>
                                 </div>
-                                <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badge}">${escapeHtml(meta.short)}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badge} shrink-0">${escapeHtml(meta.short)}</span>
                             </div>
                             <div class="mt-2">${typeof alertBadgeHtml === 'function' ? alertBadgeHtml(item) : ''}</div>
                             <p class="text-[11px] text-slate-600 mt-2">${escapeHtml((item.tinhTrang || '').slice(0, 180))}${(item.tinhTrang || '').length > 180 ? '…' : ''}</p>
                             <div class="mt-2 flex flex-wrap gap-2 items-center">
                                 ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
-                                
+                                <button type="button" onclick="openCaseDetail(${index})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm">
+                                    <i class="fa-solid fa-eye text-[9px]"></i> Xem thông tin
+                                </button>
                             </div>
                         </div>`;
                     }).join('') || '<p class="text-center text-slate-400 text-sm py-6">Không có dữ liệu</p>';
@@ -2165,17 +2235,23 @@ function toggleAdvFilter() {
                 visible = filtered.length;
                 mob.innerHTML = filtered.map(item => {
                     const meta = NHOM_MAP[item.nhomId] || NHOM_MAP[1];
+                    const idx = detailedCases.indexOf(item);
                     return `<div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
                         <div class="flex justify-between items-start gap-2">
-                            <div>
+                            <div class="min-w-0">
                                 <div class="font-semibold text-slate-800 text-sm">${escapeHtml(item.hoTen)}</div>
                                 <div class="text-[11px] text-slate-500 mt-0.5">TK ${escapeHtml(String(item.tieuKhu || '—'))} · ${escapeHtml(item.phanTruong || '')} · ${escapeHtml(item.xa || '')}</div>
                             </div>
-                            <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badge}">${escapeHtml(meta.short)}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badge} shrink-0">${escapeHtml(meta.short)}</span>
                         </div>
                         <div class="mt-2">${typeof alertBadgeHtml === 'function' ? alertBadgeHtml(item) : ''}</div>
                         <p class="text-[11px] text-slate-600 mt-2">${escapeHtml((item.tinhTrang || '').slice(0, 160))}</p>
-                        <div class="mt-2 flex flex-wrap gap-2">${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}</div>
+                        <div class="mt-2 flex flex-wrap gap-2 items-center">
+                            ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
+                            <button type="button" onclick="openCaseDetail(${idx})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm">
+                                <i class="fa-solid fa-eye text-[9px]"></i> Xem thông tin
+                            </button>
+                        </div>
                     </div>`;
                 }).join('') || '<p class="text-center text-slate-400 text-sm py-6">Không có kết quả</p>';
             }
@@ -3024,30 +3100,6 @@ function toggleAdvFilter() {
   .right{text-align:right} .center{text-align:center}
   .footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:32px}
   @media print{body{padding:12px;background:#fff} .header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
-
-/* Fix mobile quick-search layering and modal usability */
-#quickSearchModal { z-index: 999999 !important; }
-#caseDetailModal { z-index: 999998 !important; }
-@media (max-width: 640px) {
-  #quickSearchModal {
-    align-items: flex-start !important;
-    padding-top: calc(env(safe-area-inset-top, 0px) + 4.25rem) !important;
-  }
-  #quickSearchModal > div {
-    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 5.75rem) !important;
-    border-radius: 14px !important;
-  }
-  #quickSearchResults {
-    max-height: min(62dvh, 460px) !important;
-    -webkit-overflow-scrolling: touch;
-  }
-  #quickSearchResults .inline-flex {
-    min-height: 36px;
-  }
-  #caseDetailModal > div {
-    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 1rem) !important;
-  }
-}
 </style></head><body>
 <div class="header">
   <h1>BÁO CÁO VI PHẠM CÔNG TÁC QLBVR — BQLRPH XUÂN LỘC</h1>
@@ -3143,27 +3195,27 @@ function toggleAdvFilter() {
     </script>
 
 <!-- Live UI modals -->
-<div id="quickSearchModal" class="hidden fixed inset-0 z-[999999] bg-slate-900/50 backdrop-blur-[2px] flex justify-center overflow-y-auto" style="padding:calc(env(safe-area-inset-top, 0px) + 4.25rem) 0.75rem 1.5rem" onclick="if(event.target===this)closeQuickSearch()">
-  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg h-fit overflow-hidden border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
-    <div class="px-3 py-2.5 border-b border-slate-100 bg-white flex items-center gap-2">
+<div id="quickSearchModal" class="hidden fixed inset-0 z-[999999] bg-slate-900/50 backdrop-blur-[2px] flex justify-center overflow-y-auto" style="padding:calc(env(safe-area-inset-top, 0px) + 0.75rem) 0.75rem calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" onclick="if(event.target===this)closeQuickSearch()">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200/90 ring-1 ring-black/5 flex flex-col" style="max-height:calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 1.5rem)" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="px-3 py-2.5 border-b border-slate-100 bg-white flex items-center gap-2 shrink-0">
       <div class="relative flex-1 min-w-0">
         <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]"></i>
-        <input id="quickSearchInput" oninput="renderQuickSearch()" onkeydown="if(event.key==='Escape')closeQuickSearch()" class="w-full pl-8 pr-2 py-2 border border-slate-200 rounded-lg text-[13px] outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400" placeholder="Tìm hộ, số HĐ, tiểu khu, xã..." autocomplete="off">
+        <input id="quickSearchInput" oninput="renderQuickSearch()" onkeydown="if(event.key==='Escape')closeQuickSearch()" class="w-full pl-8 pr-2 py-2 border border-slate-200 rounded-lg text-[13px] outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400" placeholder="Tìm hộ, số HĐ, tiểu khu, xã..." autocomplete="off" enterkeyhint="search">
       </div>
-      <button type="button" onclick="closeQuickSearch()" class="text-slate-400 hover:text-slate-700 px-2 py-1.5 text-xs shrink-0">Esc</button>
+      <button type="button" onclick="closeQuickSearch()" class="text-slate-400 hover:text-slate-700 px-2 py-1.5 text-xs shrink-0 min-h-[36px]">Đóng</button>
     </div>
-    <div id="quickSearchMeta" class="px-3 py-1.5 text-[10px] text-slate-500 bg-slate-50/80 border-b border-slate-100"></div>
-    <div id="quickSearchResults" class="max-h-[min(58vh,420px)] overflow-y-auto overscroll-contain"></div>
+    <div id="quickSearchMeta" class="px-3 py-1.5 text-[10px] text-slate-500 bg-slate-50/80 border-b border-slate-100 shrink-0"></div>
+    <div id="quickSearchResults" class="overflow-y-auto overscroll-contain flex-1 min-h-0" style="max-height:min(58vh,420px);-webkit-overflow-scrolling:touch"></div>
   </div>
 </div>
 
-<div id="caseDetailModal" class="hidden fixed inset-0 z-[200100] bg-slate-900/50 backdrop-blur-[2px] flex items-end sm:items-center justify-center overflow-y-auto p-0 sm:p-4" onclick="if(event.target===this)closeCaseDetail()">
+<div id="caseDetailModal" class="hidden fixed inset-0 z-[1000000] bg-slate-900/50 backdrop-blur-[2px] flex items-end sm:items-center justify-center overflow-y-auto p-0 sm:p-4" onclick="if(event.target===this)closeCaseDetail()">
   <div class="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-md max-h-[88vh] overflow-y-auto border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
       <b class="text-[13px] text-slate-800">Chi tiết hồ sơ</b>
       <div class="flex items-center gap-1.5">
         <button type="button" onclick="printCaseDetail()" class="px-2.5 py-1 bg-slate-800 text-white rounded-md text-[10px] font-semibold"><i class="fa-solid fa-print mr-1"></i>In</button>
-        <button type="button" onclick="closeCaseDetail()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-50"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" onclick="closeCaseDetail()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-50" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
     <div id="caseDetailContent" class="p-3"></div>
