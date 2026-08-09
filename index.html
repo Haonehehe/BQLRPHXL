@@ -66,20 +66,41 @@
             #viewDashBtn span, #viewSummaryBtn span, #viewDetailBtn span, #viewStatsBtn span, #viewActionBtn span, #viewCheckBtn span { font-size: 11px; }
         }
         #siteFooter a { -webkit-tap-highlight-color: transparent; }
-        /* Author chip corner on desktop */
-        .author-fab {
-            position: fixed; right: 12px; bottom: 12px; z-index: 40;
-            max-width: min(280px, calc(100vw - 24px));
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
-            border: 1px solid #e2e8f0; border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(15,23,42,0.08);
-            padding: 8px 10px; font-size: 10px; color: #475569;
-            line-height: 1.35;
-        }
-        .author-fab b { color: #0f172a; font-size: 11px; }
-        .author-fab a { color: #047857; text-decoration: none; }
+
+        /* Modal full-screen mobile: không bị header / home indicator che */
         @media (max-width: 640px) {
-            .author-fab { right: 8px; bottom: 8px; padding: 6px 8px; }
+            #quickSearchModal > div,
+            #caseDetailModal > div {
+                height: 100%;
+                max-height: 100%;
+                border-radius: 0 !important;
+            }
+            #caseDetailContent { padding-bottom: 2rem !important; }
+            .contact-fab-wrap { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+        }
+
+        .contact-fab-wrap { position: fixed; right: 12px; bottom: 12px; z-index: 45; }
+        .contact-fab-btn {
+            width: 36px; height: 36px; border-radius: 9999px;
+            background: #0f172a; color: #fff; border: none;
+            box-shadow: 0 4px 14px rgba(15,23,42,0.2);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px;
+        }
+        .contact-fab-btn:hover { background: #1e293b; }
+        .contact-pop {
+            display: none; position: absolute; right: 0; bottom: 44px;
+            width: 220px; background: #fff; border: 1px solid #e2e8f0;
+            border-radius: 12px; box-shadow: 0 8px 28px rgba(15,23,42,0.12);
+            padding: 10px 12px; font-size: 11px; color: #475569; line-height: 1.45;
+        }
+        .contact-pop.open { display: block; }
+        .contact-pop b { color: #0f172a; font-size: 12px; display: block; margin-bottom: 2px; }
+        .contact-pop a { color: #047857; text-decoration: none; display: block; margin-top: 4px; }
+        .contact-pop a:hover { text-decoration: underline; }
+        @media (max-width: 640px) {
+            .contact-fab-wrap { right: 10px; bottom: 10px; }
+            .contact-fab-btn { width: 34px; height: 34px; }
         }
         @media (min-width: 641px) {
             #advFilterPanel.collapsed-mobile { display: grid !important; }
@@ -1028,24 +1049,22 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
 
 
 
-<div id="authorFab" class="author-fab" title="Người xây dựng công cụ">
-  <div><b>Huỳnh Nhựt Hào</b> · Phòng Lâm nghiệp</div>
-  <div class="mt-0.5 flex flex-wrap gap-x-2">
-    <a href="tel:0878884088">0878 884 088</a>
-    <a href="mailto:hnhao.213@gmail.com">hnhao.213@gmail.com</a>
+<div class="contact-fab-wrap" id="contactFabWrap">
+  <div id="contactPop" class="contact-pop" role="dialog" aria-label="Liên hệ">
+    <b>Huỳnh Nhựt Hào</b>
+    <span>Phòng Lâm nghiệp</span>
+    <a href="tel:0878884088"><i class="fa-solid fa-phone text-[10px] mr-1"></i>0878 884 088</a>
+    <a href="mailto:hnhao.213@gmail.com"><i class="fa-solid fa-envelope text-[10px] mr-1"></i>hnhao.213@gmail.com</a>
   </div>
+  <button type="button" class="contact-fab-btn" id="contactFabBtn" title="Thông tin liên hệ" aria-label="Thông tin liên hệ" onclick="toggleContactPop(event)">
+    <i class="fa-solid fa-circle-info"></i>
+  </button>
 </div>
 
 <footer id="siteFooter" class="mt-auto border-t border-slate-200/80 bg-white/90">
   <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-[11px] text-slate-500">
     <div>Báo cáo vi phạm công tác QLBVR · BQLRPH Xuân Lộc · Phòng Lâm nghiệp</div>
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
-      <span class="font-medium text-slate-700">Huỳnh Nhựt Hào</span>
-      <span class="hidden sm:inline text-slate-300">|</span>
-      <span>Phòng Lâm nghiệp</span>
-      <a href="tel:0878884088" class="text-emerald-700 hover:underline whitespace-nowrap"><i class="fa-solid fa-phone text-[10px] mr-0.5"></i>0878 884 088</a>
-      <a href="mailto:hnhao.213@gmail.com" class="text-sky-700 hover:underline truncate max-w-[200px]"><i class="fa-solid fa-envelope text-[10px] mr-0.5"></i>hnhao.213@gmail.com</a>
-    </div>
+    <div class="text-slate-500">Hỗ trợ kỹ thuật: bấm nút <i class="fa-solid fa-circle-info"></i> góc phải</div>
   </div>
 </footer>
 
@@ -1114,11 +1133,19 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
             window._caseDetailIndex = index;
+            const fab = document.getElementById('contactFabWrap');
+            if (fab) fab.style.display = 'none';
+            const pop = document.getElementById('contactPop');
+            if (pop) pop.classList.remove('open');
         }
         function closeCaseDetail(){
             document.getElementById('caseDetailModal')?.classList.add('hidden');
             const qs = document.getElementById('quickSearchModal');
-            if (!qs || qs.classList.contains('hidden')) document.body.style.overflow = '';
+            if (!qs || qs.classList.contains('hidden')) {
+                document.body.style.overflow = '';
+                const fab = document.getElementById('contactFabWrap');
+                if (fab) fab.style.display = '';
+            }
         }
         function printCaseDetail(index){
             if (typeof index !== 'number') index = window._caseDetailIndex;
@@ -1190,15 +1217,21 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             if (!modal) { showToast('Không tìm thấy cửa sổ tra cứu.', 'error'); return; }
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            const fab = document.getElementById('contactFabWrap');
+            if (fab) fab.style.display = 'none';
+            const pop = document.getElementById('contactPop');
+            if (pop) pop.classList.remove('open');
             const input = document.getElementById('quickSearchInput');
             if (input) { input.value = ''; setTimeout(()=>input.focus(), 50); }
             renderQuickSearch();
         }
         function closeQuickSearch(){
             document.getElementById('quickSearchModal')?.classList.add('hidden');
-            if (document.getElementById('caseDetailModal')?.classList.contains('hidden') !== false) {
-                const cd = document.getElementById('caseDetailModal');
-                if (!cd || cd.classList.contains('hidden')) document.body.style.overflow = '';
+            const cd = document.getElementById('caseDetailModal');
+            if (!cd || cd.classList.contains('hidden')) {
+                document.body.style.overflow = '';
+                const fab = document.getElementById('contactFabWrap');
+                if (fab) fab.style.display = '';
             }
         }
         function renderQuickSearch(){
@@ -3033,6 +3066,20 @@ function toggleAdvFilter() {
             }, 2 * 60 * 1000);
         }
 
+
+        function toggleContactPop(e){
+            if (e) e.stopPropagation();
+            const pop = document.getElementById('contactPop');
+            if (!pop) return;
+            pop.classList.toggle('open');
+        }
+        document.addEventListener('click', function(e){
+            const wrap = document.getElementById('contactFabWrap');
+            const pop = document.getElementById('contactPop');
+            if (!wrap || !pop) return;
+            if (!wrap.contains(e.target)) pop.classList.remove('open');
+        });
+
         window.onload = function() {
             // Mặc định Dashboard lãnh đạo + đồng bộ sheet
             setTimeout(() => {
@@ -3044,54 +3091,52 @@ function toggleAdvFilter() {
         };
     </script>
 
-<!-- Live UI modals -->
-<div id="quickSearchModal" class="hidden fixed inset-0 z-[200000] bg-slate-900/50 backdrop-blur-[2px] flex justify-center overflow-y-auto" style="padding:4.5rem 0.75rem 1.5rem" onclick="if(event.target===this)closeQuickSearch()">
-  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg h-fit overflow-hidden border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
-    <div class="px-3 py-2.5 border-b border-slate-100 bg-white flex items-center gap-2">
+<!-- Live UI modals — full viewport, safe areas -->
+<div id="quickSearchModal" class="hidden fixed inset-0 z-[200000] bg-slate-900/55 flex flex-col" onclick="if(event.target===this)closeQuickSearch()">
+  <div class="flex-1 flex flex-col min-h-0 w-full sm:max-w-lg sm:mx-auto sm:my-auto sm:max-h-[85vh] sm:rounded-xl bg-white sm:border sm:border-slate-200 overflow-hidden" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="px-3 py-2.5 border-b border-slate-100 bg-white flex items-center gap-2 shrink-0">
       <div class="relative flex-1 min-w-0">
         <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]"></i>
-        <input id="quickSearchInput" oninput="renderQuickSearch()" onkeydown="if(event.key==='Escape')closeQuickSearch()" class="w-full pl-8 pr-2 py-2 border border-slate-200 rounded-lg text-[13px] outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400" placeholder="Tìm hộ, số HĐ, tiểu khu, xã..." autocomplete="off">
+        <input id="quickSearchInput" oninput="renderQuickSearch()" onkeydown="if(event.key==='Escape')closeQuickSearch()" class="w-full pl-8 pr-2 py-2.5 border border-slate-200 rounded-lg text-[13px] outline-none focus:ring-2 focus:ring-emerald-500/40" placeholder="Tìm hộ, số HĐ, tiểu khu, xã..." autocomplete="off">
       </div>
-      <button type="button" onclick="closeQuickSearch()" class="text-slate-400 hover:text-slate-700 px-2 py-1.5 text-xs shrink-0">Esc</button>
+      <button type="button" onclick="closeQuickSearch()" class="text-slate-600 font-medium px-2 py-2 text-xs shrink-0">Đóng</button>
     </div>
-    <div id="quickSearchMeta" class="px-3 py-1.5 text-[10px] text-slate-500 bg-slate-50/80 border-b border-slate-100"></div>
-    <div id="quickSearchResults" class="max-h-[min(58vh,420px)] overflow-y-auto overscroll-contain"></div>
+    <div id="quickSearchMeta" class="px-3 py-1.5 text-[10px] text-slate-500 bg-slate-50 border-b border-slate-100 shrink-0"></div>
+    <div id="quickSearchResults" class="flex-1 overflow-y-auto overscroll-contain min-h-0"></div>
   </div>
 </div>
 
-<div id="caseDetailModal" class="hidden fixed inset-0 z-[200100] bg-slate-900/50 backdrop-blur-[2px] flex items-end sm:items-center justify-center overflow-y-auto p-0 sm:p-4" onclick="if(event.target===this)closeCaseDetail()">
-  <div class="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-md max-h-[88vh] overflow-y-auto border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
-    <div class="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
+<div id="caseDetailModal" class="hidden fixed inset-0 z-[200100] bg-slate-900/55 flex flex-col" onclick="if(event.target===this)closeCaseDetail()">
+  <div class="flex-1 flex flex-col min-h-0 w-full sm:max-w-md sm:mx-auto sm:my-auto sm:max-h-[90vh] sm:rounded-xl bg-white sm:border sm:border-slate-200 overflow-hidden" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
       <b class="text-[13px] text-slate-800">Chi tiết hồ sơ</b>
       <div class="flex items-center gap-1.5">
-        <button type="button" onclick="printCaseDetail()" class="px-2.5 py-1 bg-slate-800 text-white rounded-md text-[10px] font-semibold"><i class="fa-solid fa-print mr-1"></i>In</button>
-        <button type="button" onclick="closeCaseDetail()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-50"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" onclick="printCaseDetail()" class="px-2.5 py-1.5 bg-slate-800 text-white rounded-md text-[10px] font-semibold"><i class="fa-solid fa-print mr-1"></i>In</button>
+        <button type="button" onclick="closeCaseDetail()" class="w-9 h-9 flex items-center justify-center text-slate-500 rounded-md hover:bg-slate-50 text-base"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
-    <div id="caseDetailContent" class="p-3"></div>
+    <div id="caseDetailContent" class="flex-1 overflow-y-auto overscroll-contain min-h-0 p-3 pb-8"></div>
   </div>
 </div>
 
 
 
-<div id="authorFab" class="author-fab" title="Người xây dựng công cụ">
-  <div><b>Huỳnh Nhựt Hào</b> · Phòng Lâm nghiệp</div>
-  <div class="mt-0.5 flex flex-wrap gap-x-2">
-    <a href="tel:0878884088">0878 884 088</a>
-    <a href="mailto:hnhao.213@gmail.com">hnhao.213@gmail.com</a>
+<div class="contact-fab-wrap" id="contactFabWrap">
+  <div id="contactPop" class="contact-pop" role="dialog" aria-label="Liên hệ">
+    <b>Huỳnh Nhựt Hào</b>
+    <span>Phòng Lâm nghiệp</span>
+    <a href="tel:0878884088"><i class="fa-solid fa-phone text-[10px] mr-1"></i>0878 884 088</a>
+    <a href="mailto:hnhao.213@gmail.com"><i class="fa-solid fa-envelope text-[10px] mr-1"></i>hnhao.213@gmail.com</a>
   </div>
+  <button type="button" class="contact-fab-btn" id="contactFabBtn" title="Thông tin liên hệ" aria-label="Thông tin liên hệ" onclick="toggleContactPop(event)">
+    <i class="fa-solid fa-circle-info"></i>
+  </button>
 </div>
 
 <footer id="siteFooter" class="mt-auto border-t border-slate-200/80 bg-white/90">
   <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-[11px] text-slate-500">
     <div>Báo cáo vi phạm công tác QLBVR · BQLRPH Xuân Lộc · Phòng Lâm nghiệp</div>
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-600">
-      <span class="font-medium text-slate-700">Huỳnh Nhựt Hào</span>
-      <span class="hidden sm:inline text-slate-300">|</span>
-      <span>Phòng Lâm nghiệp</span>
-      <a href="tel:0878884088" class="text-emerald-700 hover:underline whitespace-nowrap"><i class="fa-solid fa-phone text-[10px] mr-0.5"></i>0878 884 088</a>
-      <a href="mailto:hnhao.213@gmail.com" class="text-sky-700 hover:underline truncate max-w-[200px]"><i class="fa-solid fa-envelope text-[10px] mr-0.5"></i>hnhao.213@gmail.com</a>
-    </div>
+    <div class="text-slate-500">Hỗ trợ kỹ thuật: bấm nút <i class="fa-solid fa-circle-info"></i> góc phải</div>
   </div>
 </footer>
 
