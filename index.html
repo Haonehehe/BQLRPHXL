@@ -1148,6 +1148,14 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                   <div class="text-[10px] font-semibold text-sky-800 mb-1">Hợp đồng trồng rừng</div>
                   ${hasHDTR ? row('Số HĐ', c.soHDTrongRung)+row('Ngày ký', c.ngayKyHDTrongRung)+row('Diện tích', c.dienTichHDTrongRung ? c.dienTichHDTrongRung+' ha' : '') : (hasHDK ? '<p class="text-[11px] text-slate-600">Hộ không có hợp đồng trồng rừng.</p>' : '<p class="text-[11px] text-slate-400">—</p>')}
                 </div>
+                <div class="rounded-lg border border-violet-100/80 bg-violet-50/30 p-2">
+                  <div class="text-[10px] font-semibold text-violet-800 mb-1">Thông tin quản lý / hồ sơ</div>
+                  ${row('Túi hồ sơ', c.tuiHoSo)}
+                  ${row('Địa chỉ', c.diaChi)}
+                  ${row('Hộ hợp đồng', c.hoHopDong)}
+                  ${row('Quá trình canh tác', c.quaTrinhCanhTac)}
+                  ${(c.linkHoSo||c.tuiHoSo)?`<div class="pt-1.5">${hoSoButtonHtml(c.tuiHoSo,c.linkHoSo)}</div>`:''}
+                </div>
                 <div class="rounded-lg bg-amber-50/50 border border-amber-100/80 p-2">
                   <div class="text-[10px] font-semibold text-amber-800 mb-0.5">Tình trạng xử lý</div>
                   <div class="text-[11px] text-slate-700 whitespace-pre-line leading-relaxed">${escapeHtml(c.tinhTrang||'—')}</div>
@@ -1281,16 +1289,21 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                     c.ngayKyHDTrongRung ? ('ký ' + c.ngayKyHDTrongRung) : '',
                     c.dienTichHDTrongRung ? (c.dienTichHDTrongRung + ' ha') : ''
                 ].filter(Boolean).join(' · ') : (hasHDK ? 'Không có hợp đồng trồng rừng' : '');
-                return `<button type="button" onclick="closeQuickSearch();openCaseDetail(${i})" class="w-full text-left px-3 py-2.5 border-b border-slate-50 hover:bg-emerald-50/70 active:bg-emerald-50 transition">
+                return `<div class="w-full px-3 py-2.5 border-b border-slate-50 hover:bg-emerald-50/70 transition">
                     <div class="flex items-center justify-between gap-2">
-                        <div class="min-w-0 flex-1">
+                        <div class="min-w-0 flex-1 cursor-pointer" onclick="closeQuickSearch();openCaseDetail(${i})">
                             <div class="flex items-center gap-1.5"><b class="text-[13px] text-slate-900 truncate">${escapeHtml(c.hoTen||'Chưa xác định')}</b><span class="text-[9px] text-slate-400">#${i+1}</span></div>
                             <div class="text-[10px] text-slate-500 mt-0.5 truncate">${escapeHtml([c.tieuKhu && ('TK '+c.tieuKhu), c.phanTruong, c.xa, c.hanhVi].filter(Boolean).join(' · '))}</div>
                             <div class="text-[10px] ${hasHDK?'text-emerald-700':'text-amber-600/90'} mt-0.5 truncate">${escapeHtml(hdLine)}</div>
                         </div>
-                        <span class="shrink-0 px-1.5 py-0.5 rounded border text-[9px] ${g.badge}">${escapeHtml(g.short)}</span>
+                        <div class="shrink-0 flex items-center gap-1.5">
+                            <span class="px-1.5 py-0.5 rounded border text-[9px] ${g.badge}">${escapeHtml(g.short)}</span>
+                            <button type="button" onclick="closeQuickSearch();openCaseDetail(${i})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm hover:bg-emerald-700 active:scale-95 transition whitespace-nowrap" aria-label="Xem thông tin hồ sơ ${escapeAttr(c.hoTen||'')}">
+                                <i class="fa-solid fa-eye text-[9px]"></i><span>Xem thông tin</span>
+                            </button>
+                        </div>
                     </div>
-                </button>`;
+                </div>`;
             }).join('') || '<div class="p-8 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 opacity-40"></i><div>Không tìm thấy hồ sơ phù hợp.</div><div class="mt-1">Thử tên hộ, tiểu khu, xã hoặc hành vi khác.</div></div>';
         }
 
@@ -3011,6 +3024,30 @@ function toggleAdvFilter() {
   .right{text-align:right} .center{text-align:center}
   .footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:32px}
   @media print{body{padding:12px;background:#fff} .header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+/* Fix mobile quick-search layering and modal usability */
+#quickSearchModal { z-index: 999999 !important; }
+#caseDetailModal { z-index: 999998 !important; }
+@media (max-width: 640px) {
+  #quickSearchModal {
+    align-items: flex-start !important;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 4.25rem) !important;
+  }
+  #quickSearchModal > div {
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 5.75rem) !important;
+    border-radius: 14px !important;
+  }
+  #quickSearchResults {
+    max-height: min(62dvh, 460px) !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  #quickSearchResults .inline-flex {
+    min-height: 36px;
+  }
+  #caseDetailModal > div {
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 1rem) !important;
+  }
+}
 </style></head><body>
 <div class="header">
   <h1>BÁO CÁO VI PHẠM CÔNG TÁC QLBVR — BQLRPH XUÂN LỘC</h1>
@@ -3106,7 +3143,7 @@ function toggleAdvFilter() {
     </script>
 
 <!-- Live UI modals -->
-<div id="quickSearchModal" class="hidden fixed inset-0 z-[200000] bg-slate-900/50 backdrop-blur-[2px] flex justify-center overflow-y-auto" style="padding:4.5rem 0.75rem 1.5rem" onclick="if(event.target===this)closeQuickSearch()">
+<div id="quickSearchModal" class="hidden fixed inset-0 z-[999999] bg-slate-900/50 backdrop-blur-[2px] flex justify-center overflow-y-auto" style="padding:calc(env(safe-area-inset-top, 0px) + 4.25rem) 0.75rem 1.5rem" onclick="if(event.target===this)closeQuickSearch()">
   <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg h-fit overflow-hidden border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="px-3 py-2.5 border-b border-slate-100 bg-white flex items-center gap-2">
       <div class="relative flex-1 min-w-0">
