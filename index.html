@@ -104,7 +104,7 @@
             #advFilterPanel.collapsed-mobile { display: none !important; }
             main { padding-left: 0.65rem; padding-right: 0.65rem; padding-top: 0.65rem; }
             .stat-card p.text-xl, .stat-card p.text-2xl { font-size: 1.1rem; }
-            #viewDashBtn span, #viewSummaryBtn span, #viewDetailBtn span, #viewStatsBtn span, #viewActionBtn span, #viewCheckBtn span { font-size: 11px; }
+            #viewDashBtn span, #viewSummaryBtn span, #viewDetailBtn span, #viewStatsBtn span, #viewActionBtn span, #viewCheckBtn span, #viewThuHoiBtn span { font-size: 11px; }
         }
         #siteFooter a { -webkit-tap-highlight-color: transparent; }
         .contact-fab-wrap { position: fixed; right: 12px; bottom: 12px; z-index: 45; }
@@ -115,7 +115,46 @@
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; font-size: 13px;
         }
-        .contact-fab-btn:hover { background: #1e293b; }
+        .contact-fab-btn:hover { background: #1e293b; transform: scale(1.05); }
+        /* Unified action buttons — fixed size for consistency */
+        .btn-action,
+        .btn-action-sm {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
+            height: 30px; padding: 0 0.7rem;
+            border-radius: 0.5rem; font-size: 11px; font-weight: 600;
+            line-height: 1; white-space: nowrap; cursor: pointer;
+            border: 1px solid transparent;
+            transition: background-color .15s ease, box-shadow .15s ease, transform .1s ease, border-color .15s ease, color .15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,.06);
+            box-sizing: border-box;
+        }
+        .btn-action:hover,
+        .btn-action-sm:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,.12); }
+        .btn-action:active,
+        .btn-action-sm:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+        .btn-action.w-full,
+        .btn-action-sm.w-full { width: 100%; height: 34px; }
+        .btn-primary { background: #059669; color: #fff !important; border-color: #047857; }
+        .btn-primary:hover { background: #047857; }
+        .btn-danger { background: #e11d48; color: #fff !important; border-color: #be123c; }
+        .btn-danger:hover { background: #be123c; }
+        .btn-dark { background: #1e293b; color: #fff !important; border-color: #0f172a; }
+        .btn-dark:hover { background: #0f172a; }
+        .btn-outline {
+            background: #fff; color: #334155 !important;
+            border-color: #cbd5e1;
+        }
+        .btn-outline:hover { background: #f8fafc; border-color: #94a3b8; color: #0f172a !important; }
+        .btn-indigo { background: #4f46e5; color: #fff !important; border-color: #4338ca; }
+        .btn-indigo:hover { background: #4338ca; }
+        .btn-sky { background: #0284c7; color: #fff !important; border-color: #0369a1; }
+        .btn-sky:hover { background: #0369a1; }
+        html.dark .btn-outline, body.dark-mode .btn-outline {
+            background: #1e293b; color: #e2e8f0 !important; border-color: #475569;
+        }
+        html.dark .btn-outline:hover, body.dark-mode .btn-outline:hover {
+            background: #334155; border-color: #64748b;
+        }
         .contact-pop {
             display: none; position: absolute; right: 0; bottom: 44px;
             width: 220px; background: #fff; border: 1px solid #e2e8f0;
@@ -137,6 +176,59 @@
         /* Tra cứu nhanh + chi tiết hồ sơ — mobile */
         #quickSearchModal { z-index: 999999 !important; }
         #caseDetailModal { z-index: 1000000 !important; }
+        /* Modal chi tiết: chữ tối rõ trên nền trắng (chế độ sáng) */
+        #caseDetailModal > div {
+            background: #ffffff !important;
+            color: #0f172a !important;
+        }
+        #caseDetailModal #caseDetailContent { color: #0f172a !important; }
+        #caseDetailModal #caseDetailContent h3,
+        #caseDetailModal #caseDetailContent .font-bold,
+        #caseDetailModal #caseDetailContent .font-semibold { color: #0f172a !important; }
+        #caseDetailModal #caseDetailContent .text-slate-500,
+        #caseDetailModal #caseDetailContent .text-slate-600 { color: #64748b !important; }
+        #caseDetailModal #caseDetailContent .text-slate-700,
+        #caseDetailModal #caseDetailContent .text-slate-800,
+        #caseDetailModal #caseDetailContent .text-slate-900 { color: #1e293b !important; }
+        #caseDetailModal #caseDetailContent .text-emerald-800 { color: #065f46 !important; }
+        #caseDetailModal #caseDetailContent .text-sky-800 { color: #075985 !important; }
+        #caseDetailModal #caseDetailContent .text-violet-800 { color: #5b21b6 !important; }
+        #caseDetailModal #caseDetailContent .text-amber-800,
+        #caseDetailModal #caseDetailContent .text-amber-700 { color: #92400e !important; }
+        #caseDetailModal #caseDetailContent .text-indigo-800 { color: #3730a3 !important; }
+        #caseDetailModal #caseDetailContent .text-rose-800 { color: #9f1239 !important; }
+        #caseDetailModal #caseDetailContent .bg-slate-50,
+        #caseDetailModal #caseDetailContent .bg-slate-50\/80 { background-color: #f8fafc !important; color: #0f172a !important; }
+        #caseDetailModal .sticky { background: #ffffff !important; color: #0f172a !important; }
+        html.dark #caseDetailModal > div,
+        body.dark-mode #caseDetailModal > div {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark #caseDetailModal #caseDetailContent,
+        body.dark-mode #caseDetailModal #caseDetailContent { color: #e2e8f0 !important; }
+        html.dark #caseDetailModal #caseDetailContent h3,
+        html.dark #caseDetailModal #caseDetailContent .font-bold,
+        html.dark #caseDetailModal #caseDetailContent .font-semibold,
+        body.dark-mode #caseDetailModal #caseDetailContent h3,
+        body.dark-mode #caseDetailModal #caseDetailContent .font-bold,
+        body.dark-mode #caseDetailModal #caseDetailContent .font-semibold { color: #f8fafc !important; }
+        html.dark #caseDetailModal #caseDetailContent .text-slate-500,
+        html.dark #caseDetailModal #caseDetailContent .text-slate-600,
+        body.dark-mode #caseDetailModal #caseDetailContent .text-slate-500,
+        body.dark-mode #caseDetailModal #caseDetailContent .text-slate-600 { color: #94a3b8 !important; }
+        html.dark #caseDetailModal #caseDetailContent .text-slate-700,
+        html.dark #caseDetailModal #caseDetailContent .text-slate-800,
+        html.dark #caseDetailModal #caseDetailContent .text-slate-900,
+        body.dark-mode #caseDetailModal #caseDetailContent .text-slate-700,
+        body.dark-mode #caseDetailModal #caseDetailContent .text-slate-800,
+        body.dark-mode #caseDetailModal #caseDetailContent .text-slate-900 { color: #e2e8f0 !important; }
+        html.dark #caseDetailModal #caseDetailContent .bg-slate-50,
+        html.dark #caseDetailModal #caseDetailContent .bg-slate-50\/80,
+        body.dark-mode #caseDetailModal #caseDetailContent .bg-slate-50,
+        body.dark-mode #caseDetailModal #caseDetailContent .bg-slate-50\/80 { background-color: #0f172a !important; }
+        html.dark #caseDetailModal .sticky,
+        body.dark-mode #caseDetailModal .sticky { background: #1e293b !important; color: #e2e8f0 !important; }
         @media (max-width: 640px) {
             #quickSearchModal {
                 align-items: flex-start !important;
@@ -286,20 +378,10 @@
                 <button id="viewCheckBtn" onclick="switchMainView('check')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-shield-check text-[11px]"></i><span>Kiểm tra dữ liệu</span>
                 </button>
+                <button id="viewThuHoiBtn" onclick="switchMainView('thuhoi')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-file-contract text-[11px]"></i><span>Thu hồi HĐ</span>
+                </button>
             </div>
-
-            <!-- Instruction -->
-            <div class="bg-emerald-50/80 border-b border-emerald-100 px-4 py-2.5 flex items-start space-x-2.5">
-                <i class="fa-solid fa-circle-info text-sheets-700 text-sm mt-0.5"></i>
-                <div class="text-[11px] text-emerald-900 leading-relaxed">
-                    <span class="font-semibold">Tự động kết nối sheet gốc:</span> Phân nhóm từ cột <strong>AL</strong>, tình trạng từ <strong>AM</strong>. Mỗi hộ chỉ 1 nhóm (đã đến+cam kết/tháo dỡ → Tự giác; đã thông báo → Niêm yết; AL trống → VP mới; mời 1-3 → Đang mời; QĐ chấm dứt → Chấm dứt). Biểu đồ theo Phân trường &amp; Xã.
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-sky-50 border border-sky-200 rounded-xl px-4 py-2.5 text-[11px] text-sky-900 flex items-start gap-2 shadow-sm">
-            <i class="fa-solid fa-eye mt-0.5 text-sky-600"></i>
-            <div><strong>Chế độ xem & thống kê:</strong> Web không chỉnh sửa hoặc xóa dữ liệu gốc. Mọi thay đổi được thực hiện tại Google Sheets; bấm <strong>Làm mới</strong> để cập nhật dữ liệu trên web.</div>
         </div>
 
         <!-- Dashboard Lãnh đạo -->
@@ -522,6 +604,54 @@
             <div class="upgrade-card p-4"><div class="flex items-center justify-between"><div><h2 class="text-sm font-bold text-slate-800">Kiểm tra chất lượng dữ liệu</h2><p class="text-[11px] text-slate-500 mt-0.5">Kiểm tra trước khi dùng số liệu để báo cáo.</p></div><button onclick="renderDataQuality()" class="px-3 py-1.5 bg-slate-800 text-white rounded-lg text-xs"><i class="fa-solid fa-rotate mr-1"></i>Kiểm tra lại</button></div></div>
             <div id="dataQualityCards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
             <div id="dataQualityList" class="upgrade-card overflow-hidden"></div>
+        </div>
+
+        <!-- Thu hồi HĐ — tab riêng, không gắn KPI -->
+        <div id="thuHoiPanel" class="hidden space-y-4">
+            <div class="upgrade-card p-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-800">Hợp đồng đã chấm dứt / thu hồi đất nhận khoán</h2>
+                    </div>
+                    <div class="flex flex-wrap gap-2 items-center">
+                        <span id="thuHoiCountBadge" class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[11px] font-semibold">—</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                <div class="p-3 border-b border-slate-100 bg-slate-50/70 flex flex-col sm:flex-row gap-2">
+                    <div class="relative flex-1 min-w-0">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="search" id="thuHoiSearch" oninput="renderThuHoiPanel()" placeholder="Tên hộ, tiểu khu, phân trường, số QĐ..."
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm sm:text-xs focus:ring-2 focus:ring-rose-400 outline-none">
+                    </div>
+                    <select id="thuHoiStatusFilter" onchange="renderThuHoiPanel()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white min-w-[160px]">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="da_thu_hoi">Đã thu hồi diện tích</option>
+                        <option value="dang_kien">Đang kiện / kháng cáo / THA</option>
+                        <option value="chua_thu_hoi">Chấm dứt — chưa thu hồi đất</option>
+                        <option value="hoa_giai">Hòa giải / rút đơn</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto desktop-only-table">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/80 text-slate-600 text-[11px] uppercase font-semibold tracking-wider border-b border-slate-200">
+                                <th class="py-2.5 px-3 w-10 text-center">STT</th>
+                                <th class="py-2.5 px-3 text-left">Hộ nhận khoán</th>
+                                <th class="py-2.5 px-3 text-left">Địa điểm</th>
+                                <th class="py-2.5 px-3 text-right">Diện tích (ha)</th>
+                                <th class="py-2.5 px-3 text-left">TB / QĐ thu hồi</th>
+                                <th class="py-2.5 px-3 text-left">Tòa án</th>
+                                <th class="py-2.5 px-3 text-left">Trạng thái</th>
+                                <th class="py-2.5 px-3 text-center" style="min-width:90px">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="thuHoiTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="thuHoiMobileCards" class="mobile-cards p-3 space-y-2.5"></div>
+            </div>
         </div>
 
         <!-- Data Table: KPI chỉ hiển thị trong Chi tiết hồ sơ / 5 Nhóm xử lý -->
@@ -779,7 +909,8 @@
             const label = name || "Hồ sơ";
             const isDirect = /^https?:\/\//i.test((linkUrl || "").trim());
             return `<a href="${url}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
-                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${isDirect ? 'text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200'} border transition shadow-sm"
+                class="inline-flex items-center gap-1 px-2 rounded-lg text-[11px] font-medium border transition shadow-sm ${isDirect ? 'text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border-emerald-200' : 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200'}"
+                style="height:30px;box-sizing:border-box"
                 title="${isDirect ? 'Mở thẳng túi hồ sơ Drive' : 'Tìm túi hồ sơ trên Drive'}: ${label.replace(/"/g, '&quot;')}">
                 <i class="fa-solid fa-folder-open text-[10px]"></i>
                 <span class="max-w-[110px] truncate">${escapeHtml(label)}</span>
@@ -1186,10 +1317,10 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                 return parts.join(' · ');
             }).join('; ') || '';
             document.getElementById('caseDetailContent').innerHTML=`
-              <div class="space-y-3">
+              <div class="space-y-3" style="color:#0f172a">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
-                    <h3 class="text-[15px] font-bold text-slate-900 leading-tight">${escapeHtml(c.hoTen)}</h3>
+                    <h3 class="text-[15px] font-bold leading-tight" style="color:#0f172a">${escapeHtml(c.hoTen)}</h3>
                     <p class="text-[11px] text-slate-500 mt-0.5">${escapeHtml([c.tieuKhu && ('TK '+c.tieuKhu), c.phanTruong, c.xa].filter(Boolean).join(' · '))}</p>
                   </div>
                   <span class="shrink-0 px-2 py-0.5 rounded-md border text-[10px] font-semibold ${meta.badge}">${escapeHtml(meta.short)}</span>
@@ -1227,8 +1358,8 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                 </div>
                 <div class="flex flex-wrap gap-2 justify-end pt-1 pb-1">
                   ${(c.linkHoSo||c.tuiHoSo)?hoSoButtonHtml(c.tuiHoSo,c.linkHoSo):''}
-                  <button type="button" onclick="printCaseDetail(${index})" class="px-2.5 py-1.5 bg-slate-800 text-white rounded-md text-[11px] font-semibold"><i class="fa-solid fa-print mr-1"></i>In</button>
-                  <button type="button" onclick="closeCaseDetail()" class="px-2.5 py-1.5 border border-slate-200 rounded-md text-[11px] text-slate-600">Đóng</button>
+                  <button type="button" onclick="printCaseDetail(${index})" class="btn-action-sm btn-dark"><i class="fa-solid fa-print text-[9px]"></i> In</button>
+                  <button type="button" onclick="closeCaseDetail()" class="btn-action-sm btn-outline">Đóng</button>
                 </div>
               </div>`;
             modal.classList.remove('hidden');
@@ -1366,7 +1497,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         </div>
                         <div class="qs-actions shrink-0 flex items-center gap-1.5">
                             <span class="px-1.5 py-0.5 rounded border text-[9px] ${g.badge}">${escapeHtml(g.short)}</span>
-                            <button type="button" onclick="event.stopPropagation();openCaseDetail(${i})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm hover:bg-emerald-700 active:scale-95 transition whitespace-nowrap" aria-label="Xem thông tin hồ sơ ${escapeAttr(c.hoTen||'')}">
+                            <button type="button" onclick="event.stopPropagation();openCaseDetail(${i})" class="btn-action-sm btn-primary" aria-label="Xem thông tin hồ sơ ${escapeAttr(c.hoTen||'')}">
                                 <i class="fa-solid fa-eye text-[9px]"></i><span>Xem thông tin</span>
                             </button>
                         </div>
@@ -1415,7 +1546,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             const cards=[['Ưu tiên xử lý',arr.length,'rose'],['VP mới chưa mời',counts.new,'violet'],['Đang mời',counts.invite,'sky'],['Mời lần 3',counts.urgent,'red']];
             document.getElementById('actionSummaryCards').innerHTML=cards.map(x=>`<div class="upgrade-card p-3 border-${x[2]}-200"><div class="text-[10px] text-${x[2]}-600 uppercase font-semibold">${x[0]}</div><div class="text-2xl font-bold text-${x[2]}-600">${x[1]}</div></div>`).join('');
             document.querySelector('#actionTable thead').innerHTML='<tr class="bg-slate-50 text-left"><th class="p-2">STT</th><th class="p-2">Hồ sơ</th><th class="p-2">Địa bàn</th><th class="p-2">Tình trạng</th><th class="p-2">Cảnh báo</th><th class="p-2">Xem</th></tr>';
-            document.querySelector('#actionTable tbody').innerHTML=arr.map((c,i)=>`<tr class="border-t"><td class="p-2">${i+1}</td><td class="p-2 font-semibold">${escapeHtml(c.hoTen)}</td><td class="p-2">TK ${escapeHtml(c.tieuKhu||'—')} · ${escapeHtml(c.phanTruong||'—')}</td><td class="p-2">${escapeHtml((c.tinhTrang||'').slice(0,180))}</td><td class="p-2">${alertBadgeHtml(c)}</td><td class="p-2"><button onclick="openCaseDetail(${detailedCases.indexOf(c)})" class="text-blue-600 font-semibold">Chi tiết</button></td></tr>`).join('')||'<tr><td colspan="6" class="p-6 text-center text-slate-400">Không có hồ sơ cần ưu tiên.</td></tr>';
+            document.querySelector('#actionTable tbody').innerHTML=arr.map((c,i)=>`<tr class="border-t"><td class="p-2">${i+1}</td><td class="p-2 font-semibold">${escapeHtml(c.hoTen)}</td><td class="p-2">TK ${escapeHtml(c.tieuKhu||'—')} · ${escapeHtml(c.phanTruong||'—')}</td><td class="p-2">${escapeHtml((c.tinhTrang||'').slice(0,180))}</td><td class="p-2">${alertBadgeHtml(c)}</td><td class="p-2"><button type="button" onclick="openCaseDetail(${detailedCases.indexOf(c)})" class="btn-action-sm btn-primary"><i class="fa-solid fa-eye text-[9px]"></i> Chi tiết</button></td></tr>`).join('')||'<tr><td colspan="6" class="p-6 text-center text-slate-400">Không có hồ sơ cần ưu tiên.</td></tr>';
         }
         function renderDataQuality(){
             const issues=[]; const push=(type,c,detail)=>issues.push({type,hoTen:c.hoTen||'—',detail});
@@ -1451,7 +1582,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             currentViewMode = mode;
             const activeCls = "py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5 whitespace-nowrap";
             const inactiveCls = "py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap";
-            const map = { dashboard: "viewDashBtn", summary: "viewSummaryBtn", detail: "viewDetailBtn", stats: "viewStatsBtn", action: "viewActionBtn", check: "viewCheckBtn" };
+            const map = { dashboard: "viewDashBtn", summary: "viewSummaryBtn", detail: "viewDetailBtn", stats: "viewStatsBtn", action: "viewActionBtn", check: "viewCheckBtn", thuhoi: "viewThuHoiBtn" };
             Object.entries(map).forEach(([m, id]) => {
                 const el = document.getElementById(id);
                 if (el) el.className = (mode === m) ? activeCls : inactiveCls;
@@ -1463,8 +1594,9 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             const dashPanel = document.getElementById('dashboardPanel');
             const actionPanel = document.getElementById('actionPanel');
             const checkPanel = document.getElementById('checkPanel');
+            const thuHoiPanel = document.getElementById('thuHoiPanel');
             const dashUpgrade = document.getElementById('dashboardUpgradeSection');
-            [dashPanel, dashUpgrade, statsPanel, actionPanel, checkPanel, tableWrap, chartsSec].forEach(el => { if (el) el.classList.add('hidden'); });
+            [dashPanel, dashUpgrade, statsPanel, actionPanel, checkPanel, thuHoiPanel, tableWrap, chartsSec].forEach(el => { if (el) el.classList.add('hidden'); });
 
             if (mode === 'stats') {
                 if (statsPanel) statsPanel.classList.remove('hidden');
@@ -1479,11 +1611,13 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             } else if (mode === 'check') {
                 if (checkPanel) checkPanel.classList.remove('hidden');
                 renderDataQuality();
+            } else if (mode === 'thuhoi') {
+                if (thuHoiPanel) thuHoiPanel.classList.remove('hidden');
+                renderThuHoiPanel();
             } else {
                 if (tableWrap) tableWrap.classList.remove('hidden');
                 if (chartsSec) chartsSec.classList.remove('hidden');
                 renderTable();
-                // Vẽ lại biểu đồ sau khi section hiện (canvas cần có kích thước)
                 requestAnimationFrame(() => {
                     setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 50);
                 });
@@ -1495,6 +1629,157 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             const input = document.getElementById('searchInput');
             if (input) { input.value = tk || ''; }
             if (typeof renderTable === 'function') renderTable();
+        }
+
+        /** Danh sách HĐ đã chấm dứt / thu hồi — tab riêng, không gắn KPI */
+        const thuHoiCases = [
+            { stt:1, hoTen:"Đoàn Hồng Đức", diaDiem:"TK 150A, PT Trản Táo", dienTich:1.20, soHD:"", ngayKyHD:"", soQĐ:"79/QĐ.LT", ngayQĐ:"01/6/2001", soToa:"", ngayToa:"", viPham:"Vi phạm HĐ, vi phạm cam kết PCCR nhiều lần", ketQua:"BQL đã thu hồi diện tích giao khoán", ghiChu:"Đã thu hồi diện tích khoán" },
+            { stt:2, hoTen:"Phạm Thị Điệp", diaDiem:"TK 147, PT Gia Huynh", dienTich:1.30, soHD:"", ngayKyHD:"", soQĐ:"62/QĐ.BQLRPHXL", ngayQĐ:"28/7/2008", soToa:"", ngayToa:"", viPham:"Chuyển nhượng đất trái phép, gây tranh chấp kéo dài", ketQua:"BQL đã thu hồi diện tích giao khoán, giao PT Gia Huynh trực tiếp sản xuất", ghiChu:"Đã thu hồi diện tích khoán" },
+            { stt:3, hoTen:"Nguyễn Thế Truyền", diaDiem:"TK 204, PT Trản Táo", dienTich:3.08, soHD:"364", ngayKyHD:"20/4/2012", soQĐ:"456/TB-BQLRPH", ngayQĐ:"27/6/2022", soToa:"26/2023/TB-TLVA", ngayToa:"13/2/2023", viPham:"Sang nhượng trái phép; đào múc hồ; dựng hàng rào", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 27/01/2026 (BA 07/2026/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang kháng cáo" },
+            { stt:4, hoTen:"Nguyễn Văn Long", diaDiem:"TK 204, PT Trản Táo", dienTich:1.2, soHD:"3", ngayKyHD:"11/6/2021", soQĐ:"457/TB-BQLRPH", ngayQĐ:"27/6/2022", soToa:"25/2023/TB-TLVA", ngayToa:"10/2/2023", viPham:"Sang nhượng trái phép; đào múc hồ; dựng hàng rào; xây dựng nhà trái phép; phá hoại cây rừng trái phép", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 10/02/2026 (BA 10/2026/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang kháng cáo" },
+            { stt:5, hoTen:"Trần Nàm Giểng", diaDiem:"TK 205, PT Trản Táo", dienTich:1.27, soHD:"136", ngayKyHD:"20/8/2015", soQĐ:"930/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:6, hoTen:"Vòng A Múi", diaDiem:"TK 205, PT Trản Táo", dienTich:4.71, soHD:"128", ngayKyHD:"30/9/2005", soQĐ:"57/QĐ-BQLRPHXL", ngayQĐ:"29/4/2026", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Ông Nguyễn Văn Trình nhận chuyển nhượng trái phép" },
+            { stt:7, hoTen:"Lý Minh Ngọc", diaDiem:"TK 205, PT Trản Táo", dienTich:3.09, soHD:"93", ngayKyHD:"27/3/2003", soQĐ:"932/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Người thừa kế sử dụng là ông Lý Xướng Nhì" },
+            { stt:8, hoTen:"Nguyễn Thị Kim Cúc", diaDiem:"TK 205, PT Trản Táo", dienTich:6.57, soHD:"183", ngayKyHD:"27/11/2004", soQĐ:"933/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:9, hoTen:"Nguyễn Hữu Đào", diaDiem:"TK 204, PT Trản Táo", dienTich:5.1, soHD:"58", ngayKyHD:"8/8/2002", soQĐ:"934/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:10, hoTen:"Lê Khánh Phú", diaDiem:"TK 203, PT Lán Cát", dienTich:1.53, soHD:"154", ngayKyHD:"20/1/2014", soQĐ:"976/TB-BQLRPH", ngayQĐ:"24/11/2022", soToa:"27/2023/TB-TLVA", ngayToa:"13/2/2023", viPham:"Sang nhượng trái phép; khai thác cây rừng trồng trái phép", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 27/11/2025 (BA 93/2025/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang làm hồ sơ đề nghị thi hành án" },
+            { stt:11, hoTen:"Triệu Đức Giang", diaDiem:"TK 204, PT Trản Táo", dienTich:1.59, soHD:"32", ngayKyHD:"3/11/1994", soQĐ:"39/QĐ-BQLRPH", ngayQĐ:"19/4/2023", soToa:"", ngayToa:"", viPham:"Khai thác cây rừng trồng trái phép", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:12, hoTen:"Phún Tài Múi", diaDiem:"TK 204, PT Trản Táo", dienTich:6.17, soHD:"", ngayKyHD:"", soQĐ:"334/TB-BQLRPH", ngayQĐ:"26/5/2023", soToa:"", ngayToa:"", viPham:"Khai thác cây rừng trồng trái phép", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Diện tích chưa lập HĐ" },
+            { stt:13, hoTen:"Triệu Văn Hòa", diaDiem:"TK 204, PT Trản Táo", dienTich:4.78, soHD:"40", ngayKyHD:"3/11/1994", soQĐ:"101/QĐ-BQLRPH", ngayQĐ:"10/11/2020", soToa:"75/TB-TLVA", ngayToa:"13/5/2020", viPham:"Sang nhượng trái phép; khai thác cây rừng trồng trái phép", ketQua:"Sơ thẩm BA 09/2025/DS-ST (24/7/2025); Phúc thẩm BA 60/2026/DS-PT (23/01/2026) — chấp thuận yêu cầu của BQL", ghiChu:"Đang làm hồ sơ đề nghị thi hành án" },
+            { stt:14, hoTen:"Nguyễn Mốc", diaDiem:"TK 205, PT Trản Táo", dienTich:4.71, soHD:"184", ngayKyHD:"27/11/2004", soQĐ:"12/QĐ-BQLRPH", ngayQĐ:"20/1/2021", soToa:"241/TB-TLVA", ngayToa:"23/11/2020", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"Đã hòa giải thành, ông Nguyễn Mốc đã khắc phục", ghiChu:"Đã khởi kiện. Năm 2025 đã hòa giải, BQL đã rút hồ sơ khởi kiện" },
+            { stt:15, hoTen:"Hà Thị Hạnh", diaDiem:"TK 204, PT Trản Táo", dienTich:1.69, soHD:"203", ngayKyHD:"28/4/2005", soQĐ:"14/QĐ-BQLRPH", ngayQĐ:"20/1/2021", soToa:"246/TB-TLVA", ngayToa:"26/11/2020", viPham:"Sang nhượng trái phép; khai thác cây rừng trồng trái phép", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 10/12/2025 (BA 99/2025/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang làm hồ sơ đề nghị thi hành án" },
+            { stt:16, hoTen:"Triệu A Sám", diaDiem:"TK 204, PT Trản Táo", dienTich:2.59, soHD:"202", ngayKyHD:"28/4/2005", soQĐ:"13/QĐ-BQLRPH", ngayQĐ:"20/1/2021", soToa:"237/TB-TLVA", ngayToa:"19/11/2020", viPham:"Khai thác cây rừng trồng trái phép", ketQua:"BQL đã rút hồ sơ khởi kiện để bổ sung chứng cứ", ghiChu:"Đã rút hồ sơ" },
+            { stt:17, hoTen:"Nguyễn Văn Chính", diaDiem:"TK 203, PT Lán Cát", dienTich:1.71, soHD:"142", ngayKyHD:"31/12/2016", soQĐ:"150/QĐ-BQLRPH", ngayQĐ:"31/12/2024", soToa:"", ngayToa:"", viPham:"Phá hoại cây rừng trồng, sang nhượng trái phép", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:18, hoTen:"Đặng Đức Hình", diaDiem:"TK 204, PT Trản Táo", dienTich:4.12, soHD:"214", ngayKyHD:"28/4/2005", soQĐ:"31/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:19, hoTen:"Đặng Đức Quang", diaDiem:"TK 204, PT Trản Táo", dienTich:8.81, soHD:"82", ngayKyHD:"4/11/1994", soQĐ:"28/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:20, hoTen:"Lý Viết Mông", diaDiem:"TK 205, PT Trản Táo", dienTich:5.83, soHD:"212", ngayKyHD:"28/4/2005", soQĐ:"29/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:21, hoTen:"Trần Nhộc Bẩu", diaDiem:"TK 204, PT Trản Táo", dienTich:1.46, soHD:"174", ngayKyHD:"27/11/2004", soQĐ:"30/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:22, hoTen:"Triệu Đức Thuận", diaDiem:"TK 204, PT Trản Táo", dienTich:2.75, soHD:"206", ngayKyHD:"28/4/2021", soQĐ:"32/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:23, hoTen:"Trần Thị Nhung", diaDiem:"TK 205, PT Trản Táo", dienTich:3.76, soHD:"72", ngayKyHD:"16/8/2016", soQĐ:"264/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác, phá hoại cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:24, hoTen:"Nguyễn Viết Hùng", diaDiem:"TK 203, PT Lán Cát", dienTich:7.66, soHD:"208", ngayKyHD:"1/8/2015", soQĐ:"263/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:25, hoTen:"Nguyễn Có", diaDiem:"TK 204, PT Trản Táo", dienTich:0.76, soHD:"431", ngayKyHD:"20/4/2016", soQĐ:"262/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:26, hoTen:"Lý Thị Nga", diaDiem:"TK 205, PT Trản Táo", dienTich:2.77, soHD:"211", ngayKyHD:"28/4/2005", soQĐ:"265/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; xây dựng công trình trái phép; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:27, hoTen:"Nguyễn Kế Vỹ", diaDiem:"TK 204, PT Trản Táo", dienTich:2.93, soHD:"461", ngayKyHD:"12/6/2019", soQĐ:"266/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng; đào múc hồ trái phép; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
+            { stt:28, hoTen:"Nguyễn Thị Kim Hương", diaDiem:"TK 205, PT Trản Táo", dienTich:1.94, soHD:"139", ngayKyHD:"4/6/2004", soQĐ:"67/QĐ-BQLRPHXL", ngayQĐ:"27/10/2025", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Sang nhượng trái phép cho ông Vi Chung Bảo" },
+            { stt:29, hoTen:"Phan Hữu Thành (Làng)", diaDiem:"TK 204, PT Trản Táo", dienTich:2.78, soHD:"175", ngayKyHD:"27/11/2004", soQĐ:"58/QĐ-BQLRPHXL", ngayQĐ:"29/4/2026", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, xây dựng công trình trái phép, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" }
+        ];
+
+        function classifyThuHoiStatus(c) {
+            const k = ((c.ketQua || '') + ' ' + (c.ghiChu || '')).toLowerCase();
+            if (k.includes('đã thu hồi diện tích') || k.includes('đã thu hồi đất')) return { key: 'da_thu_hoi', label: 'Đã thu hồi', cls: 'bg-emerald-50 text-emerald-800 border-emerald-200' };
+            if (k.includes('hòa giải') || k.includes('rút hồ sơ') || k.includes('đã rút')) return { key: 'hoa_giai', label: 'Hòa giải / rút đơn', cls: 'bg-slate-50 text-slate-700 border-slate-200' };
+            if (k.includes('tòa') || k.includes('kháng cáo') || k.includes('thi hành án') || k.includes('sơ thẩm') || k.includes('phúc thẩm')) return { key: 'dang_kien', label: 'Đang kiện / THA', cls: 'bg-amber-50 text-amber-800 border-amber-200' };
+            return { key: 'chua_thu_hoi', label: 'Chưa thu hồi đất', cls: 'bg-rose-50 text-rose-800 border-rose-200' };
+        }
+
+        function renderThuHoiPanel() {
+            const q = (document.getElementById('thuHoiSearch')?.value || '').toLowerCase().trim();
+            const st = document.getElementById('thuHoiStatusFilter')?.value || '';
+            const norm = v => String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const nq = norm(q);
+            const arr = thuHoiCases.filter(c => {
+                const s = classifyThuHoiStatus(c);
+                if (st && s.key !== st) return false;
+                if (!nq) return true;
+                const hay = [c.hoTen, c.diaDiem, c.soQĐ, c.soHD, c.soToa, c.viPham, c.ketQua, c.ghiChu].map(norm).join(' ');
+                return hay.includes(nq);
+            });
+            const totalHa = arr.reduce((s, c) => s + (Number(c.dienTich) || 0), 0);
+            const badge = document.getElementById('thuHoiCountBadge');
+            if (badge) badge.textContent = `${arr.length} hộ · ${totalHa.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} ha`;
+
+            const tbody = document.getElementById('thuHoiTableBody');
+            if (tbody) {
+                tbody.innerHTML = arr.map((c, i) => {
+                    const s = classifyThuHoiStatus(c);
+                    return `<tr class="border-t border-slate-100 hover:bg-slate-50/80">
+                        <td class="py-2.5 px-3 text-center text-slate-500">${c.stt}</td>
+                        <td class="py-2.5 px-3"><div class="font-semibold text-slate-800">${escapeHtml(c.hoTen)}</div>
+                            ${c.soHD ? `<div class="text-[10px] text-slate-500 mt-0.5">HĐ số ${escapeHtml(c.soHD)}${c.ngayKyHD ? ' · ký ' + escapeHtml(c.ngayKyHD) : ''}</div>` : ''}</td>
+                        <td class="py-2.5 px-3 text-slate-600">${escapeHtml(c.diaDiem)}</td>
+                        <td class="py-2.5 px-3 text-right font-medium">${Number(c.dienTich).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</td>
+                        <td class="py-2.5 px-3"><div class="font-medium text-slate-800">${escapeHtml(c.soQĐ || '—')}</div>
+                            <div class="text-[10px] text-slate-500">${escapeHtml(c.ngayQĐ || '')}</div></td>
+                        <td class="py-2.5 px-3">${c.soToa ? `<div class="text-slate-800">${escapeHtml(c.soToa)}</div><div class="text-[10px] text-slate-500">${escapeHtml(c.ngayToa || '')}</div>` : '<span class="text-slate-400">—</span>'}</td>
+                        <td class="py-2.5 px-3"><span class="inline-block px-2 py-0.5 rounded border text-[10px] font-semibold ${s.cls}">${s.label}</span>
+                            ${c.ghiChu ? `<div class="text-[10px] text-slate-500 mt-1 max-w-[180px] leading-snug">${escapeHtml(c.ghiChu)}</div>` : ''}</td>
+                        <td class="py-2.5 px-3 text-center">
+                            <button type="button" onclick="openThuHoiDetail(${c.stt - 1})" class="btn-action-sm btn-danger" title="Xem chi tiết"><i class="fa-solid fa-eye text-[9px]"></i> Chi tiết</button>
+                        </td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="8" class="py-8 text-center text-slate-400">Không có hồ sơ phù hợp.</td></tr>';
+            }
+            const mob = document.getElementById('thuHoiMobileCards');
+            if (mob) {
+                mob.innerHTML = arr.map(c => {
+                    const s = classifyThuHoiStatus(c);
+                    return `<div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                        <div class="flex justify-between items-start gap-2">
+                            <div class="min-w-0">
+                                <div class="font-semibold text-slate-800 text-sm">${escapeHtml(c.hoTen)}</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(c.diaDiem)} · ${Number(c.dienTich).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} ha</div>
+                            </div>
+                            <span class="shrink-0 px-2 py-0.5 rounded border text-[10px] font-semibold ${s.cls}">${s.label}</span>
+                        </div>
+                        <div class="mt-2 text-[11px] text-slate-600"><b>TB/QĐ:</b> ${escapeHtml(c.soQĐ || '—')}${c.ngayQĐ ? ' (' + escapeHtml(c.ngayQĐ) + ')' : ''}</div>
+                        ${c.soToa ? `<div class="text-[11px] text-slate-600"><b>Tòa:</b> ${escapeHtml(c.soToa)}${c.ngayToa ? ' (' + escapeHtml(c.ngayToa) + ')' : ''}</div>` : ''}
+                        <p class="text-[11px] text-slate-500 mt-1.5 line-clamp-2">${escapeHtml(c.viPham || '')}</p>
+                        <button type="button" onclick="openThuHoiDetail(${c.stt - 1})" class="btn-action-sm btn-danger mt-2 w-full"><i class="fa-solid fa-eye text-[10px]"></i> Xem chi tiết</button>
+                    </div>`;
+                }).join('') || '<p class="text-center text-slate-400 text-sm py-6">Không có hồ sơ phù hợp.</p>';
+            }
+        }
+
+        function openThuHoiDetail(index) {
+            const c = thuHoiCases[index];
+            if (!c) return;
+            const s = classifyThuHoiStatus(c);
+            const modal = document.getElementById('caseDetailModal');
+            if (!modal) return;
+            const row = (label, val) => val ? `<div class="grid grid-cols-[7rem_1fr] gap-x-2 gap-y-0.5 py-1 border-b border-slate-50 last:border-0"><span class="text-[10px] text-slate-500">${label}</span><span class="text-[12px] text-slate-800 leading-snug">${escapeHtml(String(val))}</span></div>` : '';
+            document.getElementById('caseDetailContent').innerHTML = `
+              <div class="space-y-3" style="color:#0f172a">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <h3 class="text-[15px] font-bold leading-tight" style="color:#0f172a">${escapeHtml(c.hoTen)}</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(c.diaDiem)} · ${Number(c.dienTich).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} ha</p>
+                  </div>
+                  <span class="shrink-0 px-2 py-0.5 rounded-md border text-[10px] font-semibold ${s.cls}">${s.label}</span>
+                </div>
+                <div class="rounded-lg border border-slate-100 p-2">
+                  <div class="text-[10px] font-semibold text-slate-600 mb-1">Hợp đồng nhận khoán</div>
+                  ${row('Số HĐ', c.soHD) || '<p class="text-[11px] text-slate-400">—</p>'}
+                  ${row('Ngày ký', c.ngayKyHD)}
+                  ${row('Diện tích', c.dienTich + ' ha')}
+                </div>
+                <div class="rounded-lg border border-rose-100 bg-rose-50/40 p-2">
+                  <div class="text-[10px] font-semibold text-rose-800 mb-1">TB / QĐ chấm dứt — thu hồi</div>
+                  ${row('Số', c.soQĐ)}
+                  ${row('Ngày', c.ngayQĐ)}
+                </div>
+                ${c.soToa ? `<div class="rounded-lg border border-amber-100 bg-amber-50/40 p-2">
+                  <div class="text-[10px] font-semibold text-amber-800 mb-1">Tòa án thụ lý</div>
+                  ${row('Số', c.soToa)}
+                  ${row('Ngày', c.ngayToa)}
+                </div>` : ''}
+                <div class="rounded-lg border border-slate-100 p-2">
+                  <div class="text-[10px] font-semibold text-slate-600 mb-1">Nội dung vi phạm</div>
+                  <div class="text-[11px] text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(c.viPham || '—')}</div>
+                </div>
+                <div class="rounded-lg border border-indigo-100 bg-indigo-50/30 p-2">
+                  <div class="text-[10px] font-semibold text-indigo-800 mb-1">Kết quả xử lý</div>
+                  <div class="text-[11px] text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(c.ketQua || '—')}</div>
+                </div>
+                ${c.ghiChu ? `<div class="rounded-lg bg-slate-50 border border-slate-100 p-2">
+                  <div class="text-[10px] font-semibold text-slate-600 mb-0.5">Ghi chú</div>
+                  <div class="text-[11px] text-slate-700">${escapeHtml(c.ghiChu)}</div>
+                </div>` : ''}
+                <div class="flex justify-end pt-1">
+                  <button type="button" onclick="closeCaseDetail()" class="btn-action-sm btn-outline">Đóng</button>
+                </div>
+              </div>`;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function renderTable() {
@@ -1648,7 +1933,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         <td class="py-2.5 px-2 text-center align-top no-export">
                             <div class="flex flex-col items-center gap-1.5">
                                 ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
-                                <button type="button" onclick="openCaseDetail(${index})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm hover:bg-emerald-700 active:scale-95 transition whitespace-nowrap" title="Xem thông tin hồ sơ">
+                                <button type="button" onclick="openCaseDetail(${index})" class="btn-action-sm btn-primary" title="Xem thông tin hồ sơ">
                                     <i class="fa-solid fa-eye text-[9px]"></i><span>Xem thông tin</span>
                                 </button>
                             </div>
@@ -1673,7 +1958,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                             <p class="text-[11px] text-slate-600 mt-2">${escapeHtml((item.tinhTrang || '').slice(0, 180))}${(item.tinhTrang || '').length > 180 ? '…' : ''}</p>
                             <div class="mt-2 flex flex-wrap gap-2 items-center">
                                 ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
-                                <button type="button" onclick="openCaseDetail(${index})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm">
+                                <button type="button" onclick="openCaseDetail(${index})" class="btn-action-sm btn-primary">
                                     <i class="fa-solid fa-eye text-[9px]"></i> Xem thông tin
                                 </button>
                             </div>
@@ -2248,7 +2533,7 @@ function toggleAdvFilter() {
                         <p class="text-[11px] text-slate-600 mt-2">${escapeHtml((item.tinhTrang || '').slice(0, 160))}</p>
                         <div class="mt-2 flex flex-wrap gap-2 items-center">
                             ${(item.tuiHoSo || item.linkHoSo) ? hoSoButtonHtml(item.tuiHoSo, item.linkHoSo) : ''}
-                            <button type="button" onclick="openCaseDetail(${idx})" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[10px] font-semibold shadow-sm">
+                            <button type="button" onclick="openCaseDetail(${idx})" class="btn-action-sm btn-primary">
                                 <i class="fa-solid fa-eye text-[9px]"></i> Xem thông tin
                             </button>
                         </div>
@@ -3210,11 +3495,11 @@ function toggleAdvFilter() {
 </div>
 
 <div id="caseDetailModal" class="hidden fixed inset-0 z-[1000000] bg-slate-900/50 backdrop-blur-[2px] flex items-end sm:items-center justify-center overflow-y-auto p-0 sm:p-4" onclick="if(event.target===this)closeCaseDetail()">
-  <div class="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-md max-h-[88vh] overflow-y-auto border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
-    <div class="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
-      <b class="text-[13px] text-slate-800">Chi tiết hồ sơ</b>
+  <div class="bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-md max-h-[88vh] overflow-y-auto border border-slate-200/90 ring-1 ring-black/5" role="dialog" aria-modal="true" onclick="event.stopPropagation()" style="background:#fff;color:#0f172a">
+    <div class="px-3 py-2.5 border-b border-slate-100 flex items-center justify-between sticky top-0 z-10" style="background:#fff;color:#0f172a">
+      <b class="text-[13px]" style="color:#0f172a">Chi tiết hồ sơ</b>
       <div class="flex items-center gap-1.5">
-        <button type="button" onclick="printCaseDetail()" class="px-2.5 py-1 bg-slate-800 text-white rounded-md text-[10px] font-semibold"><i class="fa-solid fa-print mr-1"></i>In</button>
+        <button type="button" onclick="printCaseDetail()" class="btn-action-sm btn-dark"><i class="fa-solid fa-print text-[9px]"></i> In</button>
         <button type="button" onclick="closeCaseDetail()" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md hover:bg-slate-50" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
