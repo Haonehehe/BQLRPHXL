@@ -67,6 +67,42 @@
         }
         #siteFooter a { -webkit-tap-highlight-color: transparent; }
 
+        /* Header gọn: hiển thị đầy đủ 5 giây đầu, sau đó thu vào nút 3 gạch */
+        .header-menu-btn {
+            display:flex; align-items:center; justify-content:center;
+            width:38px; height:38px; border:1px solid #cbd5e1; border-radius:10px;
+            background:#fff; color:#334155; box-shadow:0 1px 2px rgba(0,0,0,.05);
+            transition:all .2s ease; flex-shrink:0;
+        }
+        .header-menu-btn:hover { background:#f8fafc; transform:translateY(-1px); }
+        .header-actions { transition:opacity .22s ease, transform .22s ease; }
+        #siteHeader.header-collapsed .header-actions {
+            display:none !important;
+        }
+        #siteHeader.header-collapsed .header-menu-btn {
+            display:flex !important;
+        }
+        #siteHeader.header-menu-open .header-actions {
+            display:flex !important;
+            position:absolute; right:1rem; top:4.25rem; z-index:100;
+            flex-direction:column; align-items:stretch; gap:.45rem;
+            margin:0; padding:.65rem; width:min(280px,calc(100vw - 2rem));
+            background:rgba(255,255,255,.98); border:1px solid #e2e8f0;
+            border-radius:14px; box-shadow:0 16px 35px rgba(15,23,42,.15);
+        }
+        #siteHeader.header-menu-open .header-actions > * { width:100%; justify-content:flex-start; }
+        #siteHeader.header-menu-open .header-menu-btn { background:#f1f5f9; }
+        @media (min-width:641px) {
+            .header-menu-btn { display:none; }
+        }
+        @media (max-width:640px) {
+            .header-menu-btn { display:flex; }
+            #siteHeader .max-w-7xl { position:relative; }
+            #siteHeader.header-menu-open .header-actions { right:.65rem; top:3.75rem; }
+            #siteHeader.header-menu-open { z-index:1000; }
+            .header-search-btn { display:inline-flex !important; }
+        }
+
         /* Modal full-screen mobile: không bị header / home indicator che */
         @media (max-width: 640px) {
             #quickSearchModal > div,
@@ -118,10 +154,10 @@
 <body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-sm">
+    <header id="siteHeader" class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 via-sheets-700 to-teal-900 flex items-center justify-center text-white shadow-lg ring-2 ring-emerald-100">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 via-sheets-700 to-teal-900 flex items-center justify-center text-white shadow-lg ring-2 ring-emerald-100 shrink-0">
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
                 <div class="min-w-0">
@@ -129,28 +165,37 @@
                     <p class="text-[11px] text-slate-500 truncate">Ban Quản lý Rừng phòng hộ Xuân Lộc · Đồng bộ Google Sheets</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="inline-flex items-center px-2.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs rounded-lg shadow-sm transition-all" title="Sáng / Tối">
+
+            <button id="headerMenuBtn" type="button" onclick="toggleHeaderMenu(event)" class="header-menu-btn" title="Mở menu chức năng" aria-label="Mở menu chức năng" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div id="headerActions" class="header-actions flex items-center space-x-2">
+                <button onclick="toggleDarkMode();closeHeaderMenu()" id="btnDarkMode" class="inline-flex items-center px-2.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs rounded-lg shadow-sm transition-all" title="Sáng / Tối">
                     <i class="fa-solid fa-moon" id="darkModeIcon"></i>
                 </button>
-                <a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener"
+                <a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener" onclick="closeHeaderMenu()"
                    class="inline-flex items-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Mở thư mục mẹ túi hồ sơ trên Drive">
                     <i class="fa-solid fa-folder-tree mr-1.5 text-amber-500"></i>
                     <span class="hidden sm:inline">Thư mục hồ sơ</span>
                 </a>
-                <button onclick="reloadData()" id="btnReload" class="inline-flex items-center px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Tải lại dữ liệu từ Google Sheets">
+                <button onclick="reloadData();closeHeaderMenu()" id="btnReload" class="inline-flex items-center px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Tải lại dữ liệu từ Google Sheets">
                     <i class="fa-solid fa-arrows-rotate mr-1.5" id="reloadIcon"></i>
                     <span class="hidden sm:inline">Làm mới</span>
                 </button>
-                <button onclick="openSyncModal()" class="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                <button onclick="openSyncModal();closeHeaderMenu()" class="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                     <i class="fa-solid fa-link mr-1.5" id="syncIcon"></i>
                     <span class="hidden sm:inline">Đổi link Sheet</span>
                     <span class="sm:hidden">Link</span>
                 </button>
-                <button onclick="copyForGoogleSheets()" class="inline-flex items-center px-3 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all">
+                <button onclick="copyForGoogleSheets();closeHeaderMenu()" class="inline-flex items-center px-3 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all">
                     <i class="fa-regular fa-copy mr-1.5"></i>
                     <span class="hidden sm:inline">Chép dán Sheets</span>
                     <span class="sm:hidden">Copy</span>
+                </button>
+                <button onclick="openQuickSearch();closeHeaderMenu()" class="header-search-btn inline-flex items-center px-3 py-2 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition-all" title="Tra cứu nhanh">
+                    <i class="fa-solid fa-magnifying-glass mr-1.5"></i>
+                    <span>Tra cứu</span>
                 </button>
             </div>
         </div>
@@ -1212,6 +1257,41 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             w.document.write(html);
             w.document.close();
         }
+        let headerHideTimer = null;
+        function collapseHeaderMenu(){
+            const header = document.getElementById('siteHeader');
+            if (!header) return;
+            header.classList.remove('header-menu-open');
+            const btn = document.getElementById('headerMenuBtn');
+            if (btn) { btn.setAttribute('aria-expanded','false'); btn.innerHTML = '<i class="fa-solid fa-bars"></i>'; }
+        }
+        function closeHeaderMenu(){ collapseHeaderMenu(); }
+        function toggleHeaderMenu(e){
+            if (e) e.stopPropagation();
+            const header = document.getElementById('siteHeader');
+            if (!header) return;
+            const open = header.classList.toggle('header-menu-open');
+            const btn = document.getElementById('headerMenuBtn');
+            if (btn) {
+                btn.setAttribute('aria-expanded', String(open));
+                btn.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+            }
+        }
+        function initHeaderAutoCollapse(){
+            const header = document.getElementById('siteHeader');
+            if (!header) return;
+            if (headerHideTimer) clearTimeout(headerHideTimer);
+            // Cho người dùng 5 giây đầu để thấy toàn bộ chức năng.
+            headerHideTimer = setTimeout(() => {
+                header.classList.add('header-collapsed');
+                collapseHeaderMenu();
+            }, 5000);
+        }
+        document.addEventListener('click', function(e){
+            const header = document.getElementById('siteHeader');
+            if (header && header.classList.contains('header-menu-open') && !header.contains(e.target)) collapseHeaderMenu();
+        });
+
         function openQuickSearch(){
             const modal = document.getElementById('quickSearchModal');
             if (!modal) { showToast('Không tìm thấy cửa sổ tra cứu.', 'error'); return; }
@@ -1239,34 +1319,46 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             const el = document.getElementById('quickSearchResults');
             const meta = document.getElementById('quickSearchMeta');
             if (!el) return;
-            const q = (input?.value || '').toLowerCase().trim();
+
+            const q = (input?.value || '').trim();
+            const norm = v => String(v ?? '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g,'')
+                .replace(/đ/g,'d');
+            const nq = norm(q);
+            const data = Array.isArray(detailedCases) ? detailedCases : [];
+
             if (!q) {
-                if (meta) meta.textContent = `Đang có ${detailedCases.length.toLocaleString('vi-VN')} hồ sơ. Nhập từ khóa để tra cứu nhanh.`;
-                el.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass text-2xl mb-2 opacity-40"></i><div>Nhập tên hộ, đối tượng, tiểu khu, xã, hành vi hoặc số hồ sơ.</div></div>';
+                if (meta) meta.textContent = data.length
+                    ? `Đang có ${data.length.toLocaleString('vi-VN')} hồ sơ. Nhập tên hộ, đối tượng, số HĐ, tiểu khu, xã hoặc hành vi để tra cứu.`
+                    : 'Chưa có dữ liệu hồ sơ. Hãy bấm Làm mới để đồng bộ Google Sheets.';
+                el.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs"><i class="fa-solid fa-magnifying-glass text-2xl mb-2 opacity-40"></i><div>Nhập tên hộ, đối tượng, số HĐ, tiểu khu, xã, hành vi hoặc số hồ sơ.</div></div>';
                 return;
             }
-            const norm = v => String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-            const nq = norm(q);
-            const arr = detailedCases.map((c,i)=>({c,i})).filter(({c,i})=>{
-                const hay = [i+1,c.hoTen,c.doiTuong,c.tinhTrang,c.hanhVi,c.tieuKhu,c.phanTruong,c.xa,c.tuiHoSo,c.ngayViPham,c.soHDKhoan,c.soHDTrongRung,c.diaChi,c.nguonGocDat,c.quaTrinhCanhTac,c.hoHopDong].map(norm).join(' ');
-                return hay.includes(nq);
+
+            // Tìm theo nhiều trường, không phân biệt hoa/thường và dấu tiếng Việt.
+            // Đồng thời hỗ trợ tìm nhiều từ: ví dụ "Nguyễn 201" hoặc "xã Xuân Hòa".
+            const terms = nq.split(/\s+/).filter(Boolean);
+            const arr = data.map((c,i)=>({c,i})).filter(({c,i})=>{
+                const hay = norm([
+                    i + 1, c.id, c.hoTen, c.doiTuong, c.tinhTrang, c.hanhVi, c.tieuKhu,
+                    c.phanTruong, c.xa, c.tuiHoSo, c.ngayViPham, c.soHDKhoan, c.ngayKyHDKhoan,
+                    c.dienTichHDKhoan, c.soHDTrongRung, c.ngayKyHDTrongRung, c.dienTichHDTrongRung,
+                    c.diaChi, c.nguonGocDat, c.quaTrinhCanhTac, c.hoHopDong, c.alRaw, c.amRaw
+                ].join(' | '));
+                return terms.every(term => hay.includes(term));
             }).slice(0,40);
-            if (meta) meta.textContent = `Tìm thấy ${arr.length} hồ sơ${detailedCases.length>arr.length?' (hiển thị tối đa 40)':''}.`;
+
+            if (meta) meta.textContent = `Tìm thấy ${arr.length} hồ sơ${data.length > arr.length ? ' (hiển thị tối đa 40)' : ''}.`;
             el.innerHTML = arr.map(({c,i})=>{
                 const g = NHOM_MAP[c.nhomId] || NHOM_MAP[1];
-                const m = getReportMetrics(c);
                 const hasHDK = !!(c.soHDKhoan || c.ngayKyHDKhoan || c.dienTichHDKhoan);
-                const hasHDTR = !!(c.soHDTrongRung || c.ngayKyHDTrongRung || c.dienTichHDTrongRung);
                 const hdLine = hasHDK ? [
                     c.soHDKhoan ? ('HĐ khoán số ' + c.soHDKhoan) : '',
                     c.ngayKyHDKhoan ? ('ký ' + c.ngayKyHDKhoan) : '',
                     c.dienTichHDKhoan ? (c.dienTichHDKhoan + ' ha') : ''
                 ].filter(Boolean).join(' · ') : 'Chưa hợp tác lập hồ sơ quản lý';
-                const trLine = hasHDTR ? [
-                    c.soHDTrongRung ? ('HĐ trồng rừng số ' + c.soHDTrongRung) : '',
-                    c.ngayKyHDTrongRung ? ('ký ' + c.ngayKyHDTrongRung) : '',
-                    c.dienTichHDTrongRung ? (c.dienTichHDTrongRung + ' ha') : ''
-                ].filter(Boolean).join(' · ') : (hasHDK ? 'Không có hợp đồng trồng rừng' : '');
                 return `<button type="button" onclick="closeQuickSearch();openCaseDetail(${i})" class="w-full text-left px-3 py-2.5 border-b border-slate-50 hover:bg-emerald-50/70 active:bg-emerald-50 transition">
                     <div class="flex items-center justify-between gap-2">
                         <div class="min-w-0 flex-1">
@@ -1277,7 +1369,7 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         <span class="shrink-0 px-1.5 py-0.5 rounded border text-[9px] ${g.badge}">${escapeHtml(g.short)}</span>
                     </div>
                 </button>`;
-            }).join('') || '<div class="p-8 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 opacity-40"></i><div>Không tìm thấy hồ sơ phù hợp.</div><div class="mt-1">Thử tên hộ, tiểu khu, xã hoặc hành vi khác.</div></div>';
+            }).join('') || '<div class="p-8 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 opacity-40"></i><div>Không tìm thấy hồ sơ phù hợp.</div><div class="mt-1">Thử tên hộ, số HĐ, tiểu khu, xã hoặc hành vi khác.</div></div>';
         }
 
         function openPresentationMode(){
@@ -3087,6 +3179,7 @@ function toggleAdvFilter() {
                 startAutoRefresh();
                 if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
                  if (typeof switchMainView === 'function') switchMainView('dashboard');
+                 initHeaderAutoCollapse();
             }, 400);
         };
     </script>
