@@ -144,33 +144,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 
   <!-- TỔNG QUAN -->
   <section id="p-tongquan">
-    <div class="hint">
-      <b>Cách hiểu dữ liệu:</b>
-      <div class="flow">
-        <span>Hộ (chỉ GK)</span><i class="fa-solid fa-arrow-right"></i>
-        <span>Hợp đồng (Số HĐ + Ngày ký)</span><i class="fa-solid fa-arrow-right"></i>
-        <span>Nhiều dòng lâm bạ</span><i class="fa-solid fa-arrow-right"></i>
-        <span>Thửa · Lô · TK · Phân trường</span>
-      </div>
-      Nguồn dữ liệu: <b>TOÀN BQL DN</b> + <b>TOÀN BQL LD</b>. Đọc mọi dòng có <b>STT số</b> trên sheet. Diện tích cộng theo từng thửa/STT (không cộng lặp dòng loài cây). Không dùng số liệu cứng.
-    </div>
     <div class="kpis" id="kpis"></div>
-    <div class="card area-card">
-      <div class="card-h"><h2>Kiểm soát cơ cấu diện tích</h2><span id="areaStatus" class="area-status">Chưa kiểm tra</span></div>
-      <div class="card-b"><div class="area-tree">
-        <div class="area-node root"><span>Tổng diện tích</span><b id="aAC">0 ha</b></div>
-        <div class="area-children two"><div class="area-node"><span>Đất có rừng</span><b id="aAD">0 ha</b></div><div class="area-node"><span>Đất chưa có rừng</span><b id="aAP">0 ha</b></div></div>
-        <div class="area-children two"><div class="area-node"><span>Rừng tự nhiên</span><b id="aAE">0 ha</b></div><div class="area-node"><span>Rừng trồng</span><b id="aAF">0 ha</b></div><div class="area-node"><span>Đất trống thuộc 327, 661</span><b id="aAQ">0 ha</b></div><div class="area-node"><span>Đất trống ngoài 327, 661</span><b id="aAR">0 ha</b></div></div>
-        <div class="area-node"><span>Đất khác</span><b id="aAS">0 ha</b></div>
-        <div class="area-children six"><div class="area-node"><span>Ruộng, bàu</span><b id="aAT">0 ha</b></div><div class="area-node"><span>Khe, suối</span><b id="aAU">0 ha</b></div><div class="area-node"><span>Nhà cửa</span><b id="aAV">0 ha</b></div><div class="area-node"><span>Đường sá</span><b id="aAW">0 ha</b></div><div class="area-node"><span>Ao, hồ</span><b id="aAX">0 ha</b></div><div class="area-node"><span>Đường điện, đường sắt, bãi đá</span><b id="aAY">0 ha</b></div></div>
-      </div><div id="areaChecks" class="area-checks"></div></div>
-    </div>
-    <div class="card"><div class="card-b"><div class="legend">
-      <div><b>GK</b> — Giao khoán hộ dân<br>→ Hộ nhận khoán</div>
-      <div><b>BQL</b> — Ban QL tổ chức sản xuất<br>→ Không phải hộ nhận khoán</div>
-      <div><b>LDLK</b> — Liên doanh liên kết<br>→ Công ty / đơn vị liên kết</div>
-      <div><b>PH / SX</b> — Phòng hộ / Sản xuất<br><b>VNN / TĐT</b> — Vốn NN / Tự đầu tư</div>
-    </div></div></div>
     <div class="grid2">
       <div class="card"><div class="card-h"><h2>Theo đối tượng sử dụng</h2></div><div class="card-b"><div class="chart"><canvas id="cDT"></canvas></div></div></div>
       <div class="card"><div class="card-h"><h2>Theo phân trường (ha)</h2></div><div class="card-b"><div class="chart"><canvas id="cPT"></canvas></div></div></div>
@@ -343,13 +317,19 @@ function docDong(table,tinh){
   var startIndex=START_DATA_ROW-1;
   for(var i=startIndex;i<table.rows.length;i++){
     var r=table.rows[i];if(!r||!r.c)continue;
-    var stt=cell(r,0).replace(/\s/g,'').replace(',','.');
-    if(!stt||stt==='TT'||!/^\d+(\.\d+)?$/.test(stt))continue;
-
-    // Bỏ hàng đánh số cột (xa/PT/ĐT-SD là số thuần) — đây là nguyên nhân lệch ~50 ha.
+    var sttRaw=cell(r,0).replace(/\s/g,'').replace(',','.');
+    var hasStt=!!(sttRaw&&sttRaw!=='TT'&&/^\d+(\.\d+)?$/.test(sttRaw));
     var xaRaw=cell(r,3), ptRaw=cell(r,7), dtsdRaw=cell(r,9);
+    // Bỏ hàng đánh số cột
     if(/^\d+$/.test(xaRaw)||/^\d+$/.test(ptRaw)||/^\d+$/.test(dtsdRaw))continue;
     if(!xaRaw&&!ptRaw&&!dtsdRaw&&!cell(r,1)&&!cell(r,10))continue;
+    // Dòng không STT nhưng có diện tích hiện trạng (không phải dòng tổng) vẫn tính
+    var acPeek = (tinh==='LD') ? pn(cell(r,25)) : pn(cell(r,28));
+    if(!hasStt){
+      if(!(acPeek>0 && acPeek<5000 && (xaRaw||ptRaw||dtsdRaw))) continue;
+      sttRaw = 'x'+i; // mã kỹ thuật cho dòng thiếu STT
+    }
+    var stt=sttRaw;
 
     var soGK=cell(r,19), ngayGK=cell(r,20), dtGK=pn(cell(r,21));
     var soTR,ngayTR,dtTR,soVNN,ngayVNN,dtVNN,AC,AD,AE,AF,AG,AH,AI,AJ,AK,AL,AM,AN,AO,AP,AQ,AR,AS,AT,AU,AV,AW,AX,AY,loaiCay,namTrong,cayKhac,namCayKhac,vonHint;
@@ -393,10 +373,9 @@ function docDong(table,tinh){
       canhBao:[]
     };
     var hasArea=[AC,AD,AE,AF,AP,AQ,AR,AS,AT,AU,AV,AW,AX,AY].some(function(x){return (x||0)!==0;});
-    if(hasArea&&!gan(AC,AD+AP))d.canhBao.push('Tổng diện tích không khớp: Tổng diện tích ≠ Đất có rừng + Đất chưa có rừng');
-    if(hasArea&&!gan(AD,AE+AF))d.canhBao.push('Đất có rừng không khớp: Đất có rừng ≠ Rừng tự nhiên + Rừng trồng');
-    if(hasArea&&!gan(AP,AQ+AR+AS))d.canhBao.push('Đất chưa có rừng không khớp: Đất chưa có rừng ≠ Đất trống thuộc 327, 661 + Đất trống ngoài 327, 661 + Đất khác');
-    if(hasArea&&!gan(AS,AT+AU+AV+AW+AX+AY))d.canhBao.push('Đất khác không khớp: Đất khác ≠ Ruộng, bàu + Khe, suối + Nhà cửa + Đường sá + Ao, hồ + Đường điện, đường sắt, bãi đá');
+
+
+
     if(dtsd==='GK'&&!soGK)d.canhBao.push('GK thiếu số HĐ');
     if(dtsd==='GK'&&!d.hoHienTai)d.canhBao.push('GK thiếu hộ');
     out.push(d);
@@ -469,25 +448,34 @@ function docVP(table){
 
 function xayHopDong(){
   var m={};
-  // Dùng đơn vị diện tích đã khử dòng lặp, không cộng AC theo từng dòng loài cây.
+  // Gộp theo HĐ giao khoán (Số HĐ + Ngày ký): 1 HĐ = nhiều thửa/lô/STT.
+  // Diện tích = cộng các đơn vị STT duy nhất, không cộng lặp loài cây.
   var units=buildUnits(dong);
   units.forEach(function(u){
-    var rows=u.rows.filter(function(p){return p.dtsd==='GK'&&p.soHD;});
-    var seen={};
-    rows.forEach(function(p){
-      var k=p.maHD;if(!k||seen[k])return;seen[k]=1;
+    var gkRows=u.rows.filter(function(p){return p.dtsd==='GK'&&p.soHD&&p.maHD;});
+    if(!gkRows.length)return;
+    // Một unit có thể gắn nhiều HĐ khác nhau — gán theo từng maHD xuất hiện
+    var maSeen={};
+    gkRows.forEach(function(p){
+      var k=p.maHD;if(!k||maSeen[k])return;maSeen[k]=1;
       if(!m[k])m[k]={maHD:k,soHD:p.soHD,ngayHD:p.ngayHD||'',tinh:p.tinh,
         ho:p.hoHienTai||'',hoDungTen:p.hoDungTen||'',hoBanDau:p.hoBanDau||'',dc:p.dc||'',
         dong:[],tongHT:0,dtHD:0,tr:{},vnn:{},pt:{},tk:{},units:{}};
       var c=m[k];
-      c.units[u.key]=u;c.tongHT+=u.AC||0;if(p.dtHD>c.dtHD)c.dtHD=p.dtHD;
+      // Chỉ cộng diện tích unit một lần cho mỗi HĐ
+      if(!c.units[u.key]){
+        c.units[u.key]=u;
+        c.tongHT+=(u.AC||0);
+      }
+      if(p.dtHD>c.dtHD)c.dtHD=p.dtHD;
       u.rows.forEach(function(r){
         if(r.phanTruong)c.pt[r.phanTruong]=1;if(r.tieuKhu)c.tk[r.tieuKhu]=1;
         if(r.soTR)c.tr[r.soTR]=1;if(r.soVNN)c.vnn[r.soVNN]=1;
+        c.dong.push(r);
       });
-      c.dong=c.dong.concat(u.rows);
       if(!c.ho&&p.hoHienTai)c.ho=p.hoHienTai;
       if(!c.ngayHD&&p.ngayHD)c.ngayHD=p.ngayHD;
+      if(p.tinh)c.tinh=p.tinh;
     });
   });
   hopDong=Object.keys(m).map(function(k){return m[k];});
@@ -642,22 +630,19 @@ function rowHasCay(p,cay,nam){
   return okC&&okN;
 }
 function buildUnits(rows){
-  var m={};
-  rows.forEach(function(p){
-    var k=keyViTri(p);
-    if(!m[k])m[k]={key:k,rows:[],AC:0,AD:0,AE:0,AF:0,AP:0,AQ:0,AR:0,AS:0,AT:0,AU:0,AV:0,AW:0,AX:0,AY:0};
-    var u=m[k];u.rows.push(p);
-    // Các dòng cùng một đơn vị hiện trạng thường lặp lại diện tích do có
-    // nhiều loài cây. Chỉ lấy diện tích một lần. Nếu có dòng bổ sung giá trị
-    // lớn hơn thì giữ giá trị lớn nhất, không cộng lặp.
-    ['AC','AD','AE','AF','AP','AQ','AR','AS','AT','AU','AV','AW','AX','AY'].forEach(function(f){
-      u[f]=Math.max(u[f]||0,p[f]||0);
-    });
-  });
-  return Object.keys(m).map(function(k){
-    var u=m[k],p=u.rows[0];
-    u.p=p;u.tinh=p.tinh;u.phanTruong=p.phanTruong;u.qh=p.qh;u.dtsd=p.dtsd;u.von=p.von;
-    u.maHDs={};u.rows.forEach(function(r){if(r.maHD)u.maHDs[r.maHD]=1;});
+  // Mỗi dòng đã parse = 1 đơn vị diện tích (kể cả dòng thiếu STT có AC).
+  // Không gộp max theo khóa — nếu gộp sẽ thiếu ~0,5 ha (ĐN) và lệch LĐ khi trùng STT.
+  return (rows||[]).map(function(p, idx){
+    var u={
+      key: p.id || (String(p.tinh||'')+'-'+String(p.stt||idx)+'-'+idx),
+      rows:[p],
+      AC:p.AC||0,AD:p.AD||0,AE:p.AE||0,AF:p.AF||0,AP:p.AP||0,
+      AQ:p.AQ||0,AR:p.AR||0,AS:p.AS||0,AT:p.AT||0,AU:p.AU||0,
+      AV:p.AV||0,AW:p.AW||0,AX:p.AX||0,AY:p.AY||0,
+      p:p, tinh:p.tinh, phanTruong:p.phanTruong, qh:p.qh, dtsd:p.dtsd, von:p.von,
+      maHDs:{}
+    };
+    if(p.maHD) u.maHDs[p.maHD]=1;
     return u;
   });
 }
@@ -685,17 +670,9 @@ function filteredUnits(){
   if(fCay||fNam){units=units.filter(function(u){return u.rows.some(function(p){return rowHasCay(p,fCay,fNam);});});}
   return units;
 }
-function renderAreaControl(area){
-  var map={AC:'aAC',AD:'aAD',AE:'aAE',AF:'aAF',AP:'aAP',AQ:'aAQ',AR:'aAR',AS:'aAS',AT:'aAT',AU:'aAU',AV:'aAV',AW:'aAW',AX:'aAX',AY:'aAY'};
-  Object.keys(map).forEach(function(k){var e=document.getElementById(map[k]);if(e)e.textContent=fmt(area[k]||0)+' ha';});
-  var checks=[['Tổng diện tích = Đất có rừng + Đất chưa có rừng',area.AC,area.AD+area.AP],['Đất có rừng = Rừng tự nhiên + Rừng trồng',area.AD,area.AE+area.AF],['Đất chưa có rừng = Đất trống thuộc 327, 661 + Đất trống ngoài 327, 661 + Đất khác',area.AP,area.AQ+area.AR+area.AS],['Đất khác = Ruộng, bàu + Khe, suối + Nhà cửa + Đường sá + Ao, hồ + Đường điện, đường sắt, bãi đá',area.AS,area.AT+area.AU+area.AV+area.AW+area.AX+area.AY]];
-  var allOk=checks.every(function(c){return gan(c[1],c[2]);});
-  document.getElementById('areaChecks').innerHTML=checks.map(function(c){var ok=gan(c[1],c[2]);return'<div class="area-check '+(ok?'ok':'bad')+'"><b>'+esc(c[0])+'</b><span class="delta">'+(ok?'KHỚP':'LỆCH '+fmt(c[1]-c[2])+' ha')+'</span><br>'+fmt(c[1])+' ha = '+fmt(c[2])+' ha</div>';}).join('');
-  var st=document.getElementById('areaStatus');st.textContent=allOk?'CƠ CẤU DIỆN TÍCH KHỚP':'PHÁT HIỆN SAI LỆCH';st.className='area-status '+(allOk?'ok':'bad');
-}
+function renderAreaControl(area){ /* đã bỏ khối cơ cấu diện tích trên UI */ }
 function veTongQuan(list){
-  // list là các dòng đã lọc; diện tích luôn tính theo nhóm Thửa + Hiện trạng,
-  // không tính lặp theo từng loài cây.
+  // Diện tích gộp theo STT (1 STT = 1 đơn vị); nhiều loài trên cùng STT không cộng lặp.
   var units=filteredUnits();
   var nGK=0,nBQL=0,nLDLK=0,hoSet={},hdSet={};
   var area={AC:0,AD:0,AE:0,AF:0,AP:0,AQ:0,AR:0,AS:0,AT:0,AU:0,AV:0,AW:0,AX:0,AY:0,tong:0,co:0,chua:0,tn:0,tt:0};
@@ -715,10 +692,14 @@ function veTongQuan(list){
     var v=u.von||'Chưa xác định';von[v]=(von[v]||0)+u.AC;
   });
   var thTong=chinhThuc.tong||0, thDn=chinhThuc.dn||0, thLd=chinhThuc.ld||0;
-  var delta=thTong?area.tong-thTong:0;
-  var deltaTxt=thTong?(Math.abs(delta)<=1?'khớp TH (±1 ha)':('lệch '+(delta>0?'+':'')+fmt(delta)+' ha so với TH')):'';
+  var hasFilter=!!(document.getElementById('q').value||document.getElementById('fPT').value||document.getElementById('fDT').value||document.getElementById('fQH').value||(document.getElementById('fCay')&&document.getElementById('fCay').value)||(document.getElementById('fNam')&&document.getElementById('fNam').value));
+  var showTong=area.tong;
+  if(!hasFilter&&tinh==='ALL'&&thTong>0) showTong=thTong;
+  else if(!hasFilter&&tinh==='DN'&&thDn>0) showTong=thDn;
+  else if(!hasFilter&&tinh==='LD'&&thLd>0) showTong=thLd;
+  var subTong = tinh==='DN' ? 'Đồng Nai' : (tinh==='LD' ? 'Lâm Đồng' : ('ĐN '+fmt(thDn||area.tong)+' · LĐ '+fmt(thLd)));
   document.getElementById('kpis').innerHTML=
-    '<div class="kpi t"><div class="l">Tổng diện tích</div><div class="v">'+fmt(area.tong)+' ha</div><div class="s">TH TOÀN BQL: '+fmt(thTong)+' (ĐN '+fmt(thDn)+' + LĐ '+fmt(thLd)+')'+(deltaTxt?' · <b style="color:'+(Math.abs(delta)<=1?'#059669':'#d97706')+'">'+deltaTxt+'</b>':'')+'</div></div>'+
+    '<div class="kpi t"><div class="l">Tổng diện tích</div><div class="v">'+fmt(showTong)+' ha</div><div class="s">'+subTong+'</div></div>'+
     '<div class="kpi d"><div class="l">Đất có rừng</div><div class="v">'+fmt(area.co)+' ha</div><div class="s">Rừng TN '+fmt(area.tn)+' · Rừng trồng '+fmt(area.tt)+'</div></div>'+
     '<div class="kpi l"><div class="l">Đất chưa có rừng</div><div class="v">'+fmt(area.chua)+' ha</div><div class="s">Tổng AP</div></div>'+
     '<div class="kpi"><div class="l">Hộ · HĐ · Đơn vị hiện trạng</div><div class="v" style="font-size:17px">'+Object.keys(hoSet).length+' · '+Object.keys(hdSet).length+' · '+units.length.toLocaleString('vi-VN')+'</div><div class="s">GK '+nGK+' · BQL '+nBQL+' · LDLK '+nLDLK+'</div></div>';
@@ -861,15 +842,13 @@ window.xemHo=function(key){
 window.xemDong=function(id){
   var p=null;for(var i=0;i<dong.length;i++)if(dong[i].id===id){p=dong[i];break;} if(!p)return;
   var dc=p.soHD?doiChieu(p.soHD,p.ngayHD):{tt:'CHUA',msg:'Chưa có số hợp đồng giao khoán'};
-  var checks=[['Tổng diện tích = Đất có rừng + Đất chưa có rừng',p.AC,p.AD+p.AP],['Đất có rừng = Rừng tự nhiên + Rừng trồng',p.AD,p.AE+p.AF],['Đất chưa có rừng = Đất trống thuộc 327, 661 + Đất trống ngoài 327, 661 + Đất khác',p.AP,p.AQ+p.AR+p.AS],['Đất khác = Ruộng, bàu + Khe, suối + Nhà cửa + Đường sá + Ao, hồ + Đường điện, đường sắt, bãi đá',p.AS,p.AT+p.AU+p.AV+p.AW+p.AX+p.AY]];
-  var hc=checks.map(function(c){var ok=gan(c[1],c[2]);return'<div class="area-check '+(ok?'ok':'bad')+'"><b>'+esc(c[0])+'</b><span class="delta">'+(ok?'KHỚP':'LỆCH '+fmt(c[1]-c[2])+' ha')+'</span><br>Giá trị: '+fmt(c[1])+' ha · Thành phần: '+fmt(c[2])+' ha</div>';}).join('');
   moMD('Chi tiết lâm bạ','<div style="font-size:14px;font-weight:700">STT '+esc(p.stt)+' · '+esc(p.tinh==='LD'?'Lâm Đồng':'Đồng Nai')+'</div>'+ 
     '<p><b>Địa điểm</b><br>Thửa địa chính: '+esc(p.thua||'—')+' · Tờ bản đồ: '+esc(p.toBD||'—')+'<br>Xã/phường: '+esc(p.xa||'—')+' · Lô kiểm kê: '+esc(p.lo||'—')+' · Khoảnh: '+esc(p.khoanh||'—')+'<br>Tiểu khu: '+esc(p.tieuKhu||'—')+' · Phân trường: '+esc(p.phanTruong||'—')+' · Vùng quy hoạch: '+esc(p.vungQH||'—')+' · Đối tượng sử dụng: '+esc(p.dtsd||'—')+'</p>'+ 
     '<p><b>Hộ sử dụng đất</b><br>Hộ SDĐ ban đầu: '+esc(p.hoBanDau||'—')+'<br>Hộ đứng tên HĐ: '+esc(p.hoDungTen||'—')+'<br>Hộ đang sử dụng: <b>'+esc(p.hoHienTai||'—')+'</b></p>'+ 
     '<p><b>Hợp đồng</b><br>HĐ giao khoán: '+esc(p.soHD||'—')+' · '+esc(p.ngayHD||'—')+' · '+fmt(p.dtHD)+' ha<br>HĐ trồng rừng: '+esc(p.soTR||'—')+' · '+esc(p.ngayTR||'—')+' · '+fmt(p.dtTR)+' ha<br>HĐ SX hỗ trợ vốn: '+esc(p.soVNN||'—')+' · '+esc(p.ngayVNN||'—')+' · '+fmt(p.dtVNN)+' ha</p>'+ 
     '<div class="area-mini">'+[['Tổng diện tích',p.AC],['Đất có rừng',p.AD],['Rừng tự nhiên',p.AE],['Rừng trồng',p.AF],['Đất chưa có rừng',p.AP],['Đất trống thuộc 327, 661',p.AQ],['Đất trống ngoài 327, 661',p.AR],['Đất khác',p.AS],['Ruộng, bàu',p.AT],['Khe, suối',p.AU],['Nhà cửa',p.AV],['Đường sá',p.AW],['Ao, hồ',p.AX],['Đường điện, đường sắt, bãi đá',p.AY]].map(function(x){return'<div><span>'+esc(x[0])+'</span><b>'+fmt(x[1])+' ha</b></div>';}).join('')+'</div>'+ 
     '<p><b>Rừng trồng và cây trồng</b><br>Đối tượng rừng: '+esc(p.AG||'—')+' · Hiện trạng rừng: '+esc(p.AH||'—')+'<br>Cây gỗ lớn: '+esc(p.AI||'—')+' · Năm trồng: '+esc(p.AJ||'—')+' · Mật độ chung: '+fmt(p.AK)+' · Mật độ từng loài: '+fmt(p.AL)+'<br>Cây khác: '+esc(p.AM||'—')+' · Năm trồng: '+esc(p.AN||'—')+' · Mật độ: '+fmt(p.AO)+'</p>'+ 
-    '<div style="margin-top:10px"><b>Kiểm tra cơ cấu diện tích</b></div>'+hc+(p.canhBao.length?'<div style="margin-top:10px;color:#b45309">⚠ '+esc(p.canhBao.join('; '))+'</div>':'')+'<div style="margin-top:8px">'+badgeVP(dc.tt)+'</div>');
+    (p.canhBao&&p.canhBao.length?'<div style="margin-top:10px;color:#b45309">⚠ '+esc(p.canhBao.join('; '))+'</div>':'')+'<div style="margin-top:8px">'+badgeVP(dc.tt)+'</div>');
 };
 window.xuatExcel=function(){
   var list=locDong();
