@@ -171,7 +171,6 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 
   <!-- HỘ -->
   <section id="p-ho" class="hidden">
-    <div class="hint"><b>Hộ nhận khoán</b> chỉ gồm đất <b>GK</b>. Mỗi hộ có thể có nhiều hợp đồng; mỗi hợp đồng có nhiều dòng lâm bạ (thửa, lô, tiểu khu…).</div>
     <div class="card">
       <div class="card-h"><h2>Danh sách hộ</h2><span id="nHo" style="font-size:11px;color:var(--mu)"></span></div>
       <div class="scroll"><table>
@@ -183,7 +182,6 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 
   <!-- HĐ -->
   <section id="p-hd" class="hidden">
-    <div class="hint"><b>Khóa hợp đồng</b> = Số HĐ + Ngày ký. Cột vi phạm: <span class="tag vp-co">CÓ</span> <span class="tag vp-kh">KHÔNG</span> <span class="tag vp-cd">CHƯA ĐỦ DỮ LIỆU</span> — không suy diễn khi thiếu căn cứ.</div>
     <div class="card">
       <div class="card-h"><h2>Hợp đồng giao khoán</h2><span id="nHD" style="font-size:11px;color:var(--mu)"></span></div>
       <div class="scroll"><table>
@@ -195,7 +193,6 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 
   <!-- DÒNG -->
   <section id="p-dong" class="hidden">
-    <div class="hint">Mỗi dòng = một đơn vị diện tích trên lâm bạ (thửa / lô / hiện trạng). Cảnh báo ⚠ nếu sai tổng diện tích hoặc GK thiếu HĐ/hộ.</div>
     <div class="card">
       <div class="card-h"><h2>Dòng lâm bạ</h2><span id="nDong" style="font-size:11px;color:var(--mu)"></span></div>
       <div class="scroll"><table>
@@ -258,7 +255,7 @@ function pn(s){
   var n=parseFloat(t.replace(/[^\d.\-]/g,''));
   return isNaN(n)?0:n;
 }
-function fmt(n){return !n?'0':Number(n).toLocaleString('vi-VN',{maximumFractionDigits:2});}
+function fmt(n,d){if(n==null||n==='')return '0'; var x=Number(n); if(!x&&x!==0)return '0'; return x.toLocaleString('vi-VN',{maximumFractionDigits:(d==null?2:d)});}
 function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},3000);}
 function cell(r,i){
@@ -542,9 +539,8 @@ function taiLai(){
     lastSync=new Date();
     napBoLoc();veLai();
     var sumAC=aggregateAreaUnits(dong).area.AC;
-    var dlt=(chinhThuc.tong||0)?(sumAC-(chinhThuc.tong||0)):0;
-    toast('Đã tải '+dong.length.toLocaleString('vi-VN')+' dòng · AC '+fmt(sumAC)+' ha · TH '+fmt(chinhThuc.tong)+' · '+hopDong.length+' HĐ'+(Math.abs(dlt)>1?' · lệch '+fmt(dlt):''));
-    document.getElementById('syncTxt').textContent=dong.length.toLocaleString('vi-VN')+' dòng · AC '+fmt(sumAC)+' / TH '+fmt(chinhThuc.tong)+' · '+lastSync.toLocaleTimeString('vi-VN');
+    toast('Đã tải '+dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+hopDong.length+' hợp đồng');
+    document.getElementById('syncTxt').textContent=dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+lastSync.toLocaleTimeString('vi-VN');
   }).catch(function(e){console.error(e);toast(e.message||'Lỗi tải');})
   .then(function(){if(ic)ic.classList.remove('fa-spin');});
 }
@@ -699,10 +695,10 @@ function veTongQuan(list){
   else if(!hasFilter&&tinh==='LD'&&thLd>0) showTong=thLd;
   var subTong = tinh==='DN' ? 'Đồng Nai' : (tinh==='LD' ? 'Lâm Đồng' : ('ĐN '+fmt(thDn||area.tong)+' · LĐ '+fmt(thLd)));
   document.getElementById('kpis').innerHTML=
-    '<div class="kpi t"><div class="l">Tổng diện tích</div><div class="v">'+fmt(showTong)+' ha</div><div class="s">'+subTong+'</div></div>'+
-    '<div class="kpi d"><div class="l">Đất có rừng</div><div class="v">'+fmt(area.co)+' ha</div><div class="s">Rừng TN '+fmt(area.tn)+' · Rừng trồng '+fmt(area.tt)+'</div></div>'+
-    '<div class="kpi l"><div class="l">Đất chưa có rừng</div><div class="v">'+fmt(area.chua)+' ha</div><div class="s">Tổng AP</div></div>'+
-    '<div class="kpi"><div class="l">Hộ · HĐ · Đơn vị hiện trạng</div><div class="v" style="font-size:17px">'+Object.keys(hoSet).length+' · '+Object.keys(hdSet).length+' · '+units.length.toLocaleString('vi-VN')+'</div><div class="s">GK '+nGK+' · BQL '+nBQL+' · LDLK '+nLDLK+'</div></div>';
+    '<div class="kpi t"><div class="l">Tổng diện tích</div><div class="v">'+fmt(showTong)+' ha</div></div>'+
+    '<div class="kpi d"><div class="l">Đất có rừng</div><div class="v">'+fmt(area.co)+' ha</div></div>'+
+    '<div class="kpi l"><div class="l">Đất chưa có rừng</div><div class="v">'+fmt(area.chua)+' ha</div></div>'+
+    '<div class="kpi"><div class="l">Hộ · Hợp đồng · Đơn vị</div><div class="v" style="font-size:17px">'+Object.keys(hoSet).length+' · '+Object.keys(hdSet).length+' · '+units.length.toLocaleString('vi-VN')+'</div></div>';
 
   function destroy(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
   function chart(id,k,type,labels,data){destroy(k);var el=document.getElementById(id);if(!el||typeof Chart==='undefined')return;charts[k]=new Chart(el,{type:type,data:{labels:labels,datasets:[{data:data,borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:type==='bar'?{y:{beginAtZero:true}}:{}}});}
@@ -715,7 +711,7 @@ function veTongQuan(list){
   var qkeys=Object.keys(qh).sort(function(a,b){return qh[b]-qh[a];});chart('cQH','qh','bar',qkeys,qkeys.map(function(k){return qh[k];}));
   var vkeys=Object.keys(von).sort(function(a,b){return von[b]-von[a];});chart('cVon','von','bar',vkeys,vkeys.map(function(k){return von[k];}));
   var spRows=Object.keys(species).map(function(k){var x=species[k];return{x:x.cay,n:x.nam,ho:Object.keys(x.ho).length,hd:Object.keys(x.hd).length,unit:Object.keys(x.unit).length};}).sort(function(a,b){return b.unit-a.unit||a.x.localeCompare(b.x,'vi');});
-  var ci=document.getElementById('cayInfo');if(ci)ci.textContent=(document.getElementById('fCay').value||document.getElementById('fNam').value)?'Đang lọc theo loài cây / năm trồng':'Mỗi dòng cây chỉ dùng để đếm loài/hộ; diện tích tính theo thửa + hiện trạng';
+  var ci=document.getElementById('cayInfo');if(ci)ci.textContent=(document.getElementById('fCay').value||document.getElementById('fNam').value)?'Đang lọc':'';
   var tc=document.getElementById('tbCay');if(tc)tc.innerHTML=spRows.slice(0,100).map(function(x){return'<tr><td>'+esc(x.x)+'</td><td>'+esc(x.n||'—')+'</td><td class="r"><b>'+x.ho+'</b></td><td class="r">'+x.hd+'</td><td class="r">'+x.unit+'</td></tr>';}).join('')||'<tr><td colspan="5" class="muted">Chưa có dữ liệu loài cây</td></tr>';
 
   var ag={};units.forEach(function(u){var k=u.tinh+'||'+(u.phanTruong||'Chưa xác định');if(!ag[k])ag[k]={tinh:u.tinh,pt:u.phanTruong||'Chưa xác định',n:0,dt:0,co:0,gk:0,bql:0,ldlk:0};var a=ag[k];a.n++;a.dt+=u.AC;a.co+=u.AD;if(u.dtsd==='GK')a.gk++;else if(u.dtsd==='BQL')a.bql++;else if(u.dtsd==='LDLK')a.ldlk++;});
@@ -729,7 +725,7 @@ function veHo(){
     if(!q)return true;
     return[h.ten,h.hoDungTen,h.hoBanDau,h.dc].join(' ').toLowerCase().indexOf(q)>=0;
   });
-  document.getElementById('nHo').textContent=list.length.toLocaleString('vi-VN')+' hộ (chỉ GK)';
+  document.getElementById('nHo').textContent=list.length.toLocaleString('vi-VN')+' hộ';
   document.getElementById('tbHo').innerHTML=list.slice(0,250).map(function(h,i){
     return'<tr><td>'+(i+1)+'</td><td><b>'+esc(h.ten)+'</b></td>'+
       '<td style="font-size:11px;color:#64748b">'+esc(h.hoDungTen||'—')+'<br>'+esc(h.hoBanDau||'—')+'</td>'+
@@ -768,7 +764,7 @@ function veDong(list){
       '<td>'+esc(p.lo||'—')+'</td><td>'+esc(p.khoanh||'—')+'</td><td>'+esc(p.tieuKhu||'—')+'</td><td>'+esc(p.phanTruong||'—')+'</td><td>'+esc(p.vungQH||'—')+'</td>'+ 
       '<td><span class="tag '+tg+'">'+esc(p.dtsd)+'</span></td><td>'+esc(p.hoHienTai||'—')+'</td><td>'+esc(p.soHD||'—')+'</td>'+ 
       '<td class="r"><b>'+fmt(p.AC)+'</b></td><td class="r">'+fmt(p.AD)+'</td><td class="r">'+fmt(p.AP)+'</td>'+ 
-      '<td><button type="button" class="ib" title="Xem đầy đủ thông tin" onclick="xemDong("+JSON.stringify(p.id)+")"><i class="fa-solid fa-eye"></i></button></td></tr>';
+      '<td><button type="button" class="ib" title="Xem chi tiết" data-id="'+esc(p.id)+'" onclick="xemDong(this.getAttribute(\'data-id\'))"><i class="fa-solid fa-eye"></i></button></td></tr>';
   }).join('')||'<tr><td colspan="15" class="muted">Không có dữ liệu</td></tr>';
   if(list.length>max)document.getElementById('tbDong').innerHTML+='<tr><td colspan="15" class="muted">Hiển thị '+max+'/'+list.length+'</td></tr>';
 }
@@ -813,30 +809,146 @@ window.xemHD=function(ma){
   var c=null;for(var i=0;i<hopDong.length;i++)if(hopDong[i].maHD===ma){c=hopDong[i];break;}
   if(!c)return;
   var dc=doiChieu(c.soHD,c.ngayHD);
+  var rows=c.dong||[];
   moMD('Hồ sơ hợp đồng',
     '<div style="font-size:14px;font-weight:700">HĐ '+esc(c.soHD)+' · '+esc(c.ngayHD||'—')+'</div>'+
     '<div style="margin:6px 0">'+badgeVP(dc.tt)+'</div>'+
-    '<p>Hộ hiện tại: <b>'+esc(c.ho)+'</b><br>Đứng tên HĐ: '+esc(c.hoDungTen||'—')+'<br>Ban đầu: '+esc(c.hoBanDau||'—')+'</p>'+
+    '<p>Hộ hiện tại: <b>'+esc(c.ho)+'</b><br>Đứng tên HĐ: '+esc(c.hoDungTen||'—')+' · Ban đầu: '+esc(c.hoBanDau||'—')+'</p>'+
     '<p>Phân trường: '+Object.keys(c.pt).map(esc).join(', ')+'<br>Tiểu khu: '+Object.keys(c.tk).map(esc).join(', ')+'</p>'+
     '<p>Hiện trạng: <b>'+fmt(c.tongHT)+'</b> ha · Theo HĐ: '+fmt(c.dtHD)+' ha'+
-    (c.dtHD&&Math.abs(c.tongHT-c.dtHD)>0.05?' <span style="color:#d97706">(có chênh)</span>':'')+'</p>'+
-    '<p>HĐ trồng rừng: '+Object.keys(c.tr).map(esc).join(', ')+' · VNN: '+Object.keys(c.vnn).map(esc).join(', ')+'</p>'+
-    '<div style="max-height:140px;overflow:auto;font-size:11px;border-top:1px solid #e2e8f0;padding-top:8px;margin-top:8px">'+
-    c.dong.slice(0,40).map(function(p){return'#'+esc(p.stt)+' thửa '+esc(p.thua)+' · lô '+esc(p.lo)+' · TK '+esc(p.tieuKhu)+' · '+esc(p.phanTruong)+' · '+fmt(p.AC)+' ha';}).join('<br>')+'</div>'
+    (c.dtHD&&Math.abs(c.tongHT-c.dtHD)>0.05?' <span style="color:#d97706">(chênh)</span>':'')+'</p>'+
+    '<p>HĐ trồng rừng: '+(Object.keys(c.tr).map(esc).join(', ')||'—')+' · VNN: '+(Object.keys(c.vnn).map(esc).join(', ')||'—')+'</p>'+
+    htmlHienTrangCay(rows)+
+    '<div style="margin-top:12px"><b>Thửa / lô</b></div>'+
+    '<div style="max-height:160px;overflow:auto;font-size:11px;margin-top:4px">'+
+    rows.slice(0,60).map(function(p){
+      return'<div style="padding:4px 0;border-bottom:1px solid #f1f5f9">#'+esc(p.stt)+
+        ' · thửa '+esc(p.thua||'—')+' · lô '+esc(p.lo||'—')+' · TK '+esc(p.tieuKhu||'—')+
+        ' · '+esc(p.phanTruong||'')+' · <b>'+fmt(p.AC)+' ha</b>'+
+        (p.loaiCay||p.cayKhac?' · '+esc(p.loaiCay||p.cayKhac):'')+
+        (p.AH?' · '+esc(p.AH):'')+'</div>';
+    }).join('')+
+    (rows.length>60?'<div style="color:#94a3b8">… +'+(rows.length-60)+' dòng</div>':'')+
+    '</div>'
   );
 };
+function tongHopHienTrang(rows){
+  var a={AC:0,AD:0,AE:0,AF:0,AP:0,AQ:0,AR:0,AS:0}, seen={};
+  (rows||[]).forEach(function(p){
+    var uk=p.id||(p.stt+'||'+p.tinh);
+    if(seen[uk])return; seen[uk]=1;
+    a.AC+=p.AC||0;a.AD+=p.AD||0;a.AE+=p.AE||0;a.AF+=p.AF||0;a.AP+=p.AP||0;a.AQ+=p.AQ||0;a.AR+=p.AR||0;a.AS+=p.AS||0;
+  });
+  // Loài + mật độ + mô hình (mỗi dòng loài)
+  var cay=[], mh={};
+  (rows||[]).forEach(function(p){
+    var moHinh=(p.AG||p.AH||'').trim()||'—';
+    if(!mh[moHinh]) mh[moHinh]={ten:moHinh, n:0, ha:0, mdChung:[]};
+    mh[moHinh].n++;
+    if((p.AC||0)>0) mh[moHinh].ha+=(p.AC||0);
+    if(p.matDoChung||p.AK) mh[moHinh].mdChung.push(p.matDoChung||p.AK);
+    if(p.loaiCay){
+      cay.push({
+        loai:p.loaiCay, nam:p.namTrong||'', loaiNhom:'Gỗ lớn',
+        mdChung:p.matDoChung||p.AK||0, mdLoai:p.matDoLoai||p.AL||0,
+        moHinh:moHinh, hienTrang:p.AH||'', ha:p.AC||0,
+        stt:p.stt, thua:p.thua, lo:p.lo
+      });
+    }
+    if(p.cayKhac){
+      cay.push({
+        loai:p.cayKhac, nam:p.namCayKhac||'', loaiNhom:'Cây khác',
+        mdChung:0, mdLoai:p.matDoCayKhac||p.AO||0,
+        moHinh:moHinh, hienTrang:p.AH||'', ha:p.AC||0,
+        stt:p.stt, thua:p.thua, lo:p.lo
+      });
+    }
+  });
+  var models=Object.keys(mh).map(function(k){
+    var x=mh[k], avg=0;
+    if(x.mdChung.length){ var s=0; x.mdChung.forEach(function(v){s+=Number(v)||0;}); avg=s/x.mdChung.length; }
+    return {ten:x.ten, n:x.n, ha:x.ha, mdChung:avg};
+  }).sort(function(a,b){return b.ha-a.ha;});
+  return {a:a, cay:cay, models:models};
+}
+function htmlHienTrangCay(rows){
+  var t=tongHopHienTrang(rows), a=t.a;
+  var ht='<div style="margin-top:10px"><b>Hiện trạng</b></div>'+
+    '<div class="area-mini">'+[
+      ['Tổng DT',a.AC],['Có rừng',a.AD],['Rừng TN',a.AE],['Rừng trồng',a.AF],
+      ['Chưa có rừng',a.AP],['Trống 327/661',a.AQ],['Trống ngoài',a.AR],['Đất khác',a.AS]
+    ].map(function(x){return'<div><span>'+esc(x[0])+'</span><b>'+fmt(x[1])+' ha</b></div>';}).join('')+'</div>';
+
+  if(t.models && t.models.length){
+    ht+='<div style="margin-top:12px"><b>Mô hình / đối tượng rừng</b></div>'+
+      '<div style="max-height:140px;overflow:auto;margin-top:6px"><table style="width:100%;font-size:11px;border-collapse:collapse">'+
+      '<tr style="background:#f8fafc"><th style="text-align:left;padding:5px">Mô hình</th><th style="text-align:right;padding:5px">Dòng</th><th style="text-align:right;padding:5px">ha</th><th style="text-align:right;padding:5px">MĐ chung</th></tr>'+
+      t.models.map(function(x){return'<tr style="border-top:1px solid #f1f5f9"><td style="padding:5px">'+esc(x.ten)+'</td><td style="text-align:right;padding:5px">'+x.n+'</td><td style="text-align:right;padding:5px"><b>'+fmt(x.ha)+'</b></td><td style="text-align:right;padding:5px">'+(x.mdChung?fmt(x.mdChung,0):'—')+'</td></tr>';}).join('')+
+      '</table></div>';
+  }
+
+  ht+='<div style="margin-top:12px"><b>Loài cây · mật độ</b></div>';
+  if(!t.cay.length) ht+='<div style="font-size:12px;color:#94a3b8">Chưa có dữ liệu loài cây</div>';
+  else ht+='<div style="max-height:200px;overflow:auto;margin-top:6px"><table style="width:100%;font-size:11px;border-collapse:collapse">'+
+    '<tr style="background:#f8fafc">'+
+      '<th style="text-align:left;padding:5px">Loài</th>'+
+      '<th style="text-align:left;padding:5px">Nhóm</th>'+
+      '<th style="text-align:left;padding:5px">Năm</th>'+
+      '<th style="text-align:left;padding:5px">Mô hình</th>'+
+      '<th style="text-align:right;padding:5px">MĐ chung</th>'+
+      '<th style="text-align:right;padding:5px">MĐ loài</th>'+
+      '<th style="text-align:right;padding:5px">ha</th>'+
+    '</tr>'+
+    t.cay.map(function(x){return'<tr style="border-top:1px solid #f1f5f9">'+
+      '<td style="padding:5px">'+esc(x.loai)+'</td>'+
+      '<td style="padding:5px">'+esc(x.loaiNhom)+'</td>'+
+      '<td style="padding:5px">'+esc(x.nam||'—')+'</td>'+
+      '<td style="padding:5px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(x.moHinh)+'">'+esc(x.moHinh)+'</td>'+
+      '<td style="text-align:right;padding:5px">'+(x.mdChung?fmt(x.mdChung,0):'—')+'</td>'+
+      '<td style="text-align:right;padding:5px">'+(x.mdLoai?fmt(x.mdLoai,0):'—')+'</td>'+
+      '<td style="text-align:right;padding:5px"><b>'+fmt(x.ha)+'</b></td>'+
+    '</tr>';}).join('')+
+    '</table></div>';
+  return ht;
+}
 window.xemHo=function(key){
   var h=null;for(var i=0;i<ho.length;i++)if(ho[i].key===key){h=ho[i];break;}
   if(!h)return;
   var hds=Object.keys(h.hd).map(function(k){return h.hd[k];});
+  var units=Object.keys(h.units||{}).map(function(k){return h.units[k];});
+  var rows=[];
+  if(units.length) units.forEach(function(u){rows=rows.concat(u.rows||[]);});
+  else rows=h.dong||[];
+  // vị trí
+  var pts={}, tks={}, thua={};
+  rows.forEach(function(p){
+    if(p.phanTruong)pts[p.phanTruong]=1;
+    if(p.tieuKhu)tks[p.tieuKhu]=1;
+    if(p.thua)thua[p.thua]=1;
+  });
   moMD('Chi tiết hộ',
     '<div style="font-size:14px;font-weight:700">'+esc(h.ten)+'</div>'+
-    '<p>Đứng tên HĐ: '+esc(h.hoDungTen||'—')+'<br>Ban đầu: '+esc(h.hoBanDau||'—')+'<br>'+esc(h.dc)+'</p>'+
-    '<p>'+h.dong.length+' dòng · '+hds.length+' HĐ · '+fmt(h.tong)+' ha</p>'+
-    '<p><b>Các hợp đồng:</b><br>'+hds.map(function(x){
+    '<p style="margin-top:4px">Đứng tên HĐ: '+esc(h.hoDungTen||'—')+' · Ban đầu: '+esc(h.hoBanDau||'—')+'<br>'+esc(h.dc||'')+'</p>'+
+    '<p>'+fmt(h.tong)+' ha · '+hds.length+' HĐ · '+rows.length+' dòng · '+Object.keys(pts).length+' phân trường · '+Object.keys(tks).length+' tiểu khu</p>'+
+    '<p style="font-size:11px;color:#64748b">PT: '+Object.keys(pts).map(esc).join(', ')+'<br>TK: '+Object.keys(tks).map(esc).join(', ')+'</p>'+
+    '<div style="margin-top:8px"><b>Hợp đồng</b></div>'+
+    '<div style="font-size:12px">'+hds.map(function(x){
       var dc=doiChieu(x.so,x.ngay);
-      return'HĐ '+esc(x.so)+' ('+esc(x.ngay||'—')+') '+badgeVP(dc.tt);
-    }).join('<br>')+'</p>'
+      return'<div style="padding:4px 0;border-bottom:1px solid #f1f5f9">HĐ <b>'+esc(x.so)+'</b> · '+esc(x.ngay||'—')+' '+badgeVP(dc.tt)+'</div>';
+    }).join('')+'</div>'+
+    htmlHienTrangCay(rows)+
+    '<div style="margin-top:12px"><b>Danh sách thửa / lô</b></div>'+
+    '<div style="max-height:180px;overflow:auto;font-size:11px;margin-top:4px">'+
+    rows.slice(0,80).map(function(p){
+      return'<div style="padding:4px 0;border-bottom:1px solid #f1f5f9">#'+esc(p.stt)+
+        ' · thửa '+esc(p.thua||'—')+' · lô '+esc(p.lo||'—')+' · TK '+esc(p.tieuKhu||'—')+
+        ' · '+esc(p.phanTruong||'')+' · <b>'+fmt(p.AC)+' ha</b>'+
+        (p.loaiCay||p.cayKhac?' · '+(esc(p.loaiCay||p.cayKhac)):'')+
+        (p.AH?' · '+esc(p.AH):'')+
+        '</div>';
+    }).join('')+
+    (rows.length>80?'<div style="color:#94a3b8;padding:6px 0">… và '+(rows.length-80)+' dòng nữa</div>':'')+
+    '</div>'
   );
 };
 window.xemDong=function(id){
@@ -847,7 +959,15 @@ window.xemDong=function(id){
     '<p><b>Hộ sử dụng đất</b><br>Hộ SDĐ ban đầu: '+esc(p.hoBanDau||'—')+'<br>Hộ đứng tên HĐ: '+esc(p.hoDungTen||'—')+'<br>Hộ đang sử dụng: <b>'+esc(p.hoHienTai||'—')+'</b></p>'+ 
     '<p><b>Hợp đồng</b><br>HĐ giao khoán: '+esc(p.soHD||'—')+' · '+esc(p.ngayHD||'—')+' · '+fmt(p.dtHD)+' ha<br>HĐ trồng rừng: '+esc(p.soTR||'—')+' · '+esc(p.ngayTR||'—')+' · '+fmt(p.dtTR)+' ha<br>HĐ SX hỗ trợ vốn: '+esc(p.soVNN||'—')+' · '+esc(p.ngayVNN||'—')+' · '+fmt(p.dtVNN)+' ha</p>'+ 
     '<div class="area-mini">'+[['Tổng diện tích',p.AC],['Đất có rừng',p.AD],['Rừng tự nhiên',p.AE],['Rừng trồng',p.AF],['Đất chưa có rừng',p.AP],['Đất trống thuộc 327, 661',p.AQ],['Đất trống ngoài 327, 661',p.AR],['Đất khác',p.AS],['Ruộng, bàu',p.AT],['Khe, suối',p.AU],['Nhà cửa',p.AV],['Đường sá',p.AW],['Ao, hồ',p.AX],['Đường điện, đường sắt, bãi đá',p.AY]].map(function(x){return'<div><span>'+esc(x[0])+'</span><b>'+fmt(x[1])+' ha</b></div>';}).join('')+'</div>'+ 
-    '<p><b>Rừng trồng và cây trồng</b><br>Đối tượng rừng: '+esc(p.AG||'—')+' · Hiện trạng rừng: '+esc(p.AH||'—')+'<br>Cây gỗ lớn: '+esc(p.AI||'—')+' · Năm trồng: '+esc(p.AJ||'—')+' · Mật độ chung: '+fmt(p.AK)+' · Mật độ từng loài: '+fmt(p.AL)+'<br>Cây khác: '+esc(p.AM||'—')+' · Năm trồng: '+esc(p.AN||'—')+' · Mật độ: '+fmt(p.AO)+'</p>'+ 
+    '<div style="margin-top:10px"><b>Mô hình &amp; cây trồng</b></div>'+
+    '<p style="margin-top:4px">Đối tượng / mô hình: <b>'+esc(p.AG||'—')+'</b><br>Hiện trạng: '+esc(p.AH||'—')+'</p>'+
+    '<div style="margin-top:6px;font-size:12px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">'+
+      '<table style="width:100%;border-collapse:collapse;font-size:11px">'+
+      '<tr style="background:#f8fafc"><th style="text-align:left;padding:6px">Loài</th><th style="text-align:left;padding:6px">Năm</th><th style="text-align:right;padding:6px">MĐ chung</th><th style="text-align:right;padding:6px">MĐ loài</th></tr>'+
+      (p.loaiCay||p.AI?'<tr style="border-top:1px solid #f1f5f9"><td style="padding:6px">'+esc(p.loaiCay||p.AI)+' <span style="color:#64748b">(gỗ lớn)</span></td><td style="padding:6px">'+esc(p.namTrong||p.AJ||'—')+'</td><td style="text-align:right;padding:6px">'+(p.matDoChung||p.AK?fmt(p.matDoChung||p.AK,0):'—')+'</td><td style="text-align:right;padding:6px">'+(p.matDoLoai||p.AL?fmt(p.matDoLoai||p.AL,0):'—')+'</td></tr>':'')+
+      (p.cayKhac||p.AM?'<tr style="border-top:1px solid #f1f5f9"><td style="padding:6px">'+esc(p.cayKhac||p.AM)+' <span style="color:#64748b">(cây khác)</span></td><td style="padding:6px">'+esc(p.namCayKhac||p.AN||'—')+'</td><td style="text-align:right;padding:6px">—</td><td style="text-align:right;padding:6px">'+(p.matDoCayKhac||p.AO?fmt(p.matDoCayKhac||p.AO,0):'—')+'</td></tr>':'')+
+      (!p.loaiCay&&!p.AI&&!p.cayKhac&&!p.AM?'<tr><td colspan="4" style="padding:8px;color:#94a3b8;text-align:center">Chưa có loài cây</td></tr>':'')+
+      '</table></div>'+ 
     (p.canhBao&&p.canhBao.length?'<div style="margin-top:10px;color:#b45309">⚠ '+esc(p.canhBao.join('; '))+'</div>':'')+'<div style="margin-top:8px">'+badgeVP(dc.tt)+'</div>');
 };
 window.xuatExcel=function(){
