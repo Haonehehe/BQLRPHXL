@@ -112,8 +112,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
   <div class="nav" id="nav">
     <button type="button" class="on" data-t="tongquan" onclick="doiTab('tongquan')">Tổng quan</button>
     <button type="button" data-t="ho" onclick="doiTab('ho')">Hộ nhận khoán</button>
-    <button type="button" data-t="hd" onclick="doiTab('hd')">Hợp đồng</button>
-    <button type="button" data-t="dong" onclick="doiTab('dong')">Chi tiết lâm bạ</button>
+    <button type="button" data-t="hd" onclick="doiTab('hd')">Hợp đồng · Lâm bạ</button>
     <button type="button" data-t="vp" onclick="doiTab('vp')">Đối chiếu vi phạm</button>
   </div>
 
@@ -183,24 +182,15 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
   <!-- HĐ -->
   <section id="p-hd" class="hidden">
     <div class="card">
-      <div class="card-h"><h2>Hợp đồng giao khoán</h2><span id="nHD" style="font-size:11px;color:var(--mu)"></span></div>
+      <div class="card-h"><h2>Hợp đồng giao khoán · hiện trạng lâm bạ</h2><span id="nHD" style="font-size:11px;color:var(--mu)"></span></div>
       <div class="scroll"><table>
-        <thead><tr><th>Số HĐ</th><th>Ngày ký</th><th>Tỉnh</th><th>Hộ</th><th class="r">Dòng</th><th class="r">HĐ trồng rừng</th><th class="r">DT hiện trạng</th><th>Vi phạm</th><th></th></tr></thead>
+        <thead><tr>
+          <th>Số HĐ</th><th>Ngày ký</th><th>Tỉnh</th><th>Hộ</th>
+          <th>Phân trường</th><th>Tiểu khu</th>
+          <th class="r">Mô hình</th><th class="r">HĐTR</th>
+          <th class="r">DT (ha)</th><th>Vi phạm</th><th></th>
+        </tr></thead>
         <tbody id="tbHD"></tbody>
-      </table></div>
-    </div>
-  </section>
-
-  <!-- DÒNG -->
-  <section id="p-dong" class="hidden">
-    <div class="card">
-      <div class="card-h"><h2>Dòng lâm bạ</h2><span id="nDong" style="font-size:11px;color:var(--mu)"></span></div>
-      <div class="scroll"><table>
-        <thead>
-          <tr><th colspan="8" class="group-head">Thông tin địa điểm</th><th colspan="3" class="group-head">Thông tin sử dụng</th><th colspan="3" class="group-head">Hợp đồng và hiện trạng</th><th class="group-head">Thao tác</th></tr>
-          <tr class="subhead"><th>STT</th><th>Thửa địa chính / Tờ bản đồ</th><th>Xã/phường</th><th>Lô kiểm kê</th><th>Khoảnh</th><th>Tiểu khu</th><th>Phân trường</th><th>Vùng quy hoạch</th><th>Đối tượng sử dụng</th><th>Hộ đang sử dụng</th><th>Hợp đồng giao khoán</th><th>Tổng diện tích</th><th>Đất có rừng</th><th>Đất chưa có rừng</th><th></th></tr>
-        </thead>
-        <tbody id="tbDong"></tbody>
       </table></div>
     </div>
   </section>
@@ -798,8 +788,9 @@ function xoaLoc(){
   doiTinh('ALL');
 }
 function doiTab(t){
+  if(t==='dong')t='hd';
   tab=t;
-  ['tongquan','ho','hd','dong','vp'].forEach(function(x){
+  ['tongquan','ho','hd','vp'].forEach(function(x){
     var el=document.getElementById('p-'+x);if(el)el.classList.toggle('hidden',x!==t);
   });
   document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});
@@ -938,19 +929,44 @@ function veHD(){
   var q=(document.getElementById('q').value||'').toLowerCase().trim();
   var list=hopDong.filter(function(c){
     if(tinh!=='ALL'&&c.tinh!==tinh)return false;
+    if(document.getElementById('fPT').value){
+      var pt=document.getElementById('fPT').value;
+      if(!c.pt||!c.pt[pt])return false;
+    }
+    if(document.getElementById('fDT').value==='GK'||document.getElementById('fDT').value==='BQL'||document.getElementById('fDT').value==='LDLK'){
+      // HĐ chỉ GK; giữ filter nếu cần
+    }
     if(!q)return true;
-    return[c.soHD,c.ngayHD,c.ho,c.hoDungTen].join(' ').toLowerCase().indexOf(q)>=0;
+    var blob=[c.soHD,c.ngayHD,c.ho,c.hoDungTen,c.hoBanDau,Object.keys(c.pt||{}).join(' '),Object.keys(c.tk||{}).join(' ')].join(' ').toLowerCase();
+    // kèm thửa/lô từ dòng
+    (c.dong||[]).forEach(function(p){
+      if(p.isChild)return;
+      blob+=' '+(p.thua||'')+' '+(p.lo||'')+' '+(p.tieuKhu||'')+' '+(p.phanTruong||'')+' '+(p.AH||'');
+    });
+    return blob.indexOf(q)>=0;
   });
   document.getElementById('nHD').textContent=list.length.toLocaleString('vi-VN')+' hợp đồng';
-  document.getElementById('tbHD').innerHTML=list.slice(0,250).map(function(c){
+  document.getElementById('tbHD').innerHTML=list.slice(0,300).map(function(c){
     var dc=doiChieu(c.soHD,c.ngayHD);
-    return'<tr><td><b>'+esc(c.soHD)+'</b></td><td>'+esc(c.ngayHD||'—')+'</td>'+
+    var nModel=(c.dong||[]).filter(function(p){return !p.isChild && ((p.AC||0)>0||(p.AF||0)>0||(p.AD||0)>0);}).length;
+    var pts=Object.keys(c.pt||{}).join(', ')||'—';
+    var tks=Object.keys(c.tk||{}).slice(0,4).join(', ')||'—';
+    if(Object.keys(c.tk||{}).length>4) tks+='…';
+    var nTR=Object.keys(c.tr||{}).length;
+    return'<tr>'+
+      '<td><b>'+esc(c.soHD)+'</b></td>'+
+      '<td>'+esc(c.ngayHD||'—')+'</td>'+
       '<td><span class="tag '+(c.tinh==='LD'?'ld':'dn')+'">'+(c.tinh==='LD'?'LĐ':'ĐN')+'</span></td>'+
-      '<td>'+esc(c.ho||c.hoDungTen||'—')+'</td>'+
-      '<td class="r">'+c.dong.length+'</td><td class="r">'+Object.keys(c.tr).length+(Object.keys(c.vnn).length?'/VNN'+Object.keys(c.vnn).length:'')+'</td>'+
-      '<td class="r"><b>'+fmt(c.tongHT)+'</b></td><td>'+badgeVP(dc.tt)+'</td>'+
-      '<td><button type="button" class="btn btn-o" style="height:28px;font-size:11px" onclick=\'xemHD('+JSON.stringify(c.maHD)+')\'>Hồ sơ</button></td></tr>';
-  }).join('')||'<tr><td colspan="9" class="muted">Không có HĐ</td></tr>';
+      '<td>'+esc(c.ho||'—')+'</td>'+
+      '<td style="font-size:11px">'+esc(pts)+'</td>'+
+      '<td style="font-size:11px">'+esc(tks)+'</td>'+
+      '<td class="r">'+nModel+'</td>'+
+      '<td class="r">'+(nTR||'—')+'</td>'+
+      '<td class="r"><b>'+fmt(c.tongHT)+'</b></td>'+
+      '<td>'+badgeVP(dc.tt)+'</td>'+
+      '<td><button type="button" class="btn btn-o" style="height:28px;font-size:11px" onclick=\'xemHD('+JSON.stringify(c.maHD)+')\'>Hồ sơ</button></td>'+
+    '</tr>';
+  }).join('')||'<tr><td colspan="11" class="muted">Không có HĐ</td></tr>';
 }
 
 function veDong(list){
@@ -999,7 +1015,6 @@ function veLai(){
   if(tab==='tongquan')veTongQuan(list);
   if(tab==='ho')veHo();
   if(tab==='hd')veHD();
-  if(tab==='dong')veDong(list);
   if(tab==='vp'){/* giữ kết quả tra cứu */}
 }
 
