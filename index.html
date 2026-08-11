@@ -2490,23 +2490,40 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             if (current) newCases.push(current);
 
             if (newCases.length === 0) throw new Error("Không trích xuất được dòng có STT hợp lệ!");
+            // Giữ tab + bộ lọc đang dùng; chỉ cập nhật dữ liệu
+            const uiState = (typeof snapshotUiState === 'function') ? snapshotUiState() : null;
+            const keepMode = currentViewMode || (uiState && uiState.viewMode) || 'dashboard';
             detailedCases = newCases;
             if (typeof populateFilterOptions === 'function') populateFilterOptions();
             if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
-            if (currentViewMode === 'dashboard') renderDashboard();
-            else if (currentViewMode === 'stats') renderStats();
-            else if (currentViewMode === 'summary') {
+            if (typeof restoreUiState === 'function') restoreUiState(uiState);
+            currentViewMode = keepMode;
+
+            if (keepMode === 'dashboard') renderDashboard();
+            else if (keepMode === 'stats') renderStats();
+            else if (keepMode === 'summary') {
                 renderTable();
                 requestAnimationFrame(() => setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 80));
+            } else if (keepMode === 'detail') {
+                renderTable();
+                // Áp lại lọc sau khi vẽ bảng mới
+                requestAnimationFrame(() => {
+                    if (typeof filterTable === 'function') filterTable();
+                    setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 80);
+                });
             } else {
-                renderTable();
-                requestAnimationFrame(() => setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 80));
+                // action / check / khác
+                if (typeof renderTable === 'function' && (keepMode === 'action' || keepMode === 'check')) {
+                    // các view tự render trong switchMainView — gọi lại cho đúng tab
+                    if (typeof switchMainView === 'function') switchMainView(keepMode);
+                } else {
+                    renderTable();
+                    requestAnimationFrame(() => { if (typeof filterTable === 'function') filterTable(); });
+                }
             }
-            // Luôn vẽ lại biểu đồ nếu canvas đang hiện
-            if (currentViewMode === 'summary' || currentViewMode === 'detail') {
+            if (keepMode === 'summary') {
                 requestAnimationFrame(() => setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 100));
             }
-            if (typeof renderStats === 'function' && currentViewMode !== 'stats') { /* keep data ready */ }
         }
 
 function parsePastedTextData() {
@@ -2589,6 +2606,51 @@ function toggleAdvFilter() {
             p.classList.toggle('collapsed-mobile');
         }
 
+
+        const FILTER_IDS = ['tableSearchInput', 'filterNhom', 'filterHanhVi', 'filterTieuKhu', 'filterPhanTruong', 'filterXa'];
+        const STATS_FILTER_IDS = ['statsFilterNhom', 'statsFilterHanhVi', 'statsFilterTieuKhu', 'statsFilterPhanTruong', 'statsFilterXa', 'statsTimeMode', 'statsMonth', 'statsQuarter', 'statsYear', 'statsYearTop', 'statsFrom', 'statsTo'];
+
+        function snapshotUiState() {
+            const state = {
+                viewMode: typeof currentViewMode !== 'undefined' ? currentViewMode : 'dashboard',
+                filters: {},
+                statsFilters: {}
+            };
+            FILTER_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) state.filters[id] = el.value;
+            });
+            STATS_FILTER_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) state.statsFilters[id] = el.value;
+            });
+            return state;
+        }
+
+        function restoreUiState(state) {
+            if (!state) return;
+            if (state.filters) {
+                Object.entries(state.filters).forEach(([id, val]) => {
+                    const el = document.getElementById(id);
+                    if (el && val != null) el.value = val;
+                });
+            }
+            if (state.statsFilters) {
+                Object.entries(state.statsFilters).forEach(([id, val]) => {
+                    const el = document.getElementById(id);
+                    if (el && val != null) {
+                        // chỉ gán nếu option còn tồn tại (select) hoặc input text
+                        if (el.tagName === 'SELECT') {
+                            const ok = [...el.options].some(o => o.value === val);
+                            if (ok || val === '') el.value = val;
+                        } else {
+                            el.value = val;
+                        }
+                    }
+                });
+            }
+        }
+
         function clearFilters() {
             ['tableSearchInput', 'filterNhom', 'filterHanhVi', 'filterTieuKhu', 'filterPhanTruong', 'filterXa'].forEach(id => {
                 const el = document.getElementById(id);
@@ -2603,13 +2665,16 @@ function toggleAdvFilter() {
             const current = el.value;
             const uniq = [...new Set((values || []).map(v => String(v || '').trim()).filter(v => v && v !== '—'))].sort((a,b)=>a.localeCompare(b,'vi'));
             el.innerHTML = `<option value="">${firstLabel}</option>` + uniq.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
-            if (uniq.includes(current)) el.value = current;
+            if (current === '' || uniq.includes(current) || uniq.map(String).includes(String(current))) el.value = current;
         }
 
         function populateStatsFilterOptions() {
-            setSelectOptions('statsFilterNhom', [1,2,3,4,5].map(id => `${id}`), 'Tất cả nhóm xử lý');
             const nhom = document.getElementById('statsFilterNhom');
-            if (nhom) nhom.innerHTML = `<option value="">Tất cả nhóm xử lý</option>` + [1,2,3,4,5].map(id => `<option value="${id}">${escapeHtml(NHOM_MAP[id].short)}</option>`).join('');
+            const nhomCur = nhom ? nhom.value : '';
+            if (nhom) {
+                nhom.innerHTML = `<option value="">Tất cả nhóm xử lý</option>` + [1,2,3,4,5].map(id => `<option value="${id}">${escapeHtml(NHOM_MAP[id].short)}</option>`).join('');
+                if (nhomCur) nhom.value = nhomCur;
+            }
             setSelectOptions('statsFilterHanhVi', detailedCases.map(c => c.hanhVi), 'Tất cả hành vi');
             setSelectOptions('statsFilterTieuKhu', detailedCases.map(c => c.tieuKhu), 'Tất cả tiểu khu');
             setSelectOptions('statsFilterPhanTruong', detailedCases.map(c => c.phanTruong), 'Tất cả phân trường');
@@ -3608,6 +3673,13 @@ function toggleAdvFilter() {
             autoRefreshTimer = setInterval(() => {
                 const modal = document.getElementById('dataModal');
                 if (modal && !modal.classList.contains('hidden')) return;
+                const qs = document.getElementById('quickSearchModal');
+                if (qs && !qs.classList.contains('hidden')) return;
+                const cd = document.getElementById('caseDetailModal');
+                if (cd && !cd.classList.contains('hidden')) return;
+                // Đang gõ ô tìm kiếm: hoãn làm mới
+                const active = document.activeElement;
+                if (active && (active.id === 'tableSearchInput' || active.id === 'quickSearchInput')) return;
                 reloadData(true);
             }, 2 * 60 * 1000);
         }
