@@ -103,6 +103,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
   </div>
   <div class="acts">
     <button class="btn btn-b" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
+    <button class="btn btn-o" type="button" onclick="doiLinkSheet()" title="Đổi link Google Sheet lâm bạ"><i class="fa-solid fa-link"></i> Đổi link Sheet</button>
     <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
     <a class="btn btn-o" href="index.html" target="_blank"><i class="fa-solid fa-shield-halved" style="color:#e11d48"></i> QLBVR</a>
   </div>
@@ -224,9 +225,56 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 (function(){
 'use strict';
 
-var SID='1CnlGELkhVjLEa7jQwVg4kIeyiXxqmOTR';
-var GID={DN:'1710752621',LD:'516720069',TH:'149303770'};
+var DEFAULT_SID='1CnlGELkhVjLEa7jQwVg4kIeyiXxqmOTR';
+var DEFAULT_GID={DN:'1710752621',LD:'516720069',TH:'149303770'};
+var SID=DEFAULT_SID;
+var GID={DN:DEFAULT_GID.DN,LD:DEFAULT_GID.LD,TH:DEFAULT_GID.TH};
 var VP_ID='1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU', VP_GID='528762373';
+var LS_SHEET='lamba_sheet_cfg';
+var LS_STATE='lamba_ui_state';
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function loadSheetCfg(){
+  var raw=lsGet(LS_SHEET);
+  if(!raw)return;
+  try{
+    var o=JSON.parse(raw);
+    if(o.SID)SID=o.SID;
+    if(o.GID){
+      if(o.GID.DN)GID.DN=o.GID.DN;
+      if(o.GID.LD)GID.LD=o.GID.LD;
+      if(o.GID.TH)GID.TH=o.GID.TH;
+    }
+  }catch(e){}
+}
+function saveSheetCfg(){
+  lsSet(LS_SHEET, JSON.stringify({SID:SID,GID:GID}));
+}
+loadSheetCfg();
+function parseSheetUrl(url){
+  if(!url)return null;
+  var idM=String(url).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(!idM)return null;
+  var gidM=String(url).match(/[?#&]gid=([0-9]+)/);
+  return {id:idM[1], gid:gidM?gidM[1]:null};
+}
+function doiLinkSheet(){
+  var cur='https://docs.google.com/spreadsheets/d/'+SID+'/edit';
+  var u=prompt('Dán link Google Sheet lâm bạ (file chứa sheet TOÀN BQL DN / LD / TH):\n\nHiện tại:\n'+cur, cur);
+  if(u===null)return;
+  u=String(u).trim();
+  if(!u){
+    SID=DEFAULT_SID; GID={DN:DEFAULT_GID.DN,LD:DEFAULT_GID.LD,TH:DEFAULT_GID.TH};
+    saveSheetCfg(); toast('Đã về Sheet mặc định'); taiLai(); return;
+  }
+  var p=parseSheetUrl(u);
+  if(!p||!p.id){ toast('Link không hợp lệ'); return; }
+  SID=p.id;
+  // Giữ GID hiện tại (cùng file thường giữ nguyên gid các sheet)
+  saveSheetCfg();
+  toast('Đã đổi Sheet · đang tải lại…');
+  taiLai();
+}
 
 var dong=[], hopDong=[], ho=[], vpList=[];
 var chinhThuc={tong:0,dn:0,ld:0};
@@ -452,9 +500,9 @@ function moTaHoSoDong(p){
     if(sub.length) html+='<div style="font-size:11px;color:#64748b;margin-top:2px">'+sub.join(' · ')+'</div>';
 
     if(goLon.length){
-      html+='<div style="margin-top:8px;font-size:12px"><b>Cây gỗ lớn</b></div>';
+      html+='<div style="margin-top:8px;font-size:12px"><b>Cây gỗ lớn</b>'+(mdChung?' · mật độ chung <b>'+fmt(mdChung,0)+'</b> cây/ha':'')+' — trong đó:</div>';
       html+='<table style="width:100%;font-size:11px;border-collapse:collapse;margin-top:4px">';
-      html+='<tr style="background:#f8fafc"><th style="text-align:left;padding:4px">Loài</th><th style="text-align:left;padding:4px">Năm</th><th style="text-align:right;padding:4px">MĐ (cây/ha)</th></tr>';
+      html+='<tr style="background:#f8fafc"><th style="text-align:left;padding:4px">Loài</th><th style="text-align:left;padding:4px">Năm</th><th style="text-align:right;padding:4px">MĐ loài (cây/ha)</th></tr>';
       goLon.forEach(function(x){
         html+='<tr style="border-top:1px solid #f1f5f9"><td style="padding:4px">'+esc(x.loai)+'</td><td style="padding:4px">'+esc(x.nam||'—')+'</td><td style="text-align:right;padding:4px">'+(x.mdLoai?fmt(x.mdLoai,0):'—')+'</td></tr>';
       });
@@ -712,7 +760,33 @@ function badgeVP(tt){
   return'<span class="tag vp-cd">CHƯA ĐỦ DỮ LIỆU</span>';
 }
 
-function taiLai(){
+function luuTrangThai(){
+  var st={
+    tab:tab, tinh:tinh,
+    q:(document.getElementById('q')&&document.getElementById('q').value)||'',
+    fPT:(document.getElementById('fPT')&&document.getElementById('fPT').value)||'',
+    fDT:(document.getElementById('fDT')&&document.getElementById('fDT').value)||'',
+    fQH:(document.getElementById('fQH')&&document.getElementById('fQH').value)||'',
+    fCay:(document.getElementById('fCay')&&document.getElementById('fCay').value)||'',
+    fNam:(document.getElementById('fNam')&&document.getElementById('fNam').value)||''
+  };
+  lsSet(LS_STATE, JSON.stringify(st));
+  return st;
+}
+function apDungTrangThai(st){
+  if(!st)return;
+  if(st.tinh){ tinh=st.tinh; document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-p')===tinh);}); }
+  if(st.tab){ tab=st.tab; ['tongquan','ho','hd','vp'].forEach(function(x){ var el=document.getElementById('p-'+x); if(el)el.classList.toggle('hidden',x!==tab); }); document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===tab);}); }
+  if(document.getElementById('q')&&st.q!=null) document.getElementById('q').value=st.q;
+  // select được napBoLoc khôi phục theo value sau khi fill
+  if(document.getElementById('fDT')&&st.fDT) document.getElementById('fDT').value=st.fDT;
+  if(document.getElementById('fQH')&&st.fQH) document.getElementById('fQH').value=st.fQH;
+  if(document.getElementById('fPT')&&st.fPT) document.getElementById('fPT').value=st.fPT;
+  if(document.getElementById('fCay')&&st.fCay) document.getElementById('fCay').value=st.fCay;
+  if(document.getElementById('fNam')&&st.fNam) document.getElementById('fNam').value=st.fNam;
+}
+function taiLai(silent){
+  var st=luuTrangThai();
   var ic=document.getElementById('icoReload');if(ic)ic.classList.add('fa-spin');
   daTaiVP=false;
   Promise.all([
@@ -723,14 +797,15 @@ function taiLai(){
     ganDongChaCon(dong);
     var ct=docChinhThuc(res[2]);if(ct)chinhThuc=ct;
     vpList=res[3]?docVP(res[3]):[];
-    console.log('Đã nạp biểu vi phạm:', vpList.length, 'bản ghi có khóa Số HĐ + Ngày ký');
     xayHopDong();xayHo();
     lastSync=new Date();
-    napBoLoc();veLai();
+    napBoLoc();
+    apDungTrangThai(st);
+    veLai();
     var sumAC=aggregateAreaUnits(dong).area.AC;
-    toast('Đã tải '+dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+hopDong.length+' hợp đồng');
+    if(!silent) toast('Đã tải '+dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+hopDong.length+' hợp đồng');
     document.getElementById('syncTxt').textContent=dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+lastSync.toLocaleTimeString('vi-VN');
-  }).catch(function(e){console.error(e);toast(e.message||'Lỗi tải');})
+  }).catch(function(e){console.error(e);if(!silent)toast(e.message||'Lỗi tải');})
   .then(function(){if(ic)ic.classList.remove('fa-spin');});
 }
 
@@ -789,7 +864,7 @@ function xoaLoc(){
 }
 function doiTab(t){
   if(t==='dong')t='hd';
-  tab=t;
+  tab=t; luuTrangThai();
   ['tongquan','ho','hd','vp'].forEach(function(x){
     var el=document.getElementById('p-'+x);if(el)el.classList.toggle('hidden',x!==t);
   });
@@ -1011,6 +1086,7 @@ function traCuuVP(){
 }
 
 function veLai(){
+  try{luuTrangThai();}catch(e){}
   var list=locDong();
   if(tab==='tongquan')veTongQuan(list);
   if(tab==='ho')veHo();
@@ -1077,8 +1153,10 @@ window.xemHD=function(ma){
       var go=m.loai.filter(function(x){return x.nhom==='Gỗ lớn';});
       var kh=m.loai.filter(function(x){return x.nhom!=='Gỗ lớn';});
       if(go.length){
-        html+='<div style="margin-top:6px;font-size:12px"><b>Cây gỗ lớn</b></div><ul style="margin:4px 0 0 16px;padding:0;font-size:12px;line-height:1.5">';
-        go.forEach(function(x,j){ html+='<li>'+esc(x.loai)+(x.nam?' · năm '+esc(x.nam):'')+(x.mdLoai?' · MĐ '+fmt(x.mdLoai,0)+' cây/ha':'')+(x.mdChung?' · MĐ chung '+fmt(x.mdChung,0):'')+'</li>'; });
+        var mdG=0; go.forEach(function(x){ if(x.mdChung) mdG=x.mdChung; });
+        html+='<div style="margin-top:6px;font-size:12px"><b>Cây gỗ lớn</b>'+(mdG?' · mật độ chung <b>'+fmt(mdG,0)+'</b> cây/ha':'')+' — trong đó:</div>';
+        html+='<ul style="margin:4px 0 0 16px;padding:0;font-size:12px;line-height:1.5">';
+        go.forEach(function(x){ html+='<li>'+esc(x.loai)+(x.nam?' · năm '+esc(x.nam):'')+(x.mdLoai?' · MĐ '+fmt(x.mdLoai,0)+' cây/ha':'')+'</li>'; });
         html+='</ul>';
       }
       if(kh.length){
@@ -1165,10 +1243,25 @@ window.xuatExcel=function(){
   XLSX.utils.book_append_sheet(wb,ws,'Lâm bạ');XLSX.writeFile(wb,'Lamba_DN_LD.xlsx');toast('Đã xuất Excel');
 };
 
-window.taiLai=taiLai;window.doiTab=doiTab;window.doiTinh=doiTinh;window.xoaLoc=xoaLoc;
+window.taiLai=taiLai;window.doiTab=doiTab;window.doiTinh=doiTinh;window.xoaLoc=xoaLoc;window.doiLinkSheet=doiLinkSheet;
 window.veLai=veLai;window.traCuuVP=traCuuVP;window.dongMD=dongMD;window.xuatExcel=xuatExcel;
 document.addEventListener('keydown',function(e){if(e.key==='Escape')dongMD();});
-window.addEventListener('load',function(){setTimeout(taiLai,200);});
+window.addEventListener('load',function(){
+  // khôi phục tab/tỉnh từ lần trước (trước khi tải)
+  try{
+    var raw=lsGet(LS_STATE);
+    if(raw){ var st=JSON.parse(raw); if(st.tab)tab=st.tab; if(st.tinh)tinh=st.tinh; }
+  }catch(e){}
+  setTimeout(function(){taiLai(false);},200);
+  setInterval(function(){
+    if(document.getElementById('md')&&document.getElementById('md').classList.contains('open'))return;
+    var a=document.activeElement;
+    if(a&&(a.id==='q'||a.tagName==='INPUT'||a.tagName==='SELECT'||a.tagName==='TEXTAREA'))return;
+    taiLai(true);
+  },120000);
+});
+// Lưu trạng thái khi đổi tab / lọc
+var _veLai=null;
 })();
 </script>
 </body>
