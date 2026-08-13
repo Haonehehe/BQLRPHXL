@@ -56,7 +56,7 @@ a{color:inherit;text-decoration:none}
 .sync{margin-left:auto;font-size:11px;color:var(--mu)}
 /* cards */
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-@media(min-width:700px){.kpis{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:700px){.kpis{grid-template-columns:repeat(3,1fr)}}
 .kpi{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px}
 .kpi .l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--mu)}
 .kpi .v{font-size:22px;font-weight:700;margin-top:4px}
@@ -126,8 +126,9 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 .vp-card .vp-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .vp-card .vp-head b{font-size:13px}
 .vp-card .vp-meta{font-size:12px;line-height:1.55;color:#334155}
-.vp-card .vp-hit{padding:8px 0;border-top:1px solid #fee2e2;font-size:12px;color:#475569}
+.vp-card .vp-hit{padding:8px 0;border-top:1px solid #fee2e2;font-size:12px;color:#475569;line-height:1.45}
 .vp-card .vp-hit:first-of-type{border-top:1px solid #fecaca;margin-top:8px}
+.vp-card .vp-hit b{color:#0f172a;font-weight:600}
 .vp-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .vp-empty{text-align:center;padding:28px 16px;color:#94a3b8;font-size:13px;line-height:1.5}
 .vp-empty i{font-size:28px;display:block;margin-bottom:8px;color:#cbd5e1}
@@ -205,13 +206,13 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
       <div class="card"><div class="card-h"><h2>Theo quy hoạch (ha)</h2></div><div class="card-b"><div class="chart"><canvas id="cQH"></canvas></div></div></div>
       <div class="card"><div class="card-h"><h2>Theo nguồn vốn (ha)</h2></div><div class="card-b"><div class="chart"><canvas id="cVon"></canvas></div></div></div>
     </div>
-    <div class="card"><div class="card-h"><h2>Loài cây / năm trồng — thống kê hộ</h2><span id="cayInfo" style="font-size:11px;color:var(--mu)"></span></div><div class="scroll"><table><thead><tr><th>Loài cây</th><th>Năm trồng</th><th class="r">Số hộ GK</th><th class="r">Số HĐ</th><th class="r">Số đơn vị hiện trạng</th></tr></thead><tbody id="tbCay"></tbody></table></div></div>
+    <div class="card"><div class="card-h"><h2>Loài cây / năm trồng — thống kê hộ</h2><span id="cayInfo" style="font-size:11px;color:var(--mu)"></span></div><div class="scroll"><table><thead><tr><th>Loài cây</th><th>Năm trồng</th><th class="r">Số hộ GK</th><th class="r">Số HĐ</th></tr></thead><tbody id="tbCay"></tbody></table></div></div>
     <div class="card">
       <div class="card-h"><h2>Tổng hợp theo phân trường</h2>
         <button class="btn btn-o" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel" style="color:#10b981"></i> Excel</button>
       </div>
       <div class="scroll"><table>
-        <thead><tr><th>Tỉnh</th><th>Phân trường</th><th class="r">Số dòng</th><th class="r">Diện tích (ha)</th><th class="r">Có rừng</th><th class="r">GK</th><th class="r">BQL</th><th class="r">LDLK</th></tr></thead>
+        <thead><tr><th>Tỉnh</th><th>Phân trường</th><th class="r">Diện tích (ha)</th><th class="r">Có rừng</th><th class="r">GK (ha)</th><th class="r">BQL (ha)</th><th class="r">LDLK (ha)</th><th class="r">Số hộ</th><th class="r">Số HĐ</th></tr></thead>
         <tbody id="tbPT"></tbody>
       </table></div>
     </div>
@@ -222,7 +223,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
     <div class="card">
       <div class="card-h"><h2>Danh sách hộ</h2><span id="nHo" style="font-size:11px;color:var(--mu)"></span></div>
       <div class="scroll"><table>
-        <thead><tr><th>#</th><th>Hộ hiện tại</th><th>Đứng tên HĐ / Ban đầu</th><th>Địa chỉ</th><th class="r">Dòng</th><th class="r">Số HĐ</th><th class="r">DT (ha)</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Hộ hiện tại</th><th>Đứng tên HĐ / Ban đầu</th><th>Địa chỉ</th><th class="r">Số HĐ</th><th class="r">DT (ha)</th><th></th></tr></thead>
         <tbody id="tbHo"></tbody>
       </table></div>
     </div>
@@ -296,6 +297,16 @@ var DEFAULT_GID={DN:'1710752621',LD:'516720069',TH:'149303770'};
 var SID=DEFAULT_SID;
 var GID={DN:DEFAULT_GID.DN,LD:DEFAULT_GID.LD,TH:DEFAULT_GID.TH};
 var VP_ID='1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU', VP_GID='528762373';
+// Sheet thu hồi HĐ (cùng file QLBVR hoặc cấu hình riêng). TH_GID lưu localStorage nếu biết.
+var TH_SID=VP_ID, TH_GID=(function(){
+  try{
+    var g=localStorage.getItem('lamba_th_gid')||'';
+    // Xóa gid nhầm (từng lưu sheet vi phạm)
+    if(g && g===String(VP_GID)){ localStorage.removeItem('lamba_th_gid'); return ''; }
+    return g;
+  }catch(e){return '';}
+})();
+var thuHoiSource=''; // 'sheet' | 'fallback'
 var LS_SHEET='lamba_sheet_cfg';
 var LS_STATE='lamba_ui_state';
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
@@ -371,7 +382,7 @@ var THU_HOI_FALLBACK=[
             { stt:25, hoTen:"Nguyễn Có", diaDiem:"TK 204, PT Trản Táo", dienTich:0.76, soHD:"431", ngayKyHD:"20/4/2016", soQĐ:"262/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
             { stt:26, hoTen:"Lý Thị Nga", diaDiem:"TK 205, PT Trản Táo", dienTich:2.77, soHD:"211", ngayKyHD:"28/4/2005", soQĐ:"265/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; xây dựng công trình trái phép; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
             { stt:27, hoTen:"Nguyễn Kế Vỹ", diaDiem:"TK 204, PT Trản Táo", dienTich:2.93, soHD:"461", ngayKyHD:"12/6/2019", soQĐ:"266/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng; đào múc hồ trái phép; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:28, hoTen:"Nguyễn Thị Kim Hương", diaDiem:"TK 205, PT Trản Táo", dienTich:1.94, soHD:"139", ngayKyHD:"4/6/2004", soQĐ:"67/QĐ-BQLRPHXL", ngayQĐ:"27/10/2025", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Sang nhượng trái phép cho ông Vi Chung Bảo" },
+            { stt:28, hoTen:"Nguyễn Thị Kim Hương", diaDiem:"TK 205, PT Trản Táo", dienTich:1.94, soHD:"139", ngayKyHD:"02/06/2004", soQĐ:"67/QĐ-BQLRPHXL", ngayQĐ:"27/10/2025", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL đã chấm dứt HĐ / thu hồi", ghiChu:"Sang nhượng trái phép cho ông Vi Chung Bảo" },
             { stt:29, hoTen:"Phan Hữu Thành (Làng)", diaDiem:"TK 204, PT Trản Táo", dienTich:2.78, soHD:"175", ngayKyHD:"27/11/2004", soQĐ:"58/QĐ-BQLRPHXL", ngayQĐ:"29/4/2026", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, xây dựng công trình trái phép, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" }
         ];
 
@@ -407,42 +418,44 @@ function pn(s){
 }
 
 function htmlCayCauDienTich(p){
-  // p: object có AC,AD,AE,AF,AP,AQ,AR,AS,AT,AU,AV,AW,AX,AY
+  // Thống nhất KPI: Tổng(AC) = Có rừng(AD) + Chưa có rừng(AC−AD)
+  var tong=p.AC||0, co=p.AD||0;
+  if(co<0.0001 && ((p.AE||0)+(p.AF||0))>0) co=(p.AE||0)+(p.AF||0);
+  var chua=Math.max(0, tong-co);
+  var ap=p.AP||0;
   var trong=(p.AQ||0)+(p.AR||0);
   var html='<div style="margin-top:10px"><b>Cơ cấu diện tích</b></div>';
   html+='<div style="margin-top:6px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;font-size:12px">';
-  // Tổng
-  html+='<div style="display:flex;justify-content:space-between;padding:9px 12px;background:#f0fdf4;font-weight:700"><span>Tổng diện tích</span><span>'+fmt(p.AC||0)+' ha</span></div>';
-  // Có rừng
-  html+='<div style="display:flex;justify-content:space-between;padding:8px 12px;border-top:1px solid #e2e8f0"><span>Đất có rừng</span><b>'+fmt(p.AD||0)+' ha</b></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:9px 12px;background:#f0fdf4;font-weight:700"><span>Tổng diện tích</span><span>'+fmt(tong)+' ha</span></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:8px 12px;border-top:1px solid #e2e8f0"><span>Đất có rừng</span><b>'+fmt(co)+' ha</b></div>';
   html+='<div style="padding:0 12px 6px 28px;color:#64748b;font-size:11px">';
   html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Rừng tự nhiên</span><span>'+fmt(p.AE||0)+' ha</span></div>';
   html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Rừng trồng</span><span>'+fmt(p.AF||0)+' ha</span></div>';
   html+='</div>';
-  // Chưa có rừng
-  html+='<div style="display:flex;justify-content:space-between;padding:8px 12px;border-top:1px solid #e2e8f0"><span>Đất chưa có rừng</span><b>'+fmt(p.AP||0)+' ha</b></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:8px 12px;border-top:1px solid #e2e8f0"><span>Đất chưa có rừng</span><b>'+fmt(chua)+' ha</b></div>';
   html+='<div style="padding:0 12px 6px 28px;color:#64748b;font-size:11px">';
-  html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Đất trống</span><span>'+fmt(trong)+' ha</span></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Cột AP (sheet)</span><span>'+fmt(ap)+' ha</span></div>';
+  html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Đất trống (AQ+AR)</span><span>'+fmt(trong)+' ha</span></div>';
   if(trong>0){
     html+='<div style="padding-left:14px">';
     html+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>• Trong 327, 661</span><span>'+fmt(p.AQ||0)+' ha</span></div>';
     html+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>• Ngoài 327, 661</span><span>'+fmt(p.AR||0)+' ha</span></div>';
     html+='</div>';
   }
-  html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Đất khác</span><span>'+fmt(p.AS||0)+' ha</span></div>';
-  if((p.AS||0)>0){
-    // Sheet thực tế: 46 Ruộng bàu;khe suối | 47 Nhà cửa | 48 Đường sá | 49 Ao hồ | 50 Đ.điện,đ.sắt | 51 Bãi đá
-    var chi=[
-      ['Ruộng bàu; khe suối',p.AT],['Nhà cửa',p.AU],['Đường sá',p.AV],
-      ['Ao, hồ',p.AW],['Đường điện, đường sắt',p.AX],['Bãi đá',p.AY]
-    ].filter(function(x){return (x[1]||0)>0;});
-    if(chi.length){
-      html+='<div style="padding-left:14px">';
-      chi.forEach(function(x){
-        html+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>• '+esc(x[0])+'</span><span>'+fmt(x[1])+' ha</span></div>';
-      });
-      html+='</div>';
-    }
+  html+='<div style="display:flex;justify-content:space-between;padding:3px 0"><span>↳ Đất khác (AS)</span><span>'+fmt(p.AS||0)+' ha</span></div>';
+  var chi=[
+    ['Ruộng bàu; khe suối',p.AT],['Nhà cửa',p.AU],['Đường sá',p.AV],
+    ['Ao, hồ',p.AW],['Đường điện, đường sắt',p.AX],['Bãi đá',p.AY]
+  ].filter(function(x){return (x[1]||0)>0;});
+  if(chi.length){
+    html+='<div style="padding-left:14px">';
+    chi.forEach(function(x){
+      html+='<div style="display:flex;justify-content:space-between;padding:2px 0"><span>• '+esc(x[0])+'</span><span>'+fmt(x[1])+' ha</span></div>';
+    });
+    html+='</div>';
+  }
+  if(Math.abs(chua-ap)>0.05){
+    html+='<div style="margin-top:4px;color:#b45309">Chênh AP vs (Tổng−Có rừng): '+fmt(Math.abs(chua-ap))+' ha — hệ thống dùng Tổng−Có rừng để luôn khớp tổng.</div>';
   }
   html+='</div></div>';
   return html;
@@ -526,7 +539,8 @@ function gviz(id,gid,sheetName){
     var to=setTimeout(function(){cl();reject(new Error('Hết thời gian chờ'));},50000);
     function cl(){clearTimeout(to);try{delete window[cb];}catch(e){}if(sc.parentNode)sc.parentNode.removeChild(sc);}
     window[cb]=function(resp){cl();if(resp&&resp.table)resolve(resp.table);else reject(new Error('Sheet rỗng / lỗi quyền'));};
-    var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=responseHandler:'+cb+'&headers=0';
+    // _t chống cache — luôn lấy bản mới nhất từ Google Sheet
+    var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=responseHandler:'+cb+'&headers=0&_t='+Date.now();
     if(gid!=null&&gid!=='') url+='&gid='+encodeURIComponent(gid);
     if(sheetName) url+='&sheet='+encodeURIComponent(sheetName);
     sc.src=url;sc.onerror=function(){cl();reject(new Error('Không tải được sheet'));};
@@ -835,14 +849,43 @@ function docVP(table){
     var tinhTrang='';
     var tieuKhu='';
     var phanTruong='';
-    // Quét text tìm hành vi / tình trạng
+    var PT_LIST=['trản táo','gia huynh','lán cát','suối cát','bàu hàm','đầm voi','núi le','gia phu'];
+    function pickTK(s){
+      // Chỉ nhận khi có tiền tố TK — tránh nhầm số HĐ (vd. 175)
+      var m=String(s).match(/\bTK\s*([0-9]{2,4}[A-Za-z]?)\b/i);
+      return m?('TK '+m[1].toUpperCase()):'';
+    }
+    function pickPT(s){
+      var low=stripVN(s);
+      for(var pi=0;pi<PT_LIST.length;pi++){
+        if(low.indexOf(PT_LIST[pi])>=0){
+          // Giữ tên gốc gần đúng từ chuỗi
+          var re=new RegExp(PT_LIST[pi].replace(/ /g,'\\s*'),'i');
+          var mm=String(s).match(re);
+          return mm?mm[0].replace(/\s+/g,' ').trim():PT_LIST[pi];
+        }
+      }
+      var m2=String(s).match(/\bPT\s*([A-Za-zÀ-ỹ\s]{2,20})/i);
+      return m2?m2[1].replace(/\s+/g,' ').trim():'';
+    }
+    // Ưu tiên cột địa chỉ / vị trí lâm phận
+    tieuKhu=pickTK(diaChi);
+    phanTruong=pickPT(diaChi);
     parts.forEach(function(p){
-      var s=String(p), low=s.toLowerCase();
-      if(!hanhVi && /(phá|khai thác|sang nhượng|đào|xây|chặt|phá hoại|vi phạm)/i.test(s) && s.length>8 && s.length<180) hanhVi=s;
-      if(!tinhTrang && /(niêm yết|mời|khắc phục|chấm dứt|thu hồi|đã gửi|thông báo|làm việc)/i.test(s) && s.length>6) tinhTrang=s;
-      if(!tieuKhu && /^(TK\s*)?\d{2,4}[A-Z]?$/i.test(s.trim())) tieuKhu=s.trim();
-      if(!phanTruong && /(trản táo|gia huynh|lán cát|suối cát|bàu hàm)/i.test(s)) phanTruong=s;
+      var s=String(p).replace(/\s+/g,' ').trim();
+      if(!s)return;
+      if(!hanhVi && /(phá|khai thác|sang nhượng|đào|xây|chặt|phá hoại|vi phạm)/i.test(s) && s.length>8 && s.length<=220) hanhVi=s;
+      if(!tinhTrang && /(niêm yết|mời|khắc phục|chấm dứt|thu hồi|đã gửi|thông báo|làm việc|hòa giải|tòa án|xét xử)/i.test(s) && s.length>6 && s.length<=220) tinhTrang=s;
+      if(!tieuKhu) tieuKhu=pickTK(s);
+      if(!phanTruong) phanTruong=pickPT(s);
     });
+    // Chuẩn hoá tên PT viết hoa chữ cái đầu
+    if(phanTruong){
+      phanTruong=phanTruong.replace(/\s+/g,' ').trim();
+      phanTruong=phanTruong.replace(/(^|\s)\S/g,function(c){return c.toUpperCase();});
+    }
+    if(hanhVi&&hanhVi.length>200) hanhVi=hanhVi.slice(0,200);
+    if(tinhTrang&&tinhTrang.length>200) tinhTrang=tinhTrang.slice(0,200);
     out.push({
       soHD:soHD, ngayHD:ngayHD, parts:parts, cells:cells,
       hoTen:hoTen, doiTuong:doiTuong, diaChi:diaChi,
@@ -852,33 +895,70 @@ function docVP(table){
   }
   return out;
 }
+function rutGon(s,max){
+  s=String(s||'').replace(/\s+/g,' ').trim();
+  if(!s)return '';
+  max=max||180;
+  if(s.length<=max)return s;
+  return s.slice(0,max).replace(/\s+\S*$/,'')+'…';
+}
+/** Vị trí chuẩn: Tiểu khu · Phân trường (không lẫn tên người) */
+function formatViTriVP(v){
+  if(!v)return '';
+  var tk=v.tieuKhu||'';
+  var pt=v.phanTruong||'';
+  // Bổ sung parse lại nếu bản ghi cũ thiếu
+  if(!tk && v.diaChi){
+    var m=String(v.diaChi).match(/\bTK\s*([0-9]{2,4}[A-Za-z]?)\b/i);
+    if(m) tk='TK '+m[1].toUpperCase();
+  }
+  if(!pt && v.diaChi){
+    var low=stripVN(v.diaChi);
+    var names=['trản táo','gia huynh','lán cát','suối cát','bàu hàm','đầm voi','núi le','gia phu'];
+    for(var i=0;i<names.length;i++){
+      if(low.indexOf(names[i])>=0){
+        pt=names[i].replace(/(^|\s)\S/g,function(c){return c.toUpperCase();});
+        break;
+      }
+    }
+  }
+  if(tk && !/^TK\s/i.test(tk)) tk='TK '+tk;
+  var parts=[];
+  if(tk) parts.push(tk);
+  if(pt) parts.push(pt);
+  // Chỉ dùng diaChi khi trông giống địa điểm (có TK/PT/ấp/xã), không phải tên người
+  if(!parts.length && v.diaChi){
+    var dc=String(v.diaChi).replace(/\s+/g,' ').trim();
+    if(/\b(TK|PT|ấp|xa|xã|phường|tiểu khu|phân trường)\b/i.test(dc)) parts.push(rutGon(dc,80));
+  }
+  return parts.join(' · ');
+}
 function moTaVPHit(v){
   if(!v)return '';
   var lines=[];
-  if(v.hoTen) lines.push('<b>Hộ nhận khoán:</b> '+esc(v.hoTen));
-  if(v.doiTuong&&v.doiTuong!==v.hoTen) lines.push('<b>Đối tượng liên quan:</b> '+esc(v.doiTuong));
-  if(v.diaChi) lines.push('<b>Địa chỉ / vị trí:</b> '+esc(v.diaChi));
-  if(v.tieuKhu||v.phanTruong) lines.push('<b>Vị trí lâm phận:</b> '+[v.tieuKhu?('TK '+v.tieuKhu):'',v.phanTruong].filter(Boolean).map(esc).join(' · '));
-  if(v.hanhVi) lines.push('<b>Hành vi / nội dung:</b> '+esc(v.hanhVi));
-  if(v.tinhTrang) lines.push('<b>Tình trạng xử lý:</b> '+esc(v.tinhTrang));
-  lines.push('<b>HĐ khớp:</b> '+esc(v.soHD)+' · ngày ký '+esc(v.ngayHD||'—'));
-  // Các cột còn lại (rút gọn)
-  var extra=(v.parts||[]).filter(function(p){
-    var s=String(p);
-    return s&&s!==v.hoTen&&s!==v.doiTuong&&s!==v.diaChi&&s!==v.hanhVi&&s!==v.tinhTrang&&s!==v.soHD&&s!==v.ngayHD;
-  }).slice(0,6);
-  if(extra.length) lines.push('<span style="color:#64748b">'+extra.map(esc).join(' · ')+'</span>');
+  var ho=v.hoTen||v.doiTuong||'';
+  if(ho) lines.push('<b>Hộ / đối tượng:</b> '+esc(ho));
+  var vitri=formatViTriVP(v);
+  if(vitri) lines.push('<b>Vị trí:</b> '+esc(vitri));
+  if(v.hanhVi) lines.push('<b>Hành vi:</b> '+esc(rutGon(v.hanhVi,160)));
+  if(v.tinhTrang) lines.push('<b>Xử lý:</b> '+esc(rutGon(v.tinhTrang,160)));
+  if(v.soQĐ||v.ngayQĐ) lines.push('<b>QĐ/TB:</b> '+esc([v.soQĐ,v.ngayQĐ].filter(Boolean).join(' · ')));
+  if(v.soToa||v.ngayToa) lines.push('<b>Tòa:</b> '+esc([v.soToa,v.ngayToa].filter(Boolean).join(' · ')));
+  if(v.dienTich) lines.push('<b>DT liên quan:</b> '+esc(String(v.dienTich))+(String(v.dienTich).indexOf('ha')>=0?'':' ha'));
+  lines.push('<b>HĐ khớp:</b> '+esc(v.soHD||'—')+' · '+esc(v.ngayHD||'—'));
+  if(v.ghiChu) lines.push('<span style="color:#64748b">'+esc(rutGon(v.ghiChu,100))+'</span>');
   return lines.join('<br>');
 }
 function moTaVPHitText(v){
   if(!v)return '';
   var a=[];
   if(v.hoTen) a.push('Hộ: '+v.hoTen);
-  if(v.doiTuong&&v.doiTuong!==v.hoTen) a.push('Đối tượng: '+v.doiTuong);
-  if(v.diaChi) a.push('Địa chỉ: '+v.diaChi);
-  if(v.hanhVi) a.push('Hành vi: '+v.hanhVi);
-  if(v.tinhTrang) a.push('Tình trạng: '+v.tinhTrang);
-  a.push('HĐ '+v.soHD+' · '+v.ngayHD);
+  else if(v.doiTuong) a.push('Đối tượng: '+v.doiTuong);
+  var vitri=formatViTriVP(v);
+  if(vitri) a.push('Vị trí: '+vitri);
+  if(v.hanhVi) a.push('Hành vi: '+rutGon(v.hanhVi,80));
+  if(v.tinhTrang) a.push('Xử lý: '+rutGon(v.tinhTrang,80));
+  a.push('HĐ '+(v.soHD||'—')+' · '+(v.ngayHD||'—'));
   return a.join(' · ');
 }
 
@@ -941,25 +1021,52 @@ function xayHo(){
   ho.sort(function(a,b){return b.tong-a.tong;});
 }
 
-/** CÓ / KHÔNG / CHƯA ĐỦ */
+/** CÓ / KHÔNG / CHƯA ĐỦ — HĐ đã thu hồi mặc định = CÓ VI PHẠM */
 function doiChieu(soHD,ngay){
   if(!normHD(soHD))return{tt:'CHUA',hits:[],msg:'Thiếu số HĐ'};
   if(!normNgay(ngay))return{tt:'CHUA',hits:[],msg:'Thiếu ngày ký'};
-  if(!daTaiVP)return{tt:'CHUA',hits:[],msg:'Chưa tải được bảng vi phạm QLBVR'};
 
   var n=normHD(soHD), nn=normNgay(ngay), hits=[];
-  for(var i=0;i<vpList.length;i++){
-    var v=vpList[i];
-    // BẮT BUỘC khớp đồng thời Số HĐ và Ngày ký.
-    if(normHD(v.soHD)!==n)continue;
-    if(normNgay(v.ngayHD)!==nn)continue;
-    hits.push(v);
+  // 1) HĐ đã thu hồi → mặc định CÓ VI PHẠM
+  var th=doiChieuThuHoi(soHD,ngay);
+  if(th && th.tt==='THUHOI'){
+    var hitTh=th.hit?[{
+      soHD:soHD, ngayHD:ngay,
+      hoTen:(th.hit.hoTen||''),
+      hanhVi:th.hit.viPham||th.hit.ketQua||'Hợp đồng đã thu hồi',
+      tinhTrang:th.msg,
+      tieuKhu:'', phanTruong:'', diaChi:th.hit.diaDiem||'',
+      soQĐ:th.soVB||th.hit.soQD||'', ngayQĐ:th.ngayVB||th.hit.ngayQD||'',
+      ghiChu:th.hit.ghiChu||''
+    }]:[];
+    // Vẫn gom thêm bản ghi từ biểu VP nếu có
+    if(daTaiVP){
+      for(var i=0;i<vpList.length;i++){
+        var v=vpList[i];
+        if(normHD(v.soHD)!==n)continue;
+        if(normNgay(v.ngayHD)!==nn)continue;
+        hits.push(v);
+      }
+    }
+    if(!hits.length) hits=hitTh;
+    return{tt:'CO',hits:hits,msg:'HĐ đã thu hồi → mặc định CÓ VI PHẠM. '+th.msg};
+  }
+
+  if(!daTaiVP)return{tt:'CHUA',hits:[],msg:'Chưa tải được bảng vi phạm QLBVR'};
+
+  for(var j=0;j<vpList.length;j++){
+    var vv=vpList[j];
+    if(normHD(vv.soHD)!==n)continue;
+    if(normNgay(vv.ngayHD)!==nn)continue;
+    hits.push(vv);
   }
   if(hits.length){
-    var toms=hits.slice(0,2).map(function(v){
-      return (v.hoTen?v.hoTen+': ':'')+(v.hanhVi||v.tinhTrang||'có bản ghi vi phạm QLBVR');
+    var toms=hits.slice(0,3).map(function(v){
+      var ten=v.hoTen||v.doiTuong||'';
+      var hv=rutGon(v.hanhVi||v.tinhTrang||'vi phạm QLBVR',60);
+      return ten?(ten+': '+hv):hv;
     }).join('; ');
-    return{tt:'CO',hits:hits,msg:'Khớp '+hits.length+' bản ghi (Số HĐ + Ngày ký). '+toms};
+    return{tt:'CO',hits:hits,msg:'Khớp '+hits.length+' bản ghi (Số HĐ + Ngày ký)'+(toms?'. '+toms:'')};
   }
   return{tt:'KHONG',hits:[],msg:'Không có bản ghi khớp đồng thời Số HĐ + Ngày ký trên biểu vi phạm QLBVR'};
 }
@@ -974,88 +1081,149 @@ function badgeVP(tt){
 function docThuHoi(table){
   if(!table||!table.rows)return [];
   var out=[], rows=table.rows;
-  // Tìm hàng header
   var start=0, map={};
-  for(var r=0;r<Math.min(8,rows.length);r++){
+  for(var r=0;r<Math.min(12,rows.length);r++){
     var labels=[];
-    for(var c=0;c<Math.min(16,(rows[r].c||[]).length);c++) labels.push(stripVN(cell(rows[r],c)));
+    for(var c=0;c<Math.min(20,(rows[r].c||[]).length);c++) labels.push(stripVN(cell(rows[r],c)));
     var joined=labels.join('|');
-    if(joined.indexOf('so hd')>=0||joined.indexOf('so qd')>=0||joined.indexOf('ho ten')>=0||joined.indexOf('quyet dinh')>=0){
+    if(joined.indexOf('so hd')>=0||joined.indexOf('so qd')>=0||joined.indexOf('ho ten')>=0||joined.indexOf('quyet dinh')>=0||joined.indexOf('thong bao')>=0||joined.indexOf('cham dut')>=0){
       start=r+1;
       labels.forEach(function(h,i){
         if(!h)return;
-        if((h.indexOf('so hd')>=0||h==='hd'||h.indexOf('hop dong')>=0)&&map.hd==null)map.hd=i;
-        else if((h.indexOf('ngay ky')>=0||h.indexOf('ngay hd')>=0)&&map.ngayHD==null)map.ngayHD=i;
-        else if((h.indexOf('so qd')>=0||h.indexOf('so tb')>=0||h.indexOf('quyet dinh')>=0||h.indexOf('thong bao')>=0)&&map.qd==null)map.qd=i;
-        else if((h.indexOf('ngay qd')>=0||h.indexOf('ngay tb')>=0||h.indexOf('ngay ban')>=0)&&map.ngayQD==null)map.ngayQD=i;
-        else if((h.indexOf('ho ten')>=0||h.indexOf('ho nhan')>=0||h==='ho')&&map.ho==null)map.ho=i;
+        if((h.indexOf('so hd')>=0||h==='hd'||h.indexOf('hop dong')>=0||h.indexOf('so hop dong')>=0)&&map.hd==null)map.hd=i;
+        else if((h.indexOf('ngay ky')>=0||h.indexOf('ngay hd')>=0||h.indexOf('ngay hop dong')>=0)&&map.ngayHD==null)map.ngayHD=i;
+        else if((h.indexOf('so qd')>=0||h.indexOf('so tb')>=0||h.indexOf('quyet dinh')>=0||h.indexOf('thong bao')>=0||h.indexOf('so van ban')>=0)&&map.qd==null)map.qd=i;
+        else if((h.indexOf('ngay qd')>=0||h.indexOf('ngay tb')>=0||h.indexOf('ngay ban')>=0||h.indexOf('ngay van ban')>=0)&&map.ngayQD==null)map.ngayQD=i;
+        else if((h.indexOf('ho ten')>=0||h.indexOf('ho nhan')>=0||h==='ho'||h.indexOf('ten ho')>=0)&&map.ho==null)map.ho=i;
+        else if((h.indexOf('dia diem')>=0||h.indexOf('vi tri')>=0||h.indexOf('tieu khu')>=0)&&map.dia==null)map.dia=i;
+        else if((h.indexOf('ket qua')>=0||h.indexOf('tinh trang')>=0)&&map.kq==null)map.kq=i;
+        else if(h.indexOf('ghi chu')>=0&&map.gc==null)map.gc=i;
+        else if((h.indexOf('dien tich')>=0||h==='dt')&&map.dt==null)map.dt=i;
       });
       break;
     }
   }
-  // Fallback cột theo layout BQL: A stt, B họ, C địa điểm, D DT, E soHD, F ngayHD, G soQĐ, H ngayQĐ
-  if(map.hd==null) map={ho:1,hd:4,ngayHD:5,qd:6,ngayQD:7};
+  // Fallback layout BQL: A stt, B họ, C địa điểm, D DT, E soHD, F ngayHD, G soQĐ, H ngayQĐ
+  if(map.hd==null) map={ho:1,dia:2,dt:3,hd:4,ngayHD:5,qd:6,ngayQD:7,kq:8,gc:9};
   for(var i=start;i<rows.length;i++){
     var so=cell(rows[i], map.hd!=null?map.hd:4);
     var ngay=cell(rows[i], map.ngayHD!=null?map.ngayHD:5);
     var qd=cell(rows[i], map.qd!=null?map.qd:6);
     var ngayQD=cell(rows[i], map.ngayQD!=null?map.ngayQD:7);
     var ho=cell(rows[i], map.ho!=null?map.ho:1);
-    if(!so&&!qd&&!ho)continue;
-    if(ho&&/danh sach|ten ho|^stt$/i.test(ho))continue;
-    out.push({soHD:so, ngayHD:ngay, soQD:qd, ngayQD:ngayQD, hoTen:ho});
+    var dia=map.dia!=null?cell(rows[i],map.dia):'';
+    var kq=map.kq!=null?cell(rows[i],map.kq):'';
+    var gc=map.gc!=null?cell(rows[i],map.gc):'';
+    if(!normHD(so)&&!qd&&!ho)continue;
+    if(ho&&/danh sach|ten ho|^stt$|ho ten/i.test(ho)&&!normHD(so))continue;
+    // Bỏ dòng header lặp
+    if(/so hd|hop dong/i.test(String(so))&&!/\d/.test(String(so)))continue;
+    out.push({soHD:so, ngayHD:ngay, soQD:qd, ngayQD:ngayQD, hoTen:ho, diaDiem:dia, ketQua:kq, ghiChu:gc});
   }
   return out;
 }
+function thuHoiHopLe(rows){
+  if(!rows||!rows.length)return false;
+  var co=rows.filter(function(r){return normHD(r.soHD)&&(r.soQD||r.ngayQD||r.ketQua);});
+  return co.length>=1;
+}
+function mapFallbackThuHoi(){
+  return (THU_HOI_FALLBACK||[]).filter(function(x){return normHD(x.soHD);}).map(function(x){
+    return {soHD:x.soHD||'', ngayHD:x.ngayKyHD||'', soQD:x.soQĐ||x.soQD||'', ngayQD:x.ngayQĐ||x.ngayQD||'', hoTen:x.hoTen||'', diaDiem:x.diaDiem||'', ketQua:x.ketQua||'', ghiChu:x.ghiChu||'', viPham:x.viPham||'', _src:'fallback'};
+  });
+}
+function keyThuHoi(t){
+  return normHD(t.soHD)+'|'+normNgay(t.ngayHD);
+}
+/** Gộp sheet + danh sách chuẩn: sheet thắng khi trùng; bổ sung bản ghi còn thiếu */
+function gopThuHoi(sheetRows, fallbackRows){
+  var map={}, out=[];
+  function add(t, prefer){
+    if(!normHD(t.soHD))return;
+    var k=keyThuHoi(t);
+    if(!normNgay(t.ngayHD)) k=normHD(t.soHD)+'|';
+    if(map[k] && !prefer) return;
+    map[k]=t;
+  }
+  (fallbackRows||[]).forEach(function(t){add(t,false);});
+  (sheetRows||[]).forEach(function(t){add(Object.assign({_src:'sheet'},t),true);});
+  Object.keys(map).forEach(function(k){out.push(map[k]);});
+  return out;
+}
+/** Tải thu hồi từ đúng tab sheet + bổ sung danh sách chuẩn (không dùng sheet vi phạm) */
 function taiThuHoi(){
-  var names=['Thu hồi HĐ','Thu hồi HD','Thu hoi HD','Thu hồi','THU HOI HD','Chấm dứt HĐ'];
+  thuHoiSource='';
+  thuHoiList=[];
+  var tries=[];
+  // Không dùng VP_GID (sheet vi phạm) — tránh nhận nhầm dữ liệu
+  if(TH_GID && String(TH_GID)!==String(VP_GID)) tries.push({sid:TH_SID||VP_ID, gid:TH_GID, name:null});
+  var names=['Thu hồi HĐ','Thu hồi HD','Thu hoi HD','Thu hồi','THU HOI HD','Chấm dứt HĐ','Cham dut HD','Danh sách thu hồi','DS thu hồi HĐ','DS thu hồi'];
+  names.forEach(function(name){ tries.push({sid:VP_ID, gid:null, name:name}); });
+
   var chain=Promise.resolve(null);
-  names.forEach(function(name){
+  tries.forEach(function(tr){
     chain=chain.then(function(done){
       if(done)return done;
-      return gviz(VP_ID,null,name).then(function(t){
+      return gviz(tr.sid, tr.gid, tr.name).then(function(t){
         var rows=docThuHoi(t);
-        // Chỉ nhận nếu có ít nhất 1 dòng có soQD (đúng layout thu hồi), tránh nhầm sheet khác
-        var coQD=rows.filter(function(r){return r.soQD&&r.soHD;});
-        if(coQD.length>=3){ thuHoiList=rows; return true; }
+        if(thuHoiHopLe(rows)){
+          thuHoiList=rows;
+          thuHoiSource='sheet';
+          if(tr.gid){
+            TH_GID=String(tr.gid);
+            try{localStorage.setItem('lamba_th_gid', TH_GID);}catch(e){}
+          }
+          console.log('[Thu hồi] Sheet OK ·', rows.length, 'dòng', tr.name||('gid='+tr.gid));
+          return true;
+        }
         return null;
       }).catch(function(){return null;});
     });
   });
   return chain.then(function(ok){
-    if(!ok || !(thuHoiList&&thuHoiList.length)){
-      thuHoiList=(THU_HOI_FALLBACK||[]).map(function(x){
-        return {soHD:x.soHD||'', ngayHD:x.ngayKyHD||'', soQD:x.soQĐ||x.soQD||'', ngayQD:x.ngayQĐ||x.ngayQD||'', hoTen:x.hoTen||'', ketQua:x.ketQua||'', ghiChu:x.ghiChu||''};
-      });
+    var fb=mapFallbackThuHoi();
+    if(ok && thuHoiList.length){
+      var before=thuHoiList.length;
+      thuHoiList=gopThuHoi(thuHoiList, fb);
+      thuHoiSource='sheet';
+      console.log('[Thu hồi] Gộp sheet+chuẩn:', before, '→', thuHoiList.length);
+      return thuHoiList;
     }
+    thuHoiList=fb;
+    thuHoiSource='fallback';
+    console.warn('[Thu hồi] Dùng dữ liệu dự phòng ·', thuHoiList.length, 'dòng');
     return thuHoiList;
   });
 }
+/** Thu hồi chỉ khi khớp ĐỒNG THỜI Số HĐ + Ngày ký (tránh trùng số HĐ khác năm) */
 function doiChieuThuHoi(soHD,ngay){
   var n=normHD(soHD), nn=normNgay(ngay);
   if(!n) return {tt:'CHUA', msg:'Thiếu số HĐ để đối chiếu thu hồi', hit:null};
-  if(!nn) return {tt:'HIEULUC', msg:'Còn hiệu lực: chưa có ngày ký để tạo một kết quả thu hồi trùng khớp.', hit:null};
-  if(!thuHoiList||!thuHoiList.length) return {tt:'HIEULUC', msg:'Còn hiệu lực: chưa có dữ liệu thu hồi khớp Số HĐ + Ngày ký.', hit:null};
+  if(!nn) return {tt:'HIEULUC', msg:'Còn hiệu lực: thiếu ngày ký — bắt buộc khớp cả Số HĐ và Ngày ký.', hit:null};
+  if(!thuHoiList||!thuHoiList.length) return {tt:'HIEULUC', msg:'Còn hiệu lực: chưa có dữ liệu thu hồi.', hit:null};
 
   for(var i=0;i<thuHoiList.length;i++){
     var t=thuHoiList[i];
     if(normHD(t.soHD)!==n) continue;
     var tn=normNgay(t.ngayHD);
-    // Chỉ khi Số HĐ và Ngày ký cùng khớp mới xác định là đã thu hồi.
-    if(tn && tn===nn){
-      var soVB=t.soQD||'—';
-      var ngayVB=t.ngayQD||'';
-      var loai=/tb[\s\-]|thong bao/i.test(String(soVB))?'thông báo':'quyết định';
-      return {tt:'THUHOI', msg:'HĐ đã thu hồi theo '+loai+' số '+soVB+(ngayVB?' ngày '+ngayVB:''), hit:t, soVB:soVB, ngayVB:ngayVB};
-    }
+    if(!tn || tn!==nn) continue;
+    var soVB=t.soQD||'—';
+    var ngayVB=t.ngayQD||'';
+    var loai=/tb[\s\-]|thong bao/i.test(String(soVB))?'thông báo':'quyết định';
+    return {tt:'THUHOI', msg:'HĐ đã thu hồi theo '+loai+' số '+soVB+(ngayVB?' ngày '+ngayVB:''), hit:t, soVB:soVB, ngayVB:ngayVB};
   }
 
-  // Số HĐ có thể trùng nhưng nếu ngày ký không trùng thì hợp đồng hiện tại được xem là CÒN HIỆU LỰC.
+  // Có cùng số HĐ nhưng khác ngày ký → không phải HĐ này
   var sameSo=thuHoiList.filter(function(t){return normHD(t.soHD)===n;});
   if(sameSo.length){
-    return {tt:'HIEULUC', msg:'Còn hiệu lực: số HĐ có trong danh sách thu hồi nhưng ngày ký không trùng với HĐ này.', hit:null, ngayThuHoi:sameSo.map(function(t){return t.ngayHD||'';}).filter(Boolean)};
+    return {
+      tt:'HIEULUC',
+      msg:'Còn hiệu lực: số HĐ trùng trên sổ thu hồi nhưng ngày ký không khớp (sổ: '+sameSo.map(function(t){return t.ngayHD||'—';}).join(', ')+').',
+      hit:null,
+      ngayThuHoi:sameSo.map(function(t){return t.ngayHD||'';}).filter(Boolean)
+    };
   }
-  return {tt:'HIEULUC', msg:'Còn hiệu lực: không có bản ghi thu hồi khớp đồng thời Số HĐ + Ngày ký.', hit:null};
+  return {tt:'HIEULUC', msg:'Còn hiệu lực: không có bản ghi thu hồi khớp Số HĐ + Ngày ký.', hit:null};
 }
 function badgeTT(tt){
   if(tt==='THUHOI')return'<span class="tag vp-co"><i class="fa-solid fa-circle-check"></i> ĐÃ THU HỒI</span>';
@@ -1103,14 +1271,21 @@ function taiLai(silent){
     var ct=docChinhThuc(res[2]);if(ct)chinhThuc=ct;
     vpList=res[3]?docVP(res[3]):[];
     xayHopDong();xayHo();
-    console.log("[Thu hồi HĐ]", (thuHoiList||[]).length, "hồ sơ");
+    console.log("[Thu hồi HĐ]", (thuHoiList||[]).length, "hồ sơ · nguồn:", thuHoiSource||'?');
     lastSync=new Date();
     napBoLoc();
     apDungTrangThai(st);
     veLai();
     var sumAC=aggregateAreaUnits(dong).area.AC;
-    if(!silent) toast('Đã tải '+dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+hopDong.length+' hợp đồng');
-    document.getElementById('syncTxt').textContent=dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+lastSync.toLocaleTimeString('vi-VN');
+    var nTH=(thuHoiList||[]).filter(function(t){return normHD(t.soHD);}).length;
+    var nVP=(vpList||[]).length;
+    var srcTH=thuHoiSource==='sheet'?'sheet':'dự phòng';
+    if(!silent){
+      toast('Đã tải '+dong.length.toLocaleString('vi-VN')+' dòng · '+hopDong.length+' HĐ · '+nTH+' thu hồi ('+srcTH+') · '+nVP+' VP');
+    }
+    document.getElementById('syncTxt').textContent=
+      dong.length.toLocaleString('vi-VN')+' dòng · '+fmt(sumAC)+' ha · '+
+      nTH+' thu hồi ('+srcTH+') · '+lastSync.toLocaleTimeString('vi-VN');
   }).catch(function(e){console.error(e);if(!silent)toast(e.message||'Lỗi tải');})
   .then(function(){if(ic)ic.classList.remove('fa-spin');});
 }
@@ -1197,12 +1372,11 @@ function rowHasCay(p,cay,nam){
   return okC&&okN;
 }
 function buildUnits(rows){
-  // Mỗi dòng đã parse = 1 đơn vị diện tích (kể cả dòng thiếu STT có AC).
-  // Không gộp max theo khóa — nếu gộp sẽ thiếu ~0,5 ha (ĐN) và lệch LĐ khi trùng STT.
-  return (rows||[]).map(function(p, idx){
+  // Chỉ dòng cha có diện tích (bỏ dòng loài phụ isChild) — tránh cộng trùng.
+  return (rows||[]).filter(function(p){return !p.isChild;}).map(function(p, idx){
     var u={
       key: p.id || (String(p.tinh||'')+'-'+String(p.stt||idx)+'-'+idx),
-      rows:[p],
+      rows:[p].concat(p.children||[]),
       AC:p.AC||0,AD:p.AD||0,AE:p.AE||0,AF:p.AF||0,AP:p.AP||0,
       AQ:p.AQ||0,AR:p.AR||0,AS:p.AS||0,AT:p.AT||0,AU:p.AU||0,
       AV:p.AV||0,AW:p.AW||0,AX:p.AX||0,AY:p.AY||0,
@@ -1225,6 +1399,7 @@ function filteredUnits(){
   var fPT=document.getElementById('fPT').value,fDT=document.getElementById('fDT').value,fQH=document.getElementById('fQH').value;
   var fCay=document.getElementById('fCay').value,fNam=document.getElementById('fNam').value;
   var base=dong.filter(function(p){
+    if(p.isChild)return false;
     if(tinh!=='ALL'&&p.tinh!==tinh)return false;
     if(fPT&&p.phanTruong!==fPT)return false;
     if(fDT&&p.dtsd!==fDT)return false;
@@ -1253,23 +1428,26 @@ function veTongQuan(list){
       var names=[];if(r.loaiCay)names.push([r.loaiCay,r.namTrong]);if(r.cayKhac)names.push([r.cayKhac,r.namCayKhac]);
       names.forEach(function(z){var fc=document.getElementById('fCay').value,fn=document.getElementById('fNam').value;if(!rowHasCay({loaiCay:z[0],namTrong:z[1],cayKhac:'',namCayKhac:''},fc,fn))return;var sk=z[0]+'||'+(z[1]||'');if(!species[sk])species[sk]={cay:z[0],nam:z[1]||'',ho:{},hd:{},unit:{}};var sp=species[sk];if(r.dtsd==='GK'&&keyHo(r))sp.ho[keyHo(r)]=1;if(r.maHD)sp.hd[r.maHD]=1;sp.unit[u.key]=1;});
     });
-    area.AC+=u.AC;area.AD+=u.AD;area.AE+=u.AE;area.AF+=u.AF;area.AP+=u.AP;area.AQ+=u.AQ;area.AR+=u.AR;area.AS+=u.AS;area.AT+=u.AT;area.AU+=u.AU;area.AV+=u.AV;area.AW+=u.AW;area.AX+=u.AX;area.AY+=u.AY;area.tong=area.AC;area.co=area.AD;area.chua=area.AP;area.tn=area.AE;area.tt=area.AF;
+    area.AC+=u.AC;area.AD+=u.AD;area.AE+=u.AE;area.AF+=u.AF;area.AP+=u.AP;
+    area.AQ+=u.AQ;area.AR+=u.AR;area.AS+=u.AS;area.AT+=u.AT;area.AU+=u.AU;
+    area.AV+=u.AV;area.AW+=u.AW;area.AX+=u.AX;area.AY+=u.AY;
     var pt=u.phanTruong||'Chưa xác định';pm[pt]=(pm[pt]||0)+u.AC;
     var q=u.qh||'Chưa xác định';qh[q]=(qh[q]||0)+u.AC;
     var v=u.von||'Chưa xác định';von[v]=(von[v]||0)+u.AC;
   });
-  var thTong=chinhThuc.tong||0, thDn=chinhThuc.dn||0, thLd=chinhThuc.ld||0;
-  var hasFilter=!!(document.getElementById('q').value||document.getElementById('fPT').value||document.getElementById('fDT').value||document.getElementById('fQH').value||(document.getElementById('fCay')&&document.getElementById('fCay').value)||(document.getElementById('fNam')&&document.getElementById('fNam').value));
+  // Quy tắc đúng: Tổng (AC) = Đất có rừng + Đất chưa có rừng
+  // Có rừng = AD (fallback AE+AF nếu AD trống). Chưa có rừng = Tổng − Có rừng.
+  area.tong=area.AC;
+  area.co=area.AD;
+  if((area.co||0)<0.0001 && ((area.AE||0)+(area.AF||0))>0) area.co=area.AE+area.AF;
+  area.chua=Math.max(0, (area.tong||0) - (area.co||0));
+  area.tn=area.AE;area.tt=area.AF;
+
   var showTong=area.tong;
-  if(!hasFilter&&tinh==='ALL'&&thTong>0) showTong=thTong;
-  else if(!hasFilter&&tinh==='DN'&&thDn>0) showTong=thDn;
-  else if(!hasFilter&&tinh==='LD'&&thLd>0) showTong=thLd;
-  var subTong = tinh==='DN' ? 'Đồng Nai' : (tinh==='LD' ? 'Lâm Đồng' : ('ĐN '+fmt(thDn||area.tong)+' · LĐ '+fmt(thLd)));
   document.getElementById('kpis').innerHTML=
     '<div class="kpi t"><div class="l">Tổng diện tích</div><div class="v">'+fmt(showTong)+' ha</div></div>'+
     '<div class="kpi d"><div class="l">Đất có rừng</div><div class="v">'+fmt(area.co)+' ha</div></div>'+
-    '<div class="kpi l"><div class="l">Đất chưa có rừng</div><div class="v">'+fmt(area.chua)+' ha</div></div>'+
-    '<div class="kpi"><div class="l">Hộ · Hợp đồng · Đơn vị</div><div class="v" style="font-size:17px">'+Object.keys(hoSet).length+' · '+Object.keys(hdSet).length+' · '+units.length.toLocaleString('vi-VN')+'</div></div>';
+    '<div class="kpi l"><div class="l">Đất chưa có rừng</div><div class="v">'+fmt(area.chua)+' ha</div></div>';
 
   function destroy(k){if(charts[k]){charts[k].destroy();charts[k]=null;}}
   function chart(id,k,type,labels,data){destroy(k);var el=document.getElementById(id);if(!el||typeof Chart==='undefined')return;charts[k]=new Chart(el,{type:type,data:{labels:labels,datasets:[{data:data,borderWidth:0,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},scales:type==='bar'?{y:{beginAtZero:true}}:{}}});}
@@ -1283,11 +1461,38 @@ function veTongQuan(list){
   var vkeys=Object.keys(von).sort(function(a,b){return von[b]-von[a];});chart('cVon','von','bar',vkeys,vkeys.map(function(k){return von[k];}));
   var spRows=Object.keys(species).map(function(k){var x=species[k];return{x:x.cay,n:x.nam,ho:Object.keys(x.ho).length,hd:Object.keys(x.hd).length,unit:Object.keys(x.unit).length};}).sort(function(a,b){return b.unit-a.unit||a.x.localeCompare(b.x,'vi');});
   var ci=document.getElementById('cayInfo');if(ci)ci.textContent=(document.getElementById('fCay').value||document.getElementById('fNam').value)?'Đang lọc':'';
-  var tc=document.getElementById('tbCay');if(tc)tc.innerHTML=spRows.slice(0,100).map(function(x){return'<tr><td>'+esc(x.x)+'</td><td>'+esc(x.n||'—')+'</td><td class="r"><b>'+x.ho+'</b></td><td class="r">'+x.hd+'</td><td class="r">'+x.unit+'</td></tr>';}).join('')||'<tr><td colspan="5" class="muted">Chưa có dữ liệu loài cây</td></tr>';
+  var tc=document.getElementById('tbCay');if(tc)tc.innerHTML=spRows.slice(0,100).map(function(x){return'<tr><td>'+esc(x.x)+'</td><td>'+esc(x.n||'—')+'</td><td class="r"><b>'+x.ho+'</b></td><td class="r">'+x.hd+'</td></tr>';}).join('')||'<tr><td colspan="4" class="muted">Chưa có dữ liệu loài cây</td></tr>';
 
-  var ag={};units.forEach(function(u){var k=u.tinh+'||'+(u.phanTruong||'Chưa xác định');if(!ag[k])ag[k]={tinh:u.tinh,pt:u.phanTruong||'Chưa xác định',n:0,dt:0,co:0,gk:0,bql:0,ldlk:0};var a=ag[k];a.n++;a.dt+=u.AC;a.co+=u.AD;if(u.dtsd==='GK')a.gk++;else if(u.dtsd==='BQL')a.bql++;else if(u.dtsd==='LDLK')a.ldlk++;});
+  var ag={};
+  units.forEach(function(u){
+    var k=u.tinh+'||'+(u.phanTruong||'Chưa xác định');
+    if(!ag[k])ag[k]={tinh:u.tinh,pt:u.phanTruong||'Chưa xác định',dt:0,co:0,gk:0,bql:0,ldlk:0,khac:0,ho:{},hd:{}};
+    var a=ag[k];
+    a.dt+=u.AC;
+    a.co+=(u.AD||0);
+    if(u.dtsd==='GK')a.gk+=u.AC;
+    else if(u.dtsd==='BQL')a.bql+=u.AC;
+    else if(u.dtsd==='LDLK')a.ldlk+=u.AC;
+    else a.khac+=u.AC;
+    (u.rows||[]).forEach(function(r){
+      if(r.dtsd==='GK'&&keyHo(r))a.ho[keyHo(r)]=1;
+      if(r.maHD)a.hd[r.maHD]=1;
+    });
+  });
   var rows=Object.keys(ag).map(function(k){return ag[k];}).sort(function(a,b){return b.dt-a.dt;});
-  document.getElementById('tbPT').innerHTML=rows.map(function(a){return'<tr><td><span class="tag '+(a.tinh==='LD'?'ld':'dn')+'">'+(a.tinh==='LD'?'Lâm Đồng':'Đồng Nai')+'</span></td><td>'+esc(a.pt)+'</td><td class="r">'+a.n+'</td><td class="r"><b>'+fmt(a.dt)+'</b></td><td class="r">'+fmt(a.co)+'</td><td class="r">'+a.gk+'</td><td class="r">'+a.bql+'</td><td class="r">'+a.ldlk+'</td></tr>';}).join('')||'<tr><td colspan="8" class="muted">Không có dữ liệu</td></tr>';
+  // Tổng dòng bảng PT phải khớp KPI tổng / có rừng
+  var sumPT=rows.reduce(function(s,a){return s+a.dt;},0);
+  var sumCo=rows.reduce(function(s,a){return s+a.co;},0);
+  var foot='';
+  if(Math.abs(sumPT-(area.tong||0))>0.05 || Math.abs(sumCo-(area.co||0))>0.05){
+    foot='<tr style="background:#fffbeb"><td colspan="9" style="font-size:11px;color:#92400e">Cảnh báo: tổng bảng PT ('+fmt(sumPT)+' ha · có rừng '+fmt(sumCo)+') lệch KPI ('+fmt(area.tong)+' · '+fmt(area.co)+')</td></tr>';
+  }
+  document.getElementById('tbPT').innerHTML=rows.map(function(a){
+    return'<tr><td><span class="tag '+(a.tinh==='LD'?'ld':'dn')+'">'+(a.tinh==='LD'?'Lâm Đồng':'Đồng Nai')+'</span></td><td>'+esc(a.pt)+'</td>'+
+      '<td class="r"><b>'+fmt(a.dt)+'</b></td><td class="r">'+fmt(a.co)+'</td>'+
+      '<td class="r">'+fmt(a.gk)+'</td><td class="r">'+fmt(a.bql)+'</td><td class="r">'+fmt(a.ldlk)+'</td>'+
+      '<td class="r">'+Object.keys(a.ho).length+'</td><td class="r">'+Object.keys(a.hd).length+'</td></tr>';
+  }).join('')+foot||'<tr><td colspan="9" class="muted">Không có dữ liệu</td></tr>';
 }
 function veHo(){
   var q=(document.getElementById('q').value||'').toLowerCase().trim();
@@ -1301,9 +1506,9 @@ function veHo(){
     return'<tr><td>'+(i+1)+'</td><td><b>'+esc(h.ten)+'</b></td>'+
       '<td style="font-size:11px;color:#64748b">'+esc(h.hoDungTen||'—')+'<br>'+esc(h.hoBanDau||'—')+'</td>'+
       '<td style="font-size:11px;color:#64748b">'+esc(h.dc)+'</td>'+
-      '<td class="r">'+h.dong.length+'</td><td class="r">'+Object.keys(h.hd).length+'</td><td class="r"><b>'+fmt(h.tong)+'</b></td>'+
+      '<td class="r">'+Object.keys(h.hd).length+'</td><td class="r"><b>'+fmt(h.tong)+'</b></td>'+
       '<td><button type="button" class="btn btn-o" style="height:28px;font-size:11px" onclick=\'xemHo('+JSON.stringify(h.key)+')\'>Xem</button></td></tr>';
-  }).join('')||'<tr><td colspan="8" class="muted">Không có hộ</td></tr>';
+  }).join('')||'<tr><td colspan="7" class="muted">Không có hộ</td></tr>';
 }
 
 function veHD(){
@@ -1398,10 +1603,12 @@ function traCuuVP(){
   h+='<div class="vp-card '+cls+'">';
   h+='<div class="vp-head">'+badgeVP(dc.tt)+'<span style="font-size:12px;color:#64748b">'+esc(dc.msg)+'</span></div>';
   if(dc.hits&&dc.hits.length){
-    h+='<div style="font-size:11px;font-weight:700;color:#b91c1c;margin:4px 0 2px">Chi tiết bản ghi vi phạm khớp ('+dc.hits.length+')</div>';
-    dc.hits.slice(0,12).forEach(function(v,i){
-      h+='<div class="vp-hit"><div style="font-weight:700;color:#0f172a;margin-bottom:4px">'+(i+1)+'. '+(v.hoTen?esc(v.hoTen):'Bản ghi vi phạm')+'</div>'+moTaVPHit(v)+'</div>';
+    h+='<div style="font-size:11px;font-weight:700;color:#b91c1c;margin:8px 0 4px">Chi tiết vi phạm khớp ('+dc.hits.length+')</div>';
+    dc.hits.slice(0,8).forEach(function(v,i){
+      var ten=v.hoTen||v.doiTuong||('Bản ghi '+(i+1));
+      h+='<div class="vp-hit"><div style="font-weight:700;color:#0f172a;margin-bottom:3px">'+(i+1)+'. '+esc(ten)+'</div>'+moTaVPHit(v)+'</div>';
     });
+    if(dc.hits.length>8) h+='<div style="font-size:11px;color:#94a3b8;padding:6px 0">… và '+(dc.hits.length-8)+' bản ghi khác</div>';
   }
 
   h+='<div class="vp-actions">';
@@ -1510,7 +1717,17 @@ window.xemHD=function(ma){
       if(!multiUser) html+='<div style="font-size:11px;color:#64748b">Người sử dụng: <b>'+esc(m.p.hoHienTai||'—')+'</b></div>';
       html+='<div style="font-size:11px;color:#64748b">Nguồn vốn: <b>'+esc(vonCode||m.von||'—')+'</b>'+(m.von&&m.von!==vonCode?' ('+esc(m.von)+')':'')+'</div>';
       html+='<div style="font-size:11px;color:#64748b">Có rừng '+fmt(m.ad)+' (TN '+fmt(m.ae)+' · trồng '+fmt(m.af)+')'+(m.ap?' · Chưa có rừng '+fmt(m.ap):'')+'</div>';
-      html+='<div style="font-size:11px;color:#64748b">Thửa '+esc(m.thua||'—')+' · Tờ BĐ '+esc(m.toBD||'—')+' · <b>Lô '+esc(m.lo||'—')+'</b> · Khoảnh '+esc(m.khoanh||'—')+' · TK '+esc(m.tk||'—')+' · '+esc(m.pt||'')+(m.xa?' · '+esc(m.xa):'')+'</div>';
+      var locParts=[];
+      if(m.thua) locParts.push('Thửa <b>'+esc(m.thua)+'</b>');
+      if(m.toBD) locParts.push('Tờ BĐ <b>'+esc(m.toBD)+'</b>');
+      if(m.lo) locParts.push('<b>Lô '+esc(m.lo)+'</b>');
+      if(m.khoanh) locParts.push('Khoảnh '+esc(m.khoanh));
+      if(m.tk) locParts.push('TK '+esc(m.tk));
+      if(m.pt) locParts.push(esc(m.pt));
+      if(m.xa) locParts.push(esc(m.xa));
+      if(!locParts.length) locParts.push('Chưa có vị trí thửa/lô');
+      html+='<div style="font-size:11px;color:#64748b">'+locParts.join(' · ')+'</div>';
+      if(!m.thua&&(m.lo||m.tk)) html+='<div style="font-size:10px;color:#94a3b8">Thửa địa chính (cột B): chưa ghi trên dòng này</div>';
       if(m.soTR) html+='<div style="font-size:11px">HĐTR '+esc(m.soTR)+(m.ngayTR?' · '+esc(m.ngayTR):'')+(m.dtTR?' · '+fmt(m.dtTR)+' ha':'')+'</div>';
       if(m.p.soVNN) html+='<div style="font-size:11px">HĐ VNN '+esc(m.p.soVNN)+(m.p.ngayVNN?' · '+esc(m.p.ngayVNN):'')+(m.p.dtVNN?' · '+fmt(m.p.dtVNN)+' ha':'')+'</div>';
       if(m.loai.length){
@@ -1544,6 +1761,39 @@ window.xemHD=function(ma){
   html+=htmlCayCauDienTich(sum);
   moMD('Hồ sơ hợp đồng', html);
 };
+/** Tóm tắt hiện trạng / loài cây theo danh sách dòng (dùng ở chi tiết hộ) */
+function htmlHienTrangCay(rows){
+  rows=rows||[];
+  var parents=rows.filter(function(p){return !p.isChild;});
+  if(!parents.length) parents=rows;
+  var byMH={};
+  parents.forEach(function(p){
+    var k=(p.AH||'Không rõ mô hình').trim()||'Không rõ mô hình';
+    if(!byMH[k]) byMH[k]={ten:k,ha:0,n:0,loai:{}};
+    byMH[k].ha+=(p.AC||0); byMH[k].n++;
+    tatCaLoaiCuaDong(p).forEach(function(x){
+      var lk=(x.loai||'')+'|'+(x.nam||'');
+      if(!byMH[k].loai[lk]) byMH[k].loai[lk]={loai:x.loai,nam:x.nam,nhom:x.nhom};
+    });
+  });
+  var keys=Object.keys(byMH);
+  if(!keys.length) return '';
+  var h='<div style="margin-top:12px"><b>Hiện trạng / mô hình</b></div>';
+  h+='<div style="font-size:12px;margin-top:4px">';
+  keys.forEach(function(k){
+    var m=byMH[k];
+    h+='<div style="padding:6px 0;border-bottom:1px solid #f1f5f9"><b>'+esc(m.ten)+'</b> · '+fmt(m.ha)+' ha · '+m.n+' lô';
+    var ls=Object.keys(m.loai).map(function(x){return m.loai[x];});
+    if(ls.length){
+      h+='<div style="color:#64748b;font-size:11px;margin-top:2px">'+ls.slice(0,8).map(function(x){
+        return esc(x.loai)+(x.nam?' ('+esc(x.nam)+')':'');
+      }).join(' · ')+(ls.length>8?' …':'')+'</div>';
+    }
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
 window.xemHo=function(key){
   var h=null;for(var i=0;i<ho.length;i++)if(ho[i].key===key){h=ho[i];break;}
   if(!h)return;
