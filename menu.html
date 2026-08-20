@@ -157,7 +157,20 @@
             font-size: 0.7rem;
             color: #475569;
         }
-    </style>
+    
+/* Motto ticker */
+.motto-ticker{position:fixed;left:0;right:0;bottom:0;z-index:9999;height:30px;overflow:hidden;background:linear-gradient(90deg,#022c22 0%,#064e3b 40%,#0f766e 70%,#064e3b 100%);border-top:1px solid rgba(167,243,208,.25);box-shadow:0 -3px 14px rgba(6,78,59,.2);display:flex;align-items:center}
+.motto-ticker .motto-track{display:flex;align-items:center;width:max-content;animation:motto-scroll 40s linear infinite;white-space:nowrap}
+.motto-ticker:hover .motto-track{animation-play-state:paused;cursor:default}
+.motto-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px;font-size:13px;font-weight:600;letter-spacing:.02em;color:#ecfdf5}
+.motto-item i{color:#6ee7b7;font-size:12px}
+.motto-sep{color:rgba(167,243,208,.45);padding:0 8px;font-size:10px}
+@keyframes motto-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+body{padding-bottom:30px!important}
+.contact-fab-wrap{bottom:48px!important}
+@media print{.motto-ticker{display:none!important}}
+
+</style>
 </head>
 <body>
     <div class="wrap">
@@ -192,15 +205,19 @@
                 <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
             </a>
         </div>
+</div>
+<footer style="color: #006400; -webkit-text-stroke: 0.4px #ffffff;">
+    BQLRPH Xuân Lộc · Phòng Lâm nghiệp
+</footer>
+</div>
+<div class="motto-ticker" id="mottoTicker" aria-hidden="true">
+  <div class="motto-track">
+    <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
+    <span class="motto-sep">◆</span>
+    <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
+    <span class="motto-sep">◆</span>
+  </div>
+</div>
 
-        <p class="hint">
-            Các module tra cứu chéo theo tên hộ / tiểu khu / số HĐ.<br>
-            Nên mở từ trang này để giữ đường dẫn tương đối.
-        </p>
-
-        <footer>
-            BQLRPH Xuân Lộc · Phòng Lâm nghiệp
-        </footer>
-    </div>
 </body>
 </html>
