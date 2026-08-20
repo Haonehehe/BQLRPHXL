@@ -62,11 +62,11 @@ textarea{height:120px;padding:8px 10px;resize:vertical;line-height:1.45}
 .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px}
 .thumb{border:2px solid var(--bd);border-radius:12px;background:#fff;overflow:hidden;cursor:pointer;position:relative}
 .thumb:hover{border-color:#a78bfa}.thumb.sel{border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,.2)}
-.thumb .cv-wrap{aspect-ratio:3/4;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.thumb canvas{max-width:100%;max-height:100%;display:block}
+.thumb .cv-wrap{aspect-ratio:3/4;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:120px}
+.thumb canvas{max-width:100%;max-height:100%;display:block;object-fit:contain}
 .thumb .info{padding:6px 8px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f1f5f9;font-size:11px;font-weight:700}
 .thumb .info .ops{display:flex;gap:2px}
-.thumb .info button{width:24px;height:24px;border-radius:6px;border:1px solid var(--bd);background:#fff;font-size:10px;display:grid;place-items:center}
+.thumb .info button{width:24px;height:24px;border-radius:6px;border:1px solid var(--bd);background:#fff;font-size:10px;display:grid;place-items:center}.thumb .info button[data-act="rot-cw"],.thumb .info button[data-act="rot-ccw"]{color:#7c3aed;border-color:#ddd6fe;background:#f5f3ff}
 
 .thumb.dragging{opacity:.45;border-style:dashed}
 .thumb.drag-over{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.25);transform:scale(1.03)}
@@ -199,7 +199,7 @@ textarea{height:120px;padding:8px 10px;resize:vertical;line-height:1.45}
 
   <!-- XOAY -->
   <div class="panel" id="p-xoay">
-    <div class="hint"><b>Xoay:</b> chọn trang → góc → tải về.</div>
+    <div class="hint"><b>Xoay:</b> bấm <b>↺ ↻</b> ngay dưới mỗi trang để xoay · xem thumbnail đổi hướng · rồi <b>Tải bản đã xoay</b>.</div>
     <div class="card"><div class="card-h">File nguồn</div><div class="card-b">
       <div class="drop" id="dropXoay" onclick="document.getElementById('inpXoay').click()"><i class="fa-solid fa-rotate"></i><p>Chọn PDF cần xoay</p></div>
       <input type="file" id="inpXoay" accept="application/pdf,.pdf" hidden>
@@ -213,11 +213,22 @@ textarea{height:120px;padding:8px 10px;resize:vertical;line-height:1.45}
         </div>
       </div>
       <div class="toolbar" id="toolXoay" style="display:none">
+        <button class="btn btn-g" type="button" onclick="taiBanXoayHienTai()"><i class="fa-solid fa-download"></i> Tải bản đã xoay</button>
         <button class="btn btn-o btn-sm" type="button" onclick="chonTatXoay(true)">Chọn hết</button>
         <button class="btn btn-o btn-sm" type="button" onclick="chonTatXoay(false)">Bỏ chọn</button>
-        <button class="btn btn-v" type="button" onclick="lamXoay()"><i class="fa-solid fa-download"></i> Xoay &amp; tải về</button>
+        <button class="btn btn-v btn-sm" type="button" onclick="taoXemTruocXoay()"><i class="fa-solid fa-eye"></i> Xoay hàng loạt + xem trước</button>
+        <button class="btn btn-o btn-sm" type="button" onclick="resetXoay()"><i class="fa-solid fa-rotate-left"></i> Đặt lại gốc</button>
       </div>
       <div id="thumbsXoay" class="thumbs"></div>
+      <div class="preview-box" id="pvXoay">
+        <h3><i class="fa-solid fa-eye"></i> Bản xem trước sau xoay</h3>
+        <div class="sub" id="pvXoaySub">Kiểm tra hướng trang · kéo-thả / ↑↓ nếu cần · rồi tải về</div>
+        <div class="toolbar">
+          <button class="btn btn-g" type="button" onclick="taiKetQuaXoay()"><i class="fa-solid fa-download"></i> Tải về PDF</button>
+          <button class="btn btn-o btn-sm" type="button" onclick="huyPvXoay()">Hủy</button>
+        </div>
+        <div id="thumbsPvXoay" class="thumbs"></div>
+      </div>
     </div></div>
   </div>
 
@@ -291,6 +302,8 @@ var pv={bytes:null,pdfjs:null,page:0,total:0,scale:1.3,title:''};
 /* Kết quả tạm (xem trước trước khi tải) */
 var draftNoi={bytes:null,pdfjs:null,order:[],fileName:''};
 var draftTach={bytes:null,pdfjs:null,order:[],fileName:''};
+var draftXoay={bytes:null,pdfjs:null,order:[],fileName:''};
+var workingXoay={bytes:null,pdfjs:null}; // bản đang chỉnh xoay từng trang
 
 function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},3000);}
 function fmtSize(n){if(n<1024)return n+' B';if(n<1048576)return (n/1024).toFixed(1)+' KB';return (n/1048576).toFixed(2)+' MB';}
@@ -366,6 +379,7 @@ async function veThumbs(containerId,pdfjsDoc,pageCount,opts){
       '<span class="badge">Trang '+(pi+1)+'</span><div class="cv-wrap"><canvas></canvas></div><div class="info"><span>#'+(pos+1)+'</span><div class="ops">'+
       (opts.selectable?'<button type="button" data-act="sel" title="Chọn"><i class="fa-solid fa-check"></i></button>':'')+
       (opts.reorder?'<button type="button" data-act="up" title="Lên"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-act="down" title="Xuống"><i class="fa-solid fa-arrow-down"></i></button>':'')+
+      (opts.perPageRotate?'<button type="button" data-act="rot-ccw" title="Xoay trái 90°"><i class="fa-solid fa-rotate-left"></i></button><button type="button" data-act="rot-cw" title="Xoay phải 90°"><i class="fa-solid fa-rotate-right"></i></button>':'')+
       '<button type="button" data-act="view" title="Xem lớn"><i class="fa-solid fa-eye"></i></button></div></div>';
     box.appendChild(div);
     bindDrag(div, pos);
@@ -376,6 +390,8 @@ async function veThumbs(containerId,pdfjsDoc,pageCount,opts){
           if(act==='sel'&&opts.onToggle){opts.onToggle(pos);return;}
           if(act==='up'&&opts.onMove){opts.onMove(pos,-1);return;}
           if(act==='down'&&opts.onMove){opts.onMove(pos,1);return;}
+          if(act==='rot-cw'&&opts.onRotatePage){opts.onRotatePage(pi,90);return;}
+          if(act==='rot-ccw'&&opts.onRotatePage){opts.onRotatePage(pi,-90);return;}
           if(act==='view'){openPv(opts.bytes,opts.pdfjs,pi,opts.title||'Xem trước');return;}
         }
         // click body: if not dragging, open preview
@@ -552,11 +568,114 @@ async function luuThuTu(){if(!fileSua)return;setProg(30);try{var src=await PDFDo
 
 /* ===== XOAY ===== */
 bindDrop(document.getElementById('dropXoay'),document.getElementById('inpXoay'),async function(fl){
-  var f=fl[0];if(!f)return;setProg(15);try{fileXoay=await readPdfMeta(f);pdfjsXoay=await loadPdfjs(fileXoay.bytes);selXoay={};document.getElementById('listXoay').innerHTML='<div class="file-row"><div class="ico"><i class="fa-solid fa-file-pdf"></i></div><div class="meta"><b>'+esc(fileXoay.name)+'</b><span>'+fileXoay.pageCount+' trang · '+fmtSize(fileXoay.size)+'</span></div></div>';document.getElementById('toolXoay').style.display='flex';await refreshThumbsXoay();updateKpi();}catch(e){toast('Lỗi: '+(e.message||e));}setProg(null);
+  var f=fl[0];if(!f)return;setProg(15);try{fileXoay=await readPdfMeta(f);pdfjsXoay=await loadPdfjs(fileXoay.bytes);selXoay={};document.getElementById('listXoay').innerHTML='<div class="file-row"><div class="ico"><i class="fa-solid fa-file-pdf"></i></div><div class="meta"><b>'+esc(fileXoay.name)+'</b><span>'+fileXoay.pageCount+' trang · '+fmtSize(fileXoay.size)+'</span></div></div>';document.getElementById('toolXoay').style.display='flex';workingXoay={bytes:null,pdfjs:null};huyPvXoay();await refreshThumbsXoay();updateKpi();}catch(e){toast('Lỗi: '+(e.message||e));}setProg(null);
 });
-async function refreshThumbsXoay(){await veThumbs('thumbsXoay',pdfjsXoay,fileXoay.pageCount,{sel:selXoay,selectable:true,bytes:fileXoay.bytes,pdfjs:pdfjsXoay,title:fileXoay.name,onToggle:function(pos){selXoay[pos]=!selXoay[pos];refreshThumbsXoay();}});}
+async function refreshThumbsXoay(){
+  var srcBytes=workingXoay.bytes||fileXoay.bytes;
+  var srcPdfjs=workingXoay.pdfjs||pdfjsXoay;
+  // order cố định 0..n-1 — xoay không làm đổi vị trí
+  var orderFix=[];for(var i=0;i<fileXoay.pageCount;i++)orderFix.push(i);
+  await veThumbs('thumbsXoay',srcPdfjs,fileXoay.pageCount,{
+    order:orderFix,sel:selXoay,selectable:true,perPageRotate:true,reorder:false,
+    bytes:srcBytes,pdfjs:srcPdfjs,title:fileXoay.name,
+    onToggle:function(pos){selXoay[pos]=!selXoay[pos];refreshThumbsXoay();},
+    onRotatePage:function(pageIndex,delta){xoayMotTrang(pageIndex,delta);}
+  });
+}
+async function xoayMotTrang(pageIndex,delta){
+  /* Chỉ đổi góc trang tại đúng chỉ số pageIndex — không đổi thứ tự trang */
+  if(!fileXoay)return;
+  setProg(15);
+  try{
+    var base=workingXoay.bytes||fileXoay.bytes;
+    var src=await PDFDocument.load(base,{ignoreEncryption:true});
+    var pages=src.getPages();
+    if(pageIndex<0||pageIndex>=pages.length){setProg(null);return;}
+    var cur=pages[pageIndex].getRotation().angle||0;
+    var next=((cur+delta)%360+360)%360;
+    pages[pageIndex].setRotation(degrees(next));
+    // Không copy/reorder pages — giữ nguyên vị trí #1,#2,#3...
+    var bytes=new Uint8Array(await src.save());
+    var pdfjs=await loadPdfjs(bytes);
+    workingXoay={bytes:bytes,pdfjs:pdfjs};
+    await refreshThumbsXoay();
+    toast('Trang '+(pageIndex+1)+' xoay '+next+'° · vẫn giữ vị trí #'+(pageIndex+1));
+  }catch(e){toast('Lỗi xoay: '+(e.message||e));}
+  setProg(null);
+}
+function resetXoay(){
+  workingXoay={bytes:null,pdfjs:null};
+  huyPvXoay();
+  if(fileXoay) refreshThumbsXoay();
+  toast('Đã đặt lại bản gốc');
+}
+async function taiBanXoayHienTai(){
+  if(!fileXoay)return;
+  var bytes=workingXoay.bytes||fileXoay.bytes;
+  if(!workingXoay.bytes){toast('Chưa xoay trang nào — dùng nút ↺ ↻ dưới mỗi trang');return;}
+  downloadBytes(bytes, baseName(fileXoay.name)+'-xoay.pdf');
+  toast('Đã tải bản đã xoay');
+}
+
 function chonTatXoay(on){selXoay={};if(on&&fileXoay)for(var i=0;i<fileXoay.pageCount;i++)selXoay[i]=true;refreshThumbsXoay();}
-async function lamXoay(){if(!fileXoay)return;var goc=parseInt(document.getElementById('gocXoay').value,10)||90;var scope=document.getElementById('scopeXoay').value;setProg(20);try{var src=await PDFDocument.load(fileXoay.bytes,{ignoreEncryption:true});var pages=src.getPages();for(var i=0;i<pages.length;i++){if(scope==='sel'&&!selXoay[i])continue;var cur=pages[i].getRotation().angle||0;pages[i].setRotation(degrees((cur+goc)%360));}downloadBytes(await src.save(),baseName(fileXoay.name)+'-xoay-'+goc+'.pdf');toast('Đã tải file xoay '+goc+'°');}catch(e){toast('Lỗi: '+(e.message||e));}setProg(null);}
+async function taoXemTruocXoay(){
+  if(!fileXoay)return;
+  var goc=parseInt(document.getElementById('gocXoay').value,10)||90;
+  var scope=document.getElementById('scopeXoay').value;
+  if(scope==='sel'){
+    var any=false;for(var k in selXoay){if(selXoay[k]){any=true;break;}}
+    if(!any){toast('Chọn ít nhất 1 trang hoặc chọn "Tất cả trang"');return;}
+  }
+  setProg(20);
+  try{
+    var src=await PDFDocument.load(fileXoay.bytes,{ignoreEncryption:true});
+    var pages=src.getPages();
+    for(var i=0;i<pages.length;i++){
+      if(scope==='sel'&&!selXoay[i]) continue;
+      var cur=pages[i].getRotation().angle||0;
+      pages[i].setRotation(degrees((cur+goc)%360));
+    }
+    var bytes=new Uint8Array(await src.save());
+    var pdfjs=await loadPdfjs(bytes);
+    var order=[];for(var i=0;i<pdfjs.numPages;i++)order.push(i);
+    var fn=baseName(fileXoay.name)+'-xoay-'+goc+'.pdf';
+    draftXoay={bytes:bytes,pdfjs:pdfjs,order:order,fileName:fn};
+    document.getElementById('pvXoaySub').textContent=pdfjs.numPages+' trang · đã xoay '+goc+'° · '+fn+' · kiểm tra hướng rồi tải về';
+    document.getElementById('pvXoay').classList.add('on');
+    await refreshThumbsPvXoay();
+    toast('Xem trước sau xoay — kiểm tra hướng trang');
+    document.getElementById('pvXoay').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){toast('Lỗi: '+(e.message||e));}
+  setProg(null);
+}
+async function refreshThumbsPvXoay(){
+  await veThumbs('thumbsPvXoay',draftXoay.pdfjs,draftXoay.order.length,{
+    order:draftXoay.order,reorder:true,bytes:draftXoay.bytes,pdfjs:draftXoay.pdfjs,title:draftXoay.fileName,
+    onMove:function(pos,d){
+      var j=pos+d;if(j<0||j>=draftXoay.order.length)return;
+      var tmp=draftXoay.order[pos];draftXoay.order[pos]=draftXoay.order[j];draftXoay.order[j]=tmp;
+      refreshThumbsPvXoay();
+    },
+    onReorder:function(from,to){
+      if(from===to)return;
+      var item=draftXoay.order.splice(from,1)[0];
+      draftXoay.order.splice(to,0,item);
+      refreshThumbsPvXoay();
+    }
+  });
+}
+async function taiKetQuaXoay(){
+  if(!draftXoay.bytes){toast('Chưa có bản xem trước');return;}
+  setProg(40);
+  try{
+    var need=false;for(var i=0;i<draftXoay.order.length;i++)if(draftXoay.order[i]!==i){need=true;break;}
+    var bytes=need?await buildPdfFromOrder(draftXoay.bytes,draftXoay.order):draftXoay.bytes;
+    downloadBytes(bytes,draftXoay.fileName);
+    toast('Đã tải: '+draftXoay.fileName);
+  }catch(e){toast('Lỗi: '+(e.message||e));}
+  setProg(null);
+}
+function huyPvXoay(){draftXoay={bytes:null,pdfjs:null,order:[],fileName:''};var el=document.getElementById('pvXoay');if(el)el.classList.remove('on');var th=document.getElementById('thumbsPvXoay');if(th)th.innerHTML='';}
 
 /* ===== OCR ===== */
 bindDrop(document.getElementById('dropOcr'),document.getElementById('inpOcr'),async function(fl){
@@ -577,13 +696,13 @@ function taiOcrWord(){
   downloadWord(body,(fileOcr?baseName(fileOcr.name):'ocr')+'-OCR.doc');
   toast('Đã xuất Word (.doc)');
 }
-function xoaHet(){filesNoi=[];fileTach=null;pdfjsTach=null;fileSua=null;pdfjsSua=null;orderSua=[];selSua={};fileXoay=null;pdfjsXoay=null;selXoay={};fileOcr=null;pdfjsOcr=null;huyPvNoi();huyPvTach();['listNoi','listTach','listSua','listXoay','listOcr','thumbsTach','thumbsSua','thumbsXoay','thumbsOcr'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML='';});document.getElementById('btnNoi').disabled=true;document.getElementById('btnTach').disabled=true;document.getElementById('toolSua').style.display='none';document.getElementById('toolXoay').style.display='none';document.getElementById('toolOcr').style.display='none';document.getElementById('ocrResultBox').style.display='none';updateKpi();toast('Đã xóa hết');}
+function xoaHet(){filesNoi=[];fileTach=null;pdfjsTach=null;fileSua=null;pdfjsSua=null;orderSua=[];selSua={};fileXoay=null;pdfjsXoay=null;selXoay={};fileOcr=null;pdfjsOcr=null;huyPvNoi();huyPvTach();huyPvXoay();workingXoay={bytes:null,pdfjs:null};['listNoi','listTach','listSua','listXoay','listOcr','thumbsTach','thumbsSua','thumbsXoay','thumbsOcr'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML='';});document.getElementById('btnNoi').disabled=true;document.getElementById('btnTach').disabled=true;document.getElementById('toolSua').style.display='none';document.getElementById('toolXoay').style.display='none';document.getElementById('toolOcr').style.display='none';document.getElementById('ocrResultBox').style.display='none';updateKpi();toast('Đã xóa hết');}
 
 window.doiTab=doiTab;window.taoXemTruocNoi=taoXemTruocNoi;window.taiKetQuaNoi=taiKetQuaNoi;window.huyPvNoi=huyPvNoi;
 window.taoXemTruocTach=taoXemTruocTach;window.taiKetQuaTach=taiKetQuaTach;window.huyPvTach=huyPvTach;
 window.moveNoi=moveNoi;window.xoaNoi=xoaNoi;window.xemNoi=xemNoi;window.xoaListNoi=xoaListNoi;
 window.chonTat=chonTat;window.xoaTrangDaChon=xoaTrangDaChon;window.trichTrangDaChon=trichTrangDaChon;window.luuThuTu=luuThuTu;
-window.chonTatXoay=chonTatXoay;window.lamXoay=lamXoay;window.ocrTrang=ocrTrang;window.ocrTatCa=ocrTatCa;
+window.chonTatXoay=chonTatXoay;window.xoayMotTrang=xoayMotTrang;window.taiBanXoayHienTai=taiBanXoayHienTai;window.resetXoay=resetXoay;window.taoXemTruocXoay=taoXemTruocXoay;window.taiKetQuaXoay=taiKetQuaXoay;window.huyPvXoay=huyPvXoay;window.ocrTrang=ocrTrang;window.ocrTatCa=ocrTatCa;
 window.ocrTrongModal=ocrTrongModal;window.copyOcr=copyOcr;window.taiOcrTxt=taiOcrTxt;window.taiOcrWord=taiOcrWord;
 window.xoaHet=xoaHet;window.openPv=openPv;window.pvNav=pvNav;window.pvZoom=pvZoom;window.dongPv=dongPv;
 document.addEventListener('keydown',function(e){if(e.key==='Escape')dongPv();});
