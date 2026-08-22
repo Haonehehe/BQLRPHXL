@@ -9,10 +9,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg1:#0b1220;--bg2:#064e3b;--bg3:#0f766e;
-  --card:rgba(255,255,255,.07);--card-h:rgba(255,255,255,.11);
-  --line:rgba(255,255,255,.12);--line-h:rgba(255,255,255,.22);
-  --tx:#f1f5f9;--mu:#94a3b8;--soft:#64748b;
+  --tx:#f1f5f9;--mu:#94a3b8;
 }
 body{
   font-family:"Be Vietnam Pro",system-ui,sans-serif;
@@ -21,14 +18,13 @@ body{
     radial-gradient(900px 480px at 12% -8%, rgba(16,185,129,.18), transparent 55%),
     radial-gradient(700px 420px at 100% 0%, rgba(14,165,233,.12), transparent 50%),
     radial-gradient(600px 360px at 50% 110%, rgba(124,58,237,.08), transparent 45%),
-    linear-gradient(155deg, var(--bg1) 0%, var(--bg2) 48%, var(--bg3) 100%);
+    linear-gradient(155deg, #0b1220 0%, #064e3b 48%, #0f766e 100%);
   display:flex;flex-direction:column;align-items:center;
-  padding:32px 16px 48px;
+  padding:32px 16px 52px;
 }
-.wrap{width:100%;max-width:860px}
+.wrap{width:100%;max-width:960px}
 
-/* Brand */
-.brand{text-align:center;margin-bottom:28px}
+.brand{text-align:center;margin-bottom:26px}
 .brand-icon{
   width:58px;height:58px;margin:0 auto 14px;border-radius:18px;
   background:linear-gradient(145deg,#10b981,#047857);
@@ -44,42 +40,57 @@ body{
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#cbd5e1;
 }
 
-/* Grid — 2 cols, last card centered full on mobile, balanced on desktop */
+/* ===== Grid cân đối =====
+   Mobile: 1 cột
+   ≥560px: 2 cột (hàng cuối 1 thẻ căn giữa, cùng độ rộng)
+   ≥900px: 3 cột — hàng 1: 3 thẻ, hàng 2: 2 thẻ căn giữa
+*/
 .grid{
   display:grid;
   grid-template-columns:1fr;
   gap:14px;
+  align-items:stretch;
 }
-@media(min-width:620px){
-  .grid{grid-template-columns:1fr 1fr}
-  .grid .card:last-child:nth-child(odd){
-    grid-column:1 / -1;
-    max-width:calc(50% - 7px);
-    justify-self:center;
-    width:100%;
-  }
-}
-/* With 5 cards: better as 3+2 feel — use auto-fit */
-@media(min-width:900px){
+@media (min-width: 560px){
   .grid{
-    grid-template-columns:repeat(6,1fr);
+    grid-template-columns:repeat(2, 1fr);
   }
-  .grid .card{grid-column:span 2}
-  .grid .card:nth-child(4){grid-column:2 / span 2}
-  .grid .card:nth-child(5){grid-column:4 / span 2}
-  .grid .card:last-child:nth-child(odd){max-width:none;justify-self:stretch}
+  /* Thẻ lẻ cuối (PDF) căn giữa, rộng đúng 1 cột */
+  .grid .card:last-child:nth-child(odd){
+    grid-column: 1 / -1;
+    width:100%;
+    max-width:calc((100% - 14px) / 2);
+    justify-self:center;
+  }
+}
+@media (min-width: 900px){
+  .grid{
+    grid-template-columns:repeat(6, 1fr);
+  }
+  .grid .card{
+    grid-column: span 2;
+  }
+  /* Hàng 2: 2 thẻ — cột 2-3 và 4-5 (căn giữa trong 6 cột) */
+  .grid .card:nth-child(4){ grid-column: 2 / span 2; }
+  .grid .card:nth-child(5){ grid-column: 4 / span 2; }
+  .grid .card:last-child:nth-child(odd){
+    max-width:none;
+    width:auto;
+    justify-self:stretch;
+  }
 }
 
 .card{
   display:flex;flex-direction:column;
   text-decoration:none;color:inherit;
-  background:var(--card);
-  border:1px solid var(--line);
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
   border-radius:20px;
   padding:20px 18px 18px;
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   transition:transform .18s ease, background .18s, border-color .18s, box-shadow .18s;
-  position:relative;overflow:hidden;min-height:168px;
+  position:relative;overflow:hidden;
+  min-height:170px;
 }
 .card::after{
   content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;
@@ -87,8 +98,8 @@ body{
 }
 .card:hover{
   transform:translateY(-4px);
-  background:var(--card-h);
-  border-color:var(--line-h);
+  background:rgba(255,255,255,.11);
+  border-color:rgba(255,255,255,.22);
   box-shadow:0 18px 40px rgba(0,0,0,.28);
 }
 .card:active{transform:translateY(-1px)}
@@ -110,7 +121,6 @@ body{
 }
 .card:hover .go{gap:10px}
 
-/* Accents */
 .card.qlbvr .card-icon{background:rgba(244,63,94,.18);color:#fb7185}
 .card.qlbvr .code{background:rgba(244,63,94,.15);color:#fda4af}
 .card.qlbvr:hover{border-color:rgba(251,113,133,.35)}
@@ -141,7 +151,6 @@ footer{
   color:#a7f3d0;text-shadow:0 1px 0 rgba(0,0,0,.25);
 }
 
-/* Motto */
 .motto-ticker{
   position:fixed;left:0;right:0;bottom:0;z-index:9999;height:30px;overflow:hidden;
   background:linear-gradient(90deg,#022c22 0%,#064e3b 40%,#0f766e 70%,#064e3b 100%);
