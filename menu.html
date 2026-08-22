@@ -8,21 +8,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --tx:#f1f5f9;--mu:#94a3b8;
-}
 body{
   font-family:"Be Vietnam Pro",system-ui,sans-serif;
-  min-height:100vh;color:var(--tx);
+  min-height:100vh;color:#f1f5f9;
   background:
     radial-gradient(900px 480px at 12% -8%, rgba(16,185,129,.18), transparent 55%),
     radial-gradient(700px 420px at 100% 0%, rgba(14,165,233,.12), transparent 50%),
-    radial-gradient(600px 360px at 50% 110%, rgba(124,58,237,.08), transparent 45%),
     linear-gradient(155deg, #0b1220 0%, #064e3b 48%, #0f766e 100%);
   display:flex;flex-direction:column;align-items:center;
   padding:32px 16px 52px;
 }
-.wrap{width:100%;max-width:960px}
+.wrap{width:100%;max-width:980px}
 
 .brand{text-align:center;margin-bottom:26px}
 .brand-icon{
@@ -32,7 +28,7 @@ body{
   box-shadow:0 12px 32px rgba(5,150,105,.4), inset 0 1px 0 rgba(255,255,255,.25);
 }
 .brand h1{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;color:#f8fafc}
-.brand p{margin-top:6px;font-size:.82rem;color:var(--mu)}
+.brand p{margin-top:6px;font-size:.82rem;color:#94a3b8}
 .badge-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
 .badge{
   font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
@@ -40,46 +36,13 @@ body{
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#cbd5e1;
 }
 
-/* ===== Grid cân đối =====
-   Mobile: 1 cột
-   ≥560px: 2 cột (hàng cuối 1 thẻ căn giữa, cùng độ rộng)
-   ≥900px: 3 cột — hàng 1: 3 thẻ, hàng 2: 2 thẻ căn giữa
-*/
+/* Flex wrap — tất cả thẻ cùng kích thước, hàng cuối tự căn giữa */
 .grid{
-  display:grid;
-  grid-template-columns:1fr;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
   gap:14px;
-  align-items:stretch;
 }
-@media (min-width: 560px){
-  .grid{
-    grid-template-columns:repeat(2, 1fr);
-  }
-  /* Thẻ lẻ cuối (PDF) căn giữa, rộng đúng 1 cột */
-  .grid .card:last-child:nth-child(odd){
-    grid-column: 1 / -1;
-    width:100%;
-    max-width:calc((100% - 14px) / 2);
-    justify-self:center;
-  }
-}
-@media (min-width: 900px){
-  .grid{
-    grid-template-columns:repeat(6, 1fr);
-  }
-  .grid .card{
-    grid-column: span 2;
-  }
-  /* Hàng 2: 2 thẻ — cột 2-3 và 4-5 (căn giữa trong 6 cột) */
-  .grid .card:nth-child(4){ grid-column: 2 / span 2; }
-  .grid .card:nth-child(5){ grid-column: 4 / span 2; }
-  .grid .card:last-child:nth-child(odd){
-    max-width:none;
-    width:auto;
-    justify-self:stretch;
-  }
-}
-
 .card{
   display:flex;flex-direction:column;
   text-decoration:none;color:inherit;
@@ -90,8 +53,24 @@ body{
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   transition:transform .18s ease, background .18s, border-color .18s, box-shadow .18s;
   position:relative;overflow:hidden;
-  min-height:170px;
+  min-height:168px;
+  width:100%;
+  max-width:100%;
 }
+@media (min-width: 560px){
+  .card{
+    width:calc(50% - 7px);
+    max-width:calc(50% - 7px);
+  }
+}
+@media (min-width: 900px){
+  .card{
+    width:calc(33.333% - 10px);
+    max-width:300px;
+    flex:0 0 calc(33.333% - 10px);
+  }
+}
+
 .card::after{
   content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;
   background:rgba(255,255,255,.03);pointer-events:none;
@@ -113,7 +92,7 @@ body{
   padding:4px 9px;border-radius:999px;align-self:flex-start;
 }
 .card h2{font-size:1.05rem;font-weight:700;color:#f8fafc;margin-bottom:6px;letter-spacing:-.01em}
-.card p{font-size:.78rem;line-height:1.55;color:var(--mu);flex:1}
+.card p{font-size:.78rem;line-height:1.55;color:#94a3b8;flex:1}
 .card .go{
   margin-top:14px;display:inline-flex;align-items:center;gap:7px;
   font-size:.75rem;font-weight:700;color:#e2e8f0;
