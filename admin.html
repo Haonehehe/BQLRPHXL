@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bd:#e8ecf4;--mu:#64748b;--tx:#0f172a;--g:#059669;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;padding-bottom:40px;
+  background:
+    radial-gradient(900px 400px at 0% 0%, rgba(245,158,11,.08), transparent 50%),
+    radial-gradient(700px 360px at 100% 0%, rgba(16,185,129,.07), transparent 45%),
+    #f8fafc;
+}
+button{cursor:pointer;border:none;background:none;font:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+.top{
+  background:rgba(255,255,255,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:30;
+  box-shadow:0 1px 0 rgba(255,255,255,.8);
+}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap;padding:10px 0}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-i{
+  width:42px;height:42px;border-radius:14px;
+  background:linear-gradient(145deg,#fbbf24,#d97706);color:#fff;
+  display:grid;place-items:center;font-size:16px;
+  box-shadow:0 8px 20px rgba(217,119,6,.35);
+}
+.logo h1{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.logo p{font-size:11px;color:var(--mu);margin-top:1px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;
+  border-radius:11px;font-size:12px;font-weight:600;transition:.12s;
+}
+.btn:active{transform:scale(.97)}
+.btn-o{background:#fff;border:1px solid var(--bd);color:#334155}
+.btn-o:hover{background:#f8fafc}
+.btn-g{background:linear-gradient(135deg,#10b981,#047857);color:#fff;box-shadow:0 4px 12px rgba(5,150,105,.25)}
+.btn-r{background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff}
+.btn-v{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff}
+.btn-a{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.btn-sm{height:32px;padding:0 11px;font-size:11px;border-radius:9px}
+
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
+@media(min-width:720px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{
+  background:#fff;border:1px solid var(--bd);border-radius:16px;padding:16px;
+  box-shadow:0 2px 10px rgba(15,23,42,.04);position:relative;overflow:hidden;
+}
+.kpi::after{content:'';position:absolute;right:-8px;top:-8px;width:48px;height:48px;border-radius:50%;background:rgba(245,158,11,.08)}
+.kpi .l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
+.kpi .v{font-size:24px;font-weight:800;margin-top:4px;letter-spacing:-.03em;color:#b45309}
+
+.card{
+  background:#fff;border:1px solid var(--bd);border-radius:18px;margin-bottom:16px;
+  overflow:hidden;box-shadow:0 4px 20px rgba(15,23,42,.05);
+}
+.card-h{
+  padding:14px 16px;border-bottom:1px solid #f1f5f9;
+  display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(180deg,#fffcf5,#fff);
+  font-size:13px;font-weight:800;
+}
+.user{
+  padding:16px;border-bottom:1px solid #f1f5f9;
+  display:grid;gap:12px;transition:background .12s;
+}
+.user:hover{background:#fffbeb}
+.user:last-child{border-bottom:none}
+.user .row1{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.user .name{font-weight:700;font-size:14.5px}
+.user .meta{font-size:12px;color:var(--mu);margin-top:3px}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;border:1px solid;margin-left:6px}
+.tag.pending{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.tag.approved{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.tag.rejected{background:#fff1f2;color:#e11d48;border-color:#fecdd3}
+.tag.disabled{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
+.tag.admin{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+.perms{display:flex;flex-wrap:wrap;gap:8px}
+.perms label{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  padding:7px 11px;border:1px solid var(--bd);border-radius:10px;
+  background:#f8fafc;cursor:pointer;transition:.12s;
+}
+.perms label:hover{border-color:#fcd34d;background:#fffbeb}
+.perms input{accent-color:#d97706}
+.acts{display:flex;flex-wrap:wrap;gap:6px}
+.note{
+  font-size:12.5px;color:#475569;line-height:1.55;
+  background:linear-gradient(135deg,#fffbeb,#f0fdf4);
+  border:1px solid #fde68a;border-radius:14px;padding:14px 16px;margin:14px 0 0;
+}
+.gate{
+  max-width:400px;margin:100px auto;background:#fff;border:1px solid var(--bd);
+  border-radius:20px;padding:32px;text-align:center;
+  box-shadow:0 16px 48px rgba(15,23,42,.08);
+}
+.gate h2{font-size:18px;margin-bottom:8px}.gate p{font-size:13px;color:var(--mu);margin-bottom:18px;line-height:1.5}
+.loading{text-align:center;padding:40px;color:var(--mu);font-size:14px}
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;
+  opacity:0;transition:.25s;z-index:60;box-shadow:0 12px 32px rgba(15,23,42,.3);
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{padding:28px;text-align:center;color:#94a3b8;font-size:13px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ===== BQLRPH Auth (Google Sheet via Apps Script + local fallback) ===== */
+var CONFIG = {
+  // Dán Web App URL sau khi Deploy Apps Script (kết thúc bằng /exec)
+  SCRIPT_URL: '',
+  // Ví dụ: 'https://script.google.com/macros/s/AKfycbx.../exec'
+};
+
+var AUTH_KEY = 'bqlrph_auth_v1';
+var SESS_KEY = 'bqlrph_session_v1';
+var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', pdf: 'Công cụ PDF' };
+
+function useCloud() {
+  return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
+}
+
+function apiCall(payload) {
+  return fetch(CONFIG.SCRIPT_URL, {
+    method: 'POST',
+    // text/plain tránh preflight CORS phức tạp với Apps Script
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  }).then(function (r) { return r.text(); }).then(function (t) {
+    try { return JSON.parse(t); } catch (e) { throw new Error('Phản hồi API không hợp lệ'); }
+  });
+}
+
+function _loadDB() {
+  try {
+    var raw = localStorage.getItem(AUTH_KEY);
+    if (raw) { var db = JSON.parse(raw); if (db && Array.isArray(db.users)) return db; }
+  } catch (e) {}
+  var db = {
+    users: [{
+      id: 'u_admin', email: DEFAULT_ADMIN.email, name: DEFAULT_ADMIN.name,
+      pass: DEFAULT_ADMIN.pass, status: 'approved', role: 'admin',
+      perms: ALL_PERMS.slice(), created: new Date().toISOString(), approvedAt: new Date().toISOString()
+    }]
+  };
+  _saveDB(db);
+  return db;
+}
+function _saveDB(db) { localStorage.setItem(AUTH_KEY, JSON.stringify(db)); }
+
+function getSession() {
+  try { return JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; }
+}
+function setSession(s) {
+  if (s) sessionStorage.setItem(SESS_KEY, JSON.stringify(s));
+  else sessionStorage.removeItem(SESS_KEY);
+}
+function currentUser() { return getSession(); }
+function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
+function canAccess(mod) {
+  if (mod === 'pdf') return true;
+  var s = getSession();
+  if (!s) return false;
+  if (s.role === 'admin') return true;
+  return Array.isArray(s.perms) && s.perms.indexOf(mod) >= 0;
+}
+function logoutUser() { setSession(null); }
+
+function adminCred() {
+  var s = getSession();
+  if (!s || s.role !== 'admin') throw new Error('Cần đăng nhập admin');
+  // Lưu pass tạm trong session khi login (chỉ để gọi API admin)
+  return { adminEmail: s.email, adminPass: s._pass || '' };
+}
+
+/* ---- Register / Login ---- */
+function registerUser(name, email, pass) {
+  name = String(name || '').trim();
+  email = String(email || '').trim().toLowerCase();
+  pass = String(pass || '');
+  if (!name || name.length < 2) throw new Error('Nhập họ tên hợp lệ');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Email không hợp lệ');
+  if (pass.length < 6) throw new Error('Mật khẩu tối thiểu 6 ký tự');
+
+  if (useCloud()) {
+    return apiCall({ action: 'register', name: name, email: email, pass: pass }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Đăng ký thất bại');
+      return true;
+    });
+  }
+  var db = _loadDB();
+  if (db.users.some(function (u) { return u.email === email; })) throw new Error('Email đã được đăng ký');
+  db.users.push({
+    id: 'u_' + Date.now(), email: email, name: name, pass: pass,
+    status: 'pending', role: 'user', perms: ['pdf'],
+    created: new Date().toISOString(), approvedAt: null
+  });
+  _saveDB(db);
+  return Promise.resolve(true);
+}
+
+function loginUser(email, pass) {
+  email = String(email || '').trim().toLowerCase();
+  pass = String(pass || '');
+
+  if (useCloud()) {
+    return apiCall({ action: 'login', email: email, pass: pass }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Đăng nhập thất bại');
+      var u = res.user;
+      var sess = {
+        email: u.email, name: u.name, role: u.role || 'user',
+        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
+        _pass: pass // dùng cho thao tác admin trên API
+      };
+      setSession(sess);
+      return sess;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u || u.pass !== pass) return Promise.reject(new Error('Email hoặc mật khẩu không đúng'));
+  if (u.status === 'pending') return Promise.reject(new Error('Tài khoản đang chờ admin duyệt'));
+  if (u.status === 'rejected') return Promise.reject(new Error('Tài khoản đã bị từ chối'));
+  if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
+  var sess = {
+    email: u.email, name: u.name, role: u.role || 'user',
+    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
+  };
+  setSession(sess);
+  return Promise.resolve(sess);
+}
+
+function listUsers() {
+  if (useCloud()) {
+    var c = adminCred();
+    return apiCall({
+      action: 'list', adminEmail: c.adminEmail, adminPass: c.adminPass
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Không tải được danh sách');
+      return (res.users || []).map(function (u, i) {
+        u.id = 'u_' + i + '_' + (u.email || '');
+        return u;
+      });
+    });
+  }
+  return Promise.resolve(_loadDB().users.slice().sort(function (a, b) {
+    return (b.created || '').localeCompare(a.created || '');
+  }));
+}
+
+function approveUser(email, perms, asAdmin) {
+  if (useCloud()) {
+    var c = adminCred();
+    return apiCall({
+      action: 'approve', adminEmail: c.adminEmail, adminPass: c.adminPass,
+      email: email, perms: perms, asAdmin: !!asAdmin
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Duyệt thất bại');
+      return true;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u) return Promise.reject(new Error('Không tìm thấy user'));
+  u.status = 'approved';
+  u.approvedAt = new Date().toISOString();
+  u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['pdf'];
+  if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
+  if (asAdmin) { u.role = 'admin'; u.perms = ALL_PERMS.slice(); }
+  _saveDB(db);
+  return Promise.resolve(true);
+}
+
+function rejectUser(email) {
+  if (useCloud()) {
+    var c = adminCred();
+    return apiCall({
+      action: 'reject', adminEmail: c.adminEmail, adminPass: c.adminPass, email: email
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Từ chối thất bại');
+      return true;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u) return Promise.reject(new Error('Không tìm thấy user'));
+  if (u.email === DEFAULT_ADMIN.email) return Promise.reject(new Error('Không thể từ chối admin gốc'));
+  u.status = 'rejected'; u.perms = ['pdf']; u.role = 'user';
+  _saveDB(db);
+  return Promise.resolve(true);
+}
+
+function disableUser(email) {
+  if (useCloud()) {
+    var c = adminCred();
+    return apiCall({
+      action: 'disable', adminEmail: c.adminEmail, adminPass: c.adminPass, email: email
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Khóa thất bại');
+      return true;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u) return Promise.reject(new Error('Không tìm thấy'));
+  if (u.email === DEFAULT_ADMIN.email) return Promise.reject(new Error('Không thể khóa admin gốc'));
+  u.status = 'disabled';
+  _saveDB(db);
+  return Promise.resolve(true);
+}
+
+function updatePerms(email, perms) {
+  if (useCloud()) {
+    var c = adminCred();
+    return apiCall({
+      action: 'setperms', adminEmail: c.adminEmail, adminPass: c.adminPass,
+      email: email, perms: perms
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Lưu quyền thất bại');
+      return true;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u) return Promise.reject(new Error('Không tìm thấy'));
+  u.perms = perms.slice();
+  if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
+  _saveDB(db);
+  return Promise.resolve(true);
+}
+
+
+function changePassword(email, oldP, newP) {
+  email = String(email || '').trim().toLowerCase();
+  oldP = String(oldP || '');
+  newP = String(newP || '');
+  if (newP.length < 6) return Promise.reject(new Error('Mật khẩu mới tối thiểu 6 ký tự'));
+  if (useCloud()) {
+    return apiCall({ action: 'changepass', email: email, oldPass: oldP, newPass: newP }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Đổi mật khẩu thất bại');
+      var s = getSession();
+      if (s && s.email === email) { s._pass = newP; setSession(s); }
+      return true;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u || u.pass !== oldP) return Promise.reject(new Error('Mật khẩu cũ không đúng'));
+  u.pass = newP;
+  _saveDB(db);
+  var s = getSession();
+  if (s && s.email === email) { s._pass = newP; setSession(s); }
+  return Promise.resolve(true);
+}
+
+function authModeLabel() {
+  return useCloud() ? 'Google Sheet (đồng bộ)' : 'Máy local (localStorage)';
+}
+
+
+// Khôi phục URL đã lưu
+(function(){
+  try {
+    var u = localStorage.getItem('bqlrph_script_url');
+    if (u) CONFIG.SCRIPT_URL = u;
+  } catch(e){}
+})();
+
+
+(function(){ try{ var u=localStorage.getItem('bqlrph_script_url'); if(u) CONFIG.SCRIPT_URL=u; }catch(e){} })();
+
+function resetPassword(email, newPass) {
+  email = String(email || '').trim().toLowerCase();
+  newPass = String(newPass || '');
+  if (newPass.length < 6) return Promise.reject(new Error('Mật khẩu tối thiểu 6 ký tự'));
+  if (useCloud()) {
+    var c = adminCred();
+    return apiCall({
+      action: 'resetpass', adminEmail: c.adminEmail, adminPass: c.adminPass,
+      email: email, newPass: newPass
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Đặt lại MK thất bại');
+      return true;
+    });
+  }
+  var db = _loadDB();
+  var u = db.users.find(function (x) { return x.email === email; });
+  if (!u) return Promise.reject(new Error('Không tìm thấy'));
+  u.pass = newPass;
+  _saveDB(db);
+  return Promise.resolve(true);
+}
+
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2800);}
+function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+function requireAdmin(){
+  var s=currentUser();
+  if(!s||s.role!=='admin'){
+    document.getElementById('app').innerHTML='<div class="gate"><div style="font-size:32px;margin-bottom:10px">🔒</div><h2>Chỉ dành cho Admin</h2><p>Đăng nhập tài khoản quản trị trên menu trước khi vào trang này.</p><a class="btn btn-g" href="menu.html"><i class="fa-solid fa-house"></i> Về menu</a></div>';
+    return false;
+  }
+  return true;
+}
+
+function shell(inner){
+  var mode=useCloud()?'Google Sheet · đồng bộ':'Local · máy này';
+  document.getElementById('app').innerHTML=
+    '<div class="top"><div class="wrap top-in">'+
+    '<div class="logo"><div class="logo-i"><i class="fa-solid fa-user-shield"></i></div>'+
+    '<div><h1>Khu vực quản trị</h1><p>Duyệt tài khoản · Cấp quyền · '+esc(mode)+'</p></div></div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>'+
+    '<button type="button" class="btn btn-o" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button>'+
+    '<button type="button" class="btn btn-o" onclick="logoutUser();location.href=\'menu.html\'"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>'+
+    '</div></div></div><div class="wrap">'+inner+'</div>';
+}
+
+function loadUsers(){
+  if(!requireAdmin()) return;
+  shell('<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách…</div>');
+  listUsers().then(function(users){
+    var pending=users.filter(function(u){return u.status==='pending';}).length;
+    var approved=users.filter(function(u){return u.status==='approved';}).length;
+    var rejected=users.filter(function(u){return u.status==='rejected';}).length;
+    var html='<div class="note"><b>Admin mặc định:</b> <code>admin@bqlrph.local</code> / <code>Admin@2026</code>'+
+      (useCloud()?' · Dữ liệu đồng bộ Google Sheet.':' · Đang dùng localStorage — cấu hình Script URL ở menu (⚙) để đồng bộ.')+
+      '</div>';
+    html+='<div class="kpis">'+
+      '<div class="kpi"><div class="l">Tổng TK</div><div class="v">'+users.length+'</div></div>'+
+      '<div class="kpi"><div class="l">Chờ duyệt</div><div class="v">'+pending+'</div></div>'+
+      '<div class="kpi"><div class="l">Đã duyệt</div><div class="v">'+approved+'</div></div>'+
+      '<div class="kpi"><div class="l">Từ chối</div><div class="v">'+rejected+'</div></div></div>';
+
+    html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-clock" style="color:#d97706;margin-right:6px"></i>Chờ duyệt</span><span style="font-size:12px;font-weight:600;color:#64748b">'+pending+'</span></div>';
+    var pend=users.filter(function(u){return u.status==='pending';});
+    if(!pend.length) html+='<div class="empty">Không có yêu cầu mới</div>';
+    pend.forEach(function(u,i){html+=userRow(u,'p'+i);});
+    html+='</div>';
+
+    html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-users" style="color:#059669;margin-right:6px"></i>Tất cả tài khoản</span></div>';
+    users.forEach(function(u,i){html+=userRow(u,'a'+i);});
+    html+='</div>';
+    shell(html);
+  }).catch(function(e){
+    shell('<div class="note" style="background:#fff1f2;border-color:#fecdd3;color:#9f1239"><b>Lỗi tải:</b> '+esc(e.message||e)+'</div>');
+  });
+}
+
+function userRow(u,id){
+  var st=u.status||'pending';
+  var tags='<span class="tag '+st+'">'+st+'</span>';
+  if(u.role==='admin') tags+='<span class="tag admin">admin</span>';
+  var permsHtml='<div class="perms" id="perms_'+id+'">';
+  ALL_PERMS.forEach(function(p){
+    var ck=(u.perms||[]).indexOf(p)>=0?'checked':'';
+    if(p==='pdf') ck='checked';
+    var dis=p==='pdf'?' onclick="return false"':'';
+    permsHtml+='<label><input type="checkbox" data-p="'+p+'" '+ck+dis+'> '+PERM_LABEL[p]+'</label>';
+  });
+  permsHtml+='</div>';
+  var em=String(u.email||'').replace(/'/g,"\\'");
+  var acts='<div class="acts">';
+  if(st==='pending'){
+    acts+='<button type="button" class="btn btn-g btn-sm" onclick="doApprove(\''+em+'\',\''+id+'\')"><i class="fa-solid fa-check"></i> Duyệt</button>';
+    acts+='<button type="button" class="btn btn-r btn-sm" onclick="doReject(\''+em+'\')"><i class="fa-solid fa-xmark"></i> Từ chối</button>';
+  } else if(st==='approved'){
+    acts+='<button type="button" class="btn btn-v btn-sm" onclick="doSavePerms(\''+em+'\',\''+id+'\')"><i class="fa-solid fa-floppy-disk"></i> Lưu quyền</button>';
+    acts+='<button type="button" class="btn btn-a btn-sm" onclick="doResetPass(\''+em+'\')"><i class="fa-solid fa-key"></i> Đặt lại MK</button>';
+    if(u.email!==DEFAULT_ADMIN.email){
+      acts+='<button type="button" class="btn btn-o btn-sm" onclick="doDisable(\''+em+'\')"><i class="fa-solid fa-ban"></i> Khóa</button>';
+    }
+  }
+  acts+='</div>';
+  return '<div class="user"><div class="row1"><div><div class="name">'+esc(u.name)+tags+'</div>'+
+    '<div class="meta">'+esc(u.email)+(u.created?' · '+new Date(u.created).toLocaleString('vi-VN'):'')+'</div></div>'+acts+'</div>'+permsHtml+'</div>';
+}
+function readPerms(id){
+  var box=document.getElementById('perms_'+id),out=[];
+  if(!box) return ['pdf'];
+  box.querySelectorAll('input[type=checkbox]').forEach(function(inp){if(inp.checked)out.push(inp.getAttribute('data-p'));});
+  if(out.indexOf('pdf')<0) out.push('pdf');
+  return out;
+}
+function doApprove(email,id){approveUser(email,readPerms(id),false).then(function(){toast('Đã duyệt');loadUsers();}).catch(function(e){toast(e.message||e);});}
+function doReject(email){if(!confirm('Từ chối '+email+'?'))return;rejectUser(email).then(function(){toast('Đã từ chối');loadUsers();}).catch(function(e){toast(e.message||e);});}
+function doDisable(email){if(!confirm('Khóa '+email+'?'))return;disableUser(email).then(function(){toast('Đã khóa');loadUsers();}).catch(function(e){toast(e.message||e);});}
+function doSavePerms(email,id){updatePerms(email,readPerms(id)).then(function(){toast('Đã lưu quyền');loadUsers();}).catch(function(e){toast(e.message||e);});}
+function doResetPass(email){var np=prompt('Mật khẩu mới cho '+email+' (tối thiểu 6 ký tự):','');if(np==null)return;resetPassword(email,np).then(function(){toast('Đã đặt lại mật khẩu');}).catch(function(e){toast(e.message||e);});}
+
+loadUsers();
+</script>
+</body>
+</html>
