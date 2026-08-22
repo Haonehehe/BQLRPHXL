@@ -1,236 +1,233 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BQLRPH Xuân Lộc · Menu hệ thống</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: Inter, system-ui, sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(145deg, #0f172a 0%, #064e3b 45%, #0f766e 100%);
-            color: #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px 16px;
-        }
-        .wrap { width: 100%; max-width: 720px; }
-        .brand {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-        .brand-icon {
-            width: 56px; height: 56px;
-            margin: 0 auto 14px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #059669, #0f766e);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; color: #fff;
-            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.35);
-        }
-        .brand h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #f8fafc;
-            letter-spacing: -0.01em;
-        }
-        .brand p {
-            margin-top: 6px;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
-        }
-        @media (min-width: 560px) {
-            .grid { grid-template-columns: 1fr 1fr; }
-        }
-        .card {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 18px;
-            padding: 22px 20px;
-            backdrop-filter: blur(10px);
-            transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .card::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.04));
-            pointer-events: none;
-        }
-        .card:hover {
-            transform: translateY(-3px);
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.22);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-        }
-        .card:active { transform: translateY(-1px); }
-        .card-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            margin-bottom: 14px;
-        }
-        .card.qlbvr .card-icon {
-            background: rgba(244, 63, 94, 0.18);
-            color: #fb7185;
-        }
-        .card.qldd .card-icon {
-            background: rgba(16, 185, 129, 0.18);
-            color: #34d399;
-        }
-        .card.nhao .card-icon {
-            background: rgba(14, 165, 233, 0.18);
-            color: #38bdf8;
-        }
-        .card h2 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 4px;
-        }
-        .card .code {
-            display: inline-block;
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            padding: 2px 8px;
-            border-radius: 999px;
-            margin-bottom: 10px;
-        }
-        .card.qlbvr .code {
-            background: rgba(244, 63, 94, 0.15);
-            color: #fda4af;
-        }
-        .card.qldd .code {
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
-        }
-        .card.nhao .code {
-            background: rgba(14, 165, 233, 0.15);
-            color: #7dd3fc;
-        }
-        .card p {
-            font-size: 0.78rem;
-            line-height: 1.5;
-            color: #94a3b8;
-        }
-        .card .go {
-            margin-top: 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-        .card.qlbvr:hover .go { color: #fda4af; }
-        .card.qldd:hover .go { color: #6ee7b7; }
-        .card.nhao:hover .go { color: #7dd3fc; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BQLRPH Xuân Lộc · Menu hệ thống</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg1:#0b1220;--bg2:#064e3b;--bg3:#0f766e;
+  --card:rgba(255,255,255,.07);--card-h:rgba(255,255,255,.11);
+  --line:rgba(255,255,255,.12);--line-h:rgba(255,255,255,.22);
+  --tx:#f1f5f9;--mu:#94a3b8;--soft:#64748b;
+}
+body{
+  font-family:"Be Vietnam Pro",system-ui,sans-serif;
+  min-height:100vh;color:var(--tx);
+  background:
+    radial-gradient(900px 480px at 12% -8%, rgba(16,185,129,.18), transparent 55%),
+    radial-gradient(700px 420px at 100% 0%, rgba(14,165,233,.12), transparent 50%),
+    radial-gradient(600px 360px at 50% 110%, rgba(124,58,237,.08), transparent 45%),
+    linear-gradient(155deg, var(--bg1) 0%, var(--bg2) 48%, var(--bg3) 100%);
+  display:flex;flex-direction:column;align-items:center;
+  padding:32px 16px 48px;
+}
+.wrap{width:100%;max-width:860px}
 
-        .card.pdf .card-icon {
-            background: rgba(124, 58, 237, 0.18);
-            color: #a78bfa;
-        }
-        .card.pdf .code {
-            background: rgba(124, 58, 237, 0.15);
-            color: #c4b5fd;
-        }
-        .card.pdf:hover .go { color: #c4b5fd; }
+/* Brand */
+.brand{text-align:center;margin-bottom:28px}
+.brand-icon{
+  width:58px;height:58px;margin:0 auto 14px;border-radius:18px;
+  background:linear-gradient(145deg,#10b981,#047857);
+  display:grid;place-items:center;font-size:24px;color:#fff;
+  box-shadow:0 12px 32px rgba(5,150,105,.4), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.brand h1{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;color:#f8fafc}
+.brand p{margin-top:6px;font-size:.82rem;color:var(--mu)}
+.badge-row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.badge{
+  font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#cbd5e1;
+}
 
-        .hint {
-            margin-top: 22px;
-            text-align: center;
-            font-size: 0.72rem;
-            color: #64748b;
-            line-height: 1.5;
-        }
-        .hint a { color: #94a3b8; text-decoration: underline; text-underline-offset: 2px; }
-        .hint a:hover { color: #cbd5e1; }
-        footer {
-            margin-top: 36px;
-            text-align: center;
-            font-size: 0.7rem;
-            color: #475569;
-        }
-    
-/* Motto ticker */
-.motto-ticker{position:fixed;left:0;right:0;bottom:0;z-index:9999;height:30px;overflow:hidden;background:linear-gradient(90deg,#022c22 0%,#064e3b 40%,#0f766e 70%,#064e3b 100%);border-top:1px solid rgba(167,243,208,.25);box-shadow:0 -3px 14px rgba(6,78,59,.2);display:flex;align-items:center}
-.motto-ticker .motto-track{display:flex;align-items:center;width:max-content;animation:motto-scroll 40s linear infinite;white-space:nowrap}
-.motto-ticker:hover .motto-track{animation-play-state:paused;cursor:default}
-.motto-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px;font-size:13px;font-weight:600;letter-spacing:.02em;color:#ecfdf5}
+/* Grid — 2 cols, last card centered full on mobile, balanced on desktop */
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+@media(min-width:620px){
+  .grid{grid-template-columns:1fr 1fr}
+  .grid .card:last-child:nth-child(odd){
+    grid-column:1 / -1;
+    max-width:calc(50% - 7px);
+    justify-self:center;
+    width:100%;
+  }
+}
+/* With 5 cards: better as 3+2 feel — use auto-fit */
+@media(min-width:900px){
+  .grid{
+    grid-template-columns:repeat(6,1fr);
+  }
+  .grid .card{grid-column:span 2}
+  .grid .card:nth-child(4){grid-column:2 / span 2}
+  .grid .card:nth-child(5){grid-column:4 / span 2}
+  .grid .card:last-child:nth-child(odd){max-width:none;justify-self:stretch}
+}
+
+.card{
+  display:flex;flex-direction:column;
+  text-decoration:none;color:inherit;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px 18px 18px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  transition:transform .18s ease, background .18s, border-color .18s, box-shadow .18s;
+  position:relative;overflow:hidden;min-height:168px;
+}
+.card::after{
+  content:'';position:absolute;right:-20px;top:-20px;width:90px;height:90px;border-radius:50%;
+  background:rgba(255,255,255,.03);pointer-events:none;
+}
+.card:hover{
+  transform:translateY(-4px);
+  background:var(--card-h);
+  border-color:var(--line-h);
+  box-shadow:0 18px 40px rgba(0,0,0,.28);
+}
+.card:active{transform:translateY(-1px)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.card-icon{
+  width:46px;height:46px;border-radius:14px;
+  display:grid;place-items:center;font-size:18px;flex-shrink:0;
+}
+.card .code{
+  font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;align-self:flex-start;
+}
+.card h2{font-size:1.05rem;font-weight:700;color:#f8fafc;margin-bottom:6px;letter-spacing:-.01em}
+.card p{font-size:.78rem;line-height:1.55;color:var(--mu);flex:1}
+.card .go{
+  margin-top:14px;display:inline-flex;align-items:center;gap:7px;
+  font-size:.75rem;font-weight:700;color:#e2e8f0;
+  transition:gap .15s,color .15s;
+}
+.card:hover .go{gap:10px}
+
+/* Accents */
+.card.qlbvr .card-icon{background:rgba(244,63,94,.18);color:#fb7185}
+.card.qlbvr .code{background:rgba(244,63,94,.15);color:#fda4af}
+.card.qlbvr:hover{border-color:rgba(251,113,133,.35)}
+.card.qlbvr:hover .go{color:#fda4af}
+
+.card.qldd .card-icon{background:rgba(16,185,129,.18);color:#34d399}
+.card.qldd .code{background:rgba(16,185,129,.15);color:#6ee7b7}
+.card.qldd:hover{border-color:rgba(52,211,153,.35)}
+.card.qldd:hover .go{color:#6ee7b7}
+
+.card.nhao .card-icon{background:rgba(14,165,233,.18);color:#38bdf8}
+.card.nhao .code{background:rgba(14,165,233,.15);color:#7dd3fc}
+.card.nhao:hover{border-color:rgba(56,189,248,.35)}
+.card.nhao:hover .go{color:#7dd3fc}
+
+.card.moc .card-icon{background:rgba(245,158,11,.18);color:#fbbf24}
+.card.moc .code{background:rgba(245,158,11,.15);color:#fcd34d}
+.card.moc:hover{border-color:rgba(251,191,36,.35)}
+.card.moc:hover .go{color:#fcd34d}
+
+.card.pdf .card-icon{background:rgba(124,58,237,.18);color:#a78bfa}
+.card.pdf .code{background:rgba(124,58,237,.15);color:#c4b5fd}
+.card.pdf:hover{border-color:rgba(167,139,250,.35)}
+.card.pdf:hover .go{color:#c4b5fd}
+
+footer{
+  margin-top:28px;text-align:center;font-size:.72rem;
+  color:#a7f3d0;text-shadow:0 1px 0 rgba(0,0,0,.25);
+}
+
+/* Motto */
+.motto-ticker{
+  position:fixed;left:0;right:0;bottom:0;z-index:9999;height:30px;overflow:hidden;
+  background:linear-gradient(90deg,#022c22 0%,#064e3b 40%,#0f766e 70%,#064e3b 100%);
+  border-top:1px solid rgba(167,243,208,.25);
+  box-shadow:0 -3px 14px rgba(6,78,59,.2);
+  display:flex;align-items:center;
+}
+.motto-ticker .motto-track{display:flex;align-items:center;width:max-content;animation:motto-scroll 42s linear infinite;white-space:nowrap}
+.motto-ticker:hover .motto-track{animation-play-state:paused}
+.motto-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px;font-size:12.5px;font-weight:600;color:#ecfdf5}
 .motto-item i{color:#6ee7b7;font-size:12px}
 .motto-sep{color:rgba(167,243,208,.45);padding:0 8px;font-size:10px}
 @keyframes motto-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-body{padding-bottom:30px!important}
-.contact-fab-wrap{bottom:48px!important}
+body{padding-bottom:42px}
 @media print{.motto-ticker{display:none!important}}
-
 </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="brand">
-            <div class="brand-icon"><i class="fa-solid fa-tree"></i></div>
-            <h1>Ban Quản lý Rừng phòng hộ Xuân Lộc</h1>
-            <p>Phòng Lâm nghiệp · Hệ thống theo dõi &amp; quản lý</p>
-        </div>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-icon"><i class="fa-solid fa-tree"></i></div>
+    <h1>Ban Quản lý Rừng phòng hộ Xuân Lộc</h1>
+    <p>Phòng Lâm nghiệp · Hệ thống theo dõi &amp; quản lý</p>
+    <div class="badge-row">
+      <span class="badge">5 module</span>
+      <span class="badge">Google Sheet</span>
+      <span class="badge">Xuất báo cáo</span>
+    </div>
+  </div>
 
-        <div class="grid">
-            <a class="card qlbvr" href="index.html">
-                <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <span class="code">QLBVR</span>
-                <h2>Vi phạm QLBVR</h2>
-                <p>Theo dõi hồ sơ vi phạm hợp đồng khoán, nhóm xử lý, thống kê thiệt hại, báo cáo Word/Excel/PDF.</p>
-                <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
-            </a>
+  <div class="grid">
+    <a class="card qlbvr" href="index.html">
+      <div class="card-top">
+        <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <span class="code">QLBVR</span>
+      </div>
+      <h2>Vi phạm QLBVR</h2>
+      <p>Hồ sơ vi phạm hợp đồng khoán, nhóm xử lý, thống kê thiệt hại, báo cáo Word / Excel / PDF.</p>
+      <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
 
-            <a class="card qldd" href="quanly-datdai-lamba.html">
-                <div class="card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
-                <span class="code">QLĐĐ</span>
-                <h2>Quản lý đất đai</h2>
-                <p>Lâm bạ thửa đất, hộ nhận khoán, hợp đồng, hiện trạng rừng — tra cứu và thống kê diện tích.</p>
-                <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
-            </a>
+    <a class="card qldd" href="quanly-datdai-lamba.html">
+      <div class="card-top">
+        <div class="card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+        <span class="code">QLĐĐ</span>
+      </div>
+      <h2>Quản lý đất đai</h2>
+      <p>Lâm bạ thửa đất, hộ nhận khoán, hợp đồng, hiện trạng rừng — tra cứu và thống kê diện tích.</p>
+      <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
 
-            <a class="card nhao" href="quanly-nhao-lampart.html">
-                <div class="card-icon"><i class="fa-solid fa-house-chimney"></i></div>
-                <span class="code">NHÀ Ở</span>
-                <h2>Nhà ở trên lâm phận</h2>
-                <p>Quản lý nhà tạm / công trình trên 6 phân trường — hộ sử dụng, diện tích XD, phép xây, hồ sơ.</p>
-                <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
-            </a>
+    <a class="card nhao" href="quanly-nhao-lampart.html">
+      <div class="card-top">
+        <div class="card-icon"><i class="fa-solid fa-house-chimney"></i></div>
+        <span class="code">NHÀ Ở</span>
+      </div>
+      <h2>Nhà ở trên lâm phận</h2>
+      <p>Nhà tạm / công trình trên 6 phân trường — hộ sử dụng, diện tích xây dựng, phép xây, hồ sơ.</p>
+      <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
 
-            <a class="card pdf" href="quanly-pdf.html">
-                <div class="card-icon"><i class="fa-solid fa-file-pdf"></i></div>
-                <span class="code">PDF</span>
-                <h2>Công cụ PDF</h2>
-                <p>Tách, nối, xoay, xóa trang, sắp xếp PDF — xử lý ngay trên trình duyệt, không cần máy chủ.</p>
-                <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
-            </a>
+    <a class="card moc" href="quanly-mocgioi.html">
+      <div class="card-top">
+        <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
+        <span class="code">MỐC GIỚI</span>
+      </div>
+      <h2>Quản lý mốc giới</h2>
+      <p>Danh sách mốc, tọa độ X–Y, phân trường — lọc, Excel, in PDF; router sang các module khác.</p>
+      <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
 
-        </div>
+    <a class="card pdf" href="quanly-pdf.html">
+      <div class="card-top">
+        <div class="card-icon"><i class="fa-solid fa-file-pdf"></i></div>
+        <span class="code">PDF</span>
+      </div>
+      <h2>Công cụ PDF</h2>
+      <p>Tách, nối, xoay, sắp xếp trang, OCR — xử lý trên trình duyệt, không cần máy chủ.</p>
+      <span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span>
+    </a>
+  </div>
+
+  <footer>BQLRPH Xuân Lộc · Phòng Lâm nghiệp</footer>
 </div>
-<footer style="color: #006400; -webkit-text-stroke: 0.4px #ffffff;">
-    BQLRPH Xuân Lộc · Phòng Lâm nghiệp
-</footer>
-</div>
-<div class="motto-ticker" id="mottoTicker" aria-hidden="true">
+
+<div class="motto-ticker" aria-hidden="true">
   <div class="motto-track">
     <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
     <span class="motto-sep">◆</span>
@@ -238,6 +235,5 @@ body{padding-bottom:30px!important}
     <span class="motto-sep">◆</span>
   </div>
 </div>
-
 </body>
 </html>
