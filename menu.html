@@ -167,6 +167,35 @@ footer{margin-top:22px;text-align:center;font-size:.7rem;color:#a7f3d0;opacity:.
 .motto-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px;font-size:12.5px;font-weight:600;color:#ecfdf5}
 .motto-item i{color:#6ee7b7}.motto-sep{color:rgba(167,243,208,.4);padding:0 8px}
 @keyframes ms{to{transform:translateX(-50%)}}
+
+.btn-info{
+  position:fixed;right:16px;bottom:42px;z-index:60;
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(15,23,42,.75);border:1px solid rgba(255,255,255,.2);
+  color:#a7f3d0;font-size:16px;font-weight:700;
+  display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  backdrop-filter:blur(8px);
+  transition:transform .15s, background .15s;
+}
+.btn-info:hover{background:rgba(16,185,129,.35);transform:scale(1.06);color:#ecfdf5}
+.guide-box{max-width:520px;max-height:85vh;overflow:auto}
+.guide-box h3{font-size:17px;font-weight:800;margin-bottom:4px}
+.guide-box .sub{font-size:12px;color:#94a3b8;margin-bottom:14px;line-height:1.45}
+.guide-box h4{font-size:13px;font-weight:700;color:#6ee7b7;margin:14px 0 6px}
+.guide-box p,.guide-box li{font-size:12.5px;color:#e2e8f0;line-height:1.55}
+.guide-box ol,.guide-box ul{padding-left:18px;margin:0 0 6px}
+.guide-box a{color:#6ee7b7}
+.guide-box .support{
+  margin-top:16px;padding:12px 14px;border-radius:12px;
+  background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.25);
+  font-size:12.5px;line-height:1.55;color:#ecfdf5;
+}
+.guide-box .support b{color:#6ee7b7}
+.guide-box table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 8px}
+.guide-box th,.guide-box td{border:1px solid rgba(255,255,255,.12);padding:6px 8px;text-align:left}
+.guide-box th{background:rgba(255,255,255,.06);color:#a7f3d0}
+
 </style>
 </head>
 <body>
@@ -256,6 +285,96 @@ footer{margin-top:22px;text-align:center;font-size:.7rem;color:#a7f3d0;opacity:.
     <div class="macts">
       <button type="button" class="btn btn-o" onclick="closeModal()">Đóng</button>
       <button type="button" class="btn btn-b" onclick="doForgotHint()"><i class="fa-solid fa-circle-info"></i> Đã hiểu</button>
+    </div>
+  </div>
+</div>
+
+
+<button type="button" class="btn-info" id="btnGuide" title="Hướng dẫn sử dụng" onclick="openGuide()" aria-label="Hướng dẫn">i</button>
+
+<div class="modal" id="modalGuide" onclick="if(event.target===this)closeModal()">
+  <div class="mbox guide-box">
+    <h3><i class="fa-solid fa-circle-info" style="color:#6ee7b7;margin-right:6px"></i>Hướng dẫn sử dụng nhanh</h3>
+    <div class="sub">Hệ thống quản lý lâm nghiệp · BQLRPH Xuân Lộc (dành cho người mới)</div>
+
+    <h4>1. Mở hệ thống</h4>
+    <p>Truy cập: <a href="https://haonehehe.github.io/BQLRPHXL/menu" target="_blank" rel="noopener">https://haonehehe.github.io/BQLRPHXL/menu</a><br>
+    Nên dùng trình duyệt <b>Chrome</b> hoặc <b>Edge</b>.</p>
+
+    <h4>2. Lần đầu: Khách chỉ dùng được PDF</h4>
+    <p>Khi <b>chưa đăng nhập</b>:</p>
+    <ul>
+      <li>Chỉ mở được <b>Công cụ PDF</b> (tách, nối, xoay, OCR…).</li>
+      <li>Các module QLBVR, Đất đai, Nhà ở, Mốc giới bị <b>khóa</b> (có ổ khóa).</li>
+    </ul>
+    <p>→ Muốn dùng đủ chức năng: <b>Đăng ký</b> rồi chờ admin duyệt.</p>
+
+    <h4>3. Đăng ký tài khoản</h4>
+    <ol>
+      <li>Trên menu bấm <b>Đăng ký</b>.</li>
+      <li>Nhập: Họ tên · Email · Mật khẩu (tối thiểu 6 ký tự).</li>
+      <li>Bấm <b>Gửi đăng ký</b>.</li>
+      <li>Trạng thái: <i>chờ admin duyệt</i>.</li>
+      <li>Khi được duyệt → <b>Đăng nhập</b> bằng đúng email và mật khẩu đã đăng ký.</li>
+    </ol>
+    <p>Không vào được ngay sau đăng ký là bình thường — phải chờ admin cấp quyền.</p>
+
+    <h4>4. Đăng nhập</h4>
+    <ol>
+      <li>Menu → <b>Đăng nhập</b>.</li>
+      <li>Nhập email + mật khẩu.</li>
+      <li>Thành công sẽ thấy: <b>Xin chào, [Họ tên]</b>.</li>
+      <li>Chỉ hiện các module được cấp quyền.</li>
+    </ol>
+    <table>
+      <tr><th>Nút</th><th>Việc</th></tr>
+      <tr><td>Đổi MK</td><td>Đổi mật khẩu</td></tr>
+      <tr><td>⚙</td><td>Cấu hình đồng bộ (thường không cần đụng)</td></tr>
+      <tr><td>Thoát</td><td>Đăng xuất</td></tr>
+    </table>
+    <p><b>Quên mật khẩu:</b> trên form đăng nhập chọn <b>Quên mật khẩu?</b> → liên hệ admin để đặt lại MK.</p>
+
+    <h4>5. Các module nghiệp vụ</h4>
+    <p>Sau khi đăng nhập và được cấp quyền, bấm <b>Mở module</b> trên từng thẻ:</p>
+    <table>
+      <tr><th>Module</th><th>Dùng để làm gì</th></tr>
+      <tr><td>Vi phạm QLBVR</td><td>Hồ sơ vi phạm, thống kê, xuất báo cáo</td></tr>
+      <tr><td>Quản lý đất đai</td><td>Lâm bạ, hộ nhận khoán, diện tích, hiện trạng</td></tr>
+      <tr><td>Nhà ở trên lâm phận</td><td>Công trình / nhà tạm theo phân trường</td></tr>
+      <tr><td>Quản lý mốc giới</td><td>Danh sách mốc, tọa độ, lọc, Excel, in</td></tr>
+      <tr><td>Công cụ PDF</td><td>Tách, nối, xoay, OCR hồ sơ scan</td></tr>
+      <tr><td>Admin</td><td>Chỉ tài khoản quản trị — duyệt TK, cấp quyền</td></tr>
+    </table>
+    <ul>
+      <li>Dùng ô tìm / bộ lọc (phân trường, loại mốc, từ khóa…) nếu có.</li>
+      <li>Xem bảng → <b>Xuất Excel</b> hoặc <b>In / PDF</b> khi cần báo cáo.</li>
+      <li>Bấm <b>Làm mới</b> nếu dữ liệu chưa lên (cần mạng để tải Google Sheet).</li>
+    </ul>
+
+    <h4>6. Công cụ PDF (ai cũng dùng được)</h4>
+    <ol>
+      <li>Chọn tab: <b>Nối</b> · <b>Tách</b> · <b>Chỉnh sửa</b> · <b>Xoay</b> · <b>OCR</b>.</li>
+      <li>Chọn / kéo thả file PDF.</li>
+      <li><b>Xem trước</b> trang (kéo thả đổi thứ tự nếu được).</li>
+      <li>Xử lý xong → <b>Tải về</b>.</li>
+    </ol>
+    <ul>
+      <li><b>Nối:</b> thứ tự trang xem trước = thứ tự sau nối; tên file thường theo file đầu + <code>_DANOI</code>.</li>
+      <li><b>Xoay:</b> dùng nút dưới từng trang để xoay đúng hướng trước khi tải.</li>
+      <li><b>OCR:</b> chọn tiếng Việt với văn bản tiếng Việt; có thể xuất Word.</li>
+    </ul>
+
+    <div class="support">
+      <b>Hỗ trợ kỹ thuật</b><br>
+      Huỳnh Nhựt Hào<br>
+      Phát triển &amp; vận hành hệ thống BQLRPH Xuân Lộc<br>
+      SĐT: <a href="tel:0878884088">0878 884 088</a><br>
+      Email: <a href="mailto:hnhao.213@gmail.com">hnhao.213@gmail.com</a><br>
+      Liên hệ khi: không đăng nhập được, thiếu quyền module, dữ liệu không tải, hoặc lỗi xử lý PDF.
+    </div>
+
+    <div class="macts" style="margin-top:14px">
+      <button type="button" class="btn btn-g" onclick="closeModal()" style="flex:1">Đã hiểu</button>
     </div>
   </div>
 </div>
@@ -544,7 +663,8 @@ var MODULES=[
 ];
 
 function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
-function closeModal(){['modalLogin','modalReg','modalCfg','modalPass','modalForgot'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('on');});}
+function closeModal(){['modalLogin','modalReg','modalCfg','modalPass','modalForgot','modalGuide'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('on');});}
+function openGuide(){closeModal();document.getElementById('modalGuide').classList.add('on');}
 function openLogin(){closeModal();document.getElementById('loginErr').textContent='';document.getElementById('modalLogin').classList.add('on');}
 function openRegister(){closeModal();document.getElementById('regErr').textContent='';document.getElementById('modalReg').classList.add('on');}
 function openCfg(){closeModal();document.getElementById('cfgUrl').value=CONFIG.SCRIPT_URL||'';document.getElementById('modalCfg').classList.add('on');}
