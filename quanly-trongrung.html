@@ -1,6 +1,54 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
+<script>
+/* BQLRPH Auth Guard (head) — chặn trước khi vẽ trang */
+(function(){
+  try{ document.documentElement.classList.add('bqlrph-wait'); }catch(e){}
+  var SESS_KEY='bqlrph_session_v1';
+  var MOD='trongrung';
+  function getSession(){
+    try{
+      var s=sessionStorage.getItem(SESS_KEY);
+      if(s) return JSON.parse(s);
+      s=localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  function canAccess(){
+    if(MOD==='pdf') return true;
+    var s=getSession();
+    if(!s) return false;
+    if(s.role==='admin') return true;
+    return Array.isArray(s.perms) && s.perms.indexOf(MOD)>=0;
+  }
+  if(!canAccess()){
+    try{ window.stop(); }catch(e){}
+    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Trồng &amp; chăm sóc rừng</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>trongrung</b>.</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div></body></html>';
+    document.open();
+    document.write(gate);
+    document.close();
+    // đảm bảo không còn nội dung cũ
+    setTimeout(function(){
+      try{
+        if(!document.body || document.body.innerText.indexOf('Cần đăng nhập')<0){
+          document.documentElement.innerHTML=gate.replace(/^<!DOCTYPE html>/,'');
+        }
+      }catch(e){}
+    },0);
+    return;
+  }
+  // Được phép: bỏ ẩn body
+  try{
+    document.documentElement.classList.remove('bqlrph-wait');
+    var cs=document.getElementById('bqlrph-lockcss');
+    if(cs) cs.remove();
+  }catch(e){}
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trồng &amp; chăm sóc rừng 2026 · BQLRPH Xuân Lộc</title>
@@ -88,35 +136,6 @@ tr:hover td{background:#f0fdf4}
 </style>
 </head>
 <body>
-<script>window.__BQLRPH_MOD__='trongrung';</script>
-<script>
-(function(){
-  var SESS_KEY='bqlrph_session_v1';
-  var MOD='trongrung';
-  function getSession(){
-    try{
-      var s=sessionStorage.getItem(SESS_KEY);
-      if(s) return JSON.parse(s);
-      s=localStorage.getItem(SESS_KEY);
-      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
-    }catch(e){}
-    return null;
-  }
-  function canAccess(mod){
-    if(mod==='pdf') return true;
-    var s=getSession();
-    if(!s) return false;
-    if(s.role==='admin') return true;
-    return Array.isArray(s.perms)&&s.perms.indexOf(mod)>=0;
-  }
-  if(!canAccess(MOD)){
-    document.addEventListener('DOMContentLoaded',function(){
-      document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:36px;margin-bottom:10px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Trồng &amp; chăm sóc rừng</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.</p><a href="menu.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div></div>';
-    });
-    window.__BQLRPH_BLOCKED__=true;
-  }
-})();
-</script>
 
 <div class="top">
   <div class="wrap top-in">
@@ -129,6 +148,7 @@ tr:hover td{background:#f0fdf4}
     </div>
     <div class="acts no-print">
       <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
+      <button class="btn btn-o" type="button" onclick="doiLinkSheet()" title="Đổi link Google Sheet"><i class="fa-solid fa-link"></i> Đổi link Sheet</button>
       <button class="btn btn-o" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
       <button class="btn btn-b" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
       <button class="btn btn-g" type="button" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> In / PDF</button>
@@ -144,7 +164,7 @@ tr:hover td{background:#f0fdf4}
     <a class="r-card pdf" href="quanly-pdf.html"><div class="ic"><i class="fa-solid fa-file-pdf"></i></div><b>Công cụ PDF</b><span>Tách · nối · OCR</span></a>
   </div>
 
-  <p class="note no-print">Nguồn: Google Sheet <b>Tiến độ trồng và chăm sóc rừng năm 2026</b>. Nếu không tải được → chia sẻ sheet <b>Anyone with the link (Viewer)</b>.</p>
+  <p class="note no-print">Nguồn: Google Sheet <b>Tiến độ trồng và chăm sóc rừng năm 2026</b>. Nếu không tải được → Sheet phải <b>Công khai (Anyone with the link · Viewer)</b>. Có thể bấm <b>Đổi link Sheet</b> nếu dùng file khác.</p>
 
   <div class="bar no-print">
     <input type="search" id="q" placeholder="Tìm hạng mục…" oninput="veLai()">
@@ -200,8 +220,33 @@ tr:hover td{background:#f0fdf4}
 </div>
 
 <script>
-var SID='10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7';
-var GID='1027488994';
+var DEFAULT_SID='10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7';
+var DEFAULT_GID='1027488994';
+var SID=DEFAULT_SID;
+var GID=DEFAULT_GID;
+try{
+  var _cfg=JSON.parse(localStorage.getItem('trongrung_sheet_cfg')||'{}');
+  if(_cfg.sid) SID=_cfg.sid;
+  if(_cfg.gid) GID=String(_cfg.gid);
+}catch(e){}
+
+function doiLinkSheet(){
+  var cur='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID+'#gid='+GID;
+  var url=prompt('Dán link Google Sheet tiến độ trồng & chăm sóc rừng:\n(Phải chia sẻ Anyone with the link - Viewer)', cur);
+  if(url==null) return;
+  url=String(url).trim();
+  if(!url){ toast('Giữ nguyên link hiện tại'); return; }
+  var m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(!m){ toast('Link không hợp lệ'); return; }
+  var gid='0';
+  var g=url.match(/[?&#]gid=([0-9]+)/);
+  if(g) gid=g[1];
+  SID=m[1]; GID=gid;
+  try{ localStorage.setItem('trongrung_sheet_cfg', JSON.stringify({sid:SID,gid:GID})); }catch(e){}
+  toast('Đã đổi Sheet · đang tải lại…');
+  taiLai(false);
+}
+
 var PTS=['Gia Huynh','Núi Le','Trản Táo','Lán Cát','Gia Phu','Đầm Voi'];
 var dong=[];
 var lastSync=null;
@@ -367,21 +412,46 @@ function taiLai(silent){
 function locDong(){
   var q=(document.getElementById('q').value||'').toLowerCase().trim();
   var nh=document.getElementById('fNhom').value;
+  var fPT=(document.getElementById('fPT').value||'').trim();
+  var ptIdx=fPT?PTS.indexOf(fPT):-1;
   return dong.filter(function(d){
     if(nh && d.nhom!==nh) return false;
-    if(!q) return true;
-    return (d.hangMuc+' '+d.tt).toLowerCase().indexOf(q)>=0;
+    if(q && (d.hangMuc+' '+d.tt).toLowerCase().indexOf(q)<0) return false;
+    // Lọc phân trường: giữ dòng có chỉ tiêu hoặc kết quả tại PT đó
+    if(ptIdx>=0){
+      var chi=d.ptChi&&d.ptChi[ptIdx]?d.ptChi[ptIdx]:0;
+      var kq=d.ptKq&&d.ptKq[ptIdx]?d.ptKq[ptIdx]:0;
+      if(!(chi>0 || kq>0)) return false;
+    }
+    return true;
   });
 }
 
 function veLai(){
   var list=locDong();
   veKPI(list); veCharts(list); veDS(list);
+  var st=document.getElementById('syncTxt');
+  if(st && lastSync){
+    var fPT=(document.getElementById('fPT').value||'').trim();
+    var nh=document.getElementById('fNhom').value;
+    st.textContent = list.length+' hạng mục'
+      +(nh?(nh==='TRONG'?' · Trồng':' · Chăm sóc'):'')
+      +(fPT?' · '+fPT:'')
+      +' · '+lastSync.toLocaleTimeString('vi-VN');
+  }
 }
 
 function veKPI(list){
-  // ưu tiên dòng tổng RỪNG PHÒNG HỘ / RỪNG SẢN XUẤT / CHĂM SÓC
+  var fPT=(document.getElementById('fPT').value||'').trim();
+  var ptIdx=fPT?PTS.indexOf(fPT):-1;
+  function valChi(d){ return ptIdx>=0 ? (d.ptChi[ptIdx]||0) : d.chiTieu; }
+  function valKq(d){ return ptIdx>=0 ? (d.ptKq[ptIdx]||0) : d.kq; }
   function findRow(re, nhom){
+    for(var i=0;i<list.length;i++){
+      if(nhom && list[i].nhom!==nhom) continue;
+      if(re.test(list[i].hangMuc)) return list[i];
+    }
+    // fallback toàn bộ dữ liệu
     for(var i=0;i<dong.length;i++){
       if(nhom && dong[i].nhom!==nhom) continue;
       if(re.test(dong[i].hangMuc)) return dong[i];
@@ -391,25 +461,48 @@ function veKPI(list){
   var rph=findRow(/RỪNG PHÒNG HỘ/i,'TRONG');
   var rsx=findRow(/RỪNG SẢN XUẤT/i,'TRONG');
   var cs=findRow(/^CHĂM SÓC RỪNG$/i,'CHAM')||findRow(/CHĂM SÓC RỪNG/i,'CHAM');
-  var ctHa=(rph?rph.chiTieu:0)+(rsx?rsx.chiTieu:0);
-  var kqHa=(rph?rph.kq:0)+(rsx?rsx.kq:0);
+  var ctHa=(rph?valChi(rph):0)+(rsx?valChi(rsx):0);
+  var kqHa=(rph?valKq(rph):0)+(rsx?valKq(rsx):0);
+  // Nếu đang lọc nhóm chăm sóc — KPI trồng = —
+  var nh=document.getElementById('fNhom').value;
+  if(nh==='CHAM'){ ctHa=0; kqHa=0; }
+  if(nh==='TRONG'){ cs=null; }
   var pct=ctHa>0?(kqHa/ctHa*100):0;
+  var subPT=fPT?(' · '+fPT):'';
   document.getElementById('kpis').innerHTML=
-    '<div class="kpi t"><div class="l">Chỉ tiêu trồng (ha)</div><div class="v">'+fmt(ctHa)+'</div><div class="s">PH + SX</div></div>'+
-    '<div class="kpi d"><div class="l">Đã trồng (ha)</div><div class="v">'+fmt(kqHa)+'</div><div class="s">'+pctBadge(pct)+'</div></div>'+
-    '<div class="kpi a"><div class="l">Chăm sóc — chỉ tiêu (ha)</div><div class="v">'+(cs?fmt(cs.chiTieu):'—')+'</div></div>'+
-    '<div class="kpi l"><div class="l">Chăm sóc — kết quả (ha)</div><div class="v">'+(cs?fmt(cs.kq):'—')+'</div><div class="s">'+(cs&&cs.chiTieu?pctBadge(cs.kq/cs.chiTieu*100):'')+'</div></div>';
+    '<div class="kpi t"><div class="l">Chỉ tiêu trồng (ha)</div><div class="v">'+(nh==='CHAM'?'—':fmt(ctHa))+'</div><div class="s">PH + SX'+subPT+'</div></div>'+
+    '<div class="kpi d"><div class="l">Đã trồng (ha)</div><div class="v">'+(nh==='CHAM'?'—':fmt(kqHa))+'</div><div class="s">'+(nh==='CHAM'?'':pctBadge(pct))+'</div></div>'+
+    '<div class="kpi a"><div class="l">Chăm sóc — chỉ tiêu (ha)</div><div class="v">'+(cs?fmt(valChi(cs)):'—')+'</div><div class="s">'+subPT+'</div></div>'+
+    '<div class="kpi l"><div class="l">Chăm sóc — kết quả (ha)</div><div class="v">'+(cs?fmt(valKq(cs)):'—')+'</div><div class="s">'+(cs&&valChi(cs)?pctBadge(valKq(cs)/valChi(cs)*100):'')+'</div></div>';
 }
 
 function veCharts(list){
-  // lấy dòng RỪNG PHÒNG HỘ làm mẫu tiến độ PT
+  var nh=document.getElementById('fNhom').value;
+  var fPT=(document.getElementById('fPT').value||'').trim();
+  var ptIdx=fPT?PTS.indexOf(fPT):-1;
+  // chọn dòng tổng phù hợp nhóm
   var row=null;
-  for(var i=0;i<dong.length;i++){ if(/RỪNG PHÒNG HỘ/i.test(dong[i].hangMuc)&&dong[i].nhom==='TRONG'){row=dong[i];break;} }
-  if(!row){ document.getElementById('chartPT').innerHTML='<div class="muted">Không có dữ liệu</div>'; document.getElementById('chartPct').innerHTML=''; return; }
+  var prefer = nh==='CHAM' ? /CHĂM SÓC RỪNG/i : /RỪNG PHÒNG HỘ/i;
+  var preferNhom = nh==='CHAM' ? 'CHAM' : 'TRONG';
+  for(var i=0;i<list.length;i++){
+    if(list[i].nhom===preferNhom && prefer.test(list[i].hangMuc)){ row=list[i]; break; }
+  }
+  if(!row){
+    for(var i=0;i<dong.length;i++){
+      if(dong[i].nhom===preferNhom && prefer.test(dong[i].hangMuc)){ row=dong[i]; break; }
+    }
+  }
+  if(!row){ document.getElementById('chartPT').innerHTML='<div class="muted">Không có dữ liệu cho bộ lọc hiện tại</div>'; document.getElementById('chartPct').innerHTML=''; return; }
   var max=1;
-  for(var j=0;j<6;j++) max=Math.max(max, row.ptChi[j], row.ptKq[j]);
-  var h1='', h2='';
+  var idxs=[];
   for(var j=0;j<6;j++){
+    if(ptIdx>=0 && j!==ptIdx) continue;
+    idxs.push(j);
+    max=Math.max(max, row.ptChi[j], row.ptKq[j]);
+  }
+  var h1='', h2='';
+  for(var k=0;k<idxs.length;k++){
+    var j=idxs[k];
     var chi=row.ptChi[j], kq=row.ptKq[j];
     var pChi=Math.max(2,Math.round(100*chi/max));
     var pKq=Math.max(2,Math.round(100*kq/max));
@@ -420,7 +513,8 @@ function veCharts(list){
     var col=pct>=90?'#059669':(pct>=50?'#d97706':'#dc2626');
     h2+='<div class="bar-row"><span class="nm">'+esc(PTS[j])+'</span><div class="track"><div class="fill" style="width:'+pBar+'%;background:'+col+'"></div></div><span class="n">'+fmt(pct,0)+'%</span></div>';
   }
-  document.getElementById('chartPT').innerHTML='<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">Xám = chỉ tiêu · Xanh = kết quả (Rừng phòng hộ)</div>'+h1;
+  var titleNote = nh==='CHAM' ? 'Chăm sóc rừng' : 'Rừng phòng hộ';
+  document.getElementById('chartPT').innerHTML='<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">Xám = chỉ tiêu · Xanh = kết quả ('+titleNote+')</div>'+h1;
   document.getElementById('chartPct').innerHTML=h2;
 }
 
@@ -469,7 +563,59 @@ function xuatExcel(){
   toast('Đã xuất Excel · '+rows.length+' dòng');
 }
 
-window.taiLai=taiLai; window.xuatExcel=xuatExcel; window.veLai=veLai;
+
+function xuatWord(){
+  var list=locDong();
+  var fPT=(document.getElementById('fPT').value||'').trim();
+  var nh=document.getElementById('fNhom').value;
+  var nhLabel = nh==='TRONG'?'A. Trồng rừng':(nh==='CHAM'?'B. Chăm sóc rừng':'Tất cả');
+  var h='';
+  h+='<h1 style="text-align:center">BÁO CÁO TIẾN ĐỘ TRỒNG &amp; CHĂM SÓC RỪNG NĂM 2026</h1>';
+  h+='<p style="text-align:center">Ban Quản lý Rừng phòng hộ Xuân Lộc</p>';
+  h+='<p><b>Bộ lọc:</b> '+nhLabel+(fPT?' · Phân trường: '+fPT:' · Tất cả phân trường')+'</p>';
+  h+='<p>Số hạng mục: <b>'+list.length+'</b> · Xuất lúc: '+new Date().toLocaleString('vi-VN')+'</p>';
+  h+='<table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse;width:100%;font-size:11pt">';
+  h+='<tr style="background:#e2e8f0">'
+    +'<th>TT</th><th>Hạng mục</th><th>Nhóm</th><th>ĐVT</th><th>Chỉ tiêu</th><th>Kết quả</th><th>%</th>';
+  if(fPT){
+    h+='<th>CT '+fPT+'</th><th>KQ '+fPT+'</th>';
+  } else {
+    for(var j=0;j<PTS.length;j++) h+='<th>'+PTS[j]+' (KQ)</th>';
+  }
+  h+='</tr>';
+  list.forEach(function(d,i){
+    var pct=d.chiTieu>0?(d.kq/d.chiTieu*100):0;
+    h+='<tr>'
+      +'<td>'+esc(d.tt||'')+'</td>'
+      +'<td>'+esc(d.hangMuc)+'</td>'
+      +'<td>'+(d.nhom==='TRONG'?'Trồng':'Chăm sóc')+'</td>'
+      +'<td>'+esc(d.dvt||'')+'</td>'
+      +'<td style="text-align:right">'+fmt(d.chiTieu)+'</td>'
+      +'<td style="text-align:right">'+fmt(d.kq)+'</td>'
+      +'<td style="text-align:right">'+fmt(pct,0)+'%</td>';
+    if(fPT){
+      var idx=PTS.indexOf(fPT);
+      h+='<td style="text-align:right">'+fmt(d.ptChi[idx]||0)+'</td>'
+        +'<td style="text-align:right">'+fmt(d.ptKq[idx]||0)+'</td>';
+    } else {
+      for(var j=0;j<6;j++) h+='<td style="text-align:right">'+fmt(d.ptKq[j]||0)+'</td>';
+    }
+    h+='</tr>';
+  });
+  h+='</table>';
+  h+='<p style="margin-top:16px;font-size:10pt;color:#555">Nguồn: Google Sheet tiến độ trồng &amp; chăm sóc rừng · Hệ thống BQLRPH Xuân Lộc</p>';
+  var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bao cao trong cham soc rung 2026</title></head><body>'+h+'</body></html>';
+  var blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Bao_cao_trong_cham_soc_rung_2026.doc';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(a.href); },800);
+  toast('Đã xuất Word ('+list.length+' hạng mục)');
+}
+
+
+window.taiLai=taiLai; window.xuatExcel=xuatExcel; window.xuatWord=xuatWord; window.veLai=veLai; window.doiLinkSheet=doiLinkSheet;
 setTimeout(function(){ if(!window.__BQLRPH_BLOCKED__) taiLai(false); },200);
 </script>
 </body>
