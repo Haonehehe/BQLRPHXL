@@ -165,6 +165,13 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 .flow i{color:#94a3b8;font-size:10px}
 .area-card{margin-bottom:12px}.area-status{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:#f1f5f9;color:#64748b}.area-status.ok{background:#ecfdf5;color:#047857}.area-status.bad{background:#fef2f2;color:#b91c1c}.area-tree{display:grid;gap:8px}.area-node{background:#f8fafc;border:1px solid var(--bd);border-radius:10px;padding:9px 10px;display:flex;justify-content:space-between;gap:10px;align-items:center;min-height:44px}.area-node.root{background:#f0fdf4;border-color:#bbf7d0}.area-node span{font-size:11px;color:#475569}.area-node b{font-size:13px;white-space:nowrap}.area-children{display:grid;gap:8px}.area-children.two{grid-template-columns:repeat(2,minmax(0,1fr))}.area-children.six{grid-template-columns:repeat(3,minmax(0,1fr))}.area-checks{margin-top:10px;display:grid;gap:6px}.area-check{font-size:11px;padding:7px 9px;border-radius:8px;border:1px solid var(--bd);background:#fff}.area-check.ok{color:#047857;background:#ecfdf5;border-color:#a7f3d0}.area-check.bad{color:#b91c1c;background:#fef2f2;border-color:#fecaca}.area-check .delta{float:right;font-weight:700}.group-head{background:#ecfdf5!important;color:#047857!important;text-transform:none!important;font-size:11px!important;text-align:center!important}.subhead{background:#f8fafc!important;text-transform:none!important}.area-mini{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}.area-mini div{border:1px solid var(--bd);border-radius:8px;padding:7px;background:#fff}.area-mini span{display:block;font-size:10px;color:var(--mu)}.area-mini b{display:block;margin-top:2px;font-size:12px}@media(max-width:700px){.area-children.two,.area-children.six{grid-template-columns:1fr 1fr}.area-mini{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:480px){.area-children.two,.area-children.six{grid-template-columns:1fr}.area-mini{grid-template-columns:1fr 1fr}}
 </style>
+
+<style id="map-fix">
+#mapWrap{position:relative!important;width:100%!important;height:640px!important;min-height:480px!important;border-radius:14px;overflow:hidden;border:1px solid #e2e8f0;background:#dbe4ee}
+#mapLamba{width:100%!important;height:640px!important;min-height:480px!important;z-index:1}
+.leaflet-container{width:100%!important;height:100%!important;min-height:480px!important}
+</style>
+
 </head>
 <body>
 <div class="top"><div class="wrap top-in">
@@ -320,8 +327,8 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
           <button type="button" class="btn btn-o btn-sm" onclick="resetBanDo()"><i class="fa-solid fa-expand"></i> Toàn cảnh</button>
           <button type="button" class="btn btn-o btn-sm" onclick="taiBanDo(true)"><i class="fa-solid fa-arrows-rotate"></i> Tải lại map</button>
         </div>
-        <div id="mapWrap">
-          <div id="mapLamba"></div>
+        <div id="mapWrap" style="height:640px;min-height:480px">
+          <div id="mapLamba" style="height:640px;min-height:480px"></div>
           <div class="map-legend">
             <div><span style="display:inline-block;width:12px;height:12px;background:#059669;opacity:.35;border:1px solid #047857;vertical-align:middle;margin-right:6px"></span>Thửa lâm bạ</div>
             <div id="mapCount" style="margin-top:4px;color:#94a3b8">—</div>
@@ -2498,17 +2505,34 @@ function khoiTaoBanDo(){
     setMapStatus('Chưa tải được Leaflet — kiểm tra mạng');
     return;
   }
+  var el=document.getElementById('mapLamba');
+  if(!el){ setMapStatus('Thiếu khung map'); return; }
+  // Đảm bảo tab đang hiện trước khi init
+  var pan=document.getElementById('p-banndo');
+  if(pan) pan.classList.remove('hidden');
   if(!mapLamba){
-    mapLamba=L.map('mapLamba',{zoomControl:true}).setView([11.02, 107.50], 12);
+    el.style.height='640px';
+    el.style.minHeight='480px';
+    mapLamba=L.map('mapLamba',{zoomControl:true, preferCanvas:true}).setView([11.02, 107.50], 12);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
       maxZoom:19,
       attribution:'&copy; OpenStreetMap'
     }).addTo(mapLamba);
-    // optional satellite-ish none - keep OSM
   }
-  setTimeout(function(){ try{ mapLamba.invalidateSize(); }catch(e){} }, 100);
+  function fixSize(){
+    try{
+      mapLamba.invalidateSize(true);
+      if(mapLayer){
+        var b=mapLayer.getBounds();
+        if(b && b.isValid()) mapLamba.fitBounds(b,{padding:[24,24],maxZoom:15});
+      }
+    }catch(e){}
+  }
+  setTimeout(fixSize, 50);
+  setTimeout(fixSize, 250);
+  setTimeout(fixSize, 600);
   if(!mapLoaded && !mapLoading) taiBanDo(false);
-  else if(mapLayer){ try{ mapLamba.invalidateSize(); }catch(e){} }
+  else if(mapData) veLopBanDo(mapData);
 }
 
 function taiBanDo(force){
@@ -2606,7 +2630,20 @@ function veLopBanDo(geo){
   if(el) el.textContent=n.toLocaleString('vi-VN')+' thửa đang hiển thị';
   setMapStatus(n.toLocaleString('vi-VN')+' thửa (đã lọc)');
   if(n>0){
-    try{ mapLamba.fitBounds(mapLayer.getBounds(),{padding:[20,20],maxZoom:16}); }catch(e){}
+    try{
+      mapLamba.invalidateSize(true);
+      var b=mapLayer.getBounds();
+      if(b && b.isValid()) mapLamba.fitBounds(b,{padding:[24,24],maxZoom:15});
+    }catch(e){ console.warn(e); }
+    setTimeout(function(){
+      try{
+        mapLamba.invalidateSize(true);
+        var b2=mapLayer.getBounds();
+        if(b2 && b2.isValid()) mapLamba.fitBounds(b2,{padding:[24,24],maxZoom:15});
+      }catch(e){}
+    }, 300);
+  } else {
+    try{ mapLamba.invalidateSize(true); }catch(e){}
   }
 }
 
