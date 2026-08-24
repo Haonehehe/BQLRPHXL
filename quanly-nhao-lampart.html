@@ -91,9 +91,63 @@ tr:hover td{background:#f8fafc}
 .contact-pop a{display:block;color:#047857;text-decoration:none;margin-top:4px}
 .contact-pop a:hover{text-decoration:underline}
 .support-footer{border-top:1px solid #e2e8f0;background:rgba(255,255,255,.92);padding:10px 14px;font-size:11px;color:#64748b;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+
+/* Motto ticker */
+.motto-ticker{position:fixed;left:0;right:0;bottom:0;z-index:9999;height:30px;overflow:hidden;background:linear-gradient(90deg,#022c22 0%,#064e3b 40%,#0f766e 70%,#064e3b 100%);border-top:1px solid rgba(167,243,208,.25);box-shadow:0 -3px 14px rgba(6,78,59,.2);display:flex;align-items:center}
+.motto-ticker .motto-track{display:flex;align-items:center;width:max-content;animation:motto-scroll 40s linear infinite;white-space:nowrap}
+.motto-ticker:hover .motto-track{animation-play-state:paused;cursor:default}
+.motto-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px;font-size:13px;font-weight:600;letter-spacing:.02em;color:#ecfdf5}
+.motto-item i{color:#6ee7b7;font-size:12px}
+.motto-sep{color:rgba(167,243,208,.45);padding:0 8px;font-size:10px}
+@keyframes motto-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+body{padding-bottom:30px!important}
+.contact-fab-wrap{bottom:48px!important}
+@media print{.motto-ticker{display:none!important}}
+
 </style>
 </head>
 <body>
+<script>window.__BQLRPH_MOD__='nhao';</script>
+
+<script>
+/* BQLRPH Auth Guard — session đồng bộ menu (sessionStorage + localStorage) */
+(function(){
+  var SESS_KEY = 'bqlrph_session_v1';
+  var MOD = window.__BQLRPH_MOD__ || 'pdf';
+  function getSession(){
+    try{
+      var s = sessionStorage.getItem(SESS_KEY);
+      if(s){ return JSON.parse(s); }
+      s = localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY, s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  function canAccess(mod){
+    if(mod === 'pdf') return true;
+    var s = getSession();
+    if(!s) return false;
+    if(s.role === 'admin') return true;
+    return Array.isArray(s.perms) && s.perms.indexOf(mod) >= 0;
+  }
+  if(!canAccess(MOD)){
+    document.addEventListener('DOMContentLoaded', function(){
+      document.body.innerHTML =
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc">'
+        +'<div style="max-width:420px;width:100%;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)">'
+        +'<div style="font-size:36px;margin-bottom:10px">🔒</div>'
+        +'<h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1>'
+        +'<p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module này chỉ mở khi đã đăng nhập trên <b>Menu</b> và được admin cấp quyền. Không thể bỏ qua bằng cách mở link trực tiếp.</p>'
+        +'<a href="menu.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a>'
+        +'</div></div>';
+    });
+    // chặn script phía sau nếu DOM chưa sẵn
+    window.__BQLRPH_BLOCKED__ = true;
+  }
+  window.bqlrphCurrentUser = getSession;
+})();
+</script>
+
 <div class="top">
   <div class="wrap top-in">
     <div class="logo">
@@ -763,5 +817,15 @@ document.addEventListener('click',function(e){
 
 setTimeout(function(){ taiLai(false); }, 200);
 </script>
+
+<div class="motto-ticker" id="mottoTicker" aria-hidden="true">
+  <div class="motto-track">
+    <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
+    <span class="motto-sep">◆</span>
+    <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
+    <span class="motto-sep">◆</span>
+  </div>
+</div>
+
 </body>
 </html>

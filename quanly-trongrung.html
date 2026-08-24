@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trồng &amp; chăm sóc rừng 2026 · BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--g:#059669;--g2:#047857;--sky:#0284c7;--vio:#7c3aed;--amber:#d97706;--bg:#f0fdf4;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;padding-bottom:40px;background:radial-gradient(1000px 500px at 0% -10%,rgba(5,150,105,.08),transparent 50%),radial-gradient(800px 400px at 100% 0%,rgba(34,197,94,.06),transparent 45%),var(--bg)}
+button,input,select{font:inherit}button{cursor:pointer;border:none;background:none}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 16px}
+.top{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:40}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap;padding:10px 0}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-i{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#22c55e,#047857);color:#fff;display:grid;place-items:center;font-size:16px;box-shadow:0 8px 20px rgba(5,150,105,.35)}
+.logo h1{font-size:15px;font-weight:800}
+.logo p{font-size:11px;color:var(--mu);margin-top:1px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border-radius:11px;font-size:12px;font-weight:600;border:1px solid transparent;white-space:nowrap;transition:.15s}
+.btn:active{transform:scale(.97)}
+.btn-g{background:linear-gradient(135deg,#10b981,#047857);color:#fff;box-shadow:0 6px 16px rgba(5,150,105,.25)}
+.btn-b{background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff}
+.btn-o{background:#fff;border-color:var(--bd);color:#334155}
+.btn-o:hover{background:#f8fafc}
+.btn-sm{height:32px;padding:0 11px;font-size:11px;border-radius:9px}
+.router{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 12px}
+@media(min-width:700px){.router{grid-template-columns:repeat(4,1fr)}}
+.r-card{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:16px;border:1px solid var(--bd);background:#fff;box-shadow:var(--shadow);transition:.18s}
+.r-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,23,42,.1)}
+.r-card .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:15px}
+.r-card b{font-size:13px}.r-card span{font-size:11px;color:var(--mu)}
+.r-card.qlbvr .ic{background:#fff1f2;color:#e11d48}
+.r-card.lamba .ic{background:#ecfdf5;color:#059669}
+.r-card.nhao .ic{background:#e0f2fe;color:#0284c7}
+.r-card.pdf .ic{background:#f5f3ff;color:#7c3aed}
+.note{font-size:11px;color:var(--mu);margin:0 0 12px;line-height:1.45}
+.bar{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;box-shadow:var(--shadow)}
+.bar input,.bar select{height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 12px;font-size:12.5px;background:#fff}
+.bar input{flex:1;min-width:160px}
+.bar input:focus,.bar select:focus{outline:none;border-color:#6ee7b7;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+.sync{margin-left:auto;font-size:11px;color:var(--mu);font-weight:500}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:700px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
+.kpi .v{font-size:20px;font-weight:800;margin-top:4px;letter-spacing:-.02em}
+.kpi .s{font-size:11px;color:#94a3b8;margin-top:3px}
+.kpi.t .v{color:var(--g)}.kpi.d .v{color:var(--sky)}.kpi.l .v{color:var(--vio)}.kpi.a .v{color:var(--amber)}
+.charts{display:grid;gap:12px;margin-bottom:14px}
+@media(min-width:800px){.charts{grid-template-columns:1fr 1fr}}
+.chart-box{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+.chart-box h3{font-size:12px;font-weight:700;margin-bottom:10px;color:#334155}
+.bar-row{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:12px}
+.bar-row .nm{min-width:90px;color:#475569;font-weight:500}
+.bar-row .track{flex:1;height:11px;background:#f1f5f9;border-radius:99px;overflow:hidden}
+.bar-row .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#059669,#0f766e)}
+.bar-row .n{min-width:70px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.card{background:#fff;border:1px solid var(--bd);border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+.card-h{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(180deg,#fafbff,#fff)}
+.card-h h2{font-size:13px;font-weight:800}
+.scroll{overflow:auto;max-height:62vh}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.03em;color:var(--mu);z-index:1;white-space:nowrap;border-bottom:1px solid var(--bd)}
+td{padding:9px 10px;border-top:1px solid #f1f5f9;vertical-align:top}
+tr:hover td{background:#f0fdf4}
+.r{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;border:1px solid}
+.tag.sec{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.tag.grp{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.tag.sub{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+.muted{color:var(--mu);text-align:center;padding:28px}
+.foot{text-align:center;padding:18px;font-size:11px;color:#94a3b8}
+.toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%) translateY(16px);background:#0f172a;color:#fff;padding:11px 18px;border-radius:12px;font-size:13px;opacity:0;transition:.25s;z-index:99;max-width:90%;pointer-events:none;box-shadow:0 12px 32px rgba(15,23,42,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.pct{display:inline-block;min-width:48px;font-weight:700}
+.pct.ok{color:#047857}.pct.mid{color:#d97706}.pct.low{color:#b91c1c}
+.motto-ticker{position:fixed;left:0;right:0;bottom:0;z-index:9999;height:30px;overflow:hidden;background:linear-gradient(90deg,#022c22,#064e3b 40%,#0f766e 70%,#064e3b);display:flex;align-items:center;border-top:1px solid rgba(167,243,208,.2)}
+.motto-ticker .motto-track{display:flex;width:max-content;animation:ms 42s linear infinite;white-space:nowrap}
+.motto-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px;font-size:12.5px;font-weight:600;color:#ecfdf5}
+.motto-item i{color:#6ee7b7}.motto-sep{color:rgba(167,243,208,.4);padding:0 8px}
+@keyframes ms{to{transform:translateX(-50%)}}
+@media print{body{background:#fff}.top,.bar,.router,.acts,.motto-ticker,.toast,.no-print,.note,.charts{display:none!important}.scroll{max-height:none;overflow:visible}}
+</style>
+</head>
+<body>
+<script>window.__BQLRPH_MOD__='trongrung';</script>
+<script>
+(function(){
+  var SESS_KEY='bqlrph_session_v1';
+  var MOD='trongrung';
+  function getSession(){
+    try{
+      var s=sessionStorage.getItem(SESS_KEY);
+      if(s) return JSON.parse(s);
+      s=localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  function canAccess(mod){
+    if(mod==='pdf') return true;
+    var s=getSession();
+    if(!s) return false;
+    if(s.role==='admin') return true;
+    return Array.isArray(s.perms)&&s.perms.indexOf(mod)>=0;
+  }
+  if(!canAccess(MOD)){
+    document.addEventListener('DOMContentLoaded',function(){
+      document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:36px;margin-bottom:10px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Trồng &amp; chăm sóc rừng</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.</p><a href="menu.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div></div>';
+    });
+    window.__BQLRPH_BLOCKED__=true;
+  }
+})();
+</script>
+
+<div class="top">
+  <div class="wrap top-in">
+    <div class="logo">
+      <div class="logo-i"><i class="fa-solid fa-seedling"></i></div>
+      <div>
+        <h1>Trồng &amp; chăm sóc rừng 2026</h1>
+        <p>BQLRPH Xuân Lộc · Tiến độ theo phân trường</p>
+      </div>
+    </div>
+    <div class="acts no-print">
+      <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
+      <button class="btn btn-o" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
+      <button class="btn btn-b" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      <button class="btn btn-g" type="button" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> In / PDF</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" style="padding-top:8px;padding-bottom:36px">
+  <div class="router no-print">
+    <a class="r-card qlbvr" href="index.html"><div class="ic"><i class="fa-solid fa-shield-halved"></i></div><b>QLBVR</b><span>Vi phạm · báo cáo</span></a>
+    <a class="r-card lamba" href="quanly-datdai-lamba.html"><div class="ic"><i class="fa-solid fa-map-location-dot"></i></div><b>Lâm bạ</b><span>Đất đai · HĐ khoán</span></a>
+    <a class="r-card nhao" href="quanly-nhao-lampart.html"><div class="ic"><i class="fa-solid fa-house-chimney"></i></div><b>Nhà ở</b><span>Công trình lâm phận</span></a>
+    <a class="r-card pdf" href="quanly-pdf.html"><div class="ic"><i class="fa-solid fa-file-pdf"></i></div><b>Công cụ PDF</b><span>Tách · nối · OCR</span></a>
+  </div>
+
+  <p class="note no-print">Nguồn: Google Sheet <b>Tiến độ trồng và chăm sóc rừng năm 2026</b>. Nếu không tải được → chia sẻ sheet <b>Anyone with the link (Viewer)</b>.</p>
+
+  <div class="bar no-print">
+    <input type="search" id="q" placeholder="Tìm hạng mục…" oninput="veLai()">
+    <select id="fNhom" onchange="veLai()">
+      <option value="">Tất cả nhóm</option>
+      <option value="TRONG">A. Trồng rừng</option>
+      <option value="CHAM">B. Chăm sóc rừng</option>
+    </select>
+    <select id="fPT" onchange="veLai()">
+      <option value="">Tất cả phân trường</option>
+      <option>Gia Huynh</option><option>Núi Le</option><option>Trản Táo</option>
+      <option>Lán Cát</option><option>Gia Phu</option><option>Đầm Voi</option>
+    </select>
+    <span class="sync" id="syncTxt">Chưa tải dữ liệu</span>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+  <div class="charts no-print">
+    <div class="chart-box"><h3>Chỉ tiêu vs kết quả theo phân trường (ha — trồng)</h3><div id="chartPT"></div></div>
+    <div class="chart-box"><h3>Tỷ lệ hoàn thành trồng theo phân trường</h3><div id="chartPct"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      <h2>Chi tiết hạng mục</h2>
+      <span id="nDS" style="font-size:12px;color:var(--mu)"></span>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>TT</th><th>Hạng mục</th><th>ĐVT</th>
+            <th class="r">Chỉ tiêu</th><th class="r">Kết quả</th><th class="r">%</th>
+            <th class="r">Gia Huynh</th><th class="r">Núi Le</th><th class="r">Trản Táo</th>
+            <th class="r">Lán Cát</th><th class="r">Gia Phu</th><th class="r">Đầm Voi</th>
+          </tr>
+        </thead>
+        <tbody id="tbDS"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="foot no-print">BQLRPH Xuân Lộc · Tiến độ trồng &amp; chăm sóc rừng 2026</div>
+<div id="toast" class="toast"></div>
+<div class="motto-ticker no-print" aria-hidden="true">
+  <div class="motto-track">
+    <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
+    <span class="motto-sep">◆</span>
+    <span class="motto-item"><i class="fa-solid fa-seedling"></i> Học tập là gốc rễ, đổi mới sáng tạo là cành lá, và cuộc sống chính là khu rừng xanh tươi mà chúng ta cùng nhau vun đắp</span>
+    <span class="motto-sep">◆</span>
+  </div>
+</div>
+
+<script>
+var SID='10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7';
+var GID='1027488994';
+var PTS=['Gia Huynh','Núi Le','Trản Táo','Lán Cát','Gia Phu','Đầm Voi'];
+var dong=[];
+var lastSync=null;
+
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},3000);}
+function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function pn(s){
+  if(s==null||s===''||s==='-'||s==='—') return 0;
+  if(typeof s==='number') return isFinite(s)?s:0;
+  var t=String(s).replace(/\s/g,'').replace(/%/g,'');
+  if(t==='-'||t==='—') return 0;
+  // VN: 585,38 or 84.591
+  if(/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t=t.replace(/\./g,'').replace(',','.');
+  else if(t.indexOf(',')>=0 && t.indexOf('.')<0) t=t.replace(',','.');
+  var n=parseFloat(t.replace(/[^\d.\-]/g,''));
+  return isNaN(n)?0:n;
+}
+function fmt(n,d){
+  if(n==null||!isFinite(n)) return '—';
+  return n.toLocaleString('vi-VN',{maximumFractionDigits:d==null?2:d});
+}
+function pctBadge(p){
+  if(!isFinite(p)||p<=0) return '<span class="pct low">—</span>';
+  var cls=p>=90?'ok':(p>=50?'mid':'low');
+  return '<span class="pct '+cls+'">'+fmt(p,0)+'%</span>';
+}
+function parseCsvLine(line){
+  var out=[],cur='',i=0,inQ=false;
+  while(i<line.length){
+    var ch=line.charAt(i);
+    if(inQ){if(ch==='"'){if(line.charAt(i+1)==='"'){cur+='"';i+=2;continue;}inQ=false;i++;continue;}cur+=ch;i++;continue;}
+    if(ch==='"'){inQ=true;i++;continue;}
+    if(ch===','){out.push(cur);cur='';i++;continue;}
+    cur+=ch;i++;
+  }
+  out.push(cur);return out;
+}
+function parseCsvText(text){
+  var rows=[],cur='',inQ=false;
+  for(var i=0;i<text.length;i++){
+    var ch=text.charAt(i),nx=text.charAt(i+1);
+    if(ch==='"'){inQ=!inQ;cur+=ch;continue;}
+    if(!inQ&&(ch==='\n'||(ch==='\r'&&nx==='\n'))){if(ch==='\r')i++;rows.push(parseCsvLine(cur));cur='';continue;}
+    if(!inQ&&ch==='\r'){rows.push(parseCsvLine(cur));cur='';continue;}
+    cur+=ch;
+  }
+  if(cur.length) rows.push(parseCsvLine(cur));
+  return rows;
+}
+
+function parseMatrix(matrix){
+  var out=[], nhom='TRONG', section='';
+  for(var i=0;i<matrix.length;i++){
+    var c=matrix[i]; if(!c||!c.length) continue;
+    var tt=String(c[0]||'').trim();
+    var hm=String(c[1]||'').trim();
+    var dvt=String(c[2]||'').trim();
+    if(!hm && !tt) continue;
+    // section headers
+    if(/^A\b/i.test(tt) || /TRỒNG RỪNG/i.test(hm)){ nhom='TRONG'; section=hm||'Trồng rừng'; continue; }
+    if(/^B\b/i.test(tt) || /CHĂM SÓC/i.test(hm)){ nhom='CHAM'; section=hm||'Chăm sóc rừng'; continue; }
+    if(!hm) continue;
+    // skip pure header rows
+    if(/Hạng mục|Tổng khối|Theo phân/i.test(hm)) continue;
+
+    var chiTieu=pn(c[3]);
+    var kq=pn(c[10]);
+    // if row is "cây" companion, attach to previous
+    if((!tt || tt==='') && /cây/i.test(dvt) && out.length){
+      var prev=out[out.length-1];
+      if(prev.dvt==='ha' || prev.dvt==='Ha'){
+        prev.chiTieuCay=chiTieu;
+        prev.kqCay=kq;
+        prev.ptCay=[];
+        for(var j=0;j<6;j++) prev.ptCay.push(pn(c[11+j]));
+        continue;
+      }
+    }
+
+    var ptChi=[], ptKq=[];
+    for(var j=0;j<6;j++){
+      ptChi.push(pn(c[4+j]));
+      ptKq.push(pn(c[11+j]));
+    }
+    var level='item';
+    if(/^[IVX]+$/i.test(tt)) level='sec';
+    else if(/^\d+$/.test(tt)) level='grp';
+    else if(/^[a-z]$/i.test(tt) || tt==='-') level='sub';
+
+    out.push({
+      tt:tt, hangMuc:hm, dvt:dvt||'ha', nhom:nhom, section:section, level:level,
+      chiTieu:chiTieu, kq:kq,
+      ptChi:ptChi, ptKq:ptKq,
+      chiTieuCay:0, kqCay:0, ptCay:null
+    });
+  }
+  return out;
+}
+
+function fetchCsv(){
+  var url='https://docs.google.com/spreadsheets/d/'+SID+'/export?format=csv&gid='+encodeURIComponent(GID)+'&_t='+Date.now();
+  return fetch(url,{credentials:'omit',cache:'no-store'}).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.text();
+  }).then(function(text){
+    var rows=parseMatrix(parseCsvText(text));
+    if(!rows.length) throw new Error('CSV không có dòng');
+    return rows;
+  });
+}
+function fetchGvizJsonp(){
+  return new Promise(function(resolve,reject){
+    var cb='tr_'+Math.floor(Math.random()*1e9);
+    var sc=document.createElement('script');
+    var to=setTimeout(function(){cleanup();reject(new Error('Timeout'));},45000);
+    function cleanup(){clearTimeout(to);try{delete window[cb];}catch(e){window[cb]=undefined;}if(sc.parentNode)sc.parentNode.removeChild(sc);}
+    window[cb]=function(resp){
+      cleanup();
+      try{
+        if(!resp||!resp.table||!resp.table.rows) throw new Error('Sheet rỗng');
+        var matrix=[];
+        resp.table.rows.forEach(function(r){
+          var row=[];
+          for(var i=0;i<24;i++){
+            var cell=r.c&&r.c[i];
+            if(!cell){row.push('');continue;}
+            if(cell.f!=null&&String(cell.f).trim()!=='') row.push(String(cell.f).trim());
+            else if(cell.v==null) row.push('');
+            else row.push(String(cell.v));
+          }
+          matrix.push(row);
+        });
+        var rows=parseMatrix(matrix);
+        if(!rows.length) throw new Error('JSONP rỗng');
+        resolve(rows);
+      }catch(e){reject(e);}
+    };
+    sc.onerror=function(){cleanup();reject(new Error('Script error'));};
+    sc.src='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=responseHandler:'+cb+'&headers=0&gid='+encodeURIComponent(GID)+'&_t='+Date.now();
+    document.head.appendChild(sc);
+  });
+}
+
+function taiLai(silent){
+  if(window.__BQLRPH_BLOCKED__) return;
+  var ic=document.getElementById('icoReload');
+  if(ic) ic.classList.add('fa-spin');
+  document.getElementById('syncTxt').textContent='Đang tải…';
+  fetchCsv().catch(function(){return fetchGvizJsonp();})
+    .then(function(rows){
+      dong=rows; lastSync=new Date();
+      veLai();
+      document.getElementById('syncTxt').textContent=dong.length+' hạng mục · '+lastSync.toLocaleTimeString('vi-VN');
+      if(!silent) toast('Đã tải '+dong.length+' hạng mục');
+    })
+    .catch(function(e){
+      document.getElementById('syncTxt').textContent='Lỗi tải';
+      if(!silent) toast(e.message||'Không tải được sheet');
+    })
+    .then(function(){if(ic) ic.classList.remove('fa-spin');});
+}
+
+function locDong(){
+  var q=(document.getElementById('q').value||'').toLowerCase().trim();
+  var nh=document.getElementById('fNhom').value;
+  return dong.filter(function(d){
+    if(nh && d.nhom!==nh) return false;
+    if(!q) return true;
+    return (d.hangMuc+' '+d.tt).toLowerCase().indexOf(q)>=0;
+  });
+}
+
+function veLai(){
+  var list=locDong();
+  veKPI(list); veCharts(list); veDS(list);
+}
+
+function veKPI(list){
+  // ưu tiên dòng tổng RỪNG PHÒNG HỘ / RỪNG SẢN XUẤT / CHĂM SÓC
+  function findRow(re, nhom){
+    for(var i=0;i<dong.length;i++){
+      if(nhom && dong[i].nhom!==nhom) continue;
+      if(re.test(dong[i].hangMuc)) return dong[i];
+    }
+    return null;
+  }
+  var rph=findRow(/RỪNG PHÒNG HỘ/i,'TRONG');
+  var rsx=findRow(/RỪNG SẢN XUẤT/i,'TRONG');
+  var cs=findRow(/^CHĂM SÓC RỪNG$/i,'CHAM')||findRow(/CHĂM SÓC RỪNG/i,'CHAM');
+  var ctHa=(rph?rph.chiTieu:0)+(rsx?rsx.chiTieu:0);
+  var kqHa=(rph?rph.kq:0)+(rsx?rsx.kq:0);
+  var pct=ctHa>0?(kqHa/ctHa*100):0;
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi t"><div class="l">Chỉ tiêu trồng (ha)</div><div class="v">'+fmt(ctHa)+'</div><div class="s">PH + SX</div></div>'+
+    '<div class="kpi d"><div class="l">Đã trồng (ha)</div><div class="v">'+fmt(kqHa)+'</div><div class="s">'+pctBadge(pct)+'</div></div>'+
+    '<div class="kpi a"><div class="l">Chăm sóc — chỉ tiêu (ha)</div><div class="v">'+(cs?fmt(cs.chiTieu):'—')+'</div></div>'+
+    '<div class="kpi l"><div class="l">Chăm sóc — kết quả (ha)</div><div class="v">'+(cs?fmt(cs.kq):'—')+'</div><div class="s">'+(cs&&cs.chiTieu?pctBadge(cs.kq/cs.chiTieu*100):'')+'</div></div>';
+}
+
+function veCharts(list){
+  // lấy dòng RỪNG PHÒNG HỘ làm mẫu tiến độ PT
+  var row=null;
+  for(var i=0;i<dong.length;i++){ if(/RỪNG PHÒNG HỘ/i.test(dong[i].hangMuc)&&dong[i].nhom==='TRONG'){row=dong[i];break;} }
+  if(!row){ document.getElementById('chartPT').innerHTML='<div class="muted">Không có dữ liệu</div>'; document.getElementById('chartPct').innerHTML=''; return; }
+  var max=1;
+  for(var j=0;j<6;j++) max=Math.max(max, row.ptChi[j], row.ptKq[j]);
+  var h1='', h2='';
+  for(var j=0;j<6;j++){
+    var chi=row.ptChi[j], kq=row.ptKq[j];
+    var pChi=Math.max(2,Math.round(100*chi/max));
+    var pKq=Math.max(2,Math.round(100*kq/max));
+    h1+='<div class="bar-row"><span class="nm">'+esc(PTS[j])+'</span><div class="track"><div class="fill" style="width:'+pChi+'%;background:linear-gradient(90deg,#94a3b8,#64748b)"></div></div><span class="n" style="color:#64748b">'+fmt(chi)+'</span></div>';
+    h1+='<div class="bar-row" style="margin-top:-2px;margin-bottom:10px"><span class="nm" style="opacity:0">.</span><div class="track"><div class="fill" style="width:'+pKq+'%"></div></div><span class="n">'+fmt(kq)+'</span></div>';
+    var pct=chi>0?(kq/chi*100):0;
+    var pBar=Math.min(100,Math.max(2,Math.round(pct)));
+    var col=pct>=90?'#059669':(pct>=50?'#d97706':'#dc2626');
+    h2+='<div class="bar-row"><span class="nm">'+esc(PTS[j])+'</span><div class="track"><div class="fill" style="width:'+pBar+'%;background:'+col+'"></div></div><span class="n">'+fmt(pct,0)+'%</span></div>';
+  }
+  document.getElementById('chartPT').innerHTML='<div style="font-size:11px;color:#94a3b8;margin-bottom:6px">Xám = chỉ tiêu · Xanh = kết quả (Rừng phòng hộ)</div>'+h1;
+  document.getElementById('chartPct').innerHTML=h2;
+}
+
+function veDS(list){
+  document.getElementById('nDS').textContent=list.length+' dòng';
+  var fPT=document.getElementById('fPT').value;
+  var ptIdx=fPT?PTS.indexOf(fPT):-1;
+  document.getElementById('tbDS').innerHTML=list.map(function(d){
+    var tag=d.level==='sec'?'sec':(d.level==='grp'?'grp':'sub');
+    var pct=d.chiTieu>0?(d.kq/d.chiTieu*100):0;
+    var cells='';
+    for(var j=0;j<6;j++){
+      if(ptIdx>=0 && j!==ptIdx){ cells+='<td class="r" style="opacity:.35">'+fmt(d.ptKq[j])+'</td>'; continue; }
+      cells+='<td class="r"><b>'+fmt(d.ptKq[j])+'</b><div style="font-size:10px;color:#94a3b8">/'+fmt(d.ptChi[j])+'</div></td>';
+    }
+    return '<tr>'+
+      '<td>'+esc(d.tt||'')+'</td>'+
+      '<td><span class="tag '+tag+'">'+esc(d.nhom==='TRONG'?'Trồng':'Chăm sóc')+'</span> <b>'+esc(d.hangMuc)+'</b>'+
+        (d.chiTieuCay?'<div style="font-size:11px;color:#64748b">Cây: chỉ tiêu '+fmt(d.chiTieuCay,0)+' · KQ '+fmt(d.kqCay,0)+'</div>':'')+
+      '</td>'+
+      '<td>'+esc(d.dvt)+'</td>'+
+      '<td class="r">'+fmt(d.chiTieu)+'</td>'+
+      '<td class="r"><b>'+fmt(d.kq)+'</b></td>'+
+      '<td class="r">'+pctBadge(pct)+'</td>'+
+      cells+
+      '</tr>';
+  }).join('')||'<tr><td colspan="12" class="muted">Không có dữ liệu</td></tr>';
+}
+
+function xuatExcel(){
+  var list=locDong();
+  if(!list.length){toast('Không có dữ liệu');return;}
+  var rows=list.map(function(d){
+    var o={'TT':d.tt,'Nhóm':d.nhom==='TRONG'?'Trồng rừng':'Chăm sóc','Hạng mục':d.hangMuc,'ĐVT':d.dvt,
+      'Chỉ tiêu':d.chiTieu,'Kết quả':d.kq,'%':d.chiTieu?Math.round(d.kq/d.chiTieu*1000)/10:''};
+    for(var j=0;j<6;j++){
+      o[PTS[j]+' (chỉ tiêu)']=d.ptChi[j];
+      o[PTS[j]+' (kết quả)']=d.ptKq[j];
+    }
+    if(d.chiTieuCay){ o['Chỉ tiêu cây']=d.chiTieuCay; o['KQ cây']=d.kqCay; }
+    return o;
+  });
+  var ws=XLSX.utils.json_to_sheet(rows), wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Tien do 2026');
+  XLSX.writeFile(wb,'tien-do-trong-cham-soc-2026.xlsx');
+  toast('Đã xuất Excel · '+rows.length+' dòng');
+}
+
+window.taiLai=taiLai; window.xuatExcel=xuatExcel; window.veLai=veLai;
+setTimeout(function(){ if(!window.__BQLRPH_BLOCKED__) taiLai(false); },200);
+</script>
+</body>
+</html>

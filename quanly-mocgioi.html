@@ -165,6 +165,47 @@ tr:hover td{background:#f0fdf4}
 </style>
 </head>
 <body>
+<script>window.__BQLRPH_MOD__='mocgioi';</script>
+
+<script>
+/* BQLRPH Auth Guard — session đồng bộ menu (sessionStorage + localStorage) */
+(function(){
+  var SESS_KEY = 'bqlrph_session_v1';
+  var MOD = window.__BQLRPH_MOD__ || 'pdf';
+  function getSession(){
+    try{
+      var s = sessionStorage.getItem(SESS_KEY);
+      if(s){ return JSON.parse(s); }
+      s = localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY, s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  function canAccess(mod){
+    if(mod === 'pdf') return true;
+    var s = getSession();
+    if(!s) return false;
+    if(s.role === 'admin') return true;
+    return Array.isArray(s.perms) && s.perms.indexOf(mod) >= 0;
+  }
+  if(!canAccess(MOD)){
+    document.addEventListener('DOMContentLoaded', function(){
+      document.body.innerHTML =
+        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc">'
+        +'<div style="max-width:420px;width:100%;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)">'
+        +'<div style="font-size:36px;margin-bottom:10px">🔒</div>'
+        +'<h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1>'
+        +'<p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module này chỉ mở khi đã đăng nhập trên <b>Menu</b> và được admin cấp quyền. Không thể bỏ qua bằng cách mở link trực tiếp.</p>'
+        +'<a href="menu.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a>'
+        +'</div></div>';
+    });
+    // chặn script phía sau nếu DOM chưa sẵn
+    window.__BQLRPH_BLOCKED__ = true;
+  }
+  window.bqlrphCurrentUser = getSession;
+})();
+</script>
+
 <div class="top">
   <div class="wrap top-in">
     <div class="logo">

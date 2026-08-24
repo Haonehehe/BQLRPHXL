@@ -123,6 +123,8 @@ body{
 .card.nhao .code{background:rgba(14,165,233,.15);color:#7dd3fc}
 .card.moc .card-icon{background:rgba(245,158,11,.2);color:#fbbf24}
 .card.moc .code{background:rgba(245,158,11,.15);color:#fcd34d}
+.card.trong .card-icon{background:rgba(34,197,94,.2);color:#4ade80}
+.card.trong .code{background:rgba(34,197,94,.15);color:#86efac}
 .card.pdf .card-icon{background:rgba(124,58,237,.2);color:#a78bfa}
 .card.pdf .code{background:rgba(124,58,237,.15);color:#c4b5fd}
 .card.admin .card-icon{background:rgba(251,191,36,.22);color:#fbbf24}
@@ -397,8 +399,8 @@ var CONFIG = {
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -434,11 +436,26 @@ function _loadDB() {
 function _saveDB(db) { localStorage.setItem(AUTH_KEY, JSON.stringify(db)); }
 
 function getSession() {
-  try { return JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; }
+  try {
+    var raw = sessionStorage.getItem(SESS_KEY);
+    if (raw) return JSON.parse(raw);
+    raw = localStorage.getItem(SESS_KEY);
+    if (raw) {
+      sessionStorage.setItem(SESS_KEY, raw);
+      return JSON.parse(raw);
+    }
+  } catch (e) {}
+  return null;
 }
 function setSession(s) {
-  if (s) sessionStorage.setItem(SESS_KEY, JSON.stringify(s));
-  else sessionStorage.removeItem(SESS_KEY);
+  if (s) {
+    var j = JSON.stringify(s);
+    sessionStorage.setItem(SESS_KEY, j);
+    try { localStorage.setItem(SESS_KEY, j); } catch (e) {}
+  } else {
+    sessionStorage.removeItem(SESS_KEY);
+    try { localStorage.removeItem(SESS_KEY); } catch (e) {}
+  }
 }
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
@@ -659,6 +676,7 @@ var MODULES=[
   {id:'lamba',href:'quanly-datdai-lamba.html',cls:'qldd',icon:'fa-map-location-dot',code:'QLĐĐ',title:'Quản lý đất đai',desc:'Lâm bạ thửa đất, hộ nhận khoán, hợp đồng, hiện trạng rừng.'},
   {id:'nhao',href:'quanly-nhao-lampart.html',cls:'nhao',icon:'fa-house-chimney',code:'NHÀ Ở',title:'Nhà ở trên lâm phận',desc:'Công trình trên 6 phân trường — hộ, diện tích XD, phép xây.'},
   {id:'mocgioi',href:'quanly-mocgioi.html',cls:'moc',icon:'fa-location-dot',code:'MỐC GIỚI',title:'Quản lý mốc giới',desc:'Danh sách mốc, tọa độ X–Y, phân trường — lọc, Excel, in PDF.'},
+  {id:'trongrung',href:'quanly-trongrung.html',cls:'trong',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ trồng — chăm sóc rừng năm 2026 theo phân trường, hạng mục.'},
   {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách, nối, xoay, OCR — khách dùng được, không cần đăng nhập.'}
 ];
 

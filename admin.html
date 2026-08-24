@@ -125,8 +125,8 @@ var CONFIG = {
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -161,13 +161,8 @@ function _loadDB() {
 }
 function _saveDB(db) { localStorage.setItem(AUTH_KEY, JSON.stringify(db)); }
 
-function getSession() {
-  try { return JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; }
-}
-function setSession(s) {
-  if (s) sessionStorage.setItem(SESS_KEY, JSON.stringify(s));
-  else sessionStorage.removeItem(SESS_KEY);
-}
+function getSession(){try{var raw=sessionStorage.getItem(SESS_KEY);if(raw)return JSON.parse(raw);raw=localStorage.getItem(SESS_KEY);if(raw){sessionStorage.setItem(SESS_KEY,raw);return JSON.parse(raw);}}catch(e){}return null;}
+function setSession(s){if(s){var j=JSON.stringify(s);sessionStorage.setItem(SESS_KEY,j);try{localStorage.setItem(SESS_KEY,j);}catch(e){}}else{sessionStorage.removeItem(SESS_KEY);try{localStorage.removeItem(SESS_KEY);}catch(e){}}}
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
 function canAccess(mod) {
