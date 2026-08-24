@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
 <script>
-/* BQLRPH Auth Guard (head) */
+/* BQLRPH Auth Guard — lamba */
 (function(){
-  try{ document.documentElement.classList.add('bqlrph-wait'); }catch(e){}
   var SESS_KEY='bqlrph_session_v1';
-  var MOD='lamba';
   function getSession(){
     try{
       var s=sessionStorage.getItem(SESS_KEY);
@@ -17,22 +14,15 @@
     }catch(e){}
     return null;
   }
-  function canAccess(){
-    var s=getSession();
-    if(!s) return false;
-    if(s.role==='admin') return true;
-    return Array.isArray(s.perms) && s.perms.indexOf(MOD)>=0;
+  var s=getSession();
+  var ok=false;
+  if(s){
+    if(s.role==='admin') ok=true;
+    else if(Array.isArray(s.perms) && s.perms.indexOf('lamba')>=0) ok=true;
   }
-  if(!canAccess()){
-    try{ window.stop(); }catch(e){}
-    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Lâm bạ / Đất đai</b> chỉ mở khi đã đăng nhập và được admin cấp quyền <b>lamba</b>.</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div></body></html>';
-    document.open(); document.write(gate); document.close();
-    return;
+  if(!ok){
+    window.location.replace('menu.html?need=lamba');
   }
-  try{
-    document.documentElement.classList.remove('bqlrph-wait');
-    var cs=document.getElementById('bqlrph-lockcss'); if(cs) cs.remove();
-  }catch(e){}
 })();
 </script>
 
@@ -199,6 +189,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
     <button type="button" data-t="ho" onclick="doiTab('ho')">Hộ nhận khoán</button>
     <button type="button" data-t="hd" onclick="doiTab('hd')">Hợp đồng · Lâm bạ</button>
     <button type="button" data-t="vp" onclick="doiTab('vp')">Đối chiếu vi phạm</button>
+    <button type="button" data-t="banndo" onclick="doiTab('banndo')">Bản đồ thửa</button>
   </div>
 
   <div class="bar">
@@ -300,6 +291,46 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
       </div>
     </div>
   </section>
+
+
+  <section id="p-banndo" class="hidden">
+    <div class="card">
+      <div class="card-h">
+        <h2><i class="fa-solid fa-map-location-dot" style="color:#047857;margin-right:6px"></i> Bản đồ thửa lâm bạ (Đồng Nai)</h2>
+        <span class="map-status" id="mapStatus">Chưa tải bản đồ</span>
+      </div>
+      <div class="card-b">
+        <div class="hint" style="margin-bottom:10px">
+          Dữ liệu từ shapefile lâm bạ · bấm vào thửa để xem hộ / HĐ / diện tích.
+          File bản đồ: <code>maps/lamba_dn_web.geojson</code> (cùng thư mục deploy).
+          Lâm Đồng sẽ bổ sung khi có GeoJSON.
+        </div>
+        <div class="map-toolbar no-print">
+          <input type="search" id="mapQ" placeholder="Tìm hộ / thửa / số HĐ trên bản đồ…" onkeydown="if(event.key==='Enter')locBanDo()">
+          <select id="mapPT" onchange="locBanDo()">
+            <option value="">Tất cả phân trường</option>
+            <option>Gia Huynh</option>
+            <option>Núi Le</option>
+            <option>Trản Táo</option>
+            <option>Lán Cát</option>
+            <option>Gia Phu</option>
+            <option>Đầm Voi</option>
+          </select>
+          <button type="button" class="btn btn-g btn-sm" onclick="locBanDo()"><i class="fa-solid fa-filter"></i> Lọc</button>
+          <button type="button" class="btn btn-o btn-sm" onclick="resetBanDo()"><i class="fa-solid fa-expand"></i> Toàn cảnh</button>
+          <button type="button" class="btn btn-o btn-sm" onclick="taiBanDo(true)"><i class="fa-solid fa-arrows-rotate"></i> Tải lại map</button>
+        </div>
+        <div id="mapWrap">
+          <div id="mapLamba"></div>
+          <div class="map-legend">
+            <div><span style="display:inline-block;width:12px;height:12px;background:#059669;opacity:.35;border:1px solid #047857;vertical-align:middle;margin-right:6px"></span>Thửa lâm bạ</div>
+            <div id="mapCount" style="margin-top:4px;color:#94a3b8">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 
 </main>
 <footer>Tổng BQL · Đồng Nai · Lâm Đồng · Dữ liệu cập nhật trực tiếp từ Sheet</footer>
@@ -1527,11 +1558,15 @@ function xoaLoc(){
 function doiTab(t){
   if(t==='dong')t='hd';
   tab=t; luuTrangThai();
-  ['tongquan','ho','hd','vp'].forEach(function(x){
+  ['tongquan','ho','hd','vp','banndo'].forEach(function(x){
     var el=document.getElementById('p-'+x);if(el)el.classList.toggle('hidden',x!==t);
   });
   document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});
-  veLai();
+  if(t==='banndo'){
+    setTimeout(function(){ khoiTaoBanDo(); }, 80);
+  } else {
+    veLai();
+  }
 }
 
 function keyHo(p){
@@ -2441,6 +2476,167 @@ window.xuatExcel=function(){
   var ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Lâm bạ');XLSX.writeFile(wb,'Lamba_DN_LD.xlsx');toast('Đã xuất Excel');
 };
+
+
+/* ===== Bản đồ thửa lâm bạ (Leaflet + GeoJSON) ===== */
+var mapLamba=null, mapLayer=null, mapData=null, mapLoaded=false, mapLoading=false;
+var MAP_URLS=[
+  'maps/lamba_dn_web.geojson',
+  'lamba_dn_web.geojson',
+  'https://haonehehe.github.io/BQLRPHXL/maps/lamba_dn_web.geojson',
+  'https://cdn.jsdelivr.net/gh/haonehehe/BQLRPHXL@main/maps/lamba_dn_web.geojson',
+  'https://cdn.jsdelivr.net/gh/haonehehe/BQLRPHXL@master/maps/lamba_dn_web.geojson'
+];
+
+function setMapStatus(msg){
+  var el=document.getElementById('mapStatus');
+  if(el) el.textContent=msg;
+}
+
+function khoiTaoBanDo(){
+  if(typeof L==='undefined'){
+    setMapStatus('Chưa tải được Leaflet — kiểm tra mạng');
+    return;
+  }
+  if(!mapLamba){
+    mapLamba=L.map('mapLamba',{zoomControl:true}).setView([11.02, 107.50], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19,
+      attribution:'&copy; OpenStreetMap'
+    }).addTo(mapLamba);
+    // optional satellite-ish none - keep OSM
+  }
+  setTimeout(function(){ try{ mapLamba.invalidateSize(); }catch(e){} }, 100);
+  if(!mapLoaded && !mapLoading) taiBanDo(false);
+  else if(mapLayer){ try{ mapLamba.invalidateSize(); }catch(e){} }
+}
+
+function taiBanDo(force){
+  if(mapLoading) return;
+  if(mapLoaded && mapData && !force){ veLopBanDo(mapData); return; }
+  mapLoading=true;
+  setMapStatus('Đang tải GeoJSON…');
+  var urls=MAP_URLS.slice();
+  function tryNext(){
+    if(!urls.length){
+      mapLoading=false;
+      setMapStatus('Thiếu maps/lamba_dn_web.geojson trên GitHub');
+      toast('Cần đẩy thư mục maps/lamba_dn_web.geojson lên repo BQLRPHXL');
+      return;
+    }
+    var url=urls.shift()+'?t='+Date.now();
+    fetch(url,{cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    }).then(function(geo){
+      mapData=geo;
+      mapLoaded=true;
+      mapLoading=false;
+      var n=(geo.features&&geo.features.length)||0;
+      setMapStatus('Đã tải '+n.toLocaleString('vi-VN')+' thửa');
+      veLopBanDo(geo);
+      toast('Đã tải bản đồ '+n.toLocaleString('vi-VN')+' thửa');
+    }).catch(function(){ tryNext(); });
+  }
+  tryNext();
+}
+
+function styleThua(f){
+  return {
+    color:'#047857',
+    weight:1,
+    opacity:0.85,
+    fillColor:'#10b981',
+    fillOpacity:0.28
+  };
+}
+function styleHighlight(){
+  return { color:'#b45309', weight:2.5, opacity:1, fillColor:'#f59e0b', fillOpacity:0.45 };
+}
+
+function popupThua(props){
+  props=props||{};
+  var ho=props.ho||'—';
+  var html='<div style="min-width:200px">';
+  html+='<div style="font-weight:700;font-size:13px;margin-bottom:6px;color:#047857">Thửa '+(props.thua||'—')+' · Tờ '+(props.toBD||'—')+'</div>';
+  html+='<div><b>Hộ:</b> '+esc(String(ho))+'</div>';
+  html+='<div><b>Phân trường:</b> '+esc(String(props.pt||'—'))+'</div>';
+  html+='<div><b>Xã:</b> '+esc(String(props.xa||'—'))+'</div>';
+  html+='<div><b>Lô / Khoảnh / TK:</b> '+esc(String(props.lo||'—'))+' / '+esc(String(props.khoanh||'—'))+' / '+esc(String(props.tieuKhu||'—'))+'</div>';
+  html+='<div><b>Diện tích:</b> '+(props.dt!=null?Number(props.dt).toLocaleString('vi-VN',{maximumFractionDigits:2})+' ha':'—')+'</div>';
+  html+='<div><b>Số HĐGK:</b> '+(props.soHD!=null&&props.soHD!==''?props.soHD:'—')+'</div>';
+  if(props.ht) html+='<div><b>Hiện trạng:</b> '+esc(String(props.ht))+'</div>';
+  html+='</div>';
+  return html;
+}
+
+function veLopBanDo(geo){
+  if(!mapLamba) return;
+  if(mapLayer){ try{ mapLamba.removeLayer(mapLayer); }catch(e){} mapLayer=null; }
+  var q=((document.getElementById('mapQ')||{}).value||'').toLowerCase().trim();
+  var pt=((document.getElementById('mapPT')||{}).value||'').trim().toLowerCase();
+  var filtered={type:'FeatureCollection',features:[]};
+  (geo.features||[]).forEach(function(f){
+    var p=f.properties||{};
+    if(pt){
+      var ptv=String(p.pt||'').toLowerCase();
+      // normalize vietnamese-ish
+      if(ptv.indexOf(pt.replace(/\s/g,''))<0 && ptv.indexOf(pt)<0){
+        // fuzzy: dam voi / đầm voi
+        var norm=function(s){return s.toLowerCase().replace(/đ/g,'d').replace(/\s+/g,'');};
+        if(norm(ptv).indexOf(norm(pt))<0) return;
+      }
+    }
+    if(q){
+      var blob=[p.ho,p.thua,p.soHD,p.xa,p.pt,p.tieuKhu,p.lo].join(' ').toLowerCase();
+      if(blob.indexOf(q)<0) return;
+    }
+    filtered.features.push(f);
+  });
+  mapLayer=L.geoJSON(filtered,{
+    style:styleThua,
+    onEachFeature:function(feature,layer){
+      layer.bindPopup(function(){ return popupThua(feature.properties); });
+      layer.on('mouseover',function(){ layer.setStyle(styleHighlight()); layer.bringToFront(); });
+      layer.on('mouseout',function(){ mapLayer.resetStyle(layer); });
+    }
+  }).addTo(mapLamba);
+  var n=filtered.features.length;
+  var el=document.getElementById('mapCount');
+  if(el) el.textContent=n.toLocaleString('vi-VN')+' thửa đang hiển thị';
+  setMapStatus(n.toLocaleString('vi-VN')+' thửa (đã lọc)');
+  if(n>0){
+    try{ mapLamba.fitBounds(mapLayer.getBounds(),{padding:[20,20],maxZoom:16}); }catch(e){}
+  }
+}
+
+function locBanDo(){
+  if(!mapData){ taiBanDo(false); return; }
+  veLopBanDo(mapData);
+}
+function resetBanDo(){
+  var q=document.getElementById('mapQ'); if(q) q.value='';
+  var pt=document.getElementById('mapPT'); if(pt) pt.value='';
+  locBanDo();
+}
+
+/** Tìm thửa trên bản đồ theo hộ / thửa từ bảng */
+function xemTrenBanDo(thua, toBD, ho){
+  doiTab('banndo');
+  setTimeout(function(){
+    var q=[thua||'', toBD||'', ho||''].join(' ').trim();
+    var inp=document.getElementById('mapQ');
+    if(inp) inp.value=q;
+    if(mapData) veLopBanDo(mapData);
+    else taiBanDo(false);
+  }, 120);
+}
+
+window.khoiTaoBanDo=khoiTaoBanDo;
+window.taiBanDo=taiBanDo;
+window.locBanDo=locBanDo;
+window.resetBanDo=resetBanDo;
+window.xemTrenBanDo=xemTrenBanDo;
 
 window.taiLai=taiLai;window.doiTab=doiTab;window.doiTinh=doiTinh;window.xoaLoc=xoaLoc;window.doiLinkSheet=doiLinkSheet;
 window.veLai=veLai;window.traCuuVP=traCuuVP;window.dongMD=dongMD;window.xuatExcel=xuatExcel;window.xuatBaoCaoHD=xuatBaoCaoHD;window.inHoSoHD=inHoSoHD;window.inDanhSachHD=inDanhSachHD;window.inChiTietLamba=inChiTietLamba;
