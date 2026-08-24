@@ -172,6 +172,46 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 .leaflet-container{width:100%!important;height:100%!important;min-height:480px!important}
 </style>
 
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" crossorigin="">
+<script>
+/* Load Leaflet with CDN fallbacks */
+(function(){
+  var cssHrefs=[
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+  ];
+  var scriptSrcs=[
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  ];
+  function loadCss(href){
+    var l=document.createElement('link');
+    l.rel='stylesheet'; l.href=href; l.crossOrigin='';
+    document.head.appendChild(l);
+  }
+  loadCss(cssHrefs[0]);
+  window.__leafletReady=false;
+  window.__leafletFailed=false;
+  function tryScript(i){
+    if(i>=scriptSrcs.length){
+      window.__leafletFailed=true;
+      console.error('All Leaflet CDNs failed');
+      return;
+    }
+    var s=document.createElement('script');
+    s.src=scriptSrcs[i];
+    s.crossOrigin='';
+    s.onload=function(){ window.__leafletReady=true; console.log('Leaflet from', scriptSrcs[i]); };
+    s.onerror=function(){ console.warn('Leaflet CDN fail', scriptSrcs[i]); tryScript(i+1); };
+    document.head.appendChild(s);
+  }
+  tryScript(0);
+})();
+</script>
+
 </head>
 <body>
 <div class="top"><div class="wrap top-in">
@@ -2516,8 +2556,22 @@ function normVN(s){
 
 function khoiTaoBanDo(){
   if(typeof L==='undefined'){
-    setMapStatus('Chưa tải Leaflet — kiểm tra mạng (CDN)');
-    toast('Không tải được Leaflet');
+    if(window.__leafletFailed){
+      setMapStatus('Không tải được Leaflet (mọi CDN lỗi) — kiểm tra mạng/firewall');
+      toast('Không tải được thư viện bản đồ');
+      return;
+    }
+    setMapStatus('Đang tải Leaflet…');
+    var tries=0;
+    var tm=setInterval(function(){
+      tries++;
+      if(typeof L!=='undefined'){ clearInterval(tm); khoiTaoBanDo(); }
+      else if(window.__leafletFailed || tries>40){
+        clearInterval(tm);
+        setMapStatus('Không tải được Leaflet — thử mạng khác hoặc VPN');
+        toast('CDN Leaflet bị chặn');
+      }
+    }, 250);
     return;
   }
   var el=document.getElementById('mapLamba');
