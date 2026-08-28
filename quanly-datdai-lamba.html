@@ -212,6 +212,21 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 })();
 </script>
 
+
+<style id="hd-map-css">
+.hd-map-box{margin:12px 0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+.hd-map-box .hd-map-h{padding:8px 12px;background:linear-gradient(90deg,#ecfdf5,#f8fafc);border-bottom:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#047857;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+#hdMapView{width:100%;height:320px;background:#e2e8f0}
+.map-print-frame{position:relative;width:150mm;height:150mm;max-width:100%;margin:10px auto;border:1.5px solid #111;background:#fff;page-break-inside:avoid}
+.map-print-frame svg{width:100%;height:100%;display:block}
+.map-print-meta{text-align:center;font-size:11px;margin:4px 0 10px;color:#333}
+.map-print-title{font-weight:700;font-size:12px;text-align:center;margin:8px 0 2px}
+@media print{
+  #hdMapView,.hd-map-box .no-print{display:none!important}
+  .map-print-frame{width:150mm;height:150mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+
 </head>
 <body>
 <div class="top"><div class="wrap top-in">
@@ -357,11 +372,11 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
           <select id="mapPT" onchange="locBanDo()">
             <option value="">Tất cả phân trường</option>
             <option value="Gia Huynh">Gia Huynh</option>
-            <option value="Nui Le">Núi Le</option>
-            <option value="Tran Tao">Trản Táo</option>
-            <option value="Lan Cat">Lán Cát</option>
+            <option value="Núi Le">Núi Le</option>
+            <option value="Trản Táo">Trản Táo</option>
+            <option value="Lán Cát">Lán Cát</option>
             <option value="Gia Phu">Gia Phu</option>
-            <option value="Dam Voi">Đầm Voi</option>
+            <option value="Đầm Voi">Đầm Voi</option>
           </select>
           <button type="button" class="btn btn-g btn-sm" onclick="locBanDo()"><i class="fa-solid fa-filter"></i> Lọc</button>
           <button type="button" class="btn btn-o btn-sm" onclick="resetBanDo()"><i class="fa-solid fa-expand"></i> Toàn cảnh</button>
@@ -370,8 +385,16 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
         <div id="mapWrap" style="height:640px;min-height:480px">
           <div id="mapLamba" style="height:640px;min-height:480px"></div>
           <div class="map-legend">
-            <div><span style="display:inline-block;width:12px;height:12px;background:#059669;opacity:.35;border:1px solid #047857;vertical-align:middle;margin-right:6px"></span>Thửa lâm bạ</div>
-            <div id="mapCount" style="margin-top:4px;color:#94a3b8">—</div>
+            <div style="font-weight:700;margin-bottom:4px;color:#0f172a">Phân trường</div>
+            <div style="display:grid;gap:3px;font-size:10px">
+              <div><span style="display:inline-block;width:10px;height:10px;background:#059669;border-radius:2px;margin-right:5px"></span>Gia Huynh</div>
+              <div><span style="display:inline-block;width:10px;height:10px;background:#0d9488;border-radius:2px;margin-right:5px"></span>Núi Le</div>
+              <div><span style="display:inline-block;width:10px;height:10px;background:#2563eb;border-radius:2px;margin-right:5px"></span>Trản Táo</div>
+              <div><span style="display:inline-block;width:10px;height:10px;background:#7c3aed;border-radius:2px;margin-right:5px"></span>Lán Cát</div>
+              <div><span style="display:inline-block;width:10px;height:10px;background:#d97706;border-radius:2px;margin-right:5px"></span>Gia Phu</div>
+              <div><span style="display:inline-block;width:10px;height:10px;background:#dc2626;border-radius:2px;margin-right:5px"></span>Đầm Voi</div>
+            </div>
+            <div id="mapCount" style="margin-top:6px;color:#64748b;font-size:10px">—</div>
           </div>
         </div>
       </div>
@@ -2061,7 +2084,14 @@ window.xemHD=function(ma){
     sum.AT+=p.AT||0;sum.AU+=p.AU||0;sum.AV+=p.AV||0;sum.AW+=p.AW||0;sum.AX+=p.AX||0;sum.AY+=p.AY||0;
   });
   html+=htmlCayCauDienTich(sum);
+  html+='<div class="hd-map-box" id="hdMapSection">';
+  html+='<div class="hd-map-h"><span><i class="fa-solid fa-map-location-dot"></i> Bản đồ thửa gắn HĐ</span>';
+  html+='<span id="hdMapStatus" style="font-weight:500;color:#64748b;font-size:11px">Đang tải…</span></div>';
+  html+='<div id="hdMapView"></div>';
+  html+='<div class="no-print" style="padding:8px 12px;font-size:11px;color:#64748b">Bản in sẽ kèm sơ đồ tỷ lệ <b>1/5000</b>, kim chỉ Bắc và nhãn số thửa.</div>';
+  html+='</div>';
   moMD('Hồ sơ hợp đồng', html);
+  attachHDMapSection(c0);
 };
 /** Tóm tắt hiện trạng / loài cây theo danh sách dòng (dùng ở chi tiết hộ) */
 function htmlHienTrangCay(rows){
@@ -2308,6 +2338,14 @@ function buildBaoCaoHDHtml(c){
   });
   h+='</table>';
 
+  // Bản đồ tỷ lệ 1/5000
+  try{
+    var feats=matchFeaturesForHD(c);
+    h+=buildPrintMapSvg(feats,{
+      title:'SƠ ĐỒ VỊ TRÍ THỬA ĐẤT — HĐ '+esc(c.soHD||''),
+      sub:'Tỷ lệ 1/5000 · Kim chỉ Bắc · Nhãn số thửa · '+feats.length+' thửa · In '+new Date().toLocaleString('vi-VN')
+    });
+  }catch(e){ console.warn(e); }
   h+='<p style="margin-top:18px;font-size:11px;color:#555">Báo cáo tổng hợp từ dữ liệu lâm bạ và bảng đối chiếu tại thời điểm xuất · '+new Date().toLocaleString('vi-VN')+'</p>';
   h+='</div>';
   return h;
@@ -2384,6 +2422,13 @@ function buildBaoCaoDongHtml(p){
     dc.hits.slice(0,20).forEach(function(v,i){h+='<tr><td>'+(i+1)+'</td><td>'+esc(v.parts.join(' · '))+'</td></tr>';});
     h+='</table>';
   }
+  try{
+    var featsD=matchFeaturesForDong([p]);
+    h+=buildPrintMapSvg(featsD,{
+      title:'SƠ ĐỒ VỊ TRÍ THỬA ĐẤT — Thửa '+esc(chuanThua(p.thua)||p.thua||''),
+      sub:'Tỷ lệ 1/5000 · Kim chỉ Bắc · Nhãn số thửa · In '+new Date().toLocaleString('vi-VN')
+    });
+  }catch(e){ console.warn(e); }
   h+='<p style="margin-top:18px;font-size:11px;color:#555">In từ hệ thống Lâm bạ · BQLRPH Xuân Lộc · '+new Date().toLocaleString('vi-VN')+'</p>';
   h+='</div>';
   return h;
@@ -2460,9 +2505,11 @@ window.inChiTietLamba=function(id){
   if(p.isChild&&p.parentId){
     for(var j=0;j<dong.length;j++)if(dong[j].id===p.parentId){p=dong[j];break;}
   }
-  var body=buildBaoCaoDongHtml(p);
-  var sttShow=String(p.stt).indexOf('x')===0?'':String(p.stt);
-  printHtmlDoc('Chi tiết lâm bạ STT '+sttShow, body);
+  ensureMapData(function(){
+    var body=buildBaoCaoDongHtml(p);
+    var sttShow=String(p.stt).indexOf('x')===0?'':String(p.stt);
+    printHtmlDoc('Chi tiết lâm bạ STT '+sttShow, body);
+  });
 };
 
 function taiFileNoiDung(text,filename,mime){
@@ -2496,7 +2543,9 @@ window.xuatBaoCaoHD=function(ma){
 window.inHoSoHD=function(ma){
   var c=timHDTheoMa(ma);
   if(!c){toast('Không tìm thấy hồ sơ hợp đồng để in');return;}
-  printHtmlDoc('Hồ sơ HĐ '+(c.soHD||''), buildBaoCaoHDHtml(c));
+  ensureMapData(function(){
+    printHtmlDoc('Hồ sơ HĐ '+(c.soHD||''), buildBaoCaoHDHtml(c));
+  });
 };
 
 window.inDanhSachHD=function(){
@@ -2525,6 +2574,245 @@ window.xuatExcel=function(){
 };
 
 
+
+
+/* ===== Bản đồ gắn HĐ / in tỷ lệ 1:5000 ===== */
+function ensureMapData(cb){
+  if(mapData && mapData.features){ cb(mapData); return; }
+  if(typeof taiBanDo==='function'){
+    var prev=window._onMapLoadedHD;
+    // tải im lặng
+    var urls=(typeof MAP_URLS!=='undefined'?MAP_URLS:['maps/lamba_dn_web.geojson']).slice();
+    function tryNext(){
+      if(!urls.length){ cb(null); return; }
+      var url=urls.shift();
+      var sep=url.indexOf('?')>=0?'&':'?';
+      fetch(url+sep+'t='+Date.now(),{cache:'no-store'}).then(function(r){
+        if(!r.ok) throw new Error('x');
+        return r.json();
+      }).then(function(geo){
+        mapData=geo; mapLoaded=true;
+        cb(geo);
+      }).catch(function(){ tryNext(); });
+    }
+    if(mapLoading){
+      var n=0, tm=setInterval(function(){
+        n++;
+        if(mapData){ clearInterval(tm); cb(mapData); }
+        else if(!mapLoading||n>40){ clearInterval(tm); tryNext(); }
+      },250);
+    } else tryNext();
+  } else cb(null);
+}
+
+function matchFeaturesForDong(rows){
+  rows=(rows||[]).filter(function(p){ return p && !p.isChild; });
+  if(!mapData||!mapData.features) return [];
+  var keys={};
+  rows.forEach(function(p){
+    var th=chuanThua(p.thua);
+    var to=String(p.toBD||'').trim();
+    if(th) keys[th+'|'+to]=1;
+    if(th) keys[th+'|']=1; // fallback chỉ thửa
+  });
+  var out=[], seen={};
+  mapData.features.forEach(function(f){
+    var pr=f.properties||{};
+    var th=chuanThua(pr.thua);
+    var to=String(pr.toBD||'').trim();
+    var k1=th+'|'+to, k2=th+'|';
+    if(keys[k1]||keys[k2]){
+      var id=String(pr.id||th+'|'+to);
+      if(seen[id]) return;
+      seen[id]=1;
+      out.push(f);
+    }
+  });
+  return out;
+}
+
+function matchFeaturesForHD(c){
+  if(!c) return [];
+  return matchFeaturesForDong(c.dong||[]);
+}
+
+/** Lon/lat → local meters (equirectangular around lat0) */
+function projectLL(lon, lat, lon0, lat0){
+  var R=6378137;
+  var x=(lon-lon0)*Math.PI/180*R*Math.cos(lat0*Math.PI/180);
+  var y=(lat-lat0)*Math.PI/180*R;
+  return [x,y];
+}
+
+function featureRings(f){
+  var g=f.geometry; if(!g) return [];
+  var rings=[];
+  if(g.type==='Polygon'){
+    (g.coordinates||[]).forEach(function(r){ rings.push(r); });
+  } else if(g.type==='MultiPolygon'){
+    (g.coordinates||[]).forEach(function(poly){
+      (poly||[]).forEach(function(r){ rings.push(r); });
+    });
+  }
+  return rings;
+}
+
+/**
+ * SVG bản đồ in: khung 150mm, tỷ lệ 1:5000, kim Bắc, nhãn số thửa
+ * scale 1:5000 → 150mm giấy = 750m thực địa
+ */
+function buildPrintMapSvg(features, opts){
+  opts=opts||{};
+  var W=150; // mm
+  var H=150;
+  var scale=5000;
+  var groundM=(W/1000)*scale; // 0.15*5000=750m
+
+  if(!features||!features.length){
+    return '<div class="map-print-title">SƠ ĐỒ VỊ TRÍ THỬA</div>'+
+      '<div class="map-print-frame" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:12px">Không khớp được thửa trên bản đồ số</div>'+
+      '<div class="map-print-meta">Tỷ lệ 1/'+scale+' · Hệ VN-2000 / WGS84</div>';
+  }
+
+  // centroid of all points
+  var all=[];
+  features.forEach(function(f){
+    featureRings(f).forEach(function(ring){
+      ring.forEach(function(c){ if(c&&c.length>=2) all.push(c); });
+    });
+  });
+  if(!all.length) return '';
+  var lon0=0,lat0=0;
+  all.forEach(function(c){ lon0+=c[0]; lat0+=c[1]; });
+  lon0/=all.length; lat0/=all.length;
+
+  // project
+  var polys=[];
+  features.forEach(function(f){
+    var pr=f.properties||{};
+    var label=chuanThua(pr.thua)||String(pr.thua||'');
+    featureRings(f).forEach(function(ring){
+      var pts=ring.map(function(c){ return projectLL(c[0],c[1],lon0,lat0); });
+      polys.push({pts:pts, label:label, pr:pr});
+    });
+  });
+
+  // center of mass
+  var cx=0,cy=0,n=0;
+  polys.forEach(function(p){
+    p.pts.forEach(function(pt){ cx+=pt[0]; cy+=pt[1]; n++; });
+  });
+  if(n){ cx/=n; cy/=n; }
+
+  // view window at exact 1:5000
+  var half=groundM/2;
+  var minX=cx-half, maxX=cx+half, minY=cy-half, maxY=cy+half;
+
+  function tx(x){ return ((x-minX)/(maxX-minX))*W; }
+  function ty(y){ return (1-(y-minY)/(maxY-minY))*H; } // north up
+
+  var svg='';
+  svg+='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'mm" height="'+H+'mm">';
+  // background
+  svg+='<rect width="'+W+'" height="'+H+'" fill="#f8fafc"/>';
+  // grid light
+  for(var g=1;g<5;g++){
+    var gx=g*W/5, gy=g*H/5;
+    svg+='<line x1="'+gx+'" y1="0" x2="'+gx+'" y2="'+H+'" stroke="#e2e8f0" stroke-width="0.15"/>';
+    svg+='<line x1="0" y1="'+gy+'" x2="'+W+'" y2="'+gy+'" stroke="#e2e8f0" stroke-width="0.15"/>';
+  }
+  // polygons
+  polys.forEach(function(p){
+    var d='';
+    p.pts.forEach(function(pt,i){
+      var x=tx(pt[0]), y=ty(pt[1]);
+      d+=(i?'L':'M')+x.toFixed(2)+','+y.toFixed(2)+' ';
+    });
+    d+='Z';
+    svg+='<path d="'+d+'" fill="#6ee7b7" fill-opacity="0.45" stroke="#047857" stroke-width="0.35"/>';
+  });
+  // labels at centroid of each poly
+  polys.forEach(function(p){
+    if(!p.label) return;
+    var sx=0,sy=0,m=p.pts.length;
+    if(!m) return;
+    p.pts.forEach(function(pt){ sx+=pt[0]; sy+=pt[1]; });
+    sx/=m; sy/=m;
+    var x=tx(sx), y=ty(sy);
+    // only if inside frame
+    if(x<2||x>W-2||y<2||y>H-2) return;
+    svg+='<text x="'+x.toFixed(2)+'" y="'+y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.4" font-family="Arial,sans-serif" font-weight="700" fill="#064e3b">'+String(p.label).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text>';
+  });
+  // border
+  svg+='<rect x="0.4" y="0.4" width="'+(W-0.8)+'" height="'+(H-0.8)+'" fill="none" stroke="#111" stroke-width="0.5"/>';
+  // north arrow (top-right)
+  var nx=W-12, ny=14;
+  svg+='<g transform="translate('+nx+','+ny+')">';
+  svg+='<polygon points="0,-8 3,4 -3,4" fill="#0f172a"/>';
+  svg+='<line x1="0" y1="4" x2="0" y2="8" stroke="#0f172a" stroke-width="0.6"/>';
+  svg+='<text x="0" y="12" text-anchor="middle" font-size="3" font-family="Arial" font-weight="700" fill="#0f172a">B</text>';
+  svg+='</g>';
+  // scale bar bottom-left: 100m at 1:5000 = 20mm
+  var barM=100; // 100m
+  var barMm=(barM/scale)*1000; // 20mm
+  var bx=8, by=H-8;
+  svg+='<g>';
+  svg+='<line x1="'+bx+'" y1="'+by+'" x2="'+(bx+barMm)+'" y2="'+by+'" stroke="#111" stroke-width="0.7"/>';
+  svg+='<line x1="'+bx+'" y1="'+(by-2)+'" x2="'+bx+'" y2="'+(by+2)+'" stroke="#111" stroke-width="0.5"/>';
+  svg+='<line x1="'+(bx+barMm)+'" y1="'+(by-2)+'" x2="'+(bx+barMm)+'" y2="'+(by+2)+'" stroke="#111" stroke-width="0.5"/>';
+  svg+='<text x="'+(bx+barMm/2)+'" y="'+(by-3)+'" text-anchor="middle" font-size="2.2" font-family="Arial" fill="#111">100 m</text>';
+  svg+='<text x="'+bx+'" y="'+(by+5)+'" font-size="2.2" font-family="Arial" fill="#111">Tỷ lệ 1/'+scale+'</text>';
+  svg+='</g>';
+  svg+='</svg>';
+
+  var title=opts.title||'SƠ ĐỒ VỊ TRÍ THỬA ĐẤT';
+  var sub=opts.sub||('Tỷ lệ 1/'+scale+' · Kim chỉ Bắc · Nhãn: số thửa · '+features.length+' thửa');
+  return '<div class="map-print-title">'+title+'</div><div class="map-print-frame">'+svg+'</div><div class="map-print-meta">'+sub+'</div>';
+}
+
+var _hdMapInst=null;
+function renderHDMapView(features){
+  var el=document.getElementById('hdMapView');
+  if(!el) return;
+  if(typeof L==='undefined'){
+    el.innerHTML='<div style="padding:24px;text-align:center;color:#94a3b8;font-size:12px">Đang chờ Leaflet…</div>';
+    return;
+  }
+  if(_hdMapInst){ try{ _hdMapInst.remove(); }catch(e){} _hdMapInst=null; }
+  el.innerHTML='';
+  if(!features||!features.length){
+    el.innerHTML='<div style="padding:24px;text-align:center;color:#94a3b8;font-size:12px">Không tìm thấy thửa tương ứng trên bản đồ số</div>';
+    return;
+  }
+  _hdMapInst=L.map(el,{zoomControl:true, preferCanvas:true}).setView([11.05,107.48],14);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+    maxZoom:19, subdomains:'abcd', attribution:'&copy; OSM'
+  }).addTo(_hdMapInst);
+  var layer=L.geoJSON({type:'FeatureCollection',features:features},{
+    style:function(){ return {color:'#047857',weight:1.5,fillColor:'#10b981',fillOpacity:0.35}; },
+    onEachFeature:function(f,ly){
+      var pr=f.properties||{};
+      var lab=chuanThua(pr.thua)||pr.thua||'';
+      if(lab) ly.bindTooltip(String(lab),{permanent:true,direction:'center',className:'thua-label'});
+      ly.bindPopup('<b>Thửa '+esc(String(lab))+'</b><br>Tờ '+(pr.toBD||'—')+'<br>'+esc(String(pr.ho||''))+'<br>'+(pr.dt!=null?Number(pr.dt).toLocaleString('vi-VN')+' ha':''));
+    }
+  }).addTo(_hdMapInst);
+  try{ _hdMapInst.fitBounds(layer.getBounds(),{padding:[20,20],maxZoom:17}); }catch(e){}
+  setTimeout(function(){ try{ _hdMapInst.invalidateSize(true); }catch(e){} }, 200);
+}
+
+function attachHDMapSection(c){
+  // placeholder already in html; fill after data ready
+  ensureMapData(function(geo){
+    var feats=matchFeaturesForHD(c);
+    var box=document.getElementById('hdMapSection');
+    if(box){
+      var st=document.getElementById('hdMapStatus');
+      if(st) st.textContent=feats.length?('Khớp '+feats.length+' thửa trên bản đồ'):'Chưa khớp thửa';
+    }
+    renderHDMapView(feats);
+  });
+}
 
 /* ===== Bản đồ thửa lâm bạ (Leaflet + GeoJSON) ===== */
 var mapLamba=null, mapLayer=null, mapData=null, mapLoaded=false, mapLoading=false;
@@ -2586,7 +2874,7 @@ function khoiTaoBanDo(){
 
   if(!mapLamba){
     mapLamba=L.map(el,{ zoomControl:true, preferCanvas:true, fadeAnimation:false }).setView([11.05, 107.48], 12);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
       maxZoom:19, subdomains:'abcd', attribution:'&copy; OSM &copy; CARTO'
     }).addTo(mapLamba);
   }
@@ -2637,20 +2925,34 @@ function taiBanDo(force){
   tryNext();
 }
 
-function styleThua(){ return { color:'#047857', weight:0.8, opacity:0.9, fillColor:'#10b981', fillOpacity:0.35 }; }
-function styleHighlight(){ return { color:'#b45309', weight:2, opacity:1, fillColor:'#f59e0b', fillOpacity:0.5 }; }
+function styleThua(f){
+  var pt=(f && f.properties && f.properties.pt)||'';
+  // màu theo phân trường
+  var colors={
+    'Gia Huynh':'#059669','Núi Le':'#0d9488','Trản Táo':'#2563eb',
+    'Lán Cát':'#7c3aed','Gia Phu':'#d97706','Đầm Voi':'#dc2626'
+  };
+  var c=colors[pt]||'#047857';
+  return { color:c, weight:0.7, opacity:0.95, fillColor:c, fillOpacity:0.22 };
+}
+function styleHighlight(){ return { color:'#0f172a', weight:2.2, opacity:1, fillColor:'#fbbf24', fillOpacity:0.55 }; }
 
 function popupThua(props){
   props=props||{};
-  var html='<div style="min-width:210px">';
-  html+='<div style="font-weight:700;font-size:13px;margin-bottom:6px;color:#047857">Thửa '+(props.thua||'—')+' · Tờ '+(props.toBD||'—')+'</div>';
-  html+='<div><b>Hộ:</b> '+esc(String(props.ho||'—'))+'</div>';
-  html+='<div><b>Phân trường:</b> '+esc(String(props.pt||'—'))+'</div>';
-  html+='<div><b>Xã:</b> '+esc(String(props.xa||'—'))+'</div>';
-  html+='<div><b>Lô/Khoảnh/TK:</b> '+esc(String(props.lo||'—'))+' / '+esc(String(props.khoanh||'—'))+' / '+esc(String(props.tieuKhu||'—'))+'</div>';
-  html+='<div><b>Diện tích:</b> '+(props.dt!=null?Number(props.dt).toLocaleString('vi-VN',{maximumFractionDigits:2})+' ha':'—')+'</div>';
-  html+='<div><b>Số HĐGK:</b> '+(props.soHD!=null&&props.soHD!==''?props.soHD:'—')+'</div>';
-  html+='</div>';
+  var html='<div style="min-width:220px;font-family:Be Vietnam Pro,system-ui,sans-serif">';
+  html+='<div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#065f46;border-bottom:1px solid #d1fae5;padding-bottom:6px">';
+  html+='📍 Thửa '+(props.thua||'—')+' <span style="color:#64748b;font-weight:500">· Tờ '+(props.toBD||'—')+'</span></div>';
+  html+='<table style="width:100%;font-size:12px;line-height:1.5;border-collapse:collapse">';
+  function row(l,v){ return '<tr><td style="color:#64748b;padding:2px 8px 2px 0;white-space:nowrap">'+l+'</td><td style="font-weight:600;color:#0f172a">'+esc(String(v==null||v===''?'—':v))+'</td></tr>'; }
+  html+=row('Hộ', props.ho);
+  html+=row('Phân trường', props.pt);
+  html+=row('Xã', props.xa);
+  html+=row('Lô / Khoảnh / TK', (props.lo||'—')+' / '+(props.khoanh||'—')+' / '+(props.tieuKhu||'—'));
+  html+=row('Diện tích', props.dt!=null?Number(props.dt).toLocaleString('vi-VN',{maximumFractionDigits:2})+' ha':'—');
+  html+=row('Số HĐGK', props.soHD);
+  if(props.ht) html+=row('Hiện trạng', props.ht);
+  if(props.vungQH) html+=row('Quy hoạch', props.vungQH);
+  html+='</table></div>';
   return html;
 }
 
