@@ -2605,35 +2605,89 @@ function ensureMapData(cb){
   } else cb(null);
 }
 
+/** Chuẩn hóa số HĐ để so khớp */
+function normSoHD(s){
+  if(s==null||s==='') return '';
+  return String(s).replace(/\s+/g,'').replace(/^0+/, '') || '0';
+}
+function normNgay(s){
+  if(!s) return '';
+  s=String(s).trim();
+  // dd/mm/yyyy hoặc yyyy-mm-dd
+  var m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m) return m[1].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[3];
+  m=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if(m) return m[3].padStart(2,'0')+'/'+m[2].padStart(2,'0')+'/'+m[1];
+  return s;
+}
+
+/**
+ * Khớp thửa bản đồ theo đúng danh sách dòng của HĐ (thửa + tờ BĐ bắt buộc).
+ * Không khớp chỉ theo số thửa (tránh dính thửa trùng số ở tờ khác).
+ */
 function matchFeaturesForDong(rows){
   rows=(rows||[]).filter(function(p){ return p && !p.isChild; });
-  if(!mapData||!mapData.features) return [];
-  var keys={};
+  if(!mapData||!mapData.features||!rows.length) return [];
+
+  // Tập khóa chính: thửa|tờ (bắt buộc đủ 2)
+  var keysStrict={}, keysThuaOnly={};
   rows.forEach(function(p){
     var th=chuanThua(p.thua);
-    var to=String(p.toBD||'').trim();
-    if(th) keys[th+'|'+to]=1;
-    if(th) keys[th+'|']=1; // fallback chỉ thửa
+    var to=String(p.toBD!=null?p.toBD:'').trim();
+    if(th && to) keysStrict[th+'|'+to]=1;
+    else if(th) keysThuaOnly[th]=1;
   });
+
+  // Số HĐ từ dòng (nếu có) — hỗ trợ khớp phụ
+  var soSet={};
+  rows.forEach(function(p){
+    var s=normSoHD(p.soHD);
+    if(s) soSet[s]=1;
+  });
+
   var out=[], seen={};
   mapData.features.forEach(function(f){
     var pr=f.properties||{};
     var th=chuanThua(pr.thua);
-    var to=String(pr.toBD||'').trim();
-    var k1=th+'|'+to, k2=th+'|';
-    if(keys[k1]||keys[k2]){
-      var id=String(pr.id||th+'|'+to);
-      if(seen[id]) return;
-      seen[id]=1;
-      out.push(f);
+    var to=String(pr.toBD!=null?pr.toBD:'').trim();
+    var id=String(pr.id!=null?pr.id:(th+'|'+to));
+    if(seen[id]) return;
+
+    var ok=false;
+    // 1) Ưu tiên khớp đủ thửa + tờ
+    if(th && to && keysStrict[th+'|'+to]) ok=true;
+    // 2) Chỉ khi dòng HĐ thiếu tờ BĐ mới nới theo thửa (và số HĐ map trùng nếu có)
+    if(!ok && th && keysThuaOnly[th]){
+      var mapHD=normSoHD(pr.soHD);
+      if(!mapHD || soSet[mapHD]) ok=true;
     }
+    // 3) Khớp theo số HĐ trên bản đồ (nếu geojson có soHD) — chỉ khi HĐ đang xem có số đó
+    if(!ok && soSet[normSoHD(pr.soHD)] && normSoHD(pr.soHD)){
+      // vẫn cần thửa thuộc rows
+      if(th && (keysStrict[th+'|'+to] || keysThuaOnly[th] || Object.keys(keysStrict).some(function(k){return k.indexOf(th+'|')===0;}))) ok=true;
+    }
+
+    if(ok){ seen[id]=1; out.push(f); }
   });
   return out;
 }
 
+/** Khớp toàn bộ thửa của một hợp đồng (theo soHD + ngày ký của HĐ) */
 function matchFeaturesForHD(c){
   if(!c) return [];
-  return matchFeaturesForDong(c.dong||[]);
+  // Chỉ lấy dòng thuộc đúng HĐ này
+  var so=normSoHD(c.soHD);
+  var ngay=normNgay(c.ngayHD);
+  var rows=(c.dong||[]).filter(function(p){
+    if(!p||p.isChild) return false;
+    // dòng đã gắn vào object HĐ — tin cậy; vẫn lọc nếu lệch số HĐ
+    if(so && p.soHD!=null && String(p.soHD).trim()!=='' && normSoHD(p.soHD)!==so) return false;
+    if(ngay && p.ngayHD && normNgay(p.ngayHD) && normNgay(p.ngayHD)!==ngay) return false;
+    return true;
+  });
+  // Nếu sau lọc rỗng, dùng nguyên c.dong (đã được xayHopDong gắn đúng)
+  if(!rows.length) rows=(c.dong||[]).filter(function(p){return p&&!p.isChild;});
+  return matchFeaturesForDong(rows);
 }
 
 /** Lon/lat → local meters (equirectangular around lat0) */
@@ -2785,8 +2839,8 @@ function renderHDMapView(features){
     return;
   }
   _hdMapInst=L.map(el,{zoomControl:true, preferCanvas:true}).setView([11.05,107.48],14);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-    maxZoom:19, subdomains:'abcd', attribution:'&copy; OSM'
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19, attribution:'&copy; OpenStreetMap'
   }).addTo(_hdMapInst);
   var layer=L.geoJSON({type:'FeatureCollection',features:features},{
     style:function(){ return {color:'#047857',weight:1.5,fillColor:'#10b981',fillOpacity:0.35}; },
@@ -2808,7 +2862,7 @@ function attachHDMapSection(c){
     var box=document.getElementById('hdMapSection');
     if(box){
       var st=document.getElementById('hdMapStatus');
-      if(st) st.textContent=feats.length?('Khớp '+feats.length+' thửa trên bản đồ'):'Chưa khớp thửa';
+      if(st) st.textContent=feats.length?('HĐ '+esc(String(c.soHD||''))+' · '+feats.length+' thửa (khớp thửa+tờ BĐ)'):('HĐ '+esc(String(c.soHD||''))+' · chưa khớp thửa trên bản đồ');
     }
     renderHDMapView(feats);
   });
@@ -2874,8 +2928,8 @@ function khoiTaoBanDo(){
 
   if(!mapLamba){
     mapLamba=L.map(el,{ zoomControl:true, preferCanvas:true, fadeAnimation:false }).setView([11.05, 107.48], 12);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
-      maxZoom:19, subdomains:'abcd', attribution:'&copy; OSM &copy; CARTO'
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19, attribution:'&copy; OpenStreetMap'
     }).addTo(mapLamba);
   }
 
