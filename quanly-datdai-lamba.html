@@ -235,7 +235,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 .bd-mapbox{flex:1 1 auto;border:1px solid #111;margin:1.2mm 0 0;background:#fff;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden}
 .bd-mapbox svg{width:100%;height:100%;display:block}
 .bd-map-empty{align-items:center;justify-content:center;color:#555;font-size:12pt}
-.bd-foot{display:flex;border:1.2px solid #111;height:38mm;max-height:38mm;flex:0 0 38mm;margin:1.5mm 0 0;overflow:hidden}
+.bd-foot{display:flex;border:1.2px solid #111;height:50mm;max-height:50mm;flex:0 0 50mm;margin:1.5mm 0 0;overflow:hidden}
 .bd-foot-leg{flex:1;border-right:1px solid #111;padding:2mm 2.5mm;font-size:9pt;overflow:hidden}
 .bd-foot-sign{flex:1.55;display:flex;flex-direction:column;overflow:hidden}
 .bd-org{text-align:center;font-size:9.5pt;font-weight:700;padding:1.5mm;border-bottom:1px solid #111;text-transform:uppercase;letter-spacing:.3px}
@@ -243,7 +243,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 .bd-sign-box{flex:1;text-align:center;padding:2.5mm 2mm 1mm;display:flex;flex-direction:column}
 .bd-sign-box+.bd-sign-box{border-left:1px solid #111}
 .bd-sign-role{font-size:10pt;font-weight:700;text-transform:uppercase}
-.bd-sign-pad{flex:1;min-height:18mm}
+.bd-sign-pad{flex:1;min-height:28mm}
 .bd-leg-title{font-weight:700;text-align:center;margin-bottom:1mm;font-size:9.5pt}
 .bd-leg-item{display:flex;align-items:center;gap:5px;margin:0.6mm 0;line-height:1.2}
 .bd-leg-sym{display:inline-flex;align-items:center;justify-content:center;width:16px;height:11px;flex-shrink:0}
@@ -2401,7 +2401,7 @@ function baoCaoDocHtml(title,body){
     +'.bd-mapbox{flex:1 1 auto;min-height:0;border:1px solid #111;margin:1.2mm 0 0;background:#fff;display:flex;align-items:stretch;justify-content:center;overflow:hidden}'
     +'.bd-mapbox svg{width:100%;height:100%;display:block}'
     +'.bd-map-empty{align-items:center;justify-content:center;color:#555;font-size:12pt;min-height:150mm}'
-    +'.bd-foot{display:flex;border:1px solid #111;height:36mm;max-height:36mm;flex:0 0 36mm;margin:1.2mm 0 0;overflow:hidden}'
+    +'.bd-foot{display:flex;border:1px solid #111;height:50mm;max-height:50mm;flex:0 0 50mm;margin:1.2mm 0 0;overflow:hidden}'
     +'.bd-foot-leg{flex:1;border-right:1px solid #111;padding:2mm 2.5mm;font-size:9.5pt}'
     +'.bd-org{text-align:center;font-size:10.5pt;font-weight:700;padding:2mm;border-bottom:1px solid #111;text-transform:uppercase}'
     +'.bd-sign-row{display:flex;flex:1}'
@@ -2950,7 +2950,7 @@ function buildPrintMapSvg(features, opts){
     minPy=Math.min(minPy,pt[1]); maxPy=Math.max(maxPy,pt[1]);
   });});
   var span=Math.max(maxPx-minPx, maxPy-minPy, 40);
-  var useGround=Math.max(groundM, span*1.55); /* rộng hơn để thấy thửa lân cận */
+  var useGround=Math.max(groundM, span*1.65); /* đệm để thửa không tràn khung */
   var half=useGround/2;
   var minX=cx-half, maxX=cx+half, minY=cy-half, maxY=cy+half;
   var realScale=Math.round(useGround/(W/1000));
@@ -2995,11 +2995,13 @@ function buildPrintMapSvg(features, opts){
   }
 
   var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">';
+  svg+='<defs><clipPath id="bdClip"><rect x="0.5" y="0.5" width="'+(W-1)+'" height="'+(H-1)+'"/></clipPath></defs>';
   svg+='<rect width="'+W+'" height="'+H+'" fill="#fff"/>';
   for(var gi=1;gi<6;gi++){
     svg+='<line x1="'+(gi*W/6)+'" y1="0" x2="'+(gi*W/6)+'" y2="'+H+'" stroke="#ddd" stroke-width="0.12"/>';
     svg+='<line x1="0" y1="'+(gi*H/6)+'" x2="'+W+'" y2="'+(gi*H/6)+'" stroke="#ddd" stroke-width="0.12"/>';
   }
+  svg+='<g clip-path="url(#bdClip)">';
   /* Lân cận: chỉ viền, không tô đậm */
   nearPolys.forEach(function(p){
     svg+='<path d="'+pathD(p.pts)+'" fill="#f5f5f5" fill-opacity="0.5" stroke="#999" stroke-width="0.25"/>';
@@ -3027,7 +3029,35 @@ function buildPrintMapSvg(features, opts){
     svg+='<text x="'+x.toFixed(2)+'" y="'+(y-1.1).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.6" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+lab+'</text>';
     if(dtStr) svg+='<text x="'+x.toFixed(2)+'" y="'+(y+1.6).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="1.9" font-family="Times New Roman,serif" fill="#333">'+dtStr+' ha</text>';
   });
-  /* Ký hiệu TK / khoảnh đặt gần cụm thửa HĐ (trọng tâm theo từng nhóm) */
+  /* Ký hiệu TK / khoảnh: đặt sát cụm HĐ nhưng NGOÀI đa giác thửa HĐ (có thể đè lân cận) */
+  function pointInPoly(x,y,pts){
+    var inside=false;
+    for(var i=0,j=pts.length-1;i<pts.length;j=i++){
+      var xi=pts[i][0], yi=pts[i][1], xj=pts[j][0], yj=pts[j][1];
+      if(((yi>y)!==(yj>y)) && (x<(xj-xi)*(y-yi)/(yj-yi+1e-12)+xi)) inside=!inside;
+    }
+    return inside;
+  }
+  function onMainParcel(x,y){
+    for(var i=0;i<mainPolys.length;i++){
+      if(pointInPoly(x,y,mainPolys[i].pts)) return true;
+    }
+    return false;
+  }
+  function placeOutsideMain(cx0,cy0){
+    /* thử các hướng lệch ra khỏi tâm cụm */
+    var dirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[1,0.3],[-1,0.3]];
+    var spanR=Math.max(maxPx-minPx, maxPy-minPy, 30)*0.12;
+    for(var k=1;k<=8;k++){
+      for(var d=0;d<dirs.length;d++){
+        var x=cx0+dirs[d][0]*spanR*k;
+        var y=cy0+dirs[d][1]*spanR*k;
+        if(x<=minX+useGround*0.02||x>=maxX-useGround*0.02||y<=minY+useGround*0.02||y>=maxY-useGround*0.02) continue;
+        if(!onMainParcel(x,y)) return [x,y];
+      }
+    }
+    return [cx0+spanR*2, cy0];
+  }
   var tkGroups={}, khGroups={};
   mainPolys.forEach(function(p){
     var tk=String((p.pr&&p.pr.tieuKhu)||'').trim();
@@ -3044,22 +3074,27 @@ function buildPrintMapSvg(features, opts){
   });
   Object.keys(tkGroups).forEach(function(tk){
     var g=tkGroups[tk];
-    var mx=tx(g.sx/g.n), my=ty(g.sy/g.n);
-    /* lệch nhẹ lên trên cụm để không che số thửa */
-    my=Math.max(6, my-5);
+    var pos=placeOutsideMain(g.sx/g.n, g.sy/g.n);
+    var mx=tx(pos[0]), my=ty(pos[1]);
     if(mx<6) mx=6; if(mx>W-6) mx=W-6;
-    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="4.4" fill="#fff" fill-opacity="0.9" stroke="#1d4ed8" stroke-width="0.6"/>';
+    if(my<6) my=6; if(my>H-6) my=H-6;
+    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="4.4" fill="#fff" fill-opacity="0.95" stroke="#1d4ed8" stroke-width="0.6"/>';
     svg+='<text x="'+mx.toFixed(2)+'" y="'+my.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.5" font-family="Times New Roman,serif" font-weight="700" fill="#1d4ed8">'+String(tk).replace(/&/g,'&amp;')+'</text>';
   });
   Object.keys(khGroups).forEach(function(kh){
     var g=khGroups[kh];
-    var mx=tx(g.sx/g.n), my=ty(g.sy/g.n);
-    my=Math.min(H-6, my+5);
+    var pos=placeOutsideMain(g.sx/g.n, g.sy/g.n);
+    /* lệch thêm một nhịp để không trùng TK */
+    pos=[pos[0]+(maxPx-minPx)*0.04, pos[1]-(maxPy-minPy)*0.04];
+    if(onMainParcel(pos[0],pos[1])) pos=placeOutsideMain(pos[0], pos[1]);
+    var mx=tx(pos[0]), my=ty(pos[1]);
     if(mx<5) mx=5; if(mx>W-5) mx=W-5;
-    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="3.5" fill="#fff" fill-opacity="0.9" stroke="#111" stroke-width="0.5"/>';
+    if(my<5) my=5; if(my>H-5) my=H-5;
+    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="3.5" fill="#fff" fill-opacity="0.95" stroke="#111" stroke-width="0.5"/>';
     svg+='<text x="'+mx.toFixed(2)+'" y="'+my.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.2" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+String(kh).replace(/&/g,'&amp;')+'</text>';
   });
 
+  svg+='</g>';
   svg+='<rect x="0.35" y="0.35" width="'+(W-0.7)+'" height="'+(H-0.7)+'" fill="none" stroke="#111" stroke-width="0.55"/>';
   /* Kim Bắc */
   svg+='<g transform="translate('+(W-13)+',13)">';
