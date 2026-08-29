@@ -3029,7 +3029,7 @@ function buildPrintMapSvg(features, opts){
     svg+='<text x="'+x.toFixed(2)+'" y="'+(y-1.1).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.6" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+lab+'</text>';
     if(dtStr) svg+='<text x="'+x.toFixed(2)+'" y="'+(y+1.6).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="1.9" font-family="Times New Roman,serif" fill="#333">'+dtStr+' ha</text>';
   });
-  /* Ký hiệu TK / khoảnh: đặt sát cụm HĐ nhưng NGOÀI đa giác thửa HĐ (có thể đè lân cận) */
+  /* TK / khoảnh: neo theo bbox thửa HĐ, đẩy ra NGOÀI đa giác (được phép đè lân cận) */
   function pointInPoly(x,y,pts){
     var inside=false;
     for(var i=0,j=pts.length-1;i<pts.length;j=i++){
@@ -3039,58 +3039,90 @@ function buildPrintMapSvg(features, opts){
     return inside;
   }
   function onMainParcel(x,y){
-    for(var i=0;i<mainPolys.length;i++){
-      if(pointInPoly(x,y,mainPolys[i].pts)) return true;
-    }
+    for(var i=0;i<mainPolys.length;i++) if(pointInPoly(x,y,mainPolys[i].pts)) return true;
     return false;
   }
-  function placeOutsideMain(cx0,cy0){
-    /* thử các hướng lệch ra khỏi tâm cụm */
-    var dirs=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1],[1,0.3],[-1,0.3]];
-    var spanR=Math.max(maxPx-minPx, maxPy-minPy, 30)*0.12;
-    for(var k=1;k<=8;k++){
+  /* Bbox từng thửa HĐ + bbox chung */
+  var mainBB={minX:1e99,maxX:-1e99,minY:1e99,maxY:-1e99};
+  mainPolys.forEach(function(p){
+    p.pts.forEach(function(pt){
+      mainBB.minX=Math.min(mainBB.minX,pt[0]); mainBB.maxX=Math.max(mainBB.maxX,pt[0]);
+      mainBB.minY=Math.min(mainBB.minY,pt[1]); mainBB.maxY=Math.max(mainBB.maxY,pt[1]);
+    });
+  });
+  var mcx=(mainBB.minX+mainBB.maxX)/2, mcy=(mainBB.minY+mainBB.maxY)/2;
+  var mw=Math.max(mainBB.maxX-mainBB.minX, 20);
+  var mh=Math.max(mainBB.maxY-mainBB.minY, 20);
+  function placeOutsideMain(prefer){
+    /* prefer: "n","s","e","w" — điểm ứng viên ngay ngoài bbox HĐ */
+    var padX=mw*0.18+8, padY=mh*0.18+8;
+    var cands=[];
+    if(prefer==="n") cands.push([mcx, mainBB.maxY+padY]);
+    if(prefer==="s") cands.push([mcx, mainBB.minY-padY]);
+    if(prefer==="e") cands.push([mainBB.maxX+padX, mcy]);
+    if(prefer==="w") cands.push([mainBB.minX-padX, mcy]);
+    cands.push(
+      [mcx, mainBB.maxY+padY],[mcx, mainBB.minY-padY],
+      [mainBB.maxX+padX, mcy],[mainBB.minX-padX, mcy],
+      [mainBB.maxX+padX, mainBB.maxY+padY],[mainBB.minX-padX, mainBB.maxY+padY],
+      [mainBB.maxX+padX, mainBB.minY-padY],[mainBB.minX-padX, mainBB.minY-padY]
+    );
+    for(var i=0;i<cands.length;i++){
+      var x=cands[i][0], y=cands[i][1];
+      if(x<minX+useGround*0.03||x>maxX-useGround*0.03||y<minY+useGround*0.03||y>maxY-useGround*0.03) continue;
+      if(!onMainParcel(x,y)) return [x,y];
+    }
+    /* fallback: bước dần ra ngoài theo 8 hướng */
+    var dirs=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,1],[1,-1],[-1,-1]];
+    for(var k=1;k<=20;k++){
       for(var d=0;d<dirs.length;d++){
-        var x=cx0+dirs[d][0]*spanR*k;
-        var y=cy0+dirs[d][1]*spanR*k;
-        if(x<=minX+useGround*0.02||x>=maxX-useGround*0.02||y<=minY+useGround*0.02||y>=maxY-useGround*0.02) continue;
-        if(!onMainParcel(x,y)) return [x,y];
+        var x2=mcx+dirs[d][0]*(mw*0.12)*k;
+        var y2=mcy+dirs[d][1]*(mh*0.12)*k;
+        if(x2<minX||x2>maxX||y2<minY||y2>maxY) continue;
+        if(!onMainParcel(x2,y2)) return [x2,y2];
       }
     }
-    return [cx0+spanR*2, cy0];
+    return [mainBB.maxX+padX, mainBB.maxY+padY];
   }
   var tkGroups={}, khGroups={};
   mainPolys.forEach(function(p){
     var tk=String((p.pr&&p.pr.tieuKhu)||'').trim();
     var kh=String((p.pr&&p.pr.khoanh)||'').trim();
-    var c=centroid(p.pts);
-    if(tk){
-      if(!tkGroups[tk]) tkGroups[tk]={sx:0,sy:0,n:0};
-      tkGroups[tk].sx+=c[0]; tkGroups[tk].sy+=c[1]; tkGroups[tk].n++;
-    }
-    if(kh){
-      if(!khGroups[kh]) khGroups[kh]={sx:0,sy:0,n:0};
-      khGroups[kh].sx+=c[0]; khGroups[kh].sy+=c[1]; khGroups[kh].n++;
-    }
+    if(tk){ if(!tkGroups[tk]) tkGroups[tk]=1; }
+    if(kh){ if(!khGroups[kh]) khGroups[kh]=1; }
   });
-  Object.keys(tkGroups).forEach(function(tk){
-    var g=tkGroups[tk];
-    var pos=placeOutsideMain(g.sx/g.n, g.sy/g.n);
+  var tkList=Object.keys(tkGroups), khList=Object.keys(khGroups);
+  tkList.forEach(function(tk, idx){
+    var pos=placeOutsideMain(idx%2===0?"n":"e");
     var mx=tx(pos[0]), my=ty(pos[1]);
-    if(mx<6) mx=6; if(mx>W-6) mx=W-6;
-    if(my<6) my=6; if(my>H-6) my=H-6;
-    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="4.4" fill="#fff" fill-opacity="0.95" stroke="#1d4ed8" stroke-width="0.6"/>';
+    mx=Math.max(6, Math.min(W-6, mx));
+    my=Math.max(6, Math.min(H-6, my));
+    /* nếu vẫn lọt vào thửa HĐ (do tx/ty), đẩy thêm theo pixel */
+    var guard=0;
+    while(guard<12){
+      var gx=minX+(mx/W)*(maxX-minX);
+      var gy=minY+((H-my)/H)*(maxY-minY);
+      if(!onMainParcel(gx,gy)) break;
+      my=Math.max(6, my-3); /* đẩy lên trên theo màn hình */
+      guard++;
+    }
+    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="4.4" fill="#fff" fill-opacity="0.95" stroke="#1d4ed8" stroke-width="0.65"/>';
     svg+='<text x="'+mx.toFixed(2)+'" y="'+my.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.5" font-family="Times New Roman,serif" font-weight="700" fill="#1d4ed8">'+String(tk).replace(/&/g,'&amp;')+'</text>';
   });
-  Object.keys(khGroups).forEach(function(kh){
-    var g=khGroups[kh];
-    var pos=placeOutsideMain(g.sx/g.n, g.sy/g.n);
-    /* lệch thêm một nhịp để không trùng TK */
-    pos=[pos[0]+(maxPx-minPx)*0.04, pos[1]-(maxPy-minPy)*0.04];
-    if(onMainParcel(pos[0],pos[1])) pos=placeOutsideMain(pos[0], pos[1]);
+  khList.forEach(function(kh, idx){
+    var pos=placeOutsideMain(idx%2===0?"s":"w");
     var mx=tx(pos[0]), my=ty(pos[1]);
-    if(mx<5) mx=5; if(mx>W-5) mx=W-5;
-    if(my<5) my=5; if(my>H-5) my=H-5;
-    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="3.5" fill="#fff" fill-opacity="0.95" stroke="#111" stroke-width="0.5"/>';
+    mx=Math.max(5, Math.min(W-5, mx));
+    my=Math.max(5, Math.min(H-5, my));
+    var guard=0;
+    while(guard<12){
+      var gx=minX+(mx/W)*(maxX-minX);
+      var gy=minY+((H-my)/H)*(maxY-minY);
+      if(!onMainParcel(gx,gy)) break;
+      mx=Math.min(W-5, mx+3);
+      guard++;
+    }
+    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="3.5" fill="#fff" fill-opacity="0.95" stroke="#111" stroke-width="0.55"/>';
     svg+='<text x="'+mx.toFixed(2)+'" y="'+my.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.2" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+String(kh).replace(/&/g,'&amp;')+'</text>';
   });
 
