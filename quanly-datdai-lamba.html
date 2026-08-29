@@ -223,24 +223,27 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 
 .bd-a4{width:190mm;height:277mm;max-height:277mm;margin:0 auto;font-family:"Times New Roman",Times,serif;color:#111;page-break-before:always;page-break-inside:avoid;break-before:page;break-inside:avoid;overflow:hidden;box-sizing:border-box}
 .bd-outer{border:1.8px solid #111;height:100%;padding:2.5mm;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden}
-.bd-head{text-align:center;padding:0 1mm 1mm;border-bottom:1px solid #111;flex:0 0 auto}
-.bd-head-t1{font-size:11.5pt;font-weight:700;text-transform:uppercase;line-height:1.25}
-.bd-head-t2{font-size:10.5pt;font-weight:700;text-transform:uppercase;line-height:1.25;margin-top:1px}
-.bd-head-t3{font-size:10pt;font-weight:700;text-transform:uppercase;margin-top:2px}
-.bd-meta{display:flex;flex-wrap:wrap;gap:1px 10px;padding:1.2mm 1mm;font-size:9.5pt;border-bottom:1px solid #111;flex:0 0 auto}
+.bd-head{text-align:center;padding:1.5mm 2mm 1.5mm;border-bottom:1.2px solid #111;flex:0 0 auto}
+.bd-head-t1{font-size:12pt;font-weight:700;text-transform:uppercase;line-height:1.3;letter-spacing:.2px}
+.bd-head-t2{font-size:11pt;font-weight:700;text-transform:uppercase;line-height:1.3;margin-top:1px}
+.bd-head-t3{font-size:10pt;font-weight:700;text-transform:uppercase;margin-top:2.5px}
+.bd-meta{display:none}
+.bd-meta-tbl{width:100%;border-collapse:collapse;font-size:9.5pt;flex:0 0 auto}
+.bd-meta-tbl td{border:1px solid #333;padding:1.4mm 2mm;vertical-align:top;width:25%}
+.bd-meta-tbl b{font-size:8.5pt;font-weight:700}
 .bd-meta span{white-space:nowrap}
 .bd-mapbox{flex:1 1 auto;border:1px solid #111;margin:1.2mm 0 0;background:#fff;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden}
 .bd-mapbox svg{width:100%;height:100%;display:block}
 .bd-map-empty{align-items:center;justify-content:center;color:#555;font-size:12pt}
-.bd-foot{display:flex;border:1px solid #111;height:36mm;max-height:36mm;flex:0 0 36mm;margin:1.2mm 0 0;overflow:hidden}
-.bd-foot-leg{flex:1;border-right:1px solid #111;padding:1.2mm 2mm;font-size:8.5pt;overflow:hidden}
+.bd-foot{display:flex;border:1.2px solid #111;height:38mm;max-height:38mm;flex:0 0 38mm;margin:1.5mm 0 0;overflow:hidden}
+.bd-foot-leg{flex:1;border-right:1px solid #111;padding:2mm 2.5mm;font-size:9pt;overflow:hidden}
 .bd-foot-sign{flex:1.55;display:flex;flex-direction:column;overflow:hidden}
-.bd-org{text-align:center;font-size:9pt;font-weight:700;padding:1mm;border-bottom:1px solid #111;text-transform:uppercase}
+.bd-org{text-align:center;font-size:9.5pt;font-weight:700;padding:1.5mm;border-bottom:1px solid #111;text-transform:uppercase;letter-spacing:.3px}
 .bd-sign-row{display:flex;flex:1;min-height:0}
-.bd-sign-box{flex:1;text-align:center;padding:1.5mm;display:flex;flex-direction:column}
+.bd-sign-box{flex:1;text-align:center;padding:2.5mm 2mm 1mm;display:flex;flex-direction:column}
 .bd-sign-box+.bd-sign-box{border-left:1px solid #111}
-.bd-sign-role{font-size:9.5pt;font-weight:700;text-transform:uppercase}
-.bd-sign-pad{flex:1;min-height:16mm}
+.bd-sign-role{font-size:10pt;font-weight:700;text-transform:uppercase}
+.bd-sign-pad{flex:1;min-height:18mm}
 .bd-leg-title{font-weight:700;text-align:center;margin-bottom:1mm;font-size:9.5pt}
 .bd-leg-item{display:flex;align-items:center;gap:5px;margin:0.6mm 0;line-height:1.2}
 .bd-leg-sym{display:inline-flex;align-items:center;justify-content:center;width:16px;height:11px;flex-shrink:0}
@@ -2393,7 +2396,7 @@ function baoCaoDocHtml(title,body){
     +'.bd-head-t1{font-size:12pt;font-weight:700;text-transform:uppercase;line-height:1.3}'
     +'.bd-head-t2{font-size:11pt;font-weight:700;text-transform:uppercase;line-height:1.3;margin-top:1px}'
     +'.bd-head-t3{font-size:10.5pt;font-weight:700;text-transform:uppercase;margin-top:3px}'
-    +'.bd-meta{display:flex;flex-wrap:wrap;gap:2px 12px;padding:2mm 1mm;font-size:10pt;border-bottom:1px solid #111}'
+    +'.bd-meta{display:none}'+'.bd-meta-tbl{width:100%;border-collapse:collapse;font-size:9.5pt}'+'.bd-meta-tbl td{border:1px solid #333;padding:1.4mm 2mm;vertical-align:top;width:25%}'+'.bd-meta-tbl b{font-size:8.5pt}'
     +'.bd-meta span{white-space:nowrap}'
     +'.bd-mapbox{flex:1 1 auto;min-height:0;border:1px solid #111;margin:1.2mm 0 0;background:#fff;display:flex;align-items:stretch;justify-content:center;overflow:hidden}'
     +'.bd-mapbox svg{width:100%;height:100%;display:block}'
@@ -2887,15 +2890,16 @@ function buildPrintMapSvg(features, opts){
   html+='<div class="bd-head-t2">TRÊN DIỆN TÍCH NHẬN KHOÁN CỦA BQLRPH XUÂN LỘC</div>';
   html+='<div class="bd-head-t3">ĐỊA ĐIỂM: '+esc(place)+'</div>';
   html+='</div>';
-  html+='<div class="bd-meta">';
-  html+='<span><b>Số HĐ:</b> '+esc(soHD||'—')+'</span>';
-  html+='<span><b>Ngày ký:</b> '+esc(ngayHD||'—')+'</span>';
-  html+='<span><b>Hộ nhận khoán:</b> '+esc(ho||'—')+'</span>';
-  html+='<span><b>Thửa:</b> '+esc(joinMax(thuas,12))+'</span>';
-  html+='<span><b>Tờ BĐ:</b> '+esc(joinMax(tos,8))+'</span>';
-  html+='<span><b>Lô:</b> '+esc(joinMax(los,8))+'</span>';
-  html+='<span><b>Khoảnh:</b> '+esc(joinMax(khoanhs,8))+'</span>';
-  html+='</div>';
+  html+='<table class="bd-meta-tbl"><tr>';
+  html+='<td><b>Số HĐ</b><br>'+esc(soHD||'—')+'</td>';
+  html+='<td><b>Ngày ký</b><br>'+esc(ngayHD||'—')+'</td>';
+  html+='<td colspan="2"><b>Hộ nhận khoán</b><br>'+esc(ho||'—')+'</td>';
+  html+='</tr><tr>';
+  html+='<td><b>Thửa</b><br>'+esc(joinMax(thuas,12))+'</td>';
+  html+='<td><b>Tờ BĐ</b><br>'+esc(joinMax(tos,8))+'</td>';
+  html+='<td><b>Lô</b><br>'+esc(joinMax(los,8))+'</td>';
+  html+='<td><b>Khoảnh / TK</b><br>'+esc(joinMax(khoanhs,6))+' / '+esc(joinMax(tks,6))+'</td>';
+  html+='</tr></table>';
 
   if(!feats.length){
     html+='<div class="bd-mapbox bd-map-empty">Không có dữ liệu bản đồ thửa</div>';
@@ -3023,24 +3027,37 @@ function buildPrintMapSvg(features, opts){
     svg+='<text x="'+x.toFixed(2)+'" y="'+(y-1.1).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.6" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+lab+'</text>';
     if(dtStr) svg+='<text x="'+x.toFixed(2)+'" y="'+(y+1.6).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="1.9" font-family="Times New Roman,serif" fill="#333">'+dtStr+' ha</text>';
   });
-  /* Ký hiệu TK / khoảnh kiểu TCVN (góc trong cụm thửa HĐ) */
-  var tkSet={}, khSet={};
+  /* Ký hiệu TK / khoảnh đặt gần cụm thửa HĐ (trọng tâm theo từng nhóm) */
+  var tkGroups={}, khGroups={};
   mainPolys.forEach(function(p){
     var tk=String((p.pr&&p.pr.tieuKhu)||'').trim();
     var kh=String((p.pr&&p.pr.khoanh)||'').trim();
-    if(tk) tkSet[tk]=(tkSet[tk]||0)+1;
-    if(kh) khSet[kh]=(khSet[kh]||0)+1;
+    var c=centroid(p.pts);
+    if(tk){
+      if(!tkGroups[tk]) tkGroups[tk]={sx:0,sy:0,n:0};
+      tkGroups[tk].sx+=c[0]; tkGroups[tk].sy+=c[1]; tkGroups[tk].n++;
+    }
+    if(kh){
+      if(!khGroups[kh]) khGroups[kh]={sx:0,sy:0,n:0};
+      khGroups[kh].sx+=c[0]; khGroups[kh].sy+=c[1]; khGroups[kh].n++;
+    }
   });
-  var markY=12;
-  Object.keys(tkSet).slice(0,4).forEach(function(tk,i){
-    var mx=14+i*16, my=markY;
-    svg+='<circle cx="'+mx+'" cy="'+my+'" r="4.2" fill="none" stroke="#1d4ed8" stroke-width="0.55"/>';
-    svg+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" dominant-baseline="middle" font-size="2.4" font-family="Times New Roman,serif" font-weight="700" fill="#1d4ed8">'+String(tk).replace(/&/g,'&amp;')+'</text>';
+  Object.keys(tkGroups).forEach(function(tk){
+    var g=tkGroups[tk];
+    var mx=tx(g.sx/g.n), my=ty(g.sy/g.n);
+    /* lệch nhẹ lên trên cụm để không che số thửa */
+    my=Math.max(6, my-5);
+    if(mx<6) mx=6; if(mx>W-6) mx=W-6;
+    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="4.4" fill="#fff" fill-opacity="0.9" stroke="#1d4ed8" stroke-width="0.6"/>';
+    svg+='<text x="'+mx.toFixed(2)+'" y="'+my.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.5" font-family="Times New Roman,serif" font-weight="700" fill="#1d4ed8">'+String(tk).replace(/&/g,'&amp;')+'</text>';
   });
-  Object.keys(khSet).slice(0,4).forEach(function(kh,i){
-    var mx=14+i*12, my=markY+11;
-    svg+='<circle cx="'+mx+'" cy="'+my+'" r="3.4" fill="none" stroke="#111" stroke-width="0.45"/>';
-    svg+='<text x="'+mx+'" y="'+my+'" text-anchor="middle" dominant-baseline="middle" font-size="2.1" font-family="Times New Roman,serif" fill="#111">'+String(kh).replace(/&/g,'&amp;')+'</text>';
+  Object.keys(khGroups).forEach(function(kh){
+    var g=khGroups[kh];
+    var mx=tx(g.sx/g.n), my=ty(g.sy/g.n);
+    my=Math.min(H-6, my+5);
+    if(mx<5) mx=5; if(mx>W-5) mx=W-5;
+    svg+='<circle cx="'+mx.toFixed(2)+'" cy="'+my.toFixed(2)+'" r="3.5" fill="#fff" fill-opacity="0.9" stroke="#111" stroke-width="0.5"/>';
+    svg+='<text x="'+mx.toFixed(2)+'" y="'+my.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.2" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+String(kh).replace(/&/g,'&amp;')+'</text>';
   });
 
   svg+='<rect x="0.35" y="0.35" width="'+(W-0.7)+'" height="'+(H-0.7)+'" fill="none" stroke="#111" stroke-width="0.55"/>';
