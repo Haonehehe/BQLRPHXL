@@ -264,7 +264,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
   min-height:42mm;
   margin-top:auto;
 }
-.bd-foot-left{flex:1.55;border-right:1px solid #111;display:flex;flex-direction:column}
+.bd-foot-leg{flex:1;border-right:1px solid #111;padding:2mm 2.5mm;font-size:9.5pt}
 .bd-org{text-align:center;font-size:10.5pt;font-weight:700;padding:2mm 1mm;border-bottom:1px solid #111;text-transform:uppercase}
 .bd-sign-row{display:flex;flex:1}
 .bd-sign-box{flex:1;text-align:center;padding:2mm 2mm 1mm;display:flex;flex-direction:column}
@@ -272,7 +272,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 .bd-sign-role{font-size:10pt;font-weight:700;text-transform:uppercase}
 .bd-sign-hint{font-size:9pt;font-style:italic;margin-top:1px}
 .bd-sign-pad{flex:1;min-height:22mm}
-.bd-foot-right{flex:1;padding:2mm 2.5mm;font-size:9.5pt}
+.bd-foot-sign{flex:1.55;display:flex;flex-direction:column}
 .bd-leg-title{font-weight:700;text-align:center;margin-bottom:2mm;font-size:10.5pt}
 .bd-leg-item{display:flex;align-items:center;gap:6px;margin:1.2mm 0;line-height:1.25}
 .bd-leg-sym{display:inline-block;width:14px;height:10px;flex-shrink:0}
@@ -2406,19 +2406,52 @@ function buildBaoCaoHDHtml(c){
       ho: c.ho||''
     });
   }catch(e){ console.warn(e); }
-  h+='<p style="margin-top:18px;font-size:11px;color:#555">Báo cáo tổng hợp từ dữ liệu lâm bạ và bảng đối chiếu tại thời điểm xuất · '+new Date().toLocaleString('vi-VN')+'</p>';
   h+='</div>';
   return h;
 }
 
 function baoCaoDocHtml(title,body){
-  return '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+
-    'body{font-family:Arial,sans-serif;font-size:11.5pt;line-height:1.45;color:#111;padding:24px}'+
-    'h1{text-align:center;font-size:17pt;margin:0 0 4px}h2{font-size:12.5pt;margin:16px 0 6px;border-bottom:1px solid #ccc;padding-bottom:3px}'+
-    'h3{font-size:11.5pt;margin:12px 0 4px}hr{border:0;border-top:1px solid #999}'+
-    'table{width:100%;border-collapse:collapse;margin:6px 0 10px}th,td{border:1px solid #999;padding:4px 6px;vertical-align:top;font-size:10.5pt}th{background:#eee;text-align:left;width:22%}'+
-    'p{margin:4px 0}@media print{body{padding:8mm}button{display:none!important}h3{break-after:avoid}table{break-inside:avoid}}'+
-    '</style></head><body>'+body+'</body></html>';
+  var css=''
+    +'*{box-sizing:border-box}'
+    +'body{font-family:"Times New Roman",Times,serif;font-size:11pt;line-height:1.35;color:#111;margin:0;padding:0;background:#fff}'
+    +'h1{text-align:center;font-size:16pt;margin:0 0 4px}h2{font-size:12pt;margin:12px 0 6px;border-bottom:1px solid #ccc;padding-bottom:3px}'
+    +'h3{font-size:11pt;margin:10px 0 4px}hr{border:0;border-top:1px solid #999}'
+    +'table{width:100%;border-collapse:collapse;margin:6px 0 10px}th,td{border:1px solid #999;padding:4px 6px;vertical-align:top;font-size:10.5pt}th{background:#eee;text-align:left;width:22%}'
+    +'p{margin:4px 0}'
+    +'.report{padding:10mm}'
+    /* Phiếu sơ đồ A4 */
+    +'.bd-a4{width:190mm;min-height:277mm;margin:0 auto;font-family:"Times New Roman",Times,serif;color:#111}'
+    +'.bd-outer{border:1.8px solid #111;min-height:275mm;padding:3.5mm;display:flex;flex-direction:column}'
+    +'.bd-head{text-align:center;padding:1mm 1mm 2mm;border-bottom:1px solid #111}'
+    +'.bd-head-t1{font-size:12pt;font-weight:700;text-transform:uppercase;line-height:1.3}'
+    +'.bd-head-t2{font-size:11pt;font-weight:700;text-transform:uppercase;line-height:1.3;margin-top:1px}'
+    +'.bd-head-t3{font-size:10.5pt;font-weight:700;text-transform:uppercase;margin-top:3px}'
+    +'.bd-meta{display:flex;flex-wrap:wrap;gap:2px 12px;padding:2mm 1mm;font-size:10pt;border-bottom:1px solid #111}'
+    +'.bd-meta span{white-space:nowrap}'
+    +'.bd-mapbox{flex:1 1 auto;min-height:160mm;border:1px solid #111;margin:2mm 0;background:#fff;display:flex;align-items:stretch;justify-content:center}'
+    +'.bd-mapbox svg{width:100%;height:100%;display:block}'
+    +'.bd-map-empty{align-items:center;justify-content:center;color:#555;font-size:12pt;min-height:150mm}'
+    +'.bd-foot{display:flex;border:1px solid #111;min-height:40mm;margin-top:auto}'
+    +'.bd-foot-leg{flex:1;border-right:1px solid #111;padding:2mm 2.5mm;font-size:9.5pt}'
+    +'.bd-org{text-align:center;font-size:10.5pt;font-weight:700;padding:2mm;border-bottom:1px solid #111;text-transform:uppercase}'
+    +'.bd-sign-row{display:flex;flex:1}'
+    +'.bd-sign-box{flex:1;text-align:center;padding:2mm;display:flex;flex-direction:column}'
+    +'.bd-sign-box+.bd-sign-box{border-left:1px solid #111}'
+    +'.bd-sign-role{font-size:10pt;font-weight:700;text-transform:uppercase}'
+    +'.bd-sign-hint{font-size:9pt;font-style:italic;margin-top:1px}'
+    +'.bd-sign-pad{flex:1;min-height:20mm}'
+    +'.bd-foot-sign{flex:1.55;display:flex;flex-direction:column}'
+    +'.bd-leg-title{font-weight:700;text-align:center;margin-bottom:2mm;font-size:10.5pt}'
+    +'.bd-leg-item{display:flex;align-items:center;gap:6px;margin:1.1mm 0;line-height:1.25}'
+    +'.bd-leg-sym{display:inline-block;width:14px;height:10px;flex-shrink:0}'
+    +'.bd-leg-poly{background:#efefef;border:1px solid #111}'
+    +'.bd-leg-num{text-align:center;font-weight:700;font-size:9pt;line-height:10px}'
+    +'.bd-leg-line{height:0;border-top:1.5px solid #111;width:14px;margin-top:4px}'
+    +'@page{size:A4 portrait;margin:8mm}'
+    +'@media print{body{padding:0;margin:0}.report{padding:6mm}button{display:none!important}'
+    +'.bd-a4{width:190mm;min-height:277mm}.bd-outer{min-height:277mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+
+  return '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+css+'</style></head><body>'+body+'</body></html>';
 }
 
 function buildBaoCaoDongHtml(p){
@@ -2512,7 +2545,14 @@ function printHtmlDoc(title, bodyHtml){
     var host=document.createElement('div');
     host.id='printHostHD';
     host.className='print-host';
-    host.innerHTML=bodyHtml;
+    host.innerHTML='<div class="print-a4-root">'+bodyHtml+'</div>';
+    // inject CSS into page once
+    if(!document.getElementById('bd-print-css')){
+      var st=document.createElement('style');
+      st.id='bd-print-css';
+      st.textContent=document.querySelector('style#hd-map-css')?document.querySelector('style#hd-map-css').textContent:'';
+      document.head.appendChild(st);
+    }
     document.body.appendChild(host);
     var oldTitle=document.title;
     document.title=title||'In';
@@ -2980,28 +3020,28 @@ function buildPrintMapSvg(features, opts){
 
   /* ===== CHÂN TRANG: ký + chú dẫn ===== */
   html+='<div class="bd-foot">';
-  html+='<div class="bd-foot-left">';
-  html+='<div class="bd-org">BQL RỪNG PHÒNG HỘ XUÂN LỘC</div>';
-  html+='<div class="bd-sign-row">';
-  html+='<div class="bd-sign-box">';
-  html+='<div class="bd-sign-role">NGƯỜI TỔNG HỢP</div>';
-  html+='<div class="bd-sign-hint">Ký, họ tên</div>';
-  html+='<div class="bd-sign-pad"></div>';
-  html+='</div>';
-  html+='<div class="bd-sign-box">';
-  html+='<div class="bd-sign-role">PHÒNG LÂM NGHIỆP</div>';
-  html+='<div class="bd-sign-hint">Ký, họ tên, đóng dấu</div>';
-  html+='<div class="bd-sign-pad"></div>';
-  html+='</div>';
-  html+='</div>';
-  html+='</div>';
-  html+='<div class="bd-foot-right">';
+  html+='<div class="bd-foot-leg">';
   html+='<div class="bd-leg-title">CHÚ DẪN</div>';
   html+='<div class="bd-leg-item"><span class="bd-leg-sym bd-leg-poly"></span> Thửa đất thuộc HĐ</div>';
   html+='<div class="bd-leg-item"><span class="bd-leg-sym bd-leg-num">12</span> Số hiệu thửa</div>';
   html+='<div class="bd-leg-item"><span class="bd-leg-sym bd-leg-line"></span> Ranh giới thửa</div>';
   html+='<div class="bd-leg-item">Tờ BĐ: <b>'+esc(joinMax(tos,6))+'</b></div>';
   html+='<div class="bd-leg-item">Lô / Khoảnh: <b>'+esc(joinMax(los,4))+'</b> / <b>'+esc(joinMax(khoanhs,4))+'</b></div>';
+  html+='</div>';
+  html+='<div class="bd-foot-sign">';
+  html+='<div class="bd-org">BQL RỪNG PHÒNG HỘ XUÂN LỘC</div>';
+  html+='<div class="bd-sign-row">';
+  html+='<div class="bd-sign-box">';
+  html+='<div class="bd-sign-role">PHÒNG LÂM NGHIỆP</div>';
+  html+='<div class="bd-sign-hint">Ký, họ tên, đóng dấu</div>';
+  html+='<div class="bd-sign-pad"></div>';
+  html+='</div>';
+  html+='<div class="bd-sign-box">';
+  html+='<div class="bd-sign-role">NGƯỜI TỔNG HỢP</div>';
+  html+='<div class="bd-sign-hint">Ký, họ tên</div>';
+  html+='<div class="bd-sign-pad"></div>';
+  html+='</div>';
+  html+='</div>';
   html+='</div>';
   html+='</div>';
 
