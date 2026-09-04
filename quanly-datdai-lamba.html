@@ -2950,11 +2950,11 @@ function buildPrintMapSvg(features, opts){
     minPy=Math.min(minPy,pt[1]); maxPy=Math.max(maxPy,pt[1]);
   });});
   var span=Math.max(maxPx-minPx, maxPy-minPy, 40);
-  /* Cửa sổ rộng hơn để gọi đủ lô xung quanh */
-  var useGround=Math.max(groundM, span*2.8, 350);
+  /* Tỷ lệ CỐ ĐỊNH 1/5000 — không co khung theo cụm thửa */
+  var useGround=groundM; /* (W mm / 1000) * 5000 */
   var half=useGround/2;
   var minX=cx-half, maxX=cx+half, minY=cy-half, maxY=cy+half;
-  var realScale=Math.round(useGround/(W/1000));
+  var realScale=scaleTarget; /* luôn 5000 */
 
   /* ---- Thửa lân cận: giao bbox với cửa sổ (không chỉ đỉnh nằm trong) ---- */
   var nearPolys=[];
