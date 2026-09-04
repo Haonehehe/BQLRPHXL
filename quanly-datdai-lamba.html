@@ -2950,35 +2950,62 @@ function buildPrintMapSvg(features, opts){
     minPy=Math.min(minPy,pt[1]); maxPy=Math.max(maxPy,pt[1]);
   });});
   var span=Math.max(maxPx-minPx, maxPy-minPy, 40);
-  var useGround=Math.max(groundM, span*1.65); /* đệm để thửa không tràn khung */
+  /* Cửa sổ rộng hơn để gọi đủ lô xung quanh */
+  var useGround=Math.max(groundM, span*2.8, 350);
   var half=useGround/2;
   var minX=cx-half, maxX=cx+half, minY=cy-half, maxY=cy+half;
   var realScale=Math.round(useGround/(W/1000));
 
-  /* ---- Thửa lân cận trong cửa sổ ---- */
+  /* ---- Thửa lân cận: giao bbox với cửa sổ (không chỉ đỉnh nằm trong) ---- */
   var nearPolys=[];
+  var mainToSet={};
+  mainPolys.forEach(function(p){
+    var to=String((p.pr&&p.pr.toBD)!=null?p.pr.toBD:'').trim();
+    if(to) mainToSet[to]=1;
+  });
   if(mapData&&mapData.features){
+    var cands=[];
     mapData.features.forEach(function(f){
       var pr=fixProps(f.properties||{});
       var id=String(pr.id!=null?pr.id:(chuanThua(pr.thua)+'|'+pr.toBD));
       if(mainIds[id]) return;
       var ptsList=ringsToPts(f);
-      var hit=false;
+      if(!ptsList.length) return;
+      var bminX=1e99,bmaxX=-1e99,bminY=1e99,bmaxY=-1e99, nPt=0;
       ptsList.forEach(function(pts){
         pts.forEach(function(pt){
-          if(pt[0]>=minX&&pt[0]<=maxX&&pt[1]>=minY&&pt[1]<=maxY) hit=true;
+          bminX=Math.min(bminX,pt[0]); bmaxX=Math.max(bmaxX,pt[0]);
+          bminY=Math.min(bminY,pt[1]); bmaxY=Math.max(bmaxY,pt[1]);
+          nPt++;
         });
       });
-      if(!hit) return;
-      var label=chuanThua(pr.thua)||String(pr.thua||'');
-      var dt=pr.dt!=null?Number(pr.dt):null;
-      ptsList.forEach(function(pts){
-        nearPolys.push({pts:pts,label:label,dt:dt,pr:pr,main:false});
+      if(!nPt) return;
+      /* giao với cửa sổ nhìn */
+      if(bmaxX<minX||bminX>maxX||bmaxY<minY||bminY>maxY) return;
+      var bcX=(bminX+bmaxX)/2, bcY=(bminY+bmaxY)/2;
+      var dist=Math.hypot(bcX-cx, bcY-cy);
+      var sameTo=mainToSet[String(pr.toBD!=null?pr.toBD:'').trim()]?0:1;
+      cands.push({
+        ptsList:ptsList,
+        label:chuanThua(pr.thua)||String(pr.thua||''),
+        dt:pr.dt!=null?Number(pr.dt):null,
+        pr:pr,
+        dist:dist,
+        sameTo:sameTo
+      });
+    });
+    /* ưu tiên cùng tờ BĐ + gần tâm HĐ */
+    cands.sort(function(a,b){
+      if(a.sameTo!==b.sameTo) return a.sameTo-b.sameTo;
+      return a.dist-b.dist;
+    });
+    var limit=220;
+    cands.slice(0,limit).forEach(function(c){
+      c.ptsList.forEach(function(pts){
+        nearPolys.push({pts:pts,label:c.label,dt:c.dt,pr:c.pr,main:false});
       });
     });
   }
-  /* giới hạn số thửa lân cận để SVG không quá nặng */
-  if(nearPolys.length>80) nearPolys=nearPolys.slice(0,80);
 
   function tx(x){ return ((x-minX)/(maxX-minX))*W; }
   function ty(y){ return (1-(y-minY)/(maxY-minY))*H; }
