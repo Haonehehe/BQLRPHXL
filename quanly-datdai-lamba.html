@@ -3145,22 +3145,7 @@ function buildOneMapSheet(cfg){
   mainPolys.forEach(function(p){
     svg+='<path d="'+pathD(p.pts)+'" fill="#cfcfcf" fill-opacity="0.85" stroke="#111" stroke-width="0.55"/>';
   });
-  function ringAreaM2(pts){
-    if(!pts||pts.length<3) return 0;
-    var a=0;
-    for(var i=0;i<pts.length;i++){
-      var j=(i+1)%pts.length;
-      a+=pts[i][0]*pts[j][1]-pts[j][0]*pts[i][1];
-    }
-    return Math.abs(a)/2;
-  }
-  function isSmallParcel(p){
-    if(p.dt!=null && !isNaN(p.dt) && p.dt<0.10) return true;
-    if(ringAreaM2(p.pts)<1000) return true;
-    return false;
-  }
-
-  /* ---- Trước: tính vị trí TK / khoảnh (ngoài thửa HĐ) để nhãn không đè ---- */
+  /* ---- Vị trí TK / khoảnh trước (để nhãn & chú thích không đè) ---- */
   var mainBB={minX:1e99,maxX:-1e99,minY:1e99,maxY:-1e99};
   mainPolys.forEach(function(p){
     p.pts.forEach(function(pt){
@@ -3207,7 +3192,6 @@ function buildOneMapSheet(cfg){
     if(tk) tkGroups[tk]=1;
     if(kh) khGroups[kh]=1;
   });
-  /* reserved: [{x,y,r}] tọa độ màn hình SVG */
   var reservedMarkers=[];
   var tkMarks=[], khMarks=[];
   Object.keys(tkGroups).forEach(function(tk, idx){
@@ -3223,7 +3207,6 @@ function buildOneMapSheet(cfg){
     var mx=tx(pos[0]), my=ty(pos[1]);
     mx=Math.max(5, Math.min(W-5, mx));
     my=Math.max(5, Math.min(H-5, my));
-    /* tránh trùng TK */
     var guard=0;
     while(guard<15){
       var hit=false;
@@ -3244,7 +3227,35 @@ function buildOneMapSheet(cfg){
     return false;
   }
 
-  /* Nhãn lân cận: chỉ ≥ 0,10 ha */
+  function ringAreaM2(pts){
+    if(!pts||pts.length<3) return 0;
+    var a=0;
+    for(var i=0;i<pts.length;i++){
+      var j=(i+1)%pts.length;
+      a+=pts[i][0]*pts[j][1]-pts[j][0]*pts[i][1];
+    }
+    return Math.abs(a)/2;
+  }
+  function isSmallParcel(p){
+    if(p.dt!=null && !isNaN(p.dt) && p.dt<0.10) return true;
+    if(ringAreaM2(p.pts)<1000) return true;
+    /* thửa quá nhỏ trên khung in → chỉ dùng chú thích ngoài */
+    var bx0=1e99,bx1=-1e99,by0=1e99,by1=-1e99;
+    p.pts.forEach(function(pt){
+      bx0=Math.min(bx0,pt[0]); bx1=Math.max(bx1,pt[0]);
+      by0=Math.min(by0,pt[1]); by1=Math.max(by1,pt[1]);
+    });
+    var sw=Math.abs(tx(bx1)-tx(bx0)), sh=Math.abs(ty(by1)-ty(by0));
+    if(sw<9 || sh<9 || (sw*sh)<70) return true;
+    return false;
+  }
+
+  /* Gộp nhãn theo thửa — tránh ghi nhiều lần cùng số trên một thửa */
+  function labelKey(p){
+    return String(p.label||'')+'|'+(p.dt!=null?Number(p.dt).toFixed(3):'') ;
+  }
+
+  /* Nhãn lân cận: chỉ ≥ 0,10 ha và đủ chỗ */
   nearPolys.forEach(function(p){
     if(!p.label) return;
     if(isSmallParcel(p)) return;
@@ -3255,61 +3266,67 @@ function buildOneMapSheet(cfg){
     svg+='<text x="'+x.toFixed(2)+'" y="'+y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="1.9" font-family="Times New Roman,serif" fill="#777">'+String(p.label).replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</text>';
   });
 
-  /* Nhãn HĐ */
-  var leaderUsed=[];
+  /* Phân loại HĐ: lớn = nhãn trong (1 lần/thửa); nhỏ = CHỈ chú thích ngoài */
+  var largeDone={};
+  var smallList=[];
   mainPolys.forEach(function(p){
     if(!p.label) return;
+    if(isSmallParcel(p)) smallList.push(p);
+    else {
+      var k=labelKey(p);
+      if(largeDone[k]) return;
+      largeDone[k]=1;
+      var c=centroid(p.pts);
+      var x0=tx(c[0]), y0=ty(c[1]);
+      if(x0<3||x0>W-3||y0<3||y0>H-3) return;
+      if(hitsReserved(x0,y0,6)) y0=Math.max(4, y0-5);
+      var lab=String(p.label).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      var dtStr=(p.dt!=null&&!isNaN(p.dt))?Number(p.dt).toLocaleString('vi-VN',{maximumFractionDigits:2}):'';
+      svg+='<text x="'+x0.toFixed(2)+'" y="'+(y0-1.1).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.6" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+lab+'</text>';
+      if(dtStr) svg+='<text x="'+x0.toFixed(2)+'" y="'+(y0+1.6).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="1.9" font-family="Times New Roman,serif" fill="#333">'+dtStr+' ha</text>';
+    }
+  });
+
+  /* Chú thích ngoài cho lô nhỏ — không còn nhãn trên thửa */
+  var leaderUsed=[];
+  smallList.forEach(function(p){
     var c=centroid(p.pts);
     var x0=tx(c[0]), y0=ty(c[1]);
     if(x0<-5||x0>W+5||y0<-5||y0>H+5) return;
     var lab=String(p.label).replace(/&/g,'&amp;').replace(/</g,'&lt;');
     var dtStr=(p.dt!=null&&!isNaN(p.dt))?Number(p.dt).toLocaleString('vi-VN',{maximumFractionDigits:2}):'';
-    var small=isSmallParcel(p);
-
-    if(!small){
-      if(x0<3||x0>W-3||y0<3||y0>H-3) return;
-      if(hitsReserved(x0,y0,6)){
-        /* lệch nhẹ nếu đè TK/KH */
-        y0=Math.max(4, y0-5);
-      }
-      svg+='<text x="'+x0.toFixed(2)+'" y="'+(y0-1.1).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="2.6" font-family="Times New Roman,serif" font-weight="700" fill="#111">'+lab+'</text>';
-      if(dtStr) svg+='<text x="'+x0.toFixed(2)+'" y="'+(y0+1.6).toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="1.9" font-family="Times New Roman,serif" fill="#333">'+dtStr+' ha</text>';
-      return;
-    }
-
-    /* Chú thích ngoài — tránh TK / khoảnh */
-    var dirs=[[1,-1],[1,1],[-1,-1],[-1,1],[1,0],[-1,0],[0,-1],[0,1],[1,-0.5],[-1,-0.5]];
+    var dirs=[[1,-1],[1,1],[-1,-1],[-1,1],[1,0],[-1,0],[0,-1],[0,1],[1,-0.5],[-1,-0.5],[0.5,1],[-0.5,1]];
     var lx=x0, ly=y0, found=false;
     for(var d=0;d<dirs.length && !found;d++){
-      for(var step=10; step<=30; step+=2){
+      for(var step=12; step<=34; step+=2){
         var tx2=x0+dirs[d][0]*step;
         var ty2=y0+dirs[d][1]*step;
-        if(tx2<10||tx2>W-10||ty2<10||ty2>H-10) continue;
-        if(hitsReserved(tx2, ty2, 10)) continue;
+        if(tx2<12||tx2>W-12||ty2<12||ty2>H-12) continue;
+        if(hitsReserved(tx2, ty2, 11)) continue;
         var gx=minX+(tx2/W)*(maxX-minX);
         var gy=minY+((H-ty2)/H)*(maxY-minY);
         if(onMainParcel(gx,gy, mainPolys)) continue;
         var clash=false;
         for(var u=0;u<leaderUsed.length;u++){
-          if(Math.hypot(leaderUsed[u][0]-tx2, leaderUsed[u][1]-ty2)<9){ clash=true; break; }
+          if(Math.hypot(leaderUsed[u][0]-tx2, leaderUsed[u][1]-ty2)<10){ clash=true; break; }
         }
         if(clash) continue;
         lx=tx2; ly=ty2; found=true; break;
       }
     }
     if(!found){
-      /* fallback xa TK/KH nhất */
       var bestD=-1;
       for(var d2=0;d2<dirs.length;d2++){
-        var fx=Math.min(W-10, Math.max(10, x0+dirs[d2][0]*18));
-        var fy=Math.min(H-10, Math.max(10, y0+dirs[d2][1]*18));
+        var fx=Math.min(W-12, Math.max(12, x0+dirs[d2][0]*22));
+        var fy=Math.min(H-12, Math.max(12, y0+dirs[d2][1]*22));
+        if(hitsReserved(fx,fy,11)) continue;
         var md=1e9;
         for(var r=0;r<reservedMarkers.length;r++) md=Math.min(md, Math.hypot(reservedMarkers[r].x-fx, reservedMarkers[r].y-fy));
         if(md>bestD){ bestD=md; lx=fx; ly=fy; }
       }
     }
     leaderUsed.push([lx,ly]);
-    reservedMarkers.push({x:lx, y:ly, r:9}); /* khóa chỗ chú thích */
+    reservedMarkers.push({x:lx, y:ly, r:10});
     svg+='<line x1="'+x0.toFixed(2)+'" y1="'+y0.toFixed(2)+'" x2="'+lx.toFixed(2)+'" y2="'+ly.toFixed(2)+'" stroke="#333" stroke-width="0.35"/>';
     svg+='<circle cx="'+x0.toFixed(2)+'" cy="'+y0.toFixed(2)+'" r="0.65" fill="#111"/>';
     var boxW=Math.max(11, lab.length*1.7+(dtStr?dtStr.length*1.3:0));
