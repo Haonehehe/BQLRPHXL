@@ -2820,6 +2820,19 @@ function projectLL(lon, lat, lon0, lat0){
 }
 
 function featureRings(f){
+  /* Chỉ vòng ngoài (exterior) — bỏ lỗ/đảo trong để tránh nhãn ảo */
+  var g=f.geometry; if(!g) return [];
+  var rings=[];
+  if(g.type==='Polygon'){
+    if(g.coordinates&&g.coordinates[0]) rings.push(g.coordinates[0]);
+  } else if(g.type==='MultiPolygon'){
+    (g.coordinates||[]).forEach(function(poly){
+      if(poly&&poly[0]) rings.push(poly[0]);
+    });
+  }
+  return rings;
+}
+function featureAllRings(f){
   var g=f.geometry; if(!g) return [];
   var rings=[];
   if(g.type==='Polygon'){
@@ -3066,11 +3079,27 @@ function buildOneMapSheet(cfg){
 
   var mainPolys=[];
   var sheetThuas=[], sheetIds={};
+  function ringAreaM2quick(pts){
+    if(!pts||pts.length<3) return 0;
+    var a=0;
+    for(var i=0;i<pts.length;i++){
+      var j=(i+1)%pts.length;
+      a+=pts[i][0]*pts[j][1]-pts[j][0]*pts[i][1];
+    }
+    return Math.abs(a)/2;
+  }
   items.forEach(function(it){
     sheetIds[it.id]=1;
     if(it.label) sheetThuas.push(it.label);
-    it.ptsList.forEach(function(pts){
-      mainPolys.push({pts:pts,label:it.label,dt:it.dt,pr:it.pr,main:true});
+    var parts=(it.ptsList||[]).map(function(pts){
+      return {pts:pts, area:ringAreaM2quick(pts)};
+    }).filter(function(p){ return p.area>5; }) /* bỏ mảnh cực nhỏ / lỗi */
+    .sort(function(a,b){ return b.area-a.area; });
+    parts.forEach(function(part, idx){
+      var dtPart;
+      if(idx===0 && it.dt!=null && !isNaN(it.dt)) dtPart=Number(it.dt);
+      else dtPart=part.area/10000; /* ha theo hình học */
+      mainPolys.push({pts:part.pts,label:it.label,dt:dtPart,pr:it.pr,main:true,isPrimary:idx===0});
     });
   });
 
@@ -3269,11 +3298,18 @@ function buildOneMapSheet(cfg){
   /* Phân loại HĐ: lớn = nhãn trong (1 lần/thửa); nhỏ = CHỈ chú thích ngoài */
   var largeDone={};
   var smallList=[];
+  var smallDone={};
   mainPolys.forEach(function(p){
     if(!p.label) return;
-    if(isSmallParcel(p)) smallList.push(p);
-    else {
-      var k=labelKey(p);
+    if(isSmallParcel(p)){
+      /* một chú thích / tâm gần nhau */
+      var c=centroid(p.pts);
+      var sk=String(p.label)+'|'+Math.round(c[0]/5)+'|'+Math.round(c[1]/5);
+      if(smallDone[sk]) return;
+      smallDone[sk]=1;
+      smallList.push(p);
+    } else {
+      var k=String(p.label||''); /* 1 nhãn trong / số thửa */
       if(largeDone[k]) return;
       largeDone[k]=1;
       var c=centroid(p.pts);
