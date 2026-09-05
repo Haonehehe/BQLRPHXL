@@ -3266,9 +3266,10 @@ function buildOneMapSheet(cfg){
     return Math.abs(a)/2;
   }
   function isSmallParcel(p){
-    if(p.dt!=null && !isNaN(p.dt) && p.dt<0.10) return true;
+    /* Có DT hồ sơ: chỉ < 0,10 ha mới dùng chú thích ngoài */
+    if(p.dt!=null && !isNaN(p.dt)) return Number(p.dt)<0.10;
+    /* Không có DT: theo diện tích hình học */
     if(ringAreaM2(p.pts)<1000) return true;
-    /* thửa quá nhỏ trên khung in → chỉ dùng chú thích ngoài */
     var bx0=1e99,bx1=-1e99,by0=1e99,by1=-1e99;
     p.pts.forEach(function(pt){
       bx0=Math.min(bx0,pt[0]); bx1=Math.max(bx1,pt[0]);
@@ -3302,7 +3303,8 @@ function buildOneMapSheet(cfg){
   mainPolys.forEach(function(p){
     if(!p.label) return;
     if(isSmallParcel(p)){
-      /* một chú thích / tâm gần nhau */
+      /* Chỉ chú thích ngoài cho DT < 0,10 ha — không tạo chú thích cho 2,19 ha */
+      if(p.dt!=null && !isNaN(p.dt) && Number(p.dt)>=0.10) return;
       var c=centroid(p.pts);
       var sk=String(p.label)+'|'+Math.round(c[0]/5)+'|'+Math.round(c[1]/5);
       if(smallDone[sk]) return;
