@@ -15,7 +15,7 @@
 <div class="field"><label>THỜI HẠN CHỈ ĐẠO</label><input id="directiveDue" type="date"></div><div class="field"><label>THỜI HẠN HOÀN THÀNH</label><input id="completionDue" type="date"></div><div class="field"><label>NGÀY BẮT ĐẦU</label><input id="startDate" type="date"></div><div class="field"><label>TIẾN ĐỘ (%)</label><input id="progress" type="number" min="0" max="100" value="0"></div>
 <div class="field"><label>MỨC ĐỘ HOÀN THÀNH</label><select id="completionLevel"><option>Chưa hoàn thành</option><option>Đang thực hiện</option><option>Hoàn thành</option></select></div><div class="field"><label>TRẠNG THÁI</label><select id="taskStatus"><option>Chưa thực hiện</option><option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option></select></div><div class="field full"><label>SẢN PHẨM CỤ THỂ</label><textarea id="product" placeholder="Báo cáo, văn bản, bản đồ, biên bản..."></textarea></div><div class="field full"><label>GHI CHÚ</label><textarea id="note"></textarea></div></div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button class="btn slate" onclick="closeForm()">Hủy</button><button class="btn green" onclick="save()"><i class="fa-solid fa-floppy-disk"></i> Lưu nhiệm vụ</button></div></div></div>
 <script>
-const DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
+const DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec';
 function getScriptUrl(){
   try{
     const u=(localStorage.getItem('bqlrph_script_url')||'').trim();

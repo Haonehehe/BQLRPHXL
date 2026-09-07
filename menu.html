@@ -259,7 +259,7 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
   <div class="mbox">
     <h3>Cấu hình đồng bộ</h3>
     <div class="sub">Web App URL từ Google Apps Script (Deploy → Web app)</div>
-    <div class="field"><label>Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div class="field"><label>Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec"></div>
     <div class="err" id="cfgErr" style="color:#94a3b8">Để trống = lưu tài khoản trên máy này</div>
     <div class="macts">
       <button type="button" class="btn btn-o" onclick="closeModal()">Đóng</button>
@@ -397,8 +397,8 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
 /* ===== BQLRPH Auth (Google Sheet via Apps Script + local fallback) ===== */
 var CONFIG = {
   // Dán Web App URL sau khi Deploy Apps Script (kết thúc bằng /exec)
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec',
-  // Ví dụ: 'https://script.google.com/macros/s/AKfycbx.../exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec',
+  // Ví dụ: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec'
 };
 
 var AUTH_KEY = 'bqlrph_auth_v1';
@@ -720,7 +720,7 @@ function saveCfg(){
   var u=document.getElementById('cfgUrl').value.trim();
   if(!u){alert('Vui lòng nhập Link Google Apps Script /exec');return;}
   if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec(?:\?.*)?$/i.test(u)){
-    if(confirm('Link chưa có dạng https://script.google.com/macros/s/.../exec. Bạn vẫn muốn lưu?')===false)return;
+    if(confirm('Link chưa có dạng https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec. Bạn vẫn muốn lưu?')===false)return;
   }
   CONFIG.SCRIPT_URL=u;
   try{localStorage.setItem('bqlrph_script_url',u);window.dispatchEvent(new StorageEvent('storage',{key:'bqlrph_script_url',newValue:u}));}catch(e){}
