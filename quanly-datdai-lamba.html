@@ -477,7 +477,7 @@ var LS_SHEET='lamba_sheet_cfg';
 
 /* ===== Đồng bộ nguồn Sheet (Admin → Apps Script → mọi máy) ===== */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
-var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycbywJyKeZwvWFi-PpK2gV_vWZ1fzygemog6ST3L33S-y1nt1e_e1OLYcSQzYBZKWG1KdtQ/exec';
+var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
 function bqlrphScriptUrl(){
   try{ var u=localStorage.getItem('bqlrph_script_url'); if(u&&u.indexOf('http')===0) return u; }catch(e){}
   return BQLRPH_DEFAULT_SCRIPT;

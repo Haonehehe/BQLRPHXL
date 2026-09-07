@@ -234,7 +234,7 @@ var DEFAULT_SID='10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7';
 
 /* ===== Đồng bộ nguồn Sheet (Admin → Apps Script → mọi máy) ===== */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
-var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycbywJyKeZwvWFi-PpK2gV_vWZ1fzygemog6ST3L33S-y1nt1e_e1OLYcSQzYBZKWG1KdtQ/exec';
+var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
 function bqlrphScriptUrl(){
   try{ var u=localStorage.getItem('bqlrph_script_url'); if(u&&u.indexOf('http')===0) return u; }catch(e){}
   return BQLRPH_DEFAULT_SCRIPT;
@@ -661,14 +661,30 @@ function xuatWord(){
 
 
 window.taiLai=taiLai; window.xuatExcel=xuatExcel; window.xuatWord=xuatWord; window.veLai=veLai; window.doiLinkSheet=doiLinkSheet;
-(typeof bqlrphFetchSheetSources==='function'?bqlrphFetchSheetSources():Promise.resolve({})).then(function(all){
-  var sh=all&&all.trongrung;
-  if(sh){
-    if(typeof bqlrphOkId==='function'&&bqlrphOkId(sh.sid)) SID=String(sh.sid).trim();
-    if(typeof bqlrphOkGid==='function'&&bqlrphOkGid(sh.gid)) GID=String(sh.gid).trim();
+(function bootModule(){
+  var done=false;
+  function go(){
+    if(done) return;
+    done=true;
+    try {
+      (typeof bqlrphFetchSheetSources==='function'?bqlrphFetchSheetSources():Promise.resolve({})).then(function(all){
+        
+        var sh=all&&all.trongrung;
+        if(sh){
+          if(typeof bqlrphOkId==='function'&&bqlrphOkId(sh.sid)) SID=String(sh.sid).trim();
+          if(typeof bqlrphOkGid==='function'&&bqlrphOkGid(sh.gid)) GID=String(sh.gid).trim();
+        }
+
+        if(typeof taiLai==='function') taiLai(false);
+      }).catch(function(){ if(typeof taiLai==='function') taiLai(false); });
+    } catch(e) {
+      if(typeof taiLai==='function') taiLai(false);
+    }
   }
-  if(!window.__BQLRPH_BLOCKED__) taiLai(false);
-}).catch(function(){ if(!window.__BQLRPH_BLOCKED__) taiLai(false); });
+  if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(go, 100);
+  else window.addEventListener('load', go);
+  setTimeout(go, 8000); // không để treo
+})();
 </script>
 </body>
 </html>

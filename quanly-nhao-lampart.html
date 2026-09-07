@@ -287,11 +287,11 @@ function readSharedSheet(mod){
 }
 
 /* ====== Cấu hình ====== */
-var DEFAULT_NHA_SID
+var DEFAULT_NHA_SID = '1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT';
 
 /* ===== Đồng bộ nguồn Sheet (Admin → Apps Script → mọi máy) ===== */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
-var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycbywJyKeZwvWFi-PpK2gV_vWZ1fzygemog6ST3L33S-y1nt1e_e1OLYcSQzYBZKWG1KdtQ/exec';
+var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
 function bqlrphScriptUrl(){
   try{ var u=localStorage.getItem('bqlrph_script_url'); if(u&&u.indexOf('http')===0) return u; }catch(e){}
   return BQLRPH_DEFAULT_SCRIPT;
@@ -329,7 +329,6 @@ function bqlrphFetchSheetSources(){
     return local;
   }).catch(function(){ clearTimeout(to); return local; });
 }
-= '1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT';
 var DEFAULT_PT_SHEETS = [
   { key:'NUI_LE',    ten:'Núi Le',    gid:'1244934238' },
   { key:'DAM_VOI',   ten:'Đầm Voi',   gid:'1014650960' },
@@ -864,11 +863,27 @@ document.addEventListener('click',function(e){
   }
 });
 
-(typeof bqlrphFetchSheetSources==='function'?bqlrphFetchSheetSources():Promise.resolve({})).then(function(all){
-  var sh=all&&all.nhao;
-  if(sh && typeof bqlrphOkId==='function' && bqlrphOkId(sh.sid)) NHA_SID=String(sh.sid).trim();
-  taiLai(false);
-}).catch(function(){ taiLai(false); });
+(function bootModule(){
+  var done=false;
+  function go(){
+    if(done) return;
+    done=true;
+    try {
+      (typeof bqlrphFetchSheetSources==='function'?bqlrphFetchSheetSources():Promise.resolve({})).then(function(all){
+        
+        var sh=all&&all.nhao;
+        if(sh && typeof bqlrphOkId==='function' && bqlrphOkId(sh.sid)) NHA_SID=String(sh.sid).trim();
+
+        if(typeof taiLai==='function') taiLai(false);
+      }).catch(function(){ if(typeof taiLai==='function') taiLai(false); });
+    } catch(e) {
+      if(typeof taiLai==='function') taiLai(false);
+    }
+  }
+  if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(go, 100);
+  else window.addEventListener('load', go);
+  setTimeout(go, 8000); // không để treo
+})();
 </script>
 
 <div class="motto-ticker" id="mottoTicker" aria-hidden="true">
