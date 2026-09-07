@@ -1,7 +1,57 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
+<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}
+/* === UI modern polish === */
+:root{--shadow:0 4px 20px rgba(15,23,42,.06);--shadow-lg:0 12px 40px rgba(15,23,42,.1)}
+body{background:
+  radial-gradient(ellipse 80% 40% at 0% 0%, rgba(16,185,129,.07), transparent 50%),
+  radial-gradient(ellipse 60% 30% at 100% 0%, rgba(14,165,233,.05), transparent 45%),
+  var(--bg,#f0fdf4) !important;}
+.btn,.btn-g,.btn-b,.btn-o,.btn-dark{
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, filter .15s !important;
+}
+.btn:active,.btn-g:active,.btn-b:active{transform:scale(.97)}
+.btn-g{
+  background:linear-gradient(135deg,#10b981,#047857)!important;
+  box-shadow:0 4px 14px rgba(16,185,129,.28)!important;
+}
+.btn-g:hover{filter:brightness(1.06);box-shadow:0 6px 22px rgba(16,185,129,.4)!important}
+.btn-b{
+  background:linear-gradient(135deg,#0ea5e9,#0369a1)!important;
+  box-shadow:0 4px 14px rgba(14,165,233,.25)!important;
+}
+.btn-b:hover{filter:brightness(1.05)}
+.btn-o:hover{background:#f8fafc!important;border-color:#cbd5e1!important}
+.card,.kpi,.bar,.mbox{
+  box-shadow:var(--shadow)!important;
+  transition:box-shadow .2s ease, transform .15s ease;
+}
+.card:hover,.kpi:hover{box-shadow:var(--shadow-lg)!important}
+.top{
+  backdrop-filter:blur(12px);
+  background:rgba(255,255,255,.92)!important;
+  box-shadow:0 1px 0 rgba(15,23,42,.04);
+}
+.nav button{transition:background .15s, color .15s, transform .1s}
+.nav button:hover{color:var(--g2,#047857)}
+.nav button.on{box-shadow:0 -1px 0 #fff}
+input,select,textarea{
+  transition:border-color .15s, box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#34d399!important;
+  box-shadow:0 0 0 3px rgba(52,211,153,.12)!important;
+  outline:none;
+}
+.toast{border-radius:14px!important;box-shadow:0 12px 40px rgba(15,23,42,.2)!important}
+.modal{backdrop-filter:blur(6px)}
+.mbox{border-radius:18px!important;box-shadow:0 24px 60px rgba(15,23,42,.18)!important}
+
+
+
+
+</style>
 <script>
 /* BQLRPH Auth Guard (head) — QLBVR */
 (function(){
@@ -96,6 +146,67 @@
             }
         }
     </style>
+<style id="qlbvr-header-css">
+html.dark .qlbvr-topbar{background:rgba(15,23,42,.92)!important;border-bottom-color:rgba(51,65,85,.8)!important}
+html.dark .qlbvr-topbar h1{color:#f1f5f9!important}
+html.dark .qlbvr-topbar p{color:#94a3b8!important}
+html.dark .qlbvr-btn-ghost{background:#1e293b!important;color:#e2e8f0!important;border-color:#334155!important}
+html.dark .qlbvr-btn-emerald{background:rgba(16,185,129,.15)!important;color:#6ee7b7!important;border-color:rgba(16,185,129,.3)!important}
+html.dark .qlbvr-sep{background:#334155!important}
+
+.qlbvr-topbar{
+  background:rgba(255,255,255,.95)!important;
+  backdrop-filter:blur(14px) saturate(1.2);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);
+  border-bottom:1px solid #e2e8f0!important;
+  box-shadow:0 4px 24px rgba(15,23,42,.06)!important;
+}
+.qlbvr-logo{
+  width:42px!important;height:42px!important;border-radius:14px!important;
+  display:grid!important;place-items:center!important;
+  color:#fff!important;font-size:17px!important;
+  background:linear-gradient(145deg,#10b981,#059669 50%,#0f766e)!important;
+  box-shadow:0 8px 20px rgba(16,185,129,.35)!important;
+}
+.qlbvr-btn{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  gap:6px!important;height:36px!important;padding:0 12px!important;border-radius:11px!important;
+  font-size:12px!important;font-weight:600!important;line-height:1!important;
+  border:1px solid transparent!important;cursor:pointer!important;text-decoration:none!important;
+  transition:transform .15s,box-shadow .2s,background .15s,filter .15s!important;
+  white-space:nowrap!important;font-family:inherit!important;box-sizing:border-box!important;
+}
+.qlbvr-btn:active{transform:scale(.96)!important}
+.qlbvr-btn-ghost{
+  background:#fff!important;color:#334155!important;border-color:#e2e8f0!important;
+  box-shadow:0 1px 2px rgba(15,23,42,.05)!important;
+}
+.qlbvr-btn-ghost:hover{background:#f8fafc!important;border-color:#cbd5e1!important}
+.qlbvr-btn-sky{
+  background:linear-gradient(135deg,#0ea5e9,#0284c7)!important;color:#fff!important;
+  box-shadow:0 4px 14px rgba(14,165,233,.32)!important;
+}
+.qlbvr-btn-sky:hover{filter:brightness(1.07)!important}
+.qlbvr-btn-slate{
+  background:linear-gradient(135deg,#475569,#1e293b)!important;color:#fff!important;
+  box-shadow:0 4px 12px rgba(30,41,59,.28)!important;
+}
+.qlbvr-btn-green{
+  background:linear-gradient(135deg,#10b981,#047857)!important;color:#fff!important;
+  box-shadow:0 4px 14px rgba(16,185,129,.35)!important;
+}
+.qlbvr-btn-green:hover{filter:brightness(1.06)!important}
+.qlbvr-btn-emerald{
+  background:#ecfdf5!important;color:#047857!important;border-color:#a7f3d0!important;
+}
+.qlbvr-btn-emerald:hover{background:#d1fae5!important}
+.qlbvr-sep{width:1px!important;height:24px!important;background:#e2e8f0!important;margin:0 4px!important;flex-shrink:0!important}
+@media(max-width:640px){
+  .qlbvr-btn{height:34px!important;padding:0 10px!important;font-size:11px!important}
+  .qlbvr-logo{width:38px!important;height:38px!important;font-size:15px!important}
+}
+</style>
+
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
@@ -329,48 +440,49 @@
 <body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 via-sheets-700 to-teal-900 flex items-center justify-center text-white shadow-lg ring-2 ring-emerald-100">
-                    <i class="fa-solid fa-shield-halved text-lg"></i>
+    <header class="qlbvr-topbar sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between gap-3 min-h-[3.75rem] py-2">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="qlbvr-logo shrink-0">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="text-[13px] sm:text-[15px] font-bold text-slate-900 leading-tight truncate tracking-tight">Báo cáo vi phạm công tác QLBVR</h1>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 truncate mt-0.5">BQLRPH Xuân Lộc · Đồng bộ Google Sheets</p>
+                    </div>
                 </div>
-                <div class="min-w-0">
-                    <h1 class="text-sm sm:text-base font-bold text-slate-900 leading-tight truncate">Báo cáo vi phạm công tác QLBVR</h1>
-                    <p class="text-[11px] text-slate-500 truncate">Ban Quản lý Rừng phòng hộ Xuân Lộc · Đồng bộ Google Sheets</p>
+                <div class="qlbvr-actions flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
+                    <button onclick="toggleDarkMode()" id="btnDarkMode" class="qlbvr-btn qlbvr-btn-ghost" title="Sáng / Tối">
+                        <i class="fa-solid fa-moon" id="darkModeIcon"></i>
+                    </button>
+                    <a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener"
+                       class="qlbvr-btn qlbvr-btn-ghost" title="Thư mục hồ sơ Drive">
+                        <i class="fa-solid fa-folder-tree text-amber-500"></i>
+                        <span class="hidden md:inline">Hồ sơ</span>
+                    </a>
+                    <button onclick="reloadData()" id="btnReload" class="qlbvr-btn qlbvr-btn-sky" title="Tải lại dữ liệu">
+                        <i class="fa-solid fa-arrows-rotate" id="reloadIcon"></i>
+                        <span class="hidden sm:inline">Làm mới</span>
+                    </button>
+                    <button onclick="openSyncModal()" class="qlbvr-btn qlbvr-btn-slate" title="Đồng bộ nguồn Sheet">
+                        <i class="fa-solid fa-cloud-arrow-down" id="syncIcon"></i>
+                        <span class="hidden lg:inline">Đồng bộ</span>
+                    </button>
+                    <button onclick="copyForGoogleSheets()" class="qlbvr-btn qlbvr-btn-green">
+                        <i class="fa-regular fa-copy"></i>
+                        <span class="hidden sm:inline">Chép Sheets</span>
+                    </button>
+                    <div class="qlbvr-sep hidden sm:block"></div>
+                    <a href="menu.html" class="qlbvr-btn qlbvr-btn-ghost" title="Menu chính">
+                        <i class="fa-solid fa-house text-[11px]"></i>
+                        <span class="hidden sm:inline">Menu</span>
+                    </a>
+                    <a href="quanly-datdai-lamba.html" class="qlbvr-btn qlbvr-btn-emerald" title="Lâm bạ">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span class="hidden sm:inline">Lâm bạ</span>
+                    </a>
                 </div>
-            </div>
-            <div class="flex items-center space-x-2 flex-wrap justify-end">
-                <button onclick="toggleDarkMode()" id="btnDarkMode" class="inline-flex items-center px-2.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs rounded-lg shadow-sm transition-all" title="Sáng / Tối">
-                    <i class="fa-solid fa-moon" id="darkModeIcon"></i>
-                </button>
-                <a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener"
-                   class="inline-flex items-center px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Mở thư mục mẹ túi hồ sơ trên Drive">
-                    <i class="fa-solid fa-folder-tree mr-1.5 text-amber-500"></i>
-                    <span class="hidden sm:inline">Thư mục hồ sơ</span>
-                </a>
-                <button onclick="reloadData()" id="btnReload" class="inline-flex items-center px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all" title="Tải lại dữ liệu từ Google Sheets">
-                    <i class="fa-solid fa-arrows-rotate mr-1.5" id="reloadIcon"></i>
-                    <span class="hidden sm:inline">Làm mới</span>
-                </button>
-                <button onclick="openSyncModal()" class="inline-flex items-center px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500" title="Đồng bộ dữ liệu (nguồn Sheet do Admin cấu hình)">
-                    <i class="fa-solid fa-cloud-arrow-down mr-1.5" id="syncIcon"></i>
-                    <span class="hidden sm:inline">Đồng bộ</span>
-                    <span class="sm:hidden">Sync</span>
-                </button>
-                <button onclick="copyForGoogleSheets()" class="inline-flex items-center px-3 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all">
-                    <i class="fa-regular fa-copy mr-1.5"></i>
-                    <span class="hidden sm:inline">Chép dán Sheets</span>
-                    <span class="sm:hidden">Copy</span>
-                </button>
-                <a href="menu.html" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs sm:text-sm font-medium rounded-full shadow-sm transition-all" title="Menu chính">
-                    <i class="fa-solid fa-house text-[11px]"></i>
-                    <span>Menu</span>
-                </a>
-                <a href="quanly-datdai-lamba.html" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs sm:text-sm font-medium rounded-full shadow-sm transition-all" title="Quản lý đất đai - Lâm bạ">
-                    <i class="fa-solid fa-map-location-dot text-[11px]"></i>
-                    <span>Lâm bạ</span>
-                </a>
             </div>
         </div>
     </header>
