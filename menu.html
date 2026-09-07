@@ -123,6 +123,8 @@ body{
 .card.mocgioi .card-icon{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
 .card.lamba .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
 .card.trongrung .card-icon{background:linear-gradient(135deg,#fbbf24,#d97706)}
+.card.tasks .card-icon{background:linear-gradient(135deg,#60a5fa,#2563eb)}
+.card.tasks .go{background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 4px 14px rgba(37,99,235,.28)}
 .card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
 .card .code{
   font-size:10px;font-weight:700;letter-spacing:.04em;
@@ -402,8 +404,8 @@ var CONFIG = {
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF', tasks: 'Nhiệm vụ / Gantt' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -430,7 +432,7 @@ function _loadDB() {
     users: [{
       id: 'u_admin', email: DEFAULT_ADMIN.email, name: DEFAULT_ADMIN.name,
       pass: DEFAULT_ADMIN.pass, status: 'approved', role: 'admin',
-      perms: ALL_PERMS.slice(), created: new Date().toISOString(), approvedAt: new Date().toISOString()
+      perms: ALL_PERMS.slice(), unit:'Ban Quản lý', created: new Date().toISOString(), approvedAt: new Date().toISOString()
     }]
   };
   _saveDB(db);
@@ -497,7 +499,7 @@ function registerUser(name, email, pass) {
   if (db.users.some(function (u) { return u.email === email; })) throw new Error('Email đã được đăng ký');
   db.users.push({
     id: 'u_' + Date.now(), email: email, name: name, pass: pass,
-    status: 'pending', role: 'user', perms: ['pdf'],
+    status: 'pending', role: 'user', perms: ['pdf'], unit:'',
     created: new Date().toISOString(), approvedAt: null
   });
   _saveDB(db);
@@ -514,7 +516,7 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
+        perms: u.perms || ['pdf'], unit: u.unit || '', loginAt: new Date().toISOString(),
         _pass: pass // dùng cho thao tác admin trên API
       };
       setSession(sess);
@@ -529,7 +531,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
+    perms: u.perms || ['pdf'], unit: u.unit || '', loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -699,7 +701,8 @@ var MODULES={
       key:'lamsinh_grp', title:'Lâm sinh', sub:'Trồng · chăm sóc rừng',
       icon:'fa-seedling', tone:'trong',
       items:[
-        {id:'trongrung',href:'quanly-trongrung.html',cls:'trong',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ · Excel · Word.'}
+        {id:'trongrung',href:'quanly-trongrung.html',cls:'trong',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ · Excel · Word.'},
+        {id:'tasks',href:'quanly-nhiemvu-gantt.html',cls:'tasks',icon:'fa-chart-gantt',code:'GANTT',title:'Nhiệm vụ / Gantt',desc:'Chỉ đạo · tiến độ · thời hạn · sản phẩm.'}
       ]
     }
   ]
