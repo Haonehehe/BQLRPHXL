@@ -15,13 +15,27 @@
 <div class="field"><label>THỜI HẠN CHỈ ĐẠO</label><input id="directiveDue" type="date"></div><div class="field"><label>THỜI HẠN HOÀN THÀNH</label><input id="completionDue" type="date"></div><div class="field"><label>NGÀY BẮT ĐẦU</label><input id="startDate" type="date"></div><div class="field"><label>TIẾN ĐỘ (%)</label><input id="progress" type="number" min="0" max="100" value="0"></div>
 <div class="field"><label>MỨC ĐỘ HOÀN THÀNH</label><select id="completionLevel"><option>Chưa hoàn thành</option><option>Đang thực hiện</option><option>Hoàn thành</option></select></div><div class="field"><label>TRẠNG THÁI</label><select id="taskStatus"><option>Chưa thực hiện</option><option>Đang thực hiện</option><option>Hoàn thành</option><option>Tạm dừng</option></select></div><div class="field full"><label>SẢN PHẨM CỤ THỂ</label><textarea id="product" placeholder="Báo cáo, văn bản, bản đồ, biên bản..."></textarea></div><div class="field full"><label>GHI CHÚ</label><textarea id="note"></textarea></div></div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button class="btn slate" onclick="closeForm()">Hủy</button><button class="btn green" onclick="save()"><i class="fa-solid fa-floppy-disk"></i> Lưu nhiệm vụ</button></div></div></div>
 <script>
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
+const DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
+function getScriptUrl(){
+  try{
+    const u=(localStorage.getItem('bqlrph_script_url')||'').trim();
+    if(u)return u;
+  }catch(e){}
+  return DEFAULT_SCRIPT_URL;
+}
 const SESS_KEY='bqlrph_session_v1'; let me=null,tasks=[],editId='';
 function sess(){try{return JSON.parse(sessionStorage.getItem(SESS_KEY)||localStorage.getItem(SESS_KEY)||'null')}catch(e){return null}}
 me=sess(); if(!me){document.body.innerHTML='<div style="padding:60px;text-align:center;font-family:system-ui"><h2>🔒 Cần đăng nhập</h2><p>Hãy đăng nhập trên Menu và được cấp quyền “Nhiệm vụ / Gantt”.</p><a href="menu.html">Về Menu</a></div>';throw new Error('auth')}
 if(me.role!=='admin' && !(me.perms||[]).includes('tasks')){document.body.innerHTML='<div style="padding:60px;text-align:center;font-family:system-ui"><h2>⛔ Chưa được cấp quyền</h2><p>Liên hệ Admin để cấp module Nhiệm vụ / Gantt.</p><a href="menu.html">Về Menu</a></div>';throw new Error('perm')}
 document.getElementById('who').textContent=(me.name||'')+' · '+(me.unit||'Chưa gán đơn vị');
-async function api(action,extra){let r=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action,email:me.email,pass:me._pass||''},extra||{}))});let x=await r.json();if(!x.ok)throw new Error(x.error||'Lỗi API');return x}
+window.addEventListener('storage',function(e){if(e.key==='bqlrph_script_url'){console.log('Đã cập nhật Link đồng bộ:',getScriptUrl());}});
+async function api(action,extra){
+  const SCRIPT_URL=getScriptUrl();
+  let r=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action,email:me.email,pass:me._pass||''},extra||{})),redirect:'follow'});
+  let x=await r.json();
+  if(!x.ok)throw new Error(x.error||'Lỗi API');
+  return x;
+}
 function esc(x){return String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function d(s){if(!s)return null;let x=new Date(s);return isNaN(x)?null:x}
 function fmt(s){let x=d(s);return x?x.toLocaleDateString('vi-VN'):''}

@@ -159,7 +159,7 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
   position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
   padding:16px;background:rgba(2,6,23,.75);backdrop-filter:blur(10px);
 }
-.modal.open{display:flex;animation:fadeIn .2s ease}
+.modal.open,.modal.on{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .mbox{
   width:100%;max-width:400px;border-radius:20px;padding:22px 20px;
@@ -716,7 +716,16 @@ function openRegister(){closeModal();document.getElementById('regErr').textConte
 function openCfg(){closeModal();document.getElementById('cfgUrl').value=CONFIG.SCRIPT_URL||'';document.getElementById('modalCfg').classList.add('on');}
 function openChangePass(){closeModal();document.getElementById('passErr').textContent='';['passOld','passNew','passNew2'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('modalPass').classList.add('on');}
 function openForgot(){closeModal();document.getElementById('forgotErr').style.color='#94a3b8';document.getElementById('forgotErr').innerHTML='Admin → Khu vực Admin → <b>Đặt lại MK</b>';document.getElementById('forgotEmail').value=document.getElementById('loginEmail').value||'';document.getElementById('modalForgot').classList.add('on');}
-function saveCfg(){var u=document.getElementById('cfgUrl').value.trim();CONFIG.SCRIPT_URL=u;try{localStorage.setItem('bqlrph_script_url',u);}catch(e){}closeModal();render();}
+function saveCfg(){
+  var u=document.getElementById('cfgUrl').value.trim();
+  if(!u){alert('Vui lòng nhập Link Google Apps Script /exec');return;}
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec(?:\?.*)?$/i.test(u)){
+    if(confirm('Link chưa có dạng https://script.google.com/macros/s/.../exec. Bạn vẫn muốn lưu?')===false)return;
+  }
+  CONFIG.SCRIPT_URL=u;
+  try{localStorage.setItem('bqlrph_script_url',u);window.dispatchEvent(new StorageEvent('storage',{key:'bqlrph_script_url',newValue:u}));}catch(e){}
+  closeModal();render();
+}
 function doLogin(){var err=document.getElementById('loginErr'),btn=document.getElementById('btnLogin');err.textContent='';btn.disabled=true;loginUser(document.getElementById('loginEmail').value,document.getElementById('loginPass').value).then(function(){closeModal();render();}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doRegister(){var err=document.getElementById('regErr'),btn=document.getElementById('btnReg');err.style.color='#fda4af';err.textContent='';btn.disabled=true;registerUser(document.getElementById('regName').value,document.getElementById('regEmail').value,document.getElementById('regPass').value).then(function(){err.style.color='#6ee7b7';err.textContent='Đã gửi đăng ký. Chờ admin duyệt rồi đăng nhập.';setTimeout(function(){closeModal();openLogin();},1400);}).catch(function(e){err.style.color='#fda4af';err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doLogout(){logoutUser();render();}
