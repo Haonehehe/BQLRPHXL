@@ -540,7 +540,7 @@ function saveSheetSourcesUI(){
     cfg[k][f]=val;
   });
   pushSheetSourcesCloud(cfg).then(function(){
-    toast('Đã lưu nguồn Sheet — user khác tải lại trang module sẽ nhận (cần Apps Script getsheets/setsheets để đồng bộ máy khác)');
+    toast('Đã lưu nguồn Sheet lên máy chủ — user khác mở lại module sẽ nhận link mới');
   }).catch(function(e){
     toast(e.message||String(e));
   });
@@ -556,6 +556,8 @@ function resetSheetSourcesUI(){
 function loadUsers(){
   if(!requireAdmin()) return;
   shell('<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách…</div>');
+  // Đồng bộ nguồn sheet từ cloud trước khi vẽ form
+  fetchSheetSourcesCloud().then(function(){}).catch(function(){});
   listUsers().then(function(users){
     var pending=users.filter(function(u){return u.status==='pending';}).length;
     var approved=users.filter(function(u){return u.status==='approved';}).length;

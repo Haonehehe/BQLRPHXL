@@ -319,6 +319,42 @@ function readSharedSheet(mod){
 }
 
 var SID='1XOz-KdIhtWIyocSrV8ZvpOgusTLUOGCX';
+
+/* ===== Đồng bộ nguồn Sheet (Admin → Apps Script → mọi máy) ===== */
+var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
+var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycbywJyKeZwvWFi-PpK2gV_vWZ1fzygemog6ST3L33S-y1nt1e_e1OLYcSQzYBZKWG1KdtQ/exec';
+function bqlrphScriptUrl(){
+  try{ var u=localStorage.getItem('bqlrph_script_url'); if(u&&u.indexOf('http')===0) return u; }catch(e){}
+  return BQLRPH_DEFAULT_SCRIPT;
+}
+function bqlrphSaveSheetsLocal(cfg){
+  try{ localStorage.setItem(SHEET_CFG_KEY, JSON.stringify(cfg||{})); }catch(e){}
+}
+function bqlrphLoadSheetsLocal(){
+  try{ var r=localStorage.getItem(SHEET_CFG_KEY); if(r) return JSON.parse(r); }catch(e){}
+  return null;
+}
+/** Lấy cấu hình sheet từ cloud; fallback local. Trả về object theo module. */
+function bqlrphFetchSheetSources(){
+  var url=bqlrphScriptUrl();
+  if(!url) return Promise.resolve(bqlrphLoadSheetsLocal()||{});
+  return fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'getsheets'}),
+    redirect:'follow'
+  }).then(function(r){ return r.text(); }).then(function(t){
+    var res; try{ res=JSON.parse(t); }catch(e){ throw new Error('JSON'); }
+    if(res && res.ok && res.sheets){
+      bqlrphSaveSheetsLocal(res.sheets);
+      return res.sheets;
+    }
+    return bqlrphLoadSheetsLocal()||{};
+  }).catch(function(){ return bqlrphLoadSheetsLocal()||{}; });
+}
+function bqlrphOkId(s){ return s && String(s).trim().length>=30 && /^[a-zA-Z0-9-_]+$/.test(String(s).trim()); }
+function bqlrphOkGid(s){ return s!=null && String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()); }
+
 var GID='1646240187';
 (function(){
   var sh=readSharedSheet('mocgioi');
@@ -582,7 +618,14 @@ function inBaoCao(){
 }
 
 window.taiLai=taiLai;window.xuatExcel=xuatExcel;window.inBaoCao=inBaoCao;window.veLai=veLai;
-setTimeout(function(){taiLai(false);},200);
+(typeof bqlrphFetchSheetSources==='function'?bqlrphFetchSheetSources():Promise.resolve({})).then(function(all){
+  var sh=all&&all.mocgioi;
+  if(sh){
+    if(typeof bqlrphOkId==='function'&&bqlrphOkId(sh.sid)) SID=String(sh.sid).trim();
+    if(typeof bqlrphOkGid==='function'&&bqlrphOkGid(sh.gid)) GID=String(sh.gid).trim();
+  }
+  taiLai(false);
+}).catch(function(){ taiLai(false); });
 </script>
 </body>
 </html>
