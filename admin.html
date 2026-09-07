@@ -179,7 +179,13 @@ function pushSheetSourcesCloud(cfg){
       adminEmail:c.adminEmail||'', adminPass:c.adminPass||''
     }).then(function(res){
       if(res && res.ok) return true;
-      throw new Error((res&&res.error)||'Máy chủ chưa hỗ trợ setsheets — đã lưu trên trình duyệt admin. Cập nhật Apps Script để đồng bộ mọi máy.');
+      var msg=(res&&res.error)||'';
+      if(/unknown action/i.test(msg)){
+        msg='Apps Script chưa deploy bản có getsheets/setsheets. Mở script → dán full code → Deploy → New version. Đã lưu tạm trên máy admin.';
+      } else if(!msg){
+        msg='Máy chủ chưa hỗ trợ setsheets — đã lưu trên trình duyệt admin.';
+      }
+      throw new Error(msg);
     });
   }
   return Promise.resolve(true);

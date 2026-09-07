@@ -334,27 +334,32 @@ function bqlrphLoadSheetsLocal(){
   try{ var r=localStorage.getItem(SHEET_CFG_KEY); if(r) return JSON.parse(r); }catch(e){}
   return null;
 }
-/** Lấy cấu hình sheet từ cloud; fallback local. Trả về object theo module. */
+function bqlrphOkId(s){ return s && String(s).trim().length>=30 && /^[a-zA-Z0-9-_]+$/.test(String(s).trim()); }
+function bqlrphOkGid(s){ return s!=null && String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()); }
+/** Lấy cấu hình sheet từ cloud (timeout 6s); lỗi/Unknown action → local/rỗng, không chặn tải dữ liệu */
 function bqlrphFetchSheetSources(){
   var url=bqlrphScriptUrl();
-  if(!url) return Promise.resolve(bqlrphLoadSheetsLocal()||{});
+  var local=bqlrphLoadSheetsLocal()||{};
+  if(!url) return Promise.resolve(local);
+  var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
+  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 6000);
   return fetch(url, {
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({action:'getsheets'}),
-    redirect:'follow'
+    redirect:'follow',
+    signal: ctrl?ctrl.signal:undefined
   }).then(function(r){ return r.text(); }).then(function(t){
-    var res; try{ res=JSON.parse(t); }catch(e){ throw new Error('JSON'); }
+    clearTimeout(to);
+    var res; try{ res=JSON.parse(t); }catch(e){ return local; }
     if(res && res.ok && res.sheets){
       bqlrphSaveSheetsLocal(res.sheets);
       return res.sheets;
     }
-    return bqlrphLoadSheetsLocal()||{};
-  }).catch(function(){ return bqlrphLoadSheetsLocal()||{}; });
+    // Unknown action / chưa deploy → dùng local
+    return local;
+  }).catch(function(){ clearTimeout(to); return local; });
 }
-function bqlrphOkId(s){ return s && String(s).trim().length>=30 && /^[a-zA-Z0-9-_]+$/.test(String(s).trim()); }
-function bqlrphOkGid(s){ return s!=null && String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()); }
-
 var GID='1646240187';
 (function(){
   var sh=readSharedSheet('mocgioi');
