@@ -273,7 +273,6 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
   </div>
   <div class="acts">
     <button class="btn btn-b" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
-    <button class="btn btn-o" type="button" onclick="doiLinkSheet()" title="Đổi link Google Sheet lâm bạ"><i class="fa-solid fa-link"></i> Đổi link Sheet</button>
     <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
     <a class="btn btn-o" href="index.html" target="_blank"><i class="fa-solid fa-shield-halved" style="color:#e11d48"></i> QLBVR</a>
   </div>
@@ -459,9 +458,20 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
 'use strict';
 
 var DEFAULT_SID='1CnlGELkhVjLEa7jQwVg4kIeyiXxqmOTR';
+/* shared sheet */
+var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';function readSharedSheet(mod){try{var raw=localStorage.getItem(SHEET_CFG_KEY);if(raw){var o=JSON.parse(raw);if(o&&o[mod])return o[mod];}}catch(e){}return null;}
 var DEFAULT_GID={DN:'1710752621',LD:'516720069',TH:'149303770'};
 var SID=DEFAULT_SID;
 var GID={DN:DEFAULT_GID.DN,LD:DEFAULT_GID.LD,TH:DEFAULT_GID.TH};
+(function(){
+  var sh=readSharedSheet('lamba');
+  if(sh){
+    if(sh.sid) SID=String(sh.sid);
+    if(sh.gidDN) GID.DN=String(sh.gidDN);
+    if(sh.gidLD) GID.LD=String(sh.gidLD);
+    if(sh.gidTH) GID.TH=String(sh.gidTH);
+  }
+})();
 var VP_ID='1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU', VP_GID='528762373';
 // Sheet thu hồi HĐ (cùng file QLBVR hoặc cấu hình riêng). TH_GID lưu localStorage nếu biết.
 var TH_SID=VP_ID, TH_GID=(function(){
@@ -501,70 +511,8 @@ function parseSheetUrl(url){
   var gidM=String(url).match(/[?#&]gid=([0-9]+)/);
   return {id:idM[1], gid:gidM?gidM[1]:null};
 }
-function doiLinkSheet(){
-  var cur='https://docs.google.com/spreadsheets/d/'+SID+'/edit';
-  var u=prompt('Dán link Google Sheet lâm bạ (file chứa sheet TOÀN BQL DN / LD / TH):\n\nHiện tại:\n'+cur, cur);
-  if(u===null)return;
-  u=String(u).trim();
-  if(!u){
-    SID=DEFAULT_SID; GID={DN:DEFAULT_GID.DN,LD:DEFAULT_GID.LD,TH:DEFAULT_GID.TH};
-    saveSheetCfg(); toast('Đã về Sheet mặc định'); taiLai(); return;
-  }
-  var p=parseSheetUrl(u);
-  if(!p||!p.id){ toast('Link không hợp lệ'); return; }
-  SID=p.id;
-  // Giữ GID hiện tại (cùng file thường giữ nguyên gid các sheet)
-  saveSheetCfg();
-  toast('Đã đổi Sheet · đang tải lại…');
-  taiLai();
-}
+function doiLinkSheet(){ if(typeof toast==='function') toast('Nguồn Sheet do Admin cấu hình tại trang Admin'); }
 
-var dong=[], hopDong=[], ho=[], vpList=[], thuHoiList=[];
-var THU_HOI_FALLBACK=[
-            { stt:1, hoTen:"Đoàn Hồng Đức", diaDiem:"TK 150A, PT Trản Táo", dienTich:1.20, soHD:"", ngayKyHD:"", soQĐ:"79/QĐ.LT", ngayQĐ:"01/6/2001", soToa:"", ngayToa:"", viPham:"Vi phạm HĐ, vi phạm cam kết PCCR nhiều lần", ketQua:"BQL đã thu hồi diện tích giao khoán", ghiChu:"Đã thu hồi diện tích khoán" },
-            { stt:2, hoTen:"Phạm Thị Điệp", diaDiem:"TK 147, PT Gia Huynh", dienTich:1.30, soHD:"", ngayKyHD:"", soQĐ:"62/QĐ.BQLRPHXL", ngayQĐ:"28/7/2008", soToa:"", ngayToa:"", viPham:"Chuyển nhượng đất trái phép, gây tranh chấp kéo dài", ketQua:"BQL đã thu hồi diện tích giao khoán, giao PT Gia Huynh trực tiếp sản xuất", ghiChu:"Đã thu hồi diện tích khoán" },
-            { stt:3, hoTen:"Nguyễn Thế Truyền", diaDiem:"TK 204, PT Trản Táo", dienTich:3.08, soHD:"364", ngayKyHD:"20/4/2012", soQĐ:"456/TB-BQLRPH", ngayQĐ:"27/6/2022", soToa:"26/2023/TB-TLVA", ngayToa:"13/2/2023", viPham:"Sang nhượng trái phép; đào múc hồ; dựng hàng rào", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 27/01/2026 (BA 07/2026/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang kháng cáo" },
-            { stt:4, hoTen:"Nguyễn Văn Long", diaDiem:"TK 204, PT Trản Táo", dienTich:1.2, soHD:"3", ngayKyHD:"11/6/2021", soQĐ:"457/TB-BQLRPH", ngayQĐ:"27/6/2022", soToa:"25/2023/TB-TLVA", ngayToa:"10/2/2023", viPham:"Sang nhượng trái phép; đào múc hồ; dựng hàng rào; xây dựng nhà trái phép; phá hoại cây rừng trái phép", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 10/02/2026 (BA 10/2026/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang kháng cáo" },
-            { stt:5, hoTen:"Trần Nàm Giểng", diaDiem:"TK 205, PT Trản Táo", dienTich:1.27, soHD:"136", ngayKyHD:"20/8/2015", soQĐ:"930/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:6, hoTen:"Vòng A Múi", diaDiem:"TK 205, PT Trản Táo", dienTich:4.71, soHD:"128", ngayKyHD:"30/9/2005", soQĐ:"57/QĐ-BQLRPHXL", ngayQĐ:"29/4/2026", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Ông Nguyễn Văn Trình nhận chuyển nhượng trái phép" },
-            { stt:7, hoTen:"Lý Minh Ngọc", diaDiem:"TK 205, PT Trản Táo", dienTich:3.09, soHD:"93", ngayKyHD:"27/3/2003", soQĐ:"932/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Người thừa kế sử dụng là ông Lý Xướng Nhì" },
-            { stt:8, hoTen:"Nguyễn Thị Kim Cúc", diaDiem:"TK 205, PT Trản Táo", dienTich:6.57, soHD:"183", ngayKyHD:"27/11/2004", soQĐ:"933/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:9, hoTen:"Nguyễn Hữu Đào", diaDiem:"TK 204, PT Trản Táo", dienTich:5.1, soHD:"58", ngayKyHD:"8/8/2002", soQĐ:"934/TB-BQLRPH", ngayQĐ:"13/12/2021", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:10, hoTen:"Lê Khánh Phú", diaDiem:"TK 203, PT Lán Cát", dienTich:1.53, soHD:"154", ngayKyHD:"20/1/2014", soQĐ:"976/TB-BQLRPH", ngayQĐ:"24/11/2022", soToa:"27/2023/TB-TLVA", ngayToa:"13/2/2023", viPham:"Sang nhượng trái phép; khai thác cây rừng trồng trái phép", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 27/11/2025 (BA 93/2025/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang làm hồ sơ đề nghị thi hành án" },
-            { stt:11, hoTen:"Triệu Đức Giang", diaDiem:"TK 204, PT Trản Táo", dienTich:1.59, soHD:"32", ngayKyHD:"3/11/1994", soQĐ:"39/QĐ-BQLRPH", ngayQĐ:"19/4/2023", soToa:"", ngayToa:"", viPham:"Khai thác cây rừng trồng trái phép", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:12, hoTen:"Phún Tài Múi", diaDiem:"TK 204, PT Trản Táo", dienTich:6.17, soHD:"", ngayKyHD:"", soQĐ:"334/TB-BQLRPH", ngayQĐ:"26/5/2023", soToa:"", ngayToa:"", viPham:"Khai thác cây rừng trồng trái phép", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"Diện tích chưa lập HĐ" },
-            { stt:13, hoTen:"Triệu Văn Hòa", diaDiem:"TK 204, PT Trản Táo", dienTich:4.78, soHD:"40", ngayKyHD:"3/11/1994", soQĐ:"101/QĐ-BQLRPH", ngayQĐ:"10/11/2020", soToa:"75/TB-TLVA", ngayToa:"13/5/2020", viPham:"Sang nhượng trái phép; khai thác cây rừng trồng trái phép", ketQua:"Sơ thẩm BA 09/2025/DS-ST (24/7/2025); Phúc thẩm BA 60/2026/DS-PT (23/01/2026) — chấp thuận yêu cầu của BQL", ghiChu:"Đang làm hồ sơ đề nghị thi hành án" },
-            { stt:14, hoTen:"Nguyễn Mốc", diaDiem:"TK 205, PT Trản Táo", dienTich:4.71, soHD:"184", ngayKyHD:"27/11/2004", soQĐ:"12/QĐ-BQLRPH", ngayQĐ:"20/1/2021", soToa:"241/TB-TLVA", ngayToa:"23/11/2020", viPham:"Phá hoại rừng trồng trái pháp", ketQua:"Đã hòa giải thành, ông Nguyễn Mốc đã khắc phục", ghiChu:"Đã khởi kiện. Năm 2025 đã hòa giải, BQL đã rút hồ sơ khởi kiện" },
-            { stt:15, hoTen:"Hà Thị Hạnh", diaDiem:"TK 204, PT Trản Táo", dienTich:1.69, soHD:"203", ngayKyHD:"28/4/2005", soQĐ:"14/QĐ-BQLRPH", ngayQĐ:"20/1/2021", soToa:"246/TB-TLVA", ngayToa:"26/11/2020", viPham:"Sang nhượng trái phép; khai thác cây rừng trồng trái phép", ketQua:"Tòa án nhân dân khu vực 6 xét xử sơ thẩm 10/12/2025 (BA 99/2025/DS-ST), chấp thuận toàn bộ yêu cầu của BQL", ghiChu:"Đang làm hồ sơ đề nghị thi hành án" },
-            { stt:16, hoTen:"Triệu A Sám", diaDiem:"TK 204, PT Trản Táo", dienTich:2.59, soHD:"202", ngayKyHD:"28/4/2005", soQĐ:"13/QĐ-BQLRPH", ngayQĐ:"20/1/2021", soToa:"237/TB-TLVA", ngayToa:"19/11/2020", viPham:"Khai thác cây rừng trồng trái phép", ketQua:"BQL đã rút hồ sơ khởi kiện để bổ sung chứng cứ", ghiChu:"Đã rút hồ sơ" },
-            { stt:17, hoTen:"Nguyễn Văn Chính", diaDiem:"TK 203, PT Lán Cát", dienTich:1.71, soHD:"142", ngayKyHD:"31/12/2016", soQĐ:"150/QĐ-BQLRPH", ngayQĐ:"31/12/2024", soToa:"", ngayToa:"", viPham:"Phá hoại cây rừng trồng, sang nhượng trái phép", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:18, hoTen:"Đặng Đức Hình", diaDiem:"TK 204, PT Trản Táo", dienTich:4.12, soHD:"214", ngayKyHD:"28/4/2005", soQĐ:"31/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:19, hoTen:"Đặng Đức Quang", diaDiem:"TK 204, PT Trản Táo", dienTich:8.81, soHD:"82", ngayKyHD:"4/11/1994", soQĐ:"28/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:20, hoTen:"Lý Viết Mông", diaDiem:"TK 205, PT Trản Táo", dienTich:5.83, soHD:"212", ngayKyHD:"28/4/2005", soQĐ:"29/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:21, hoTen:"Trần Nhộc Bẩu", diaDiem:"TK 204, PT Trản Táo", dienTich:1.46, soHD:"174", ngayKyHD:"27/11/2004", soQĐ:"30/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:22, hoTen:"Triệu Đức Thuận", diaDiem:"TK 204, PT Trản Táo", dienTich:2.75, soHD:"206", ngayKyHD:"28/4/2021", soQĐ:"32/QĐ-BQLRPH", ngayQĐ:"11/4/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:23, hoTen:"Trần Thị Nhung", diaDiem:"TK 205, PT Trản Táo", dienTich:3.76, soHD:"72", ngayKyHD:"16/8/2016", soQĐ:"264/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác, phá hoại cây rừng; XD công trình trái phép, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:24, hoTen:"Nguyễn Viết Hùng", diaDiem:"TK 203, PT Lán Cát", dienTich:7.66, soHD:"208", ngayKyHD:"1/8/2015", soQĐ:"263/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:25, hoTen:"Nguyễn Có", diaDiem:"TK 204, PT Trản Táo", dienTich:0.76, soHD:"431", ngayKyHD:"20/4/2016", soQĐ:"262/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng, không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:26, hoTen:"Lý Thị Nga", diaDiem:"TK 205, PT Trản Táo", dienTich:2.77, soHD:"211", ngayKyHD:"28/4/2005", soQĐ:"265/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; xây dựng công trình trái phép; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:27, hoTen:"Nguyễn Kế Vỹ", diaDiem:"TK 204, PT Trản Táo", dienTich:2.93, soHD:"461", ngayKyHD:"12/6/2019", soQĐ:"266/TB-BQLRPHXL", ngayQĐ:"4/9/2025", soToa:"", ngayToa:"", viPham:"Tự ý khai thác cây rừng; phá hoại rừng trồng; đào múc hồ trái phép; không hợp tác lập hồ sơ", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" },
-            { stt:28, hoTen:"Nguyễn Thị Kim Hương", diaDiem:"TK 205, PT Trản Táo", dienTich:1.94, soHD:"139", ngayKyHD:"02/06/2004", soQĐ:"67/QĐ-BQLRPHXL", ngayQĐ:"27/10/2025", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, sang nhượng trái phép hợp đồng", ketQua:"BQL đã chấm dứt HĐ / thu hồi", ghiChu:"Sang nhượng trái phép cho ông Vi Chung Bảo" },
-            { stt:29, hoTen:"Phan Hữu Thành (Làng)", diaDiem:"TK 204, PT Trản Táo", dienTich:2.78, soHD:"175", ngayKyHD:"27/11/2004", soQĐ:"58/QĐ-BQLRPHXL", ngayQĐ:"29/4/2026", soToa:"", ngayToa:"", viPham:"Phá hoại rừng trồng, tự ý khai thác cây rừng trồng, xây dựng công trình trái phép, sang nhượng trái phép hợp đồng", ketQua:"BQL mới chấm dứt HĐ, chưa thu hồi được diện tích khoán", ghiChu:"" }
-        ];
-
-var chinhThuc={tong:0,dn:0,ld:0};
-var tinh='ALL', tab='tongquan', daTaiVP=false, charts={};
-var lastSync=null;
-var START_DATA_ROW=1; // Chỉ bỏ hàng không có STT số; không cắt cứng hàng 1-9 (gviz đã phẳng header).
-var SOURCE_SHEETS={DN:'TOÀN BQL DN',LD:'TOÀN BQL LD'};
-var VP_KEY_RULE='Số HĐ + Ngày ký';
-
-/** Làm tròn 2 chữ số thập phân (chuẩn diện tích ha) */
-function round2(n){
-  var x=Number(n);
-  if(!isFinite(x)) return 0;
-  return Math.round((x + Number.EPSILON) * 100) / 100;
-}
 /** Thửa địa chính: giữ "100.2" / "100.20" / "47" — không coi là số để trừ/cộng */
 function chuanThua(s){
   if(s==null||s==='') return '';

@@ -353,10 +353,10 @@
                     <i class="fa-solid fa-arrows-rotate mr-1.5" id="reloadIcon"></i>
                     <span class="hidden sm:inline">Làm mới</span>
                 </button>
-                <button onclick="openSyncModal()" class="inline-flex items-center px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                    <i class="fa-solid fa-link mr-1.5" id="syncIcon"></i>
-                    <span class="hidden sm:inline">Đổi link Sheet</span>
-                    <span class="sm:hidden">Link</span>
+                <button onclick="openSyncModal()" class="inline-flex items-center px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500" title="Đồng bộ dữ liệu (nguồn Sheet do Admin cấu hình)">
+                    <i class="fa-solid fa-cloud-arrow-down mr-1.5" id="syncIcon"></i>
+                    <span class="hidden sm:inline">Đồng bộ</span>
+                    <span class="sm:hidden">Sync</span>
                 </button>
                 <button onclick="copyForGoogleSheets()" class="inline-flex items-center px-3 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all">
                     <i class="fa-regular fa-copy mr-1.5"></i>
@@ -806,7 +806,7 @@
             <div class="px-5 py-3.5 bg-gradient-to-r from-emerald-700 to-sheets-800 text-white flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-link"></i>
-                    <h3 class="text-sm font-bold">Kết nối Google Sheets Trực tuyến</h3>
+                    <h3 class="text-sm font-bold">Đồng bộ dữ liệu Google Sheets</h3>
                 </div>
                 <button onclick="closeSyncModal()" class="text-emerald-100 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -822,15 +822,12 @@
 
             <div id="tabContent1" class="p-5 space-y-3.5 text-xs">
                 <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-900 text-[11px] leading-relaxed">
-                    <p class="font-bold flex items-center mb-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5"></i> Lưu ý để kết nối thành công:</p>
-                    <ol class="list-decimal list-inside space-y-0.5 pl-0.5 text-slate-700">
-                        <li>Mở tệp Google Trang tính → nút <strong>Chia sẻ</strong></li>
-                        <li>Đổi quyền thành: <strong>“Bất kỳ ai có liên kết đều có thể xem”</strong></li>
-                    </ol>
+                    <p class="font-bold flex items-center mb-1"><i class="fa-solid fa-circle-info text-amber-600 mr-1.5"></i> Nguồn Sheet</p>
+                    <p class="text-slate-700">Link sheet do <strong>Admin</strong> cấu hình tại trang Admin → Nguồn Google Sheet. Máy này chỉ <strong>đồng bộ / làm mới</strong> dữ liệu. Sheet phải chia sẻ <strong>Anyone with the link · Viewer</strong>.</p>
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Link sheet chính (vi phạm QLBVR):</label>
-                    <input type="url" id="sheetCsvUrl" value="https://docs.google.com/spreadsheets/d/1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU/edit?gid=528762373#gid=528762373" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none text-xs">
+                    <label class="block font-semibold text-slate-700 mb-1">Link sheet chính (do Admin cấu hình):</label>
+                    <input type="url" id="sheetCsvUrl" readonly title="Chỉ Admin đổi tại trang Admin → Nguồn Google Sheet" value="https://docs.google.com/spreadsheets/d/1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU/edit?gid=528762373#gid=528762373" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none text-xs">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Link tab <span class="text-rose-600">Thu hồi HĐ</span> <span class="font-normal text-slate-500">(để trống = tự tìm sheet tên “Thu hồi HĐ”)</span>:</label>
@@ -877,7 +874,26 @@
 
     <script>
         // Master Dataset - 56 cases (nhomId: 1=đang mời, 2=chấp hành, 3=niêm yết, 4=chấm dứt)
-        let detailedCases = [
+        
+/* Nguồn Sheet dùng chung (admin) */
+var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
+function readSharedSheet(mod){
+  try{
+    var raw=localStorage.getItem(SHEET_CFG_KEY);
+    if(raw){ var o=JSON.parse(raw); if(o&&o[mod]) return o[mod]; }
+  }catch(e){}
+  return null;
+}
+function applySharedQlbvrSheet(){
+  var sh=readSharedSheet('qlbvr');
+  if(!sh||!sh.sid) return;
+  var url='https://docs.google.com/spreadsheets/d/'+sh.sid+'/edit';
+  if(sh.gid) url+='?gid='+sh.gid+'#gid='+sh.gid;
+  var el=document.getElementById('sheetCsvUrl');
+  if(el) el.value=url;
+}
+
+let detailedCases = [
             { id: 1, hoTen: "Lầu Cún Khiềng", doiTuong: "Lầu Cún Sáng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời làm việc lần 1 và lần 2. Hộ chưa đến làm việc." },
             { id: 2, hoTen: "Thân Văn Hiệp", doiTuong: "Nguyễn Thị Phượng", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã làm việc, cam kết tháo dỡ công trình cơi nới trái phép." },
             { id: 3, hoTen: "Lê Văn Hiệp", doiTuong: "Nguyễn Văn Hướng", nhomId: 2, nhomTen: "Chấp hành làm việc / Khắc phục", tinhTrang: "Đã tự giác tháo dỡ hoàn toàn công trình nhà tạm trên đất lâm nghiệp." },
@@ -2100,7 +2116,11 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
             showToast("Đã tải file CSV!");
         }
 
-        function openSyncModal() { document.getElementById('syncModal').classList.remove('hidden'); }
+        function openSyncModal(){
+            try{ applySharedQlbvrSheet(); }catch(e){}
+            var a=document.getElementById('sheetCsvUrl');
+            if(a){ a.readOnly=true; a.classList.add('bg-slate-50'); }
+ document.getElementById('syncModal').classList.remove('hidden'); }
         function closeSyncModal() { document.getElementById('syncModal').classList.add('hidden'); }
 
         function switchSyncTab(tab) {
@@ -3745,6 +3765,8 @@ function toggleAdvFilter() {
         });
 
         window.onload = function() {
+            try{ applySharedQlbvrSheet(); }catch(e){}
+
             // Mặc định Dashboard lãnh đạo + đồng bộ sheet
             setTimeout(() => {
                 reloadData(true);

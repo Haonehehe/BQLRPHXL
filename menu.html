@@ -18,102 +18,96 @@ body{
   font-family:"Be Vietnam Pro",system-ui,sans-serif;
   min-height:100vh;color:var(--tx);
   background:
-    radial-gradient(1000px 520px at 8% -12%, rgba(16,185,129,.22), transparent 55%),
-    radial-gradient(800px 480px at 100% 0%, rgba(56,189,248,.12), transparent 50%),
-    radial-gradient(600px 400px at 50% 100%, rgba(139,92,246,.1), transparent 45%),
-    linear-gradient(160deg,#07111f 0%,#064e3b 50%,#0f766e 100%);
+    radial-gradient(900px 420px at 10% -8%, rgba(16,185,129,.18), transparent 55%),
+    radial-gradient(700px 400px at 100% 0%, rgba(56,189,248,.1), transparent 50%),
+    linear-gradient(165deg,#07111f 0%,#064e3b 55%,#0f766e 100%);
   display:flex;flex-direction:column;align-items:center;
-  padding:28px 16px 56px;
+  padding:18px 14px 48px;
 }
-.wrap{width:100%;max-width:1000px}
+.wrap{width:100%;max-width:920px}
 
 /* Brand */
-.brand{text-align:center;margin-bottom:20px}
+.brand{text-align:center;margin-bottom:14px}
 .brand-icon{
-  width:60px;height:60px;margin:0 auto 12px;border-radius:20px;
+  width:44px;height:44px;margin:0 auto 8px;border-radius:14px;
   background:linear-gradient(145deg,#34d399,#059669);
-  display:grid;place-items:center;font-size:24px;color:#fff;
-  box-shadow:0 14px 36px rgba(5,150,105,.45), inset 0 1px 0 rgba(255,255,255,.3);
+  display:grid;place-items:center;font-size:18px;color:#fff;
+  box-shadow:0 8px 22px rgba(5,150,105,.4), inset 0 1px 0 rgba(255,255,255,.25);
 }
-.brand h1{font-size:1.4rem;font-weight:800;letter-spacing:-.025em}
-.brand p{margin-top:6px;font-size:.82rem;color:var(--mu)}
-.pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.brand h1{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.brand p{margin-top:4px;font-size:.75rem;color:var(--mu)}
+.pills{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:8px}
 .pill{
-  font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-  padding:5px 11px;border-radius:999px;
-  background:rgba(255,255,255,.07);border:1px solid var(--line);color:#cbd5e1;
+  font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);color:#94a3b8;
 }
 
 /* Auth strip */
 .authbar{
-  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
-  margin:0 0 20px;padding:12px 16px;border-radius:16px;
-  background:rgba(0,0,0,.28);border:1px solid var(--line);
-  backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+  margin:0 0 14px;padding:8px 12px;border-radius:12px;
+  background:rgba(0,0,0,.22);border:1px solid var(--line);
+  backdrop-filter:blur(10px);
 }
-.authbar .who{font-size:13px;color:#e2e8f0;margin-right:4px}
+.authbar .who{font-size:12px;color:#e2e8f0;margin-right:2px}
 .authbar .who b{color:#6ee7b7;font-weight:700}
 
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  height:36px;padding:0 14px;border-radius:11px;font-size:12px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:32px;padding:0 12px;border-radius:9px;font-size:11.5px;font-weight:600;
   border:1px solid transparent;cursor:pointer;font-family:inherit;color:#fff;
   transition:transform .12s, box-shadow .15s, background .15s;
 }
 .btn:active{transform:scale(.97)}
-.btn-g{background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 6px 18px rgba(5,150,105,.3)}
+.btn-g{background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 4px 12px rgba(5,150,105,.28)}
 .btn-o{background:rgba(255,255,255,.08);border-color:var(--line);color:#e2e8f0}
 .btn-o:hover{background:rgba(255,255,255,.14)}
-.btn-v{background:linear-gradient(135deg,#a78bfa,#7c3aed);box-shadow:0 6px 18px rgba(124,58,237,.28)}
+.btn-v{background:linear-gradient(135deg,#a78bfa,#7c3aed);box-shadow:0 4px 12px rgba(124,58,237,.25)}
 .btn-b{background:linear-gradient(135deg,#38bdf8,#0284c7)}
-.btn-sm{height:32px;padding:0 11px;font-size:11px}
+.btn-sm{height:28px;padding:0 10px;font-size:11px}
 
 /* Cards */
-.grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.grid{display:flex;flex-direction:column;align-items:stretch;gap:0;width:100%}
 .card{
   display:flex;flex-direction:column;text-decoration:none;color:inherit;
-  background:var(--glass);border:1px solid var(--line);border-radius:22px;
-  padding:22px 18px 18px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  transition:transform .18s, background .18s, border-color .18s, box-shadow .18s;
-  position:relative;overflow:hidden;min-height:172px;width:100%;
+  background:var(--glass);border:1px solid var(--line);border-radius:14px;
+  padding:12px 12px 11px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:transform .15s, background .15s, border-color .15s, box-shadow .15s;
+  position:relative;overflow:hidden;min-height:0;width:100%;
 }
-@media(min-width:560px){.card{width:calc(50% - 7px);max-width:calc(50% - 7px)}}
-@media(min-width:920px){.card{width:calc(33.333% - 10px);max-width:310px;flex:0 0 calc(33.333% - 10px)}}
-.card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(145deg, rgba(255,255,255,.06), transparent 42%);
-  pointer-events:none;
-}
+.card::before{display:none}
 .card:hover{
-  transform:translateY(-5px);background:var(--glass2);
-  border-color:rgba(255,255,255,.22);
-  box-shadow:0 20px 48px rgba(0,0,0,.35);
+  transform:translateY(-2px);background:var(--glass2);
+  border-color:rgba(255,255,255,.2);
+  box-shadow:0 10px 28px rgba(0,0,0,.28);
 }
-.card.locked{opacity:.5;filter:saturate(.7)}
+.card.locked{opacity:.48;filter:saturate(.65)}
 .card.locked:hover{transform:none;box-shadow:none;cursor:pointer}
 .lock-badge{
-  position:absolute;top:12px;right:12px;z-index:2;
-  font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;
-  background:rgba(15,23,42,.55);color:#fde68a;border:1px solid rgba(253,230,138,.3);
+  position:absolute;top:8px;right:8px;z-index:2;
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;
+  background:rgba(15,23,42,.55);color:#fde68a;border:1px solid rgba(253,230,138,.25);
 }
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;position:relative;z-index:1}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;position:relative;z-index:1;gap:8px}
 .card-icon{
-  width:48px;height:48px;border-radius:15px;
-  display:grid;place-items:center;font-size:19px;
-  box-shadow:0 4px 12px rgba(0,0,0,.15);
+  width:34px;height:34px;border-radius:10px;
+  display:grid;place-items:center;font-size:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
 }
 .card .code{
-  font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
-  padding:4px 10px;border-radius:999px;
+  font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;
 }
-.card h2{font-size:1.08rem;font-weight:700;margin-bottom:6px;position:relative;z-index:1}
-.card p{font-size:.78rem;line-height:1.55;color:var(--mu);flex:1;position:relative;z-index:1}
+.card h2{font-size:.88rem;font-weight:700;margin-bottom:3px;position:relative;z-index:1;line-height:1.25}
+.card p{font-size:.7rem;line-height:1.4;color:var(--mu);flex:1;position:relative;z-index:1;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .card .go{
-  margin-top:14px;font-size:.75rem;font-weight:700;color:#e2e8f0;
-  display:inline-flex;align-items:center;gap:7px;position:relative;z-index:1;
+  margin-top:8px;font-size:.68rem;font-weight:700;color:#cbd5e1;
+  display:inline-flex;align-items:center;gap:5px;position:relative;z-index:1;
   transition:gap .15s;
 }
-.card:hover .go{gap:11px}
+.card:hover .go{gap:8px;color:#e2e8f0}
 
 .card.qlbvr .card-icon{background:rgba(244,63,94,.2);color:#fb7185}
 .card.qlbvr .code{background:rgba(244,63,94,.15);color:#fda4af}
@@ -130,8 +124,8 @@ body{
 .card.admin .card-icon{background:rgba(251,191,36,.22);color:#fbbf24}
 .card.admin .code{background:rgba(251,191,36,.15);color:#fcd34d}
 
-.hint{margin-top:18px;text-align:center;font-size:12.5px;color:#94a3b8;line-height:1.55;max-width:560px;margin-left:auto;margin-right:auto}
-footer{margin-top:22px;text-align:center;font-size:.7rem;color:#a7f3d0;opacity:.9}
+.hint{margin-top:12px;text-align:center;font-size:11.5px;color:#64748b;line-height:1.45;max-width:480px;margin-left:auto;margin-right:auto}
+footer{margin-top:14px;text-align:center;font-size:.65rem;color:#6ee7b7;opacity:.75}
 
 /* Modal */
 .modal{position:fixed;inset:0;background:rgba(2,6,14,.7);backdrop-filter:blur(8px);z-index:90;display:none;align-items:center;justify-content:center;padding:16px}
@@ -198,6 +192,42 @@ footer{margin-top:22px;text-align:center;font-size:.7rem;color:#a7f3d0;opacity:.
 .guide-box th,.guide-box td{border:1px solid rgba(255,255,255,.12);padding:6px 8px;text-align:left}
 .guide-box th{background:rgba(255,255,255,.06);color:#a7f3d0}
 
+
+
+.sec-label{
+  width:100%;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:#6ee7b7;margin:12px 0 8px;
+}
+.sec-label:first-child{margin-top:2px}
+.sec-label span{font-weight:500;text-transform:none;letter-spacing:0;color:#64748b;font-size:11px}
+.sec-label i{font-size:11px;opacity:.85}
+.grid-inner{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
+@media(min-width:520px){.grid-inner{grid-template-columns:repeat(2,1fr)}}
+.grp-card{
+  width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(0,0,0,.16);padding:10px 10px 12px;margin-bottom:10px;
+}
+.grp-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:2px 2px 8px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.grp-ico{
+  width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:13px;
+  background:rgba(255,255,255,.07);color:#6ee7b7;flex-shrink:0;
+}
+.grp-head b{display:block;font-size:12.5px;font-weight:800;color:#f1f5f9}
+.grp-head span{display:block;font-size:10.5px;color:#64748b;margin-top:1px;line-height:1.3}
+.grp-items{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:560px){.grp-items{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:820px){.grp-items{grid-template-columns:repeat(3,1fr)}}
+.grp-card.qlbvr .grp-ico{color:#fb7185;background:rgba(244,63,94,.14)}
+.grp-card.qldd .grp-ico{color:#34d399;background:rgba(16,185,129,.14)}
+.grp-card.trong .grp-ico{color:#4ade80;background:rgba(34,197,94,.14)}
+
+  .grid-inner .card{width:calc(33.333% - 10px);max-width:310px;flex:0 0 calc(33.333% - 10px)}
+}
+
 </style>
 </head>
 <body>
@@ -207,9 +237,8 @@ footer{margin-top:22px;text-align:center;font-size:.7rem;color:#a7f3d0;opacity:.
     <h1>Ban Quản lý Rừng phòng hộ Xuân Lộc</h1>
     <p>Phòng Lâm nghiệp · Hệ thống theo dõi &amp; quản lý</p>
     <div class="pills">
-      <span class="pill">Phân quyền</span>
       <span class="pill" id="modeBadge">Auth</span>
-      <span class="pill">5 module</span>
+      <span class="pill">Tiện ích · Chuyên môn</span>
     </div>
   </div>
 
@@ -671,14 +700,36 @@ function authModeLabel() {
 
 (function(){ try{ var u=localStorage.getItem('bqlrph_script_url'); if(u) CONFIG.SCRIPT_URL=u; }catch(e){} })();
 
-var MODULES=[
-  {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ vi phạm, nhóm xử lý, thống kê thiệt hại, báo cáo Word / Excel / PDF.'},
-  {id:'lamba',href:'quanly-datdai-lamba.html',cls:'qldd',icon:'fa-map-location-dot',code:'QLĐĐ',title:'Quản lý đất đai',desc:'Lâm bạ thửa đất, hộ nhận khoán, hợp đồng, hiện trạng rừng.'},
-  {id:'nhao',href:'quanly-nhao-lampart.html',cls:'nhao',icon:'fa-house-chimney',code:'NHÀ Ở',title:'Nhà ở trên lâm phận',desc:'Công trình trên 6 phân trường — hộ, diện tích XD, phép xây.'},
-  {id:'mocgioi',href:'quanly-mocgioi.html',cls:'moc',icon:'fa-location-dot',code:'MỐC GIỚI',title:'Quản lý mốc giới',desc:'Danh sách mốc, tọa độ X–Y, phân trường — lọc, Excel, in PDF.'},
-  {id:'trongrung',href:'quanly-trongrung.html',cls:'trong',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ trồng — chăm sóc rừng năm 2026 theo phân trường, hạng mục.'},
-  {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách, nối, xoay, OCR — khách dùng được, không cần đăng nhập.'}
-];
+var MODULES={
+  tienich:[
+    {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'}
+  ],
+  groups:[
+    {
+      key:'qlbvr_grp', title:'Quản lý bảo vệ rừng', sub:'Vi phạm · nhà ở · mốc giới',
+      icon:'fa-shield-halved', tone:'qlbvr',
+      items:[
+        {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
+        {id:'nhao',href:'quanly-nhao-lampart.html',cls:'nhao',icon:'fa-house-chimney',code:'NHÀ Ở',title:'Nhà ở lâm phận',desc:'6 phân trường · phép xây.'},
+        {id:'mocgioi',href:'quanly-mocgioi.html',cls:'moc',icon:'fa-location-dot',code:'MỐC GIỚI',title:'Mốc giới',desc:'Tọa độ · lọc · Excel · in.'}
+      ]
+    },
+    {
+      key:'datdai_grp', title:'Quản lý đất đai', sub:'Lâm bạ · hợp đồng khoán',
+      icon:'fa-map-location-dot', tone:'qldd',
+      items:[
+        {id:'lamba',href:'quanly-datdai-lamba.html',cls:'qldd',icon:'fa-map-location-dot',code:'LÂM BẠ',title:'Lâm bạ / Đất đai',desc:'HĐ khoán · bản đồ · in sơ đồ.'}
+      ]
+    },
+    {
+      key:'lamsinh_grp', title:'Lâm sinh', sub:'Trồng · chăm sóc rừng',
+      icon:'fa-seedling', tone:'trong',
+      items:[
+        {id:'trongrung',href:'quanly-trongrung.html',cls:'trong',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ · Excel · Word.'}
+      ]
+    }
+  ]
+};
 
 function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
 function closeModal(){['modalLogin','modalReg','modalCfg','modalPass','modalForgot','modalGuide'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('on');});}
@@ -710,14 +761,30 @@ function renderAuthBar(){
     '<button type="button" class="btn btn-o" onclick="openCfg()"><i class="fa-solid fa-gear"></i></button>'+
     '<button type="button" class="btn btn-o" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>';
 }
+function moduleCard(m, ok){
+  if(ok) return '<a class="card '+m.cls+'" href="'+m.href+'"><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Mở <i class="fa-solid fa-arrow-right"></i></span></a>';
+  return '<div class="card '+m.cls+' locked" onclick="openLogin()"><span class="lock-badge"><i class="fa-solid fa-lock"></i> Cần đăng nhập</span><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Cần đăng nhập <i class="fa-solid fa-lock"></i></span></div>';
+}
 function renderGrid(){
   var html='';
-  MODULES.forEach(function(m){
-    var ok=canAccess(m.id);
-    if(ok) html+='<a class="card '+m.cls+'" href="'+m.href+'"><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Mở module <i class="fa-solid fa-arrow-right"></i></span></a>';
-    else html+='<div class="card '+m.cls+' locked" onclick="openLogin()"><span class="lock-badge"><i class="fa-solid fa-lock"></i> Cần đăng nhập</span><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Đăng nhập để mở <i class="fa-solid fa-lock"></i></span></div>';
+  /* --- Nhóm tiện ích --- */
+  html+='<div class="sec-label"><i class="fa-solid fa-wrench"></i> Tiện ích <span>Dùng được khi chưa đăng nhập</span></div>';
+  html+='<div class="grid-inner">';
+  (MODULES.tienich||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
+  html+='</div>';
+  /* --- Nhóm chuyên môn --- */
+  html+='<div class="sec-label" style="margin-top:22px"><i class="fa-solid fa-briefcase"></i> Chuyên môn <span>Cần đăng nhập &amp; được cấp quyền</span></div>';
+  (MODULES.groups||[]).forEach(function(g){
+    html+='<div class="grp-card '+g.tone+'">';
+    html+='<div class="grp-head"><div class="grp-ico"><i class="fa-solid '+g.icon+'"></i></div><div><b>'+g.title+'</b><span>'+g.sub+'</span></div></div>';
+    html+='<div class="grp-items">';
+    (g.items||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
+    html+='</div></div>';
   });
-  if(isAdmin()) html+='<a class="card admin" href="admin.html"><div class="card-top"><div class="card-icon"><i class="fa-solid fa-user-shield"></i></div><span class="code">ADMIN</span></div><h2>Khu vực quản trị</h2><p>Duyệt đăng ký, cấp quyền module, đặt lại mật khẩu, khóa tài khoản.</p><span class="go">Vào trang Admin <i class="fa-solid fa-arrow-right"></i></span></a>';
+  if(isAdmin()){
+    html+='<div class="sec-label" style="margin-top:22px"><i class="fa-solid fa-user-shield"></i> Quản trị</div>';
+    html+='<div class="grid-inner"><a class="card admin" href="admin.html"><div class="card-top"><div class="card-icon"><i class="fa-solid fa-user-shield"></i></div><span class="code">ADMIN</span></div><h2>Khu vực quản trị</h2><p>Duyệt TK · cấp quyền · nguồn Sheet.</p><span class="go">Vào Admin <i class="fa-solid fa-arrow-right"></i></span></a></div>';
+  }
   document.getElementById('grid').innerHTML=html;
 }
 function render(){

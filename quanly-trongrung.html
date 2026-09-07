@@ -148,7 +148,6 @@ tr:hover td{background:#f0fdf4}
     </div>
     <div class="acts no-print">
       <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
-      <button class="btn btn-o" type="button" onclick="doiLinkSheet()" title="Đổi link Google Sheet"><i class="fa-solid fa-link"></i> Đổi link Sheet</button>
       <button class="btn btn-o" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
       <button class="btn btn-b" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
       <button class="btn btn-g" type="button" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> In / PDF</button>
@@ -164,7 +163,7 @@ tr:hover td{background:#f0fdf4}
     <a class="r-card pdf" href="quanly-pdf.html"><div class="ic"><i class="fa-solid fa-file-pdf"></i></div><b>Công cụ PDF</b><span>Tách · nối · OCR</span></a>
   </div>
 
-  <p class="note no-print">Nguồn: Google Sheet <b>Tiến độ trồng và chăm sóc rừng năm 2026</b>. Nếu không tải được → Sheet phải <b>Công khai (Anyone with the link · Viewer)</b>. Có thể bấm <b>Đổi link Sheet</b> nếu dùng file khác.</p>
+  <p class="note no-print">Nguồn: Google Sheet <b>Tiến độ trồng và chăm sóc rừng năm 2026</b>. Nếu không tải được → Sheet phải <b>Công khai (Anyone with the link · Viewer)</b>. Nguồn Sheet do <b>Admin</b> cấu hình (trang Admin → Nguồn Google Sheet).</p>
 
   <div class="bar no-print">
     <input type="search" id="q" placeholder="Tìm hạng mục…" oninput="veLai()">
@@ -220,32 +219,37 @@ tr:hover td{background:#f0fdf4}
 </div>
 
 <script>
+
+/* Nguồn Sheet dùng chung (admin cấu hình) */
+var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
+function readSharedSheet(mod){
+  try{
+    var raw=localStorage.getItem(SHEET_CFG_KEY);
+    if(raw){ var o=JSON.parse(raw); if(o&&o[mod]) return o[mod]; }
+  }catch(e){}
+  return null;
+}
+
 var DEFAULT_SID='10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7';
 var DEFAULT_GID='1027488994';
 var SID=DEFAULT_SID;
 var GID=DEFAULT_GID;
-try{
-  var _cfg=JSON.parse(localStorage.getItem('trongrung_sheet_cfg')||'{}');
-  if(_cfg.sid) SID=_cfg.sid;
-  if(_cfg.gid) GID=String(_cfg.gid);
-}catch(e){}
+(function(){
+  var sh=readSharedSheet('trongrung');
+  if(sh){
+    if(sh.sid) SID=String(sh.sid);
+    if(sh.gid) GID=String(sh.gid);
+  } else {
+    try{
+      var _cfg=JSON.parse(localStorage.getItem('trongrung_sheet_cfg')||'{}');
+      if(_cfg.sid) SID=_cfg.sid;
+      if(_cfg.gid) GID=String(_cfg.gid);
+    }catch(e){}
+  }
+})();
 
-function doiLinkSheet(){
-  var cur='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID+'#gid='+GID;
-  var url=prompt('Dán link Google Sheet tiến độ trồng & chăm sóc rừng:\n(Phải chia sẻ Anyone with the link - Viewer)', cur);
-  if(url==null) return;
-  url=String(url).trim();
-  if(!url){ toast('Giữ nguyên link hiện tại'); return; }
-  var m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  if(!m){ toast('Link không hợp lệ'); return; }
-  var gid='0';
-  var g=url.match(/[?&#]gid=([0-9]+)/);
-  if(g) gid=g[1];
-  SID=m[1]; GID=gid;
-  try{ localStorage.setItem('trongrung_sheet_cfg', JSON.stringify({sid:SID,gid:GID})); }catch(e){}
-  toast('Đã đổi Sheet · đang tải lại…');
-  taiLai(false);
-}
+function doiLinkSheet(){ toast('Nguồn Sheet do Admin cấu hình tại trang Admin'); }
+
 
 var PTS=['Gia Huynh','Núi Le','Trản Táo','Lán Cát','Gia Phu','Đầm Voi'];
 var dong=[];

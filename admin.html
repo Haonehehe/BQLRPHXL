@@ -122,6 +122,69 @@ var CONFIG = {
   // Ví dụ: 'https://script.google.com/macros/s/AKfycbx.../exec'
 };
 
+
+/* ===== Nguồn Google Sheet dùng chung (admin cấu hình → mọi user) ===== */
+var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
+var DEFAULT_SHEET_SOURCES={
+  qlbvr:{sid:'1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU',gid:'528762373',label:'QLBVR'},
+  lamba:{sid:'1CnlGELkhVjLEa7jQwVg4kIeyiXxqmOTR',gidDN:'1710752621',gidLD:'516720069',gidTH:'149303770',label:'Lâm bạ'},
+  nhao:{sid:'1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT',label:'Nhà ở'},
+  mocgioi:{sid:'1XOz-KdIhtWIyocSrV8ZvpOgusTLUOGCX',gid:'1646240187',label:'Mốc giới'},
+  trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'}
+};
+function loadSheetSourcesLocal(){
+  try{
+    var raw=localStorage.getItem(SHEET_CFG_KEY);
+    if(raw){ var o=JSON.parse(raw); if(o&&typeof o==='object') return o; }
+  }catch(e){}
+  return null;
+}
+function saveSheetSourcesLocal(cfg){
+  try{ localStorage.setItem(SHEET_CFG_KEY, JSON.stringify(cfg)); }catch(e){}
+}
+function mergeSheetSources(remote){
+  var base=JSON.parse(JSON.stringify(DEFAULT_SHEET_SOURCES));
+  var loc=loadSheetSourcesLocal()||{};
+  [loc, remote||{}].forEach(function(src){
+    Object.keys(src||{}).forEach(function(k){
+      if(!src[k]||typeof src[k]!=='object') return;
+      base[k]=base[k]||{};
+      Object.keys(src[k]).forEach(function(f){
+        if(src[k][f]!=null && String(src[k][f]).trim()!=='') base[k][f]=src[k][f];
+      });
+    });
+  });
+  return base;
+}
+function getSheetSources(){ return mergeSheetSources(null); }
+function fetchSheetSourcesCloud(){
+  if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
+    return apiCall({action:'getsheets'}).then(function(res){
+      if(res && res.ok && res.sheets){
+        saveSheetSourcesLocal(res.sheets);
+        return mergeSheetSources(res.sheets);
+      }
+      return getSheetSources();
+    }).catch(function(){ return getSheetSources(); });
+  }
+  return Promise.resolve(getSheetSources());
+}
+function pushSheetSourcesCloud(cfg){
+  saveSheetSourcesLocal(cfg);
+  if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
+    var c={};
+    try{ if(typeof adminCred==='function') c=adminCred(); }catch(e){}
+    return apiCall({
+      action:'setsheets', sheets:cfg,
+      adminEmail:c.adminEmail||'', adminPass:c.adminPass||''
+    }).then(function(res){
+      if(res && res.ok) return true;
+      throw new Error((res&&res.error)||'Máy chủ chưa hỗ trợ setsheets — đã lưu trên trình duyệt admin. Cập nhật Apps Script để đồng bộ mọi máy.');
+    });
+  }
+  return Promise.resolve(true);
+}
+
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
@@ -424,6 +487,72 @@ function shell(inner){
     '</div></div></div><div class="wrap">'+inner+'</div>';
 }
 
+
+function sheetSourcesCard(){
+  var cfg=getSheetSources();
+  var fields=[
+    {k:'qlbvr', title:'QLBVR — Vi phạm', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
+    {k:'lamba', title:'Lâm bạ — Đất đai', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gidDN',l:'GID Đồng Nai'},{f:'gidLD',l:'GID Lâm Đồng'},{f:'gidTH',l:'GID Tổng hợp'}]},
+    {k:'nhao', title:'Nhà ở trên lâm phận', fields:[{f:'sid',l:'Spreadsheet ID'}]},
+    {k:'mocgioi', title:'Mốc giới', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
+    {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
+  ];
+  var h='<div class="card"><div class="card-h"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><span style="font-size:11px;font-weight:600;color:#64748b">Đồng bộ cho mọi user</span></div>';
+  h+='<div style="padding:14px 16px;font-size:12px;color:#475569;line-height:1.5">Admin đổi link tại đây → lưu → các module đọc chung (localStorage + Apps Script nếu đã cập nhật <code>getsheets</code>/<code>setsheets</code>). Module con <b>không còn nút Đổi link Sheet</b>.</div>';
+  fields.forEach(function(sec){
+    var o=cfg[sec.k]||{};
+    h+='<div style="padding:12px 16px;border-top:1px solid #f1f5f9">';
+    h+='<div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#0f172a">'+esc(sec.title)+'</div>';
+    sec.fields.forEach(function(ff){
+      h+='<div style="margin-bottom:8px"><label style="display:block;font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:4px">'+esc(ff.l)+'</label>';
+      h+='<input type="text" data-sk="'+sec.k+'" data-sf="'+ff.f+'" value="'+esc(o[ff.f]||'')+'" style="width:100%;height:36px;border:1px solid #e2e8f0;border-radius:10px;padding:0 11px;font-size:12.5px;font-family:ui-monospace,monospace" placeholder="ID hoặc dán full link Google Sheet"></div>';
+    });
+    h+='</div>';
+  });
+  h+='<div style="padding:12px 16px;border-top:1px solid #f1f5f9;display:flex;gap:8px;flex-wrap:wrap">';
+  h+='<button type="button" class="btn btn-g" onclick="saveSheetSourcesUI()"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu nguồn Sheet</button>';
+  h+='<button type="button" class="btn btn-o" onclick="resetSheetSourcesUI()"><i class="fa-solid fa-rotate-left"></i> Về mặc định</button>';
+  h+='</div></div>';
+  return h;
+}
+function parseSidFromInput(v){
+  v=String(v||'').trim();
+  var m=v.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(m) return m[1];
+  if(/^[a-zA-Z0-9-_]{20,}$/.test(v)) return v;
+  return v;
+}
+function parseGidFromInput(v){
+  v=String(v||'').trim();
+  var m=v.match(/[?&#]gid=([0-9]+)/);
+  if(m) return m[1];
+  if(/^[0-9]+$/.test(v)) return v;
+  return v;
+}
+function saveSheetSourcesUI(){
+  var cfg=getSheetSources();
+  document.querySelectorAll('input[data-sk]').forEach(function(inp){
+    var k=inp.getAttribute('data-sk'), f=inp.getAttribute('data-sf');
+    if(!cfg[k]) cfg[k]={};
+    var val=inp.value.trim();
+    if(f==='sid'||f.indexOf('sid')>=0) val=parseSidFromInput(val);
+    else if(f.indexOf('gid')>=0||f==='gid') val=parseGidFromInput(val);
+    cfg[k][f]=val;
+  });
+  pushSheetSourcesCloud(cfg).then(function(){
+    toast('Đã lưu nguồn Sheet — user khác tải lại trang module sẽ nhận (cần Apps Script getsheets/setsheets để đồng bộ máy khác)');
+  }).catch(function(e){
+    toast(e.message||String(e));
+  });
+}
+function resetSheetSourcesUI(){
+  if(!confirm('Khôi phục nguồn Sheet mặc định trong code?')) return;
+  saveSheetSourcesLocal(DEFAULT_SHEET_SOURCES);
+  pushSheetSourcesCloud(DEFAULT_SHEET_SOURCES).then(function(){
+    toast('Đã về mặc định'); loadUsers();
+  }).catch(function(){ toast('Đã về mặc định (local)'); loadUsers(); });
+}
+
 function loadUsers(){
   if(!requireAdmin()) return;
   shell('<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách…</div>');
@@ -449,6 +578,7 @@ function loadUsers(){
     html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-users" style="color:#059669;margin-right:6px"></i>Tất cả tài khoản</span></div>';
     users.forEach(function(u,i){html+=userRow(u,'a'+i);});
     html+='</div>';
+    html+=sheetSourcesCard();
     shell(html);
   }).catch(function(e){
     shell('<div class="note" style="background:#fff1f2;border-color:#fecdd3;color:#9f1239"><b>Lỗi tải:</b> '+esc(e.message||e)+'</div>');

@@ -1,6 +1,54 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
+<script>
+/* BQLRPH Auth Guard (head) — chặn trước khi vẽ trang */
+(function(){
+  try{ document.documentElement.classList.add('bqlrph-wait'); }catch(e){}
+  var SESS_KEY='bqlrph_session_v1';
+  var MOD='nhao';
+  function getSession(){
+    try{
+      var s=sessionStorage.getItem(SESS_KEY);
+      if(s) return JSON.parse(s);
+      s=localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  function canAccess(){
+    if(MOD==='pdf') return true;
+    var s=getSession();
+    if(!s) return false;
+    if(s.role==='admin') return true;
+    return Array.isArray(s.perms) && s.perms.indexOf(MOD)>=0;
+  }
+  if(!canAccess()){
+    try{ window.stop(); }catch(e){}
+    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Nhà ở trên lâm phận</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>nhao</b>.</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div></body></html>';
+    document.open();
+    document.write(gate);
+    document.close();
+    // đảm bảo không còn nội dung cũ
+    setTimeout(function(){
+      try{
+        if(!document.body || document.body.innerText.indexOf('Cần đăng nhập')<0){
+          document.documentElement.innerHTML=gate.replace(/^<!DOCTYPE html>/,'');
+        }
+      }catch(e){}
+    },0);
+    return;
+  }
+  // Được phép: bỏ ẩn body
+  try{
+    document.documentElement.classList.remove('bqlrph-wait');
+    var cs=document.getElementById('bqlrph-lockcss');
+    if(cs) cs.remove();
+  }catch(e){}
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nhà ở trên lâm phận · BQLRPH Xuân Lộc</title>
@@ -107,46 +155,6 @@ body{padding-bottom:30px!important}
 </style>
 </head>
 <body>
-<script>window.__BQLRPH_MOD__='nhao';</script>
-
-<script>
-/* BQLRPH Auth Guard — session đồng bộ menu (sessionStorage + localStorage) */
-(function(){
-  var SESS_KEY = 'bqlrph_session_v1';
-  var MOD = window.__BQLRPH_MOD__ || 'pdf';
-  function getSession(){
-    try{
-      var s = sessionStorage.getItem(SESS_KEY);
-      if(s){ return JSON.parse(s); }
-      s = localStorage.getItem(SESS_KEY);
-      if(s){ sessionStorage.setItem(SESS_KEY, s); return JSON.parse(s); }
-    }catch(e){}
-    return null;
-  }
-  function canAccess(mod){
-    if(mod === 'pdf') return true;
-    var s = getSession();
-    if(!s) return false;
-    if(s.role === 'admin') return true;
-    return Array.isArray(s.perms) && s.perms.indexOf(mod) >= 0;
-  }
-  if(!canAccess(MOD)){
-    document.addEventListener('DOMContentLoaded', function(){
-      document.body.innerHTML =
-        '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc">'
-        +'<div style="max-width:420px;width:100%;background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)">'
-        +'<div style="font-size:36px;margin-bottom:10px">🔒</div>'
-        +'<h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1>'
-        +'<p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module này chỉ mở khi đã đăng nhập trên <b>Menu</b> và được admin cấp quyền. Không thể bỏ qua bằng cách mở link trực tiếp.</p>'
-        +'<a href="menu.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a>'
-        +'</div></div>';
-    });
-    // chặn script phía sau nếu DOM chưa sẵn
-    window.__BQLRPH_BLOCKED__ = true;
-  }
-  window.bqlrphCurrentUser = getSession;
-})();
-</script>
 
 <div class="top">
   <div class="wrap top-in">
@@ -159,7 +167,6 @@ body{padding-bottom:30px!important}
     </div>
     <div class="acts">
       <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
-      <button class="btn btn-o" type="button" onclick="doiLinkSheet()" title="Đổi link Google Sheet"><i class="fa-solid fa-link"></i> Đổi link Sheet</button>
       <button class="btn btn-o" type="button" onclick="moHoTro()"><i class="fa-solid fa-circle-info"></i> Hỗ trợ</button>
       <button class="btn btn-b" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
       <button class="btn btn-g" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
@@ -268,6 +275,17 @@ body{padding-bottom:30px!important}
 </div>
 
 <script>
+
+/* Nguồn Sheet dùng chung (admin cấu hình) */
+var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
+function readSharedSheet(mod){
+  try{
+    var raw=localStorage.getItem(SHEET_CFG_KEY);
+    if(raw){ var o=JSON.parse(raw); if(o&&o[mod]) return o[mod]; }
+  }catch(e){}
+  return null;
+}
+
 /* ====== Cấu hình ====== */
 var DEFAULT_NHA_SID = '1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT';
 var DEFAULT_PT_SHEETS = [
@@ -279,6 +297,8 @@ var DEFAULT_PT_SHEETS = [
   { key:'GIA_PHU',   ten:'Gia Phu',   gid:'1629649228' }
 ];
 var NHA_SID = DEFAULT_NHA_SID;
+(function(){var sh=readSharedSheet('nhao');if(sh&&sh.sid)NHA_SID=String(sh.sid);})();
+
 var PT_SHEETS = DEFAULT_PT_SHEETS.map(function(p){ return {key:p.key, ten:p.ten, gid:p.gid}; });
 
 try{
@@ -724,20 +744,7 @@ window.xemCT=function(id){
 };
 function dongModal(){ document.getElementById('modal').classList.remove('on'); }
 
-function doiLinkSheet(){
-  var cur='https://docs.google.com/spreadsheets/d/'+NHA_SID+'/edit';
-  var url=prompt('Dán link Google Sheet nhà ở trên lâm phận (file có 6 sheet phân trường):', cur);
-  if(url==null) return;
-  url=url.trim();
-  if(!url){ toast('Giữ nguyên link hiện tại'); return; }
-  var m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  if(!m){ toast('Link không hợp lệ'); return; }
-  NHA_SID=m[1];
-  // Giữ GID 6 PT mặc định (cùng cấu trúc); chỉ đổi SID
-  try{ localStorage.setItem('nhao_cfg', JSON.stringify({sid:NHA_SID, sheets:PT_SHEETS})); }catch(e){}
-  toast('Đã đổi Sheet · đang tải lại…');
-  taiLai(true);
-}
+function doiLinkSheet(){ toast('Nguồn Sheet do Admin cấu hình tại trang Admin'); }
 
 function moHoTro(){
   document.getElementById('mdTitle').textContent='Hướng dẫn & hỗ trợ';
