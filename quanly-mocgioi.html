@@ -342,7 +342,7 @@ function bqlrphFetchSheetSources(){
   var local=bqlrphLoadSheetsLocal()||{};
   if(!url) return Promise.resolve(local);
   var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
-  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 6000);
+  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 3000);
   return fetch(url, {
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -645,7 +645,7 @@ window.taiLai=taiLai;window.xuatExcel=xuatExcel;window.inBaoCao=inBaoCao;window.
   }
   if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(go, 100);
   else window.addEventListener('load', go);
-  setTimeout(go, 8000); // không để treo
+  setTimeout(go, 4000); // không để treo
 })();
 </script>
 </body>

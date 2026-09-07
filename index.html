@@ -884,7 +884,22 @@ function readSharedSheet(mod){
   }catch(e){}
   return null;
 }
-function applySharedQlbvrSheet
+function applySharedQlbvrSheet(){
+  try{
+    var raw = localStorage.getItem('bqlrph_sheet_sources_v1');
+    var sh = null;
+    if(raw){
+      var o = JSON.parse(raw);
+      if(o && o.qlbvr) sh = o.qlbvr;
+    }
+    if(sh && sh.sid && String(sh.sid).length >= 30){
+      var url = 'https://docs.google.com/spreadsheets/d/' + String(sh.sid).trim() + '/edit';
+      if(sh.gid) url += '?gid=' + sh.gid + '#gid=' + sh.gid;
+      var el = document.getElementById('sheetCsvUrl');
+      if(el) el.value = url;
+    }
+  }catch(e){}
+}
 
 /* ===== Đồng bộ nguồn Sheet (Admin → Apps Script → mọi máy) ===== */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
@@ -902,13 +917,12 @@ function bqlrphLoadSheetsLocal(){
 }
 function bqlrphOkId(s){ return s && String(s).trim().length>=30 && /^[a-zA-Z0-9-_]+$/.test(String(s).trim()); }
 function bqlrphOkGid(s){ return s!=null && String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()); }
-/** Lấy cấu hình sheet từ cloud (timeout 6s); lỗi/Unknown action → local/rỗng, không chặn tải dữ liệu */
 function bqlrphFetchSheetSources(){
   var url=bqlrphScriptUrl();
   var local=bqlrphLoadSheetsLocal()||{};
   if(!url) return Promise.resolve(local);
   var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
-  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 6000);
+  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 4000);
   return fetch(url, {
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -922,18 +936,10 @@ function bqlrphFetchSheetSources(){
       bqlrphSaveSheetsLocal(res.sheets);
       return res.sheets;
     }
-    // Unknown action / chưa deploy → dùng local
     return local;
   }).catch(function(){ clearTimeout(to); return local; });
 }
-(){
-  var sh=readSharedSheet('qlbvr');
-  if(!sh||!sh.sid) return;
-  var url='https://docs.google.com/spreadsheets/d/'+sh.sid+'/edit';
-  if(sh.gid) url+='?gid='+sh.gid+'#gid='+sh.gid;
-  var el=document.getElementById('sheetCsvUrl');
-  if(el) el.value=url;
-}
+
 
 let detailedCases = [
             { id: 1, hoTen: "Lầu Cún Khiềng", doiTuong: "Lầu Cún Sáng", nhomId: 1, nhomTen: "Vi phạm mới / Đang mời (lần 1–3)", tinhTrang: "Đã gửi giấy mời làm việc lần 1 và lần 2. Hộ chưa đến làm việc." },
@@ -3818,15 +3824,34 @@ function toggleAdvFilter() {
         });
 
         window.onload = function() {
-            try{ applySharedQlbvrSheet(); }catch(e){}
-
-            // Mặc định Dashboard lãnh đạo + đồng bộ sheet
-            setTimeout(() => {
+            var started = false;
+            function startApp(){
+                if(started) return;
+                started = true;
+                try{ applySharedQlbvrSheet(); }catch(e){}
                 reloadData(true);
                 startAutoRefresh();
                 if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
-                 if (typeof switchMainView === 'function') switchMainView('dashboard');
-            }, 400);
+                if (typeof switchMainView === 'function') switchMainView('dashboard');
+            }
+            try{
+                if(typeof bqlrphFetchSheetSources === 'function'){
+                    bqlrphFetchSheetSources().then(function(all){
+                        var sh = all && all.qlbvr;
+                        if(sh && typeof bqlrphOkId === 'function' && bqlrphOkId(sh.sid)){
+                            var url = 'https://docs.google.com/spreadsheets/d/' + String(sh.sid).trim() + '/edit';
+                            if(sh.gid) url += '?gid=' + sh.gid + '#gid=' + sh.gid;
+                            var el = document.getElementById('sheetCsvUrl');
+                            if(el) el.value = url;
+                        }
+                        startApp();
+                    }).catch(function(){ startApp(); });
+                } else {
+                    startApp();
+                }
+            }catch(e){ startApp(); }
+            // Không để treo
+            setTimeout(startApp, 5000);
         };
     </script>
 

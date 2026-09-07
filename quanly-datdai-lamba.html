@@ -497,7 +497,7 @@ function bqlrphFetchSheetSources(){
   var local=bqlrphLoadSheetsLocal()||{};
   if(!url) return Promise.resolve(local);
   var ctrl=typeof AbortController!=='undefined'?new AbortController():null;
-  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 6000);
+  var to=setTimeout(function(){ try{ if(ctrl) ctrl.abort(); }catch(e){} }, 3000);
   return fetch(url, {
     method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -3806,7 +3806,7 @@ window.addEventListener('load',function(){
     runTai();
   }).catch(function(){ runTai(); });
   // Không để treo: sau 7s vẫn tải bằng SID mặc định
-  setTimeout(runTai, 7000);
+  setTimeout(runTai, 4000);
   setInterval(function(){
     if(document.getElementById('md')&&document.getElementById('md').classList.contains('open'))return;
     var a=document.activeElement;
