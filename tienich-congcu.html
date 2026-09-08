@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bộ tiện ích · BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f5f9;--card:#fff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--g:#059669;--sky:#0284c7;--shadow:0 8px 28px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;background:radial-gradient(900px 400px at 0% -10%,#dbeafe 0%,transparent 55%),radial-gradient(700px 360px at 100% 0%,#d1fae5 0%,transparent 50%),var(--bg);padding-bottom:40px}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px}
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-i{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#14b8a6,#0f766e);box-shadow:0 8px 18px rgba(20,184,166,.3);font-size:17px}
+.logo h1{font-size:16px;font-weight:800}
+.logo p{font-size:11.5px;color:var(--mu)}
+.btn{height:36px;padding:0 12px;border-radius:11px;border:1px solid var(--bd);background:#fff;font:600 12.5px "Be Vietnam Pro",system-ui;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit}
+.btn-g{background:linear-gradient(135deg,#14b8a6,#0d9488);color:#fff;border-color:transparent}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 12px}
+.tab{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 12.5px "Be Vietnam Pro",system-ui;cursor:pointer;color:#475569}
+.tab.on{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(13,148,136,.28)}
+.panel{display:none;background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:18px 16px;box-shadow:var(--shadow)}
+.panel.on{display:block}
+.panel h2{font-size:15px;font-weight:800;margin-bottom:4px}
+.panel .sub{font-size:12.5px;color:var(--mu);margin-bottom:14px;line-height:1.45}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.03em;margin-bottom:5px}
+.field input,.field select{
+  width:100%;height:42px;border-radius:12px;border:1px solid var(--bd);padding:0 12px;
+  font:500 14px "Be Vietnam Pro",system-ui;background:#f8fafc;outline:none
+}
+.field input:focus,.field select:focus{border-color:#2dd4bf;box-shadow:0 0 0 3px rgba(45,212,191,.18);background:#fff}
+.field{margin-bottom:12px}
+.row-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.result{
+  margin-top:14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(13,148,136,.08),rgba(14,165,233,.06));
+  border:1px solid rgba(13,148,136,.2);font-size:14px;line-height:1.55
+}
+.result b{color:#0f766e}
+.result .big{font-size:22px;font-weight:800;color:#0f766e;margin:4px 0}
+.hint{font-size:12px;color:var(--mu);margin-top:10px;line-height:1.45}
+table.mini{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+table.mini th,table.mini td{border:1px solid var(--bd);padding:8px 10px;text-align:left}
+table.mini th{background:#f8fafc;font-size:11px;text-transform:uppercase;color:var(--mu)}
+.note{margin:12px 0;padding:11px 13px;border-radius:12px;font-size:12.5px;color:#334155;background:#fff;border:1px solid var(--bd)}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="wrap top-in">
+    <div class="logo">
+      <div class="logo-i"><i class="fa-solid fa-wrench"></i></div>
+      <div>
+        <h1>Bộ tiện ích nhanh</h1>
+        <p>Không cần đăng nhập · chạy trên trình duyệt</p>
+      </div>
+    </div>
+    <a class="btn" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="note"><b>Gợi ý:</b> Quy đổi diện tích khi làm hồ sơ · đếm ngày làm việc cho hạn báo cáo · đọc số bằng chữ khi soạn quyết định · tỷ lệ bản đồ khi in sơ đồ thửa.</div>
+
+  <div class="tabs">
+    <button type="button" class="tab on" data-tab="dien-tich" onclick="showTab(this)"><i class="fa-solid fa-ruler-combined"></i> Diện tích</button>
+    <button type="button" class="tab" data-tab="ngay" onclick="showTab(this)"><i class="fa-solid fa-calendar-days"></i> Ngày làm việc</button>
+    <button type="button" class="tab" data-tab="chu" onclick="showTab(this)"><i class="fa-solid fa-language"></i> Số → chữ</button>
+    <button type="button" class="tab" data-tab="tyle" onclick="showTab(this)"><i class="fa-solid fa-map"></i> Tỷ lệ bản đồ</button>
+  </div>
+
+  <!-- Diện tích -->
+  <div class="panel on" id="tab-dien-tich">
+    <h2>Quy đổi diện tích</h2>
+    <p class="sub">m² · ha · sào (Nam Bộ ≈ 1.000 m²) · công (≈ 1.000 m², tùy địa phương có thể khác)</p>
+    <div class="grid2">
+      <div class="field">
+        <label>Giá trị</label>
+        <input type="number" id="dtVal" step="any" value="1" oninput="doiDienTich()">
+      </div>
+      <div class="field">
+        <label>Đơn vị nguồn</label>
+        <select id="dtFrom" onchange="doiDienTich()">
+          <option value="m2">m²</option>
+          <option value="ha" selected>ha</option>
+          <option value="sao">Sào (1.000 m²)</option>
+          <option value="cong">Công (1.000 m²)</option>
+        </select>
+      </div>
+    </div>
+    <div class="result" id="dtOut"></div>
+    <p class="hint">Chỉ mang tính hỗ trợ nghiệp vụ. Hồ sơ chính thức theo đơn vị và hệ số địa phương quy định.</p>
+  </div>
+
+  <!-- Ngày làm việc -->
+  <div class="panel" id="tab-ngay">
+    <h2>Đếm ngày làm việc</h2>
+    <p class="sub">Tính số ngày giữa hai mốc hoặc cộng N ngày làm việc (mặc định trừ T7 &amp; CN)</p>
+    <div class="grid2">
+      <div class="field">
+        <label>Ngày bắt đầu</label>
+        <input type="date" id="dStart" onchange="tinhNgay()">
+      </div>
+      <div class="field">
+        <label>Ngày kết thúc (khoảng)</label>
+        <input type="date" id="dEnd" onchange="tinhNgay()">
+      </div>
+      <div class="field">
+        <label>Cộng thêm N ngày làm việc</label>
+        <input type="number" id="dAdd" value="5" min="0" step="1" oninput="tinhNgay()">
+      </div>
+      <div class="field">
+        <label>Trừ cuối tuần</label>
+        <select id="dWeekend" onchange="tinhNgay()">
+          <option value="1" selected>Có (T7 + CN)</option>
+          <option value="0">Không (đếm mọi ngày)</option>
+        </select>
+      </div>
+    </div>
+    <div class="result" id="ngayOut"></div>
+    <p class="hint">Chưa trừ ngày lễ. Dùng tham khảo hạn nội bộ; hạn pháp lý theo văn bản cụ thể.</p>
+  </div>
+
+  <!-- Số thành chữ -->
+  <div class="panel" id="tab-chu">
+    <h2>Đọc số thành chữ (tiếng Việt)</h2>
+    <p class="sub">Hỗ trợ số nguyên và một phần thập phân (diện tích, số tiền làm tròn)</p>
+    <div class="grid2">
+      <div class="field">
+        <label>Số cần đọc</label>
+        <input type="text" id="chuVal" value="12.5" oninput="docSo()" placeholder="vd: 12.5 hoặc 1500000">
+      </div>
+      <div class="field">
+        <label>Kiểu</label>
+        <select id="chuType" onchange="docSo()">
+          <option value="area">Diện tích (… héc-ta / mét vuông)</option>
+          <option value="money">Tiền Việt (… đồng)</option>
+          <option value="plain">Chỉ đọc số</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Đơn vị diện tích (khi chọn diện tích)</label>
+      <select id="chuUnit" onchange="docSo()">
+        <option value="ha">ha</option>
+        <option value="m2">m²</option>
+      </select>
+    </div>
+    <div class="result" id="chuOut"></div>
+  </div>
+
+  <!-- Tỷ lệ bản đồ -->
+  <div class="panel" id="tab-tyle">
+    <h2>Tỷ lệ bản đồ / sơ đồ</h2>
+    <p class="sub">Đổi chiều dài thực ↔ đoạn trên giấy theo tỷ lệ (vd 1/5000)</p>
+    <div class="grid2">
+      <div class="field">
+        <label>Tỷ lệ 1 :</label>
+        <input type="number" id="tlScale" value="5000" min="1" step="1" oninput="tinhTyLe()">
+      </div>
+      <div class="field">
+        <label>Chiều dài thực (mét)</label>
+        <input type="number" id="tlThuc" value="100" step="any" oninput="tinhTyLe()">
+      </div>
+      <div class="field">
+        <label>Đoạn trên giấy (mm)</label>
+        <input type="number" id="tlGiay" step="any" oninput="tinhTyLeTuGiay()">
+      </div>
+    </div>
+    <div class="result" id="tlOut"></div>
+    <table class="mini">
+      <thead><tr><th>Tỷ lệ</th><th>100 m thực ≈ trên giấy</th></tr></thead>
+      <tbody>
+        <tr><td>1/1.000</td><td>100 mm</td></tr>
+        <tr><td>1/5.000</td><td>20 mm</td></tr>
+        <tr><td>1/10.000</td><td>10 mm</td></tr>
+        <tr><td>1/25.000</td><td>4 mm</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function showTab(btn){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('tab-'+btn.getAttribute('data-tab')).classList.add('on');
+}
+
+/* ===== Diện tích ===== */
+var TO_M2={m2:1,ha:10000,sao:1000,cong:1000};
+function doiDienTich(){
+  var v=parseFloat(document.getElementById('dtVal').value);
+  var from=document.getElementById('dtFrom').value;
+  if(!isFinite(v)){document.getElementById('dtOut').innerHTML='Nhập số hợp lệ';return;}
+  var m2=v*TO_M2[from];
+  document.getElementById('dtOut').innerHTML=
+    '<div>Tương đương:</div>'+
+    '<div class="big">'+(m2/10000).toLocaleString('vi-VN',{maximumFractionDigits:6})+' ha</div>'+
+    '<div><b>'+m2.toLocaleString('vi-VN',{maximumFractionDigits:2})+'</b> m²</div>'+
+    '<div><b>'+(m2/1000).toLocaleString('vi-VN',{maximumFractionDigits:4})+'</b> sào / công (theo 1.000 m²)</div>';
+}
+
+/* ===== Ngày làm việc ===== */
+function isWeekend(d){var x=d.getDay();return x===0||x===6;}
+function addWorkDays(start,n,skipWe){
+  var d=new Date(start.getFullYear(),start.getMonth(),start.getDate());
+  var left=n;
+  if(left===0) return d;
+  var step=left>0?1:-1;
+  left=Math.abs(left);
+  while(left>0){
+    d.setDate(d.getDate()+step);
+    if(skipWe && isWeekend(d)) continue;
+    left--;
+  }
+  return d;
+}
+function countWorkDays(a,b,skipWe){
+  if(b<a){var t=a;a=b;b=t;}
+  var d=new Date(a.getFullYear(),a.getMonth(),a.getDate());
+  var end=new Date(b.getFullYear(),b.getMonth(),b.getDate());
+  var n=0;
+  while(d<=end){
+    if(!(skipWe && isWeekend(d))) n++;
+    d.setDate(d.getDate()+1);
+  }
+  return n;
+}
+function fmtD(d){
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+}
+function tinhNgay(){
+  var skip=document.getElementById('dWeekend').value==='1';
+  var s=document.getElementById('dStart').value;
+  var e=document.getElementById('dEnd').value;
+  var add=parseInt(document.getElementById('dAdd').value,10)||0;
+  var html='';
+  if(s){
+    var start=new Date(s+'T00:00:00');
+    if(e){
+      var end=new Date(e+'T00:00:00');
+      var cal=Math.round((end-start)/864e5)+1;
+      var work=countWorkDays(start,end,skip);
+      html+='<div>Từ <b>'+fmtD(start)+'</b> đến <b>'+fmtD(end)+'</b></div>';
+      html+='<div class="big">'+work+' ngày'+(skip?' làm việc':'')+'</div>';
+      html+='<div>Tổng ngày lịch: <b>'+cal+'</b></div>';
+    }
+    var den=addWorkDays(start,add,skip);
+    html+='<div style="margin-top:8px">Bắt đầu <b>'+fmtD(start)+'</b> + <b>'+add+'</b> ngày'+(skip?' làm việc':'')+' → <b>'+fmtD(den)+'</b></div>';
+  } else html='Chọn ngày bắt đầu';
+  document.getElementById('ngayOut').innerHTML=html;
+}
+
+/* ===== Số thành chữ ===== */
+var CHU=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+function docBa(n){
+  n=n|0;
+  var tram=(n/100)|0, chuc=((n%100)/10)|0, don=n%10;
+  var s='';
+  if(tram) s+=CHU[tram]+' trăm';
+  if(chuc>1){ s+=(s?' ':'')+CHU[chuc]+' mươi'; if(don===1) s+=' mốt'; else if(don===5) s+=' lăm'; else if(don) s+=' '+CHU[don]; }
+  else if(chuc===1){ s+=(s?' ':'')+'mười'; if(don===5) s+=' lăm'; else if(don) s+=' '+CHU[don]; }
+  else if(don){ s+=(s?' ':'')+(tram?'lẻ ':'')+CHU[don]; }
+  return s||'không';
+}
+function docSoNguyen(n){
+  n=Math.floor(Math.abs(n));
+  if(n===0) return 'không';
+  var dv=['',' nghìn',' triệu',' tỷ',' nghìn tỷ'];
+  var parts=[], i=0;
+  while(n>0 && i<dv.length){
+    var block=n%1000;
+    if(block) parts.unshift(docBa(block)+dv[i]);
+    n=Math.floor(n/1000); i++;
+  }
+  return parts.join(' ').replace(/\s+/g,' ').trim();
+}
+function docSo(){
+  var raw=String(document.getElementById('chuVal').value||'').replace(/\s/g,'').replace(',','.');
+  var type=document.getElementById('chuType').value;
+  var unit=document.getElementById('chuUnit').value;
+  var num=parseFloat(raw);
+  if(!isFinite(num)){document.getElementById('chuOut').innerHTML='Nhập số hợp lệ';return;}
+  var am=num<0?'âm ':'';
+  var abs=Math.abs(num);
+  var nguyen=Math.floor(abs);
+  var thap=String(raw).split('.')[1]||'';
+  var s=am+docSoNguyen(nguyen);
+  if(thap){
+    s+=' phẩy';
+    for(var i=0;i<thap.length;i++) s+=' '+CHU[parseInt(thap[i],10)||0];
+  }
+  if(type==='money') s+=' đồng';
+  else if(type==='area') s+=' '+(unit==='ha'?'héc-ta':'mét vuông');
+  s=s.charAt(0).toUpperCase()+s.slice(1);
+  document.getElementById('chuOut').innerHTML='<div class="big" style="font-size:16px;line-height:1.45">'+s+'</div>';
+}
+
+/* ===== Tỷ lệ ===== */
+var tlLock=false;
+function tinhTyLe(){
+  if(tlLock) return;
+  tlLock=true;
+  var scale=parseFloat(document.getElementById('tlScale').value)||1;
+  var thuc=parseFloat(document.getElementById('tlThuc').value); // m
+  if(isFinite(thuc)){
+    var mm=(thuc*1000)/scale; // m → mm trên giấy
+    document.getElementById('tlGiay').value=Math.round(mm*1000)/1000;
+    document.getElementById('tlOut').innerHTML=
+      '<div><b>'+thuc+' m</b> thực trên bản đồ <b>1/'+scale.toLocaleString('vi-VN')+'</b></div>'+
+      '<div class="big">'+mm.toLocaleString('vi-VN',{maximumFractionDigits:3})+' mm</div>'+
+      '<div>≈ '+(mm/10).toLocaleString('vi-VN',{maximumFractionDigits:3})+' cm trên giấy</div>';
+  }
+  tlLock=false;
+}
+function tinhTyLeTuGiay(){
+  if(tlLock) return;
+  tlLock=true;
+  var scale=parseFloat(document.getElementById('tlScale').value)||1;
+  var mm=parseFloat(document.getElementById('tlGiay').value);
+  if(isFinite(mm)){
+    var thuc=(mm*scale)/1000; // mm giấy → m thực
+    document.getElementById('tlThuc').value=Math.round(thuc*1000)/1000;
+    document.getElementById('tlOut').innerHTML=
+      '<div><b>'+mm+' mm</b> trên giấy (1/'+scale.toLocaleString('vi-VN')+')</div>'+
+      '<div class="big">'+thuc.toLocaleString('vi-VN',{maximumFractionDigits:3})+' m thực</div>';
+  }
+  tlLock=false;
+}
+
+(function init(){
+  var t=new Date();
+  document.getElementById('dStart').value=t.toISOString().slice(0,10);
+  doiDienTich(); tinhNgay(); docSo(); tinhTyLe();
+})();
+</script>
+</body>
+</html>

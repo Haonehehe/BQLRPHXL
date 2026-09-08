@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tra cứu pháp luật lâm nghiệp · BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1f5f9;--card:#fff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;
+  --sky:#0284c7;--g:#059669;--amber:#d97706;--red:#dc2626;
+  --shadow:0 8px 28px rgba(15,23,42,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;
+  background:
+    radial-gradient(900px 420px at 0% -10%,#dbeafe 0%,transparent 55%),
+    radial-gradient(700px 360px at 100% 0%,#d1fae5 0%,transparent 50%),
+    var(--bg);
+  padding-bottom:48px;
+}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+.top{
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,.86);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--bd);box-shadow:0 4px 18px rgba(15,23,42,.04);
+}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-i{
+  width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;font-size:18px;
+  background:linear-gradient(135deg,#6366f1,#4338ca);box-shadow:0 8px 20px rgba(99,102,241,.35);
+}
+.logo h1{font-size:16.5px;font-weight:800}
+.logo p{font-size:11.5px;color:var(--mu);margin-top:2px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.btn{
+  height:38px;padding:0 14px;border-radius:12px;border:1px solid transparent;
+  font:600 12.5px/1 "Be Vietnam Pro",system-ui;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:inherit;
+  transition:transform .15s,box-shadow .2s,filter .15s;
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+.btn-o{background:#fff;border-color:var(--bd);color:#334155}
+.btn-b{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.28)}
+.btn-g{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 6px 16px rgba(16,185,129,.28)}
+
+.note{
+  margin:14px 0 10px;padding:12px 14px;border-radius:14px;font-size:12.5px;line-height:1.55;color:#334155;
+  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(16,185,129,.06));
+  border:1px solid rgba(99,102,241,.18);
+}
+.bar{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0 14px;
+  padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--bd);box-shadow:var(--shadow);
+}
+.bar input[type=search],.bar select{
+  height:40px;border-radius:12px;border:1px solid var(--bd);padding:0 12px;
+  font:500 13px "Be Vietnam Pro",system-ui;background:#f8fafc;outline:none;
+}
+.bar input[type=search]{flex:1;min-width:200px}
+.bar input:focus,.bar select:focus{border-color:#818cf8;box-shadow:0 0 0 3px rgba(99,102,241,.15);background:#fff}
+.bar select{min-width:140px}
+.sync{font-size:12px;color:var(--mu);padding:6px 10px;border-radius:999px;background:#f1f5f9;border:1px solid var(--bd)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{
+  background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);
+}
+.kpi .l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--mu)}
+.kpi .v{font-size:22px;font-weight:800;margin-top:2px;color:#4338ca}
+
+.list{display:flex;flex-direction:column;gap:12px}
+.card{
+  background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;
+  box-shadow:var(--shadow);transition:border-color .15s,box-shadow .2s;
+}
+.card:hover{border-color:#c7d2fe;box-shadow:0 10px 28px rgba(99,102,241,.1)}
+.card-top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.badge{
+  display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;
+  font-size:11px;font-weight:700;border:1px solid transparent;
+}
+.badge.law{background:#eef2ff;color:#4338ca;border-color:#c7d2fe}
+.badge.nd{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.badge.tt{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.badge.vbhn{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.badge.other{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+.badge.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.badge.part{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.badge.off{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.so{font-weight:800;font-size:14px;color:#0f172a}
+.ten{font-size:14px;font-weight:700;line-height:1.4;margin:4px 0 8px}
+.meta{font-size:12px;color:var(--mu);display:flex;flex-wrap:wrap;gap:10px 14px;margin-bottom:8px}
+.meta i{width:14px;text-align:center;opacity:.8}
+.trich{font-size:13px;line-height:1.55;color:#334155;margin-bottom:8px}
+.ghi{font-size:12px;color:#64748b;line-height:1.45;padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px dashed var(--bd);margin-bottom:10px}
+.card-acts{display:flex;flex-wrap:wrap;gap:8px}
+.muted{text-align:center;color:var(--mu);padding:36px 12px;font-size:13px}
+#toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(16px);
+  background:#0f172a;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 10px 28px rgba(0,0,0,.25);
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;font-size:11.5px;color:var(--mu);margin-top:20px;padding-bottom:8px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="wrap top-in">
+    <div class="logo">
+      <div class="logo-i"><i class="fa-solid fa-scale-balanced"></i></div>
+      <div>
+        <h1>Tra cứu pháp luật lâm nghiệp</h1>
+        <p>Văn bản hiện hành · hỗ trợ nghiệp vụ BQLRPH</p>
+      </div>
+    </div>
+    <div class="acts">
+      <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
+      <button class="btn btn-o" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
+      <a class="btn btn-b" target="_blank" rel="noopener" href="https://vbpl.vn/"><i class="fa-solid fa-landmark"></i> vbpl.vn</a>
+      <a class="btn btn-g" target="_blank" rel="noopener" id="linkSheet" href="https://docs.google.com/spreadsheets/d/13z-ujF-G03A_w0wOWdrRcns3a5JshzAI/edit?gid=1138171418#gid=1138171418"><i class="fa-solid fa-table"></i> Sheet</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="note">
+    <b>Không cần đăng nhập.</b> Dữ liệu lấy từ kho văn bản nội bộ Ban (Google Sheet).
+    Đây là <b>hỗ trợ tra cứu</b>, không thay thế tư vấn pháp lý — luôn đối chiếu hiệu lực trên
+    <a href="https://vbpl.vn/" target="_blank" rel="noopener">vbpl.vn</a> hoặc link gốc của từng văn bản.
+  </div>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="Tìm số hiệu, tên văn bản, trích yếu, lĩnh vực…" oninput="veLai()">
+    <select id="fLoai" onchange="veLai()"><option value="">Tất cả loại</option></select>
+    <select id="fTT" onchange="veLai()">
+      <option value="">Mọi tình trạng</option>
+      <option value="Còn hiệu lực">Còn hiệu lực</option>
+      <option value="Hiệu lực một phần">Hiệu lực một phần</option>
+      <option value="Hết hiệu lực">Hết hiệu lực</option>
+    </select>
+    <select id="fLV" onchange="veLai()"><option value="">Tất cả lĩnh vực</option></select>
+    <span class="sync" id="syncTxt">Chưa tải</span>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+  <div class="list" id="list"></div>
+  <footer>BQLRPH Xuân Lộc · Phòng Lâm nghiệp · Nguồn Sheet nội bộ</footer>
+</div>
+<div id="toast"></div>
+
+<script>
+var SID='13z-ujF-G03A_w0wOWdrRcns3a5JshzAI';
+var GID='1138171418';
+var dong=[];
+var lastSync=null;
+
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},2800);}
+function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function cellGviz(r,i){
+  if(!r||!r.c||!r.c[i]) return '';
+  var v=r.c[i];
+  if(v.f!=null && String(v.f).trim()!=='') return String(v.f).trim();
+  if(v.v==null) return '';
+  return String(v.v).trim();
+}
+
+function fetchGviz(){
+  return new Promise(function(resolve,reject){
+    var cb='pl_'+Math.floor(Math.random()*1e9);
+    var sc=document.createElement('script');
+    var to=setTimeout(function(){cleanup();reject(new Error('Timeout tải Sheet'));},45000);
+    function cleanup(){
+      clearTimeout(to);
+      try{delete window[cb];}catch(e){window[cb]=undefined;}
+      if(sc.parentNode) sc.parentNode.removeChild(sc);
+    }
+    window[cb]=function(resp){
+      cleanup();
+      try{
+        if(!resp||!resp.table||!resp.table.rows) throw new Error('Sheet rỗng');
+        var out=[];
+        resp.table.rows.forEach(function(r){
+          var stt=cellGviz(r,0);
+          var so=cellGviz(r,1);
+          var loai=cellGviz(r,2);
+          var cq=cellGviz(r,3);
+          var ten=cellGviz(r,4);
+          var ngay=cellGviz(r,5);
+          var lv=cellGviz(r,6);
+          var trich=cellGviz(r,7);
+          var tt=cellGviz(r,8);
+          var sua=cellGviz(r,9);
+          var ghi=cellGviz(r,10);
+          var link=cellGviz(r,11);
+          if(!so && !ten) return;
+          if(/số hiệu|tên văn bản/i.test(so+ten)) return;
+          out.push({stt:stt,so:so,loai:loai,coQuan:cq,ten:ten,ngay:ngay,linhVuc:lv,trich:trich,tinhTrang:tt,suaDoi:sua,ghiChu:ghi,link:link});
+        });
+        resolve(out);
+      }catch(e){reject(e);}
+    };
+    sc.onerror=function(){cleanup();reject(new Error('Lỗi tải gviz — kiểm tra chia sẻ Sheet (Anyone with link)'));};
+    sc.src='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=responseHandler:'+cb+'&headers=1&gid='+encodeURIComponent(GID)+'&_t='+Date.now();
+    document.head.appendChild(sc);
+  });
+}
+
+function badgeLoai(loai){
+  var s=String(loai||'').toLowerCase();
+  if(/luật/.test(s)) return 'law';
+  if(/nghị định|nghi dinh/.test(s)) return 'nd';
+  if(/thông tư|thong tu/.test(s)) return 'tt';
+  if(/hợp nhất|hop nhat|vbhn/.test(s)) return 'vbhn';
+  return 'other';
+}
+function badgeTT(tt){
+  var s=String(tt||'').toLowerCase();
+  if(/còn hiệu lực|con hieu luc/.test(s) && !/một phần|mot phan/.test(s)) return 'ok';
+  if(/một phần|mot phan/.test(s)) return 'part';
+  if(/hết|het/.test(s)) return 'off';
+  return 'other';
+}
+
+function taiLai(silent){
+  var ic=document.getElementById('icoReload');
+  if(ic) ic.classList.add('fa-spin');
+  document.getElementById('syncTxt').textContent='Đang tải…';
+  fetchGviz().then(function(rows){
+    dong=rows;
+    lastSync=new Date();
+    napBoLoc();
+    veLai();
+    document.getElementById('syncTxt').textContent=dong.length+' văn bản · '+lastSync.toLocaleTimeString('vi-VN');
+    if(!silent) toast('Đã tải '+dong.length+' văn bản');
+  }).catch(function(e){
+    document.getElementById('syncTxt').textContent='Lỗi tải';
+    if(!silent) toast(e.message||'Không tải được Sheet');
+  }).then(function(){if(ic) ic.classList.remove('fa-spin');});
+}
+
+function napBoLoc(){
+  var loai={}, lv={};
+  dong.forEach(function(d){
+    if(d.loai) loai[d.loai]=1;
+    if(d.linhVuc) lv[d.linhVuc]=1;
+  });
+  var s1=document.getElementById('fLoai'), c1=s1.value;
+  s1.innerHTML='<option value="">Tất cả loại</option>'+Object.keys(loai).sort().map(function(k){return '<option value="'+esc(k)+'">'+esc(k)+'</option>';}).join('');
+  if(c1) s1.value=c1;
+  var s2=document.getElementById('fLV'), c2=s2.value;
+  s2.innerHTML='<option value="">Tất cả lĩnh vực</option>'+Object.keys(lv).sort().map(function(k){return '<option value="'+esc(k)+'">'+esc(k)+'</option>';}).join('');
+  if(c2) s2.value=c2;
+}
+
+function locDong(){
+  var q=(document.getElementById('q').value||'').toLowerCase().trim();
+  var fLoai=document.getElementById('fLoai').value;
+  var fTT=document.getElementById('fTT').value;
+  var fLV=document.getElementById('fLV').value;
+  return dong.filter(function(d){
+    if(fLoai && d.loai!==fLoai) return false;
+    if(fTT && String(d.tinhTrang||'').indexOf(fTT)<0) return false;
+    if(fLV && d.linhVuc!==fLV) return false;
+    if(!q) return true;
+    var bag=[d.so,d.ten,d.trich,d.linhVuc,d.coQuan,d.ghiChu,d.suaDoi].join(' ').toLowerCase();
+    return q.split(/\s+/).every(function(w){return bag.indexOf(w)>=0;});
+  });
+}
+
+function veLai(){
+  var list=locDong();
+  var ok=0, part=0, off=0;
+  list.forEach(function(d){
+    var t=String(d.tinhTrang||'').toLowerCase();
+    if(/hết|het/.test(t)) off++;
+    else if(/một phần|mot phan/.test(t)) part++;
+    else if(/còn|con/.test(t)) ok++;
+  });
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi"><div class="l">Đang hiện</div><div class="v">'+list.length+'</div></div>'+
+    '<div class="kpi"><div class="l">Còn hiệu lực</div><div class="v" style="color:#059669">'+ok+'</div></div>'+
+    '<div class="kpi"><div class="l">Một phần</div><div class="v" style="color:#d97706">'+part+'</div></div>'+
+    '<div class="kpi"><div class="l">Hết hiệu lực</div><div class="v" style="color:#dc2626">'+off+'</div></div>';
+
+  if(!list.length){
+    document.getElementById('list').innerHTML='<div class="muted">Không có văn bản khớp bộ lọc</div>';
+    return;
+  }
+  var html='';
+  list.forEach(function(d){
+    var link=d.link||'';
+    if(link && !/^https?:\/\//i.test(link)) link='https://'+link;
+    html+='<article class="card">'+
+      '<div class="card-top">'+
+        '<span class="badge '+badgeLoai(d.loai)+'">'+esc(d.loai||'Văn bản')+'</span>'+
+        '<span class="badge '+badgeTT(d.tinhTrang)+'">'+esc(d.tinhTrang||'—')+'</span>'+
+        '<span class="so">'+esc(d.so||'')+'</span>'+
+      '</div>'+
+      '<div class="ten">'+esc(d.ten||'')+'</div>'+
+      '<div class="meta">'+
+        (d.coQuan?'<span><i class="fa-solid fa-building-columns"></i> '+esc(d.coQuan)+'</span>':'')+
+        (d.ngay?'<span><i class="fa-regular fa-calendar"></i> '+esc(d.ngay)+'</span>':'')+
+        (d.linhVuc?'<span><i class="fa-solid fa-tags"></i> '+esc(d.linhVuc)+'</span>':'')+
+      '</div>'+
+      (d.trich?'<div class="trich">'+esc(d.trich)+'</div>':'')+
+      ((d.suaDoi||d.ghiChu)?'<div class="ghi">'+(d.suaDoi?'<b>Sửa đổi / thay thế:</b> '+esc(d.suaDoi)+'<br>':'')+(d.ghiChu?esc(d.ghiChu):'')+'</div>':'')+
+      '<div class="card-acts">'+
+        (link?'<a class="btn btn-b" href="'+esc(link)+'" target="_blank" rel="noopener"><i class="fa-solid fa-up-right-from-square"></i> Mở văn bản</a>':'')+
+        '<a class="btn btn-o" href="https://vbpl.vn/" target="_blank" rel="noopener"><i class="fa-solid fa-magnifying-glass"></i> Tra trên vbpl</a>'+
+      '</div>'+
+    '</article>';
+  });
+  document.getElementById('list').innerHTML=html;
+}
+
+window.taiLai=taiLai;
+window.veLai=veLai;
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){taiLai(true);});
+else taiLai(true);
+</script>
+</body>
+</html>
