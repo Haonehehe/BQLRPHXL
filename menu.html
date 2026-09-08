@@ -123,8 +123,6 @@ body{
 .card.mocgioi .card-icon{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
 .card.lamba .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
 .card.trongrung .card-icon{background:linear-gradient(135deg,#fbbf24,#d97706)}
-.card.tasks .card-icon{background:linear-gradient(135deg,#60a5fa,#2563eb)}
-.card.tasks .go{background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 4px 14px rgba(37,99,235,.28)}
 .card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
 .card .code{
   font-size:10px;font-weight:700;letter-spacing:.04em;
@@ -159,7 +157,7 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
   position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
   padding:16px;background:rgba(2,6,23,.75);backdrop-filter:blur(10px);
 }
-.modal.open,.modal.on{display:flex;animation:fadeIn .2s ease}
+.modal.open{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .mbox{
   width:100%;max-width:400px;border-radius:20px;padding:22px 20px;
@@ -204,6 +202,37 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
   .card{padding:12px}
   .brand-icon{width:56px;height:56px;font-size:24px}
 }
+
+/* nút (i) hướng dẫn */
+.btn-info{
+  position:fixed;right:16px;bottom:44px;z-index:45;
+  width:36px;height:36px;border-radius:999px;
+  background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;
+  font-size:15px;font-weight:800;font-style:italic;font-family:Georgia,serif;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  display:grid;place-items:center;cursor:pointer;
+  transition:transform .15s, box-shadow .2s, filter .15s;
+}
+.btn-info:hover{transform:scale(1.08);filter:brightness(1.1);box-shadow:0 10px 28px rgba(0,0,0,.45)}
+.btn-info:active{transform:scale(.96)}
+.mbox.guide-box{max-width:520px;max-height:85vh;overflow:auto}
+.mbox.guide-box h3{display:flex;align-items:center;gap:8px}
+.guide-body{font-size:13px;line-height:1.55;color:#cbd5e1}
+.guide-body ol,.guide-body ul{margin:8px 0 8px 18px}
+.guide-body li{margin:4px 0}
+.guide-body b{color:#e2e8f0}
+.guide-support{
+  margin-top:14px;padding:12px;border-radius:12px;
+  background:rgba(16,185,129,.1);border:1px solid rgba(52,211,153,.25);
+  font-size:12.5px;color:#a7f3d0;
+}
+.guide-support a{color:#6ee7b7;font-weight:600}
+/* gọn hơn */
+.wrap{padding:22px 16px 56px}
+.grp-card{display:none}
+.card p{min-height:0}
+
 </style>
 </head>
 <body>
@@ -259,7 +288,7 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
   <div class="mbox">
     <h3>Cấu hình đồng bộ</h3>
     <div class="sub">Web App URL từ Google Apps Script (Deploy → Web app)</div>
-    <div class="field"><label>Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec"></div>
+    <div class="field"><label>Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
     <div class="err" id="cfgErr" style="color:#94a3b8">Để trống = lưu tài khoản trên máy này</div>
     <div class="macts">
       <button type="button" class="btn btn-o" onclick="closeModal()">Đóng</button>
@@ -397,15 +426,15 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
 /* ===== BQLRPH Auth (Google Sheet via Apps Script + local fallback) ===== */
 var CONFIG = {
   // Dán Web App URL sau khi Deploy Apps Script (kết thúc bằng /exec)
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec',
-  // Ví dụ: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec',
+  // Ví dụ: 'https://script.google.com/macros/s/AKfycbx.../exec'
 };
 
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF', tasks: 'Nhiệm vụ / Gantt' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -432,7 +461,7 @@ function _loadDB() {
     users: [{
       id: 'u_admin', email: DEFAULT_ADMIN.email, name: DEFAULT_ADMIN.name,
       pass: DEFAULT_ADMIN.pass, status: 'approved', role: 'admin',
-      perms: ALL_PERMS.slice(), unit:'Ban Quản lý', created: new Date().toISOString(), approvedAt: new Date().toISOString()
+      perms: ALL_PERMS.slice(), created: new Date().toISOString(), approvedAt: new Date().toISOString()
     }]
   };
   _saveDB(db);
@@ -499,7 +528,7 @@ function registerUser(name, email, pass) {
   if (db.users.some(function (u) { return u.email === email; })) throw new Error('Email đã được đăng ký');
   db.users.push({
     id: 'u_' + Date.now(), email: email, name: name, pass: pass,
-    status: 'pending', role: 'user', perms: ['pdf'], unit:'',
+    status: 'pending', role: 'user', perms: ['pdf'],
     created: new Date().toISOString(), approvedAt: null
   });
   _saveDB(db);
@@ -516,7 +545,7 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: u.perms || ['pdf'], unit: u.unit || '', loginAt: new Date().toISOString(),
+        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
         _pass: pass // dùng cho thao tác admin trên API
       };
       setSession(sess);
@@ -531,7 +560,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: u.perms || ['pdf'], unit: u.unit || '', loginAt: new Date().toISOString(), _pass: pass
+    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -680,31 +709,13 @@ var MODULES={
   tienich:[
     {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'}
   ],
-  groups:[
-    {
-      key:'qlbvr_grp', title:'Quản lý bảo vệ rừng', sub:'Vi phạm · nhà ở · mốc giới',
-      icon:'fa-shield-halved', tone:'qlbvr',
-      items:[
-        {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
-        {id:'nhao',href:'quanly-nhao-lampart.html',cls:'nhao',icon:'fa-house-chimney',code:'NHÀ Ở',title:'Nhà ở lâm phận',desc:'6 phân trường · phép xây.'},
-        {id:'mocgioi',href:'quanly-mocgioi.html',cls:'moc',icon:'fa-location-dot',code:'MỐC GIỚI',title:'Mốc giới',desc:'Tọa độ · lọc · Excel · in.'}
-      ]
-    },
-    {
-      key:'datdai_grp', title:'Quản lý đất đai', sub:'Lâm bạ · hợp đồng khoán',
-      icon:'fa-map-location-dot', tone:'qldd',
-      items:[
-        {id:'lamba',href:'quanly-datdai-lamba.html',cls:'qldd',icon:'fa-map-location-dot',code:'LÂM BẠ',title:'Lâm bạ / Đất đai',desc:'HĐ khoán · bản đồ · in sơ đồ.'}
-      ]
-    },
-    {
-      key:'lamsinh_grp', title:'Lâm sinh', sub:'Trồng · chăm sóc rừng',
-      icon:'fa-seedling', tone:'trong',
-      items:[
-        {id:'trongrung',href:'quanly-trongrung.html',cls:'trong',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ · Excel · Word.'},
-        {id:'tasks',href:'quanly-nhiemvu-gantt.html',cls:'tasks',icon:'fa-chart-gantt',code:'GANTT',title:'Nhiệm vụ / Gantt',desc:'Chỉ đạo · tiến độ · thời hạn · sản phẩm.'}
-      ]
-    }
+  chuyenmon:[
+    {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
+    {id:'nhao',href:'quanly-nhao-lampart.html',cls:'nhao',icon:'fa-house-chimney',code:'NHÀ Ở',title:'Nhà ở lâm phận',desc:'6 phân trường · phép xây.'},
+    {id:'mocgioi',href:'quanly-mocgioi.html',cls:'mocgioi',icon:'fa-location-dot',code:'MỐC GIỚI',title:'Mốc giới',desc:'Tọa độ · lọc · Excel · in.'},
+    {id:'lamba',href:'quanly-datdai-lamba.html',cls:'lamba',icon:'fa-map-location-dot',code:'LÂM BẠ',title:'Lâm bạ / Đất đai',desc:'HĐ khoán · bản đồ · in sơ đồ.'},
+    {id:'trongrung',href:'quanly-trongrung.html',cls:'trongrung',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ · Excel · Word.'},
+    {id:'tasks',href:'quanly-nhiemvu-gantt.html',cls:'tasks',icon:'fa-chart-gantt',code:'GANTT',title:'Nhiệm vụ / Gantt',desc:'Chỉ đạo · tiến độ · Sheet.'}
   ]
 };
 
@@ -716,16 +727,7 @@ function openRegister(){closeModal();document.getElementById('regErr').textConte
 function openCfg(){closeModal();document.getElementById('cfgUrl').value=CONFIG.SCRIPT_URL||'';document.getElementById('modalCfg').classList.add('on');}
 function openChangePass(){closeModal();document.getElementById('passErr').textContent='';['passOld','passNew','passNew2'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('modalPass').classList.add('on');}
 function openForgot(){closeModal();document.getElementById('forgotErr').style.color='#94a3b8';document.getElementById('forgotErr').innerHTML='Admin → Khu vực Admin → <b>Đặt lại MK</b>';document.getElementById('forgotEmail').value=document.getElementById('loginEmail').value||'';document.getElementById('modalForgot').classList.add('on');}
-function saveCfg(){
-  var u=document.getElementById('cfgUrl').value.trim();
-  if(!u){alert('Vui lòng nhập Link Google Apps Script /exec');return;}
-  if(!/^https:\/\/script\.google\.com\/macros\/s\/[^\s]+\/exec(?:\?.*)?$/i.test(u)){
-    if(confirm('Link chưa có dạng https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec. Bạn vẫn muốn lưu?')===false)return;
-  }
-  CONFIG.SCRIPT_URL=u;
-  try{localStorage.setItem('bqlrph_script_url',u);window.dispatchEvent(new StorageEvent('storage',{key:'bqlrph_script_url',newValue:u}));}catch(e){}
-  closeModal();render();
-}
+function saveCfg(){var u=document.getElementById('cfgUrl').value.trim();CONFIG.SCRIPT_URL=u;try{localStorage.setItem('bqlrph_script_url',u);}catch(e){}closeModal();render();}
 function doLogin(){var err=document.getElementById('loginErr'),btn=document.getElementById('btnLogin');err.textContent='';btn.disabled=true;loginUser(document.getElementById('loginEmail').value,document.getElementById('loginPass').value).then(function(){closeModal();render();}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doRegister(){var err=document.getElementById('regErr'),btn=document.getElementById('btnReg');err.style.color='#fda4af';err.textContent='';btn.disabled=true;registerUser(document.getElementById('regName').value,document.getElementById('regEmail').value,document.getElementById('regPass').value).then(function(){err.style.color='#6ee7b7';err.textContent='Đã gửi đăng ký. Chờ admin duyệt rồi đăng nhập.';setTimeout(function(){closeModal();openLogin();},1400);}).catch(function(e){err.style.color='#fda4af';err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doLogout(){logoutUser();render();}
@@ -753,22 +755,16 @@ function moduleCard(m, ok){
 }
 function renderGrid(){
   var html='';
-  /* --- Nhóm tiện ích --- */
-  html+='<div class="sec-label"><i class="fa-solid fa-wrench"></i> Tiện ích <span>Dùng được khi chưa đăng nhập</span></div>';
+  html+='<div class="sec-label"><i class="fa-solid fa-wrench"></i> Tiện ích <span>Không cần đăng nhập</span></div>';
   html+='<div class="grid-inner">';
   (MODULES.tienich||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
   html+='</div>';
-  /* --- Nhóm chuyên môn --- */
-  html+='<div class="sec-label" style="margin-top:22px"><i class="fa-solid fa-briefcase"></i> Chuyên môn <span>Cần đăng nhập &amp; được cấp quyền</span></div>';
-  (MODULES.groups||[]).forEach(function(g){
-    html+='<div class="grp-card '+g.tone+'">';
-    html+='<div class="grp-head"><div class="grp-ico"><i class="fa-solid '+g.icon+'"></i></div><div><b>'+g.title+'</b><span>'+g.sub+'</span></div></div>';
-    html+='<div class="grp-items">';
-    (g.items||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
-    html+='</div></div>';
-  });
+  html+='<div class="sec-label" style="margin-top:18px"><i class="fa-solid fa-briefcase"></i> Chuyên môn <span>Cần đăng nhập &amp; cấp quyền</span></div>';
+  html+='<div class="grid-inner">';
+  (MODULES.chuyenmon||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
+  html+='</div>';
   if(isAdmin()){
-    html+='<div class="sec-label" style="margin-top:22px"><i class="fa-solid fa-user-shield"></i> Quản trị</div>';
+    html+='<div class="sec-label" style="margin-top:18px"><i class="fa-solid fa-user-shield"></i> Quản trị</div>';
     html+='<div class="grid-inner"><a class="card admin" href="admin.html"><div class="card-top"><div class="card-icon"><i class="fa-solid fa-user-shield"></i></div><span class="code">ADMIN</span></div><h2>Khu vực quản trị</h2><p>Duyệt TK · cấp quyền · nguồn Sheet.</p><span class="go">Vào Admin <i class="fa-solid fa-arrow-right"></i></span></a></div>';
   }
   document.getElementById('grid').innerHTML=html;

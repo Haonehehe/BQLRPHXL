@@ -135,8 +135,8 @@ input:focus,select:focus{border-color:#34d399!important;box-shadow:0 0 0 3px rgb
 /* ===== BQLRPH Auth (Google Sheet via Apps Script + local fallback) ===== */
 var CONFIG = {
   // Dán Web App URL sau khi Deploy Apps Script (kết thúc bằng /exec)
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec',
-  // Ví dụ: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec',
+  // Ví dụ: 'https://script.google.com/macros/s/AKfycbx.../exec'
 };
 
 
@@ -147,7 +147,8 @@ var DEFAULT_SHEET_SOURCES={
   lamba:{sid:'1CnlGELkhVjLEa7jQwVg4kIeyiXxqmOTR',gidDN:'1710752621',gidLD:'516720069',gidTH:'149303770',label:'Lâm bạ'},
   nhao:{sid:'1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT',label:'Nhà ở'},
   mocgioi:{sid:'1XOz-KdIhtWIyocSrV8ZvpOgusTLUOGCX',gid:'1646240187',label:'Mốc giới'},
-  trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'}
+  trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'},
+  tasks:{sid:'1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe',gid:'1800611191',label:'Nhiệm vụ / Gantt'}
 };
 function loadSheetSourcesLocal(){
   try{
@@ -211,8 +212,8 @@ function pushSheetSourcesCloud(cfg){
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF', tasks: 'Nhiệm vụ / Gantt' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -239,7 +240,7 @@ function _loadDB() {
     users: [{
       id: 'u_admin', email: DEFAULT_ADMIN.email, name: DEFAULT_ADMIN.name,
       pass: DEFAULT_ADMIN.pass, status: 'approved', role: 'admin',
-      perms: ALL_PERMS.slice(), unit:'Ban Quản lý', created: new Date().toISOString(), approvedAt: new Date().toISOString()
+      perms: ALL_PERMS.slice(), created: new Date().toISOString(), approvedAt: new Date().toISOString()
     }]
   };
   _saveDB(db);
@@ -286,7 +287,7 @@ function registerUser(name, email, pass) {
   if (db.users.some(function (u) { return u.email === email; })) throw new Error('Email đã được đăng ký');
   db.users.push({
     id: 'u_' + Date.now(), email: email, name: name, pass: pass,
-    status: 'pending', role: 'user', perms: ['pdf'], unit:'',
+    status: 'pending', role: 'user', perms: ['pdf'],
     created: new Date().toISOString(), approvedAt: null
   });
   _saveDB(db);
@@ -303,7 +304,7 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: u.perms || ['pdf'], unit: u.unit || '', loginAt: new Date().toISOString(),
+        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
         _pass: pass // dùng cho thao tác admin trên API
       };
       setSession(sess);
@@ -318,7 +319,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: u.perms || ['pdf'], unit: u.unit || '', loginAt: new Date().toISOString(), _pass: pass
+    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -342,12 +343,12 @@ function listUsers() {
   }));
 }
 
-function approveUser(email, perms, asAdmin, unit) {
+function approveUser(email, perms, asAdmin) {
   if (useCloud()) {
     var c = adminCred();
     return apiCall({
       action: 'approve', adminEmail: c.adminEmail, adminPass: c.adminPass,
-      email: email, perms: perms, asAdmin: !!asAdmin, unit: unit || ''
+      email: email, perms: perms, asAdmin: !!asAdmin
     }).then(function (res) {
       if (!res.ok) throw new Error(res.error || 'Duyệt thất bại');
       return true;
@@ -359,7 +360,6 @@ function approveUser(email, perms, asAdmin, unit) {
   u.status = 'approved';
   u.approvedAt = new Date().toISOString();
   u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['pdf'];
-  u.unit = unit || u.unit || '';
   if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
   if (asAdmin) { u.role = 'admin'; u.perms = ALL_PERMS.slice(); }
   _saveDB(db);
@@ -424,11 +424,6 @@ function updatePerms(email, perms) {
   return Promise.resolve(true);
 }
 
-
-function updateUnit(email, unit) {
-  if (useCloud()) { var c=adminCred(); return apiCall({action:'setunit',adminEmail:c.adminEmail,adminPass:c.adminPass,email:email,unit:unit||''}).then(function(res){if(!res.ok)throw new Error(res.error||'Lưu đơn vị thất bại');return true;}); }
-  var db=_loadDB(),u=db.users.find(function(x){return x.email===email;}); if(!u)return Promise.reject(new Error('Không tìm thấy')); u.unit=String(unit||''); _saveDB(db); return Promise.resolve(true);
-}
 
 function changePassword(email, oldP, newP) {
   email = String(email || '').trim().toLowerCase();
@@ -524,7 +519,8 @@ function sheetSourcesCard(){
     {k:'lamba', title:'Lâm bạ — Đất đai', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gidDN',l:'GID Đồng Nai'},{f:'gidLD',l:'GID Lâm Đồng'},{f:'gidTH',l:'GID Tổng hợp'}]},
     {k:'nhao', title:'Nhà ở trên lâm phận', fields:[{f:'sid',l:'Spreadsheet ID'}]},
     {k:'mocgioi', title:'Mốc giới', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
-    {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
+    {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
+    {k:'tasks', title:'Nhiệm vụ / Gantt', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
   ];
   var h='<div class="card"><div class="card-h"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><span style="font-size:11px;font-weight:600;color:#64748b">Đồng bộ cho mọi user</span></div>';
   h+='<div style="padding:14px 16px;font-size:12px;color:#475569;line-height:1.5">Admin đổi link tại đây → lưu → các module đọc chung (localStorage + Apps Script nếu đã cập nhật <code>getsheets</code>/<code>setsheets</code>). Module con <b>không còn nút Đổi link Sheet</b>.</div>';
@@ -618,10 +614,9 @@ function loadUsers(){
 
 function userRow(u,id){
   var st=u.status||'pending';
-  var em=String(u.email||'').replace(/'/g,"\\'");
   var tags='<span class="tag '+st+'">'+st+'</span>';
   if(u.role==='admin') tags+='<span class="tag admin">admin</span>';
-  var unitOpts=['','Ban Quản lý','Phòng Lâm nghiệp','Phân trường Trảng Táo','Phân trường Núi Le','Phân trường Gia Huynh','Phân trường Gia Phu','Phân trường Lán Cát']; var unitHtml='<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label style="font-size:11px;font-weight:600;color:#64748b">Đơn vị</label><select id="unit_'+id+'" style="height:32px;border:1px solid #e2e8f0;border-radius:9px;padding:0 8px;font-size:12px">'+unitOpts.map(function(x){return '<option value="'+esc(x)+'" '+(String(u.unit||'')===x?'selected':'')+'>'+(x||'Chưa gán')+'</option>';}).join('')+'</select><button type="button" class="btn btn-o btn-sm" onclick="doSaveUnit(\''+em+'\',\''+id+'\')">Lưu đơn vị</button></div>'; var permsHtml='<div class="perms" id="perms_'+id+'">';
+  var permsHtml='<div class="perms" id="perms_'+id+'">';
   ALL_PERMS.forEach(function(p){
     var ck=(u.perms||[]).indexOf(p)>=0?'checked':'';
     if(p==='pdf') ck='checked';
@@ -629,6 +624,7 @@ function userRow(u,id){
     permsHtml+='<label><input type="checkbox" data-p="'+p+'" '+ck+dis+'> '+PERM_LABEL[p]+'</label>';
   });
   permsHtml+='</div>';
+  var em=String(u.email||'').replace(/'/g,"\\'");
   var acts='<div class="acts">';
   if(st==='pending'){
     acts+='<button type="button" class="btn btn-g btn-sm" onclick="doApprove(\''+em+'\',\''+id+'\')"><i class="fa-solid fa-check"></i> Duyệt</button>';
@@ -642,7 +638,7 @@ function userRow(u,id){
   }
   acts+='</div>';
   return '<div class="user"><div class="row1"><div><div class="name">'+esc(u.name)+tags+'</div>'+
-    '<div class="meta">'+esc(u.email)+(u.created?' · '+new Date(u.created).toLocaleString('vi-VN'):'')+'</div></div>'+acts+'</div>'+unitHtml+permsHtml+'</div>';
+    '<div class="meta">'+esc(u.email)+(u.created?' · '+new Date(u.created).toLocaleString('vi-VN'):'')+'</div></div>'+acts+'</div>'+permsHtml+'</div>';
 }
 function readPerms(id){
   var box=document.getElementById('perms_'+id),out=[];
@@ -651,11 +647,10 @@ function readPerms(id){
   if(out.indexOf('pdf')<0) out.push('pdf');
   return out;
 }
-function doApprove(email,id){approveUser(email,readPerms(id),false,document.getElementById('unit_'+id)?.value||'').then(function(){toast('Đã duyệt');loadUsers();}).catch(function(e){toast(e.message||e);});}
+function doApprove(email,id){approveUser(email,readPerms(id),false).then(function(){toast('Đã duyệt');loadUsers();}).catch(function(e){toast(e.message||e);});}
 function doReject(email){if(!confirm('Từ chối '+email+'?'))return;rejectUser(email).then(function(){toast('Đã từ chối');loadUsers();}).catch(function(e){toast(e.message||e);});}
 function doDisable(email){if(!confirm('Khóa '+email+'?'))return;disableUser(email).then(function(){toast('Đã khóa');loadUsers();}).catch(function(e){toast(e.message||e);});}
 function doSavePerms(email,id){updatePerms(email,readPerms(id)).then(function(){toast('Đã lưu quyền');loadUsers();}).catch(function(e){toast(e.message||e);});}
-function doSaveUnit(email,id){updateUnit(email,document.getElementById('unit_'+id)?.value||'').then(function(){toast('Đã lưu đơn vị');loadUsers();}).catch(function(e){toast(e.message||e);});}
 function doResetPass(email){var np=prompt('Mật khẩu mới cho '+email+' (tối thiểu 6 ký tự):','');if(np==null)return;resetPassword(email,np).then(function(){toast('Đã đặt lại mật khẩu');}).catch(function(e){toast(e.message||e);});}
 
 loadUsers();
