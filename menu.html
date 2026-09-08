@@ -125,6 +125,7 @@ body{
 .card.trongrung .card-icon{background:linear-gradient(135deg,#fbbf24,#d97706)}
 .card.tasks .card-icon{background:linear-gradient(135deg,#818cf8,#4f46e5)}
 .card.phapluat .card-icon{background:linear-gradient(135deg,#818cf8,#4338ca)}
+.card.congcu .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
 .card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
 .card .code{
   font-size:10px;font-weight:700;letter-spacing:.04em;
@@ -560,7 +561,7 @@ function setSession(s) {
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
 function canAccess(mod) {
-  if (mod === 'pdf' || mod === 'phapluat') return true;
+  if (mod === 'pdf' || mod === 'phapluat' || mod === 'congcu') return true;
   var s = getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
@@ -775,7 +776,8 @@ function authModeLabel() {
 var MODULES={
   tienich:[
     {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'},
-    {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'}
+    {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'},
+    {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Diện tích · ngày · số chữ · tỷ lệ.'}
   ],
   chuyenmon:[
     {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
