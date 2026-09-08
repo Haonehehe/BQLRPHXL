@@ -123,6 +123,7 @@ body{
 .card.mocgioi .card-icon{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
 .card.lamba .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
 .card.trongrung .card-icon{background:linear-gradient(135deg,#fbbf24,#d97706)}
+.card.tasks .card-icon{background:linear-gradient(135deg,#818cf8,#4f46e5)}
 .card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
 .card .code{
   font-size:10px;font-weight:700;letter-spacing:.04em;
@@ -157,7 +158,7 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
   position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
   padding:16px;background:rgba(2,6,23,.75);backdrop-filter:blur(10px);
 }
-.modal.open{display:flex;animation:fadeIn .2s ease}
+.modal.open,.modal.on{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .mbox{
   width:100%;max-width:400px;border-radius:20px;padding:22px 20px;
@@ -232,6 +233,33 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
 .wrap{padding:22px 16px 56px}
 .grp-card{display:none}
 .card p{min-height:0}
+
+
+.mbox.guide-box{max-width:560px;max-height:82vh;overflow:auto;padding:20px 18px 16px}
+.mbox.guide-box h3{margin-bottom:2px;color:#f8fafc}
+.mbox.guide-box .sub{color:#94a3b8;margin-bottom:14px;font-size:12px}
+.mbox.guide-box h4{
+  font-size:13px;font-weight:700;color:#6ee7b7;margin:14px 0 6px;
+  padding-bottom:4px;border-bottom:1px solid rgba(148,163,184,.15);
+}
+.mbox.guide-box p,.mbox.guide-box li{font-size:12.5px;line-height:1.55;color:#cbd5e1;margin:4px 0}
+.mbox.guide-box ul,.mbox.guide-box ol{margin:6px 0 8px 18px;color:#cbd5e1}
+.mbox.guide-box b{color:#e2e8f0}
+.mbox.guide-box a{color:#6ee7b7;text-decoration:none;font-weight:600}
+.mbox.guide-box a:hover{text-decoration:underline}
+.mbox.guide-box code{background:rgba(15,23,42,.6);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#a7f3d0}
+.mbox.guide-box table{width:100%;border-collapse:collapse;margin:8px 0 10px;font-size:12px}
+.mbox.guide-box th,.mbox.guide-box td{
+  border:1px solid rgba(148,163,184,.2);padding:6px 8px;text-align:left;color:#cbd5e1;
+}
+.mbox.guide-box th{background:rgba(15,23,42,.7);color:#94a3b8;font-size:11px;text-transform:uppercase}
+.mbox.guide-box .support{
+  margin-top:14px;padding:12px 14px;border-radius:12px;
+  background:rgba(16,185,129,.1);border:1px solid rgba(52,211,153,.28);
+  font-size:12.5px;color:#a7f3d0;line-height:1.55;
+}
+.mbox.guide-box .support b{color:#6ee7b7}
+.mbox.guide-box .support a{color:#6ee7b7}
 
 </style>
 </head>
@@ -379,7 +407,9 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
       <tr><td>Nhà ở trên lâm phận</td><td>Công trình / nhà tạm theo phân trường</td></tr>
       <tr><td>Quản lý mốc giới</td><td>Danh sách mốc, tọa độ, lọc, Excel, in</td></tr>
       <tr><td>Công cụ PDF</td><td>Tách, nối, xoay, OCR hồ sơ scan</td></tr>
-      <tr><td>Admin</td><td>Chỉ tài khoản quản trị — duyệt TK, cấp quyền</td></tr>
+      <tr><td>Trồng &amp; chăm sóc rừng</td><td>Tiến độ trồng, chăm sóc, xuất báo cáo</td></tr>
+      <tr><td>Nhiệm vụ / Gantt</td><td>Chỉ đạo, tiến độ, timeline, Excel/Word</td></tr>
+      <tr><td>Admin</td><td>Chỉ tài khoản quản trị — duyệt TK, cấp quyền, nguồn Sheet</td></tr>
     </table>
     <ul>
       <li>Dùng ô tìm / bộ lọc (phân trường, loại mốc, từ khóa…) nếu có.</li>
@@ -434,7 +464,7 @@ var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
 var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -720,7 +750,7 @@ var MODULES={
 };
 
 function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
-function closeModal(){['modalLogin','modalReg','modalCfg','modalPass','modalForgot','modalGuide'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('on');});}
+function closeModal(){['modalLogin','modalReg','modalCfg','modalPass','modalForgot','modalGuide'].forEach(function(id){var el=document.getElementById(id);if(el){el.classList.remove('on');el.classList.remove('open');}});}
 function openGuide(){closeModal();document.getElementById('modalGuide').classList.add('on');}
 function openLogin(){closeModal();document.getElementById('loginErr').textContent='';document.getElementById('modalLogin').classList.add('on');}
 function openRegister(){closeModal();document.getElementById('regErr').textContent='';document.getElementById('modalReg').classList.add('on');}

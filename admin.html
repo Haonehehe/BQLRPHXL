@@ -212,8 +212,8 @@ function pushSheetSourcesCloud(cfg){
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -325,6 +325,49 @@ function loginUser(email, pass) {
   return Promise.resolve(sess);
 }
 
+
+function fmtDateSafe(v){
+  if(v==null || v==='') return '';
+  if(typeof v==='number' && isFinite(v)){
+    // Google Sheet serial date
+    var ms = Math.round((v - 25569) * 86400 * 1000);
+    var d = new Date(ms);
+    if(!isNaN(d.getTime())) return d.toLocaleString('vi-VN');
+  }
+  var s = String(v).trim();
+  if(!s) return '';
+  // already locale-ish
+  if(/Invalid/i.test(s)) return '';
+  var d = new Date(s);
+  if(!isNaN(d.getTime())) return d.toLocaleString('vi-VN');
+  // dd/mm/yyyy or dd-mm-yyyy
+  var m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if(m){
+    d = new Date(+m[3], +m[2]-1, +m[1], +(m[4]||0), +(m[5]||0), +(m[6]||0));
+    if(!isNaN(d.getTime())) return d.toLocaleString('vi-VN');
+  }
+  return s;
+}
+function normalizePerms(p){
+  if(Array.isArray(p)) return p.map(function(x){return String(x||'').trim().toLowerCase();}).filter(Boolean);
+  if(p==null || p==='') return ['pdf'];
+  return String(p).split(/[,;|]/).map(function(x){return x.trim().toLowerCase();}).filter(Boolean);
+}
+function normalizeUser(u, i){
+  u = u || {};
+  u.id = u.id || ('u_' + i + '_' + (u.email || ''));
+  u.email = String(u.email || '').trim().toLowerCase();
+  u.name = u.name || u.fullName || u.hoTen || u.email || '';
+  u.status = String(u.status || 'pending').toLowerCase();
+  u.role = String(u.role || 'user').toLowerCase();
+  u.perms = normalizePerms(u.perms);
+  if(u.perms.indexOf('pdf')<0) u.perms.push('pdf');
+  // unify created field
+  u.created = u.created || u.createdAt || u.created_at || u.registeredAt || u.time || '';
+  u.createdLabel = fmtDateSafe(u.created);
+  return u;
+}
+
 function listUsers() {
   if (useCloud()) {
     var c = adminCred();
@@ -333,13 +376,12 @@ function listUsers() {
     }).then(function (res) {
       if (!res.ok) throw new Error(res.error || 'Không tải được danh sách');
       return (res.users || []).map(function (u, i) {
-        u.id = 'u_' + i + '_' + (u.email || '');
-        return u;
+        return normalizeUser(u, i);
       });
     });
   }
-  return Promise.resolve(_loadDB().users.slice().sort(function (a, b) {
-    return (b.created || '').localeCompare(a.created || '');
+  return Promise.resolve(_loadDB().users.slice().map(function(u,i){return normalizeUser(u,i);}).sort(function (a, b) {
+    return String(b.created || '').localeCompare(String(a.created || ''));
   }));
 }
 
@@ -638,7 +680,7 @@ function userRow(u,id){
   }
   acts+='</div>';
   return '<div class="user"><div class="row1"><div><div class="name">'+esc(u.name)+tags+'</div>'+
-    '<div class="meta">'+esc(u.email)+(u.created?' · '+new Date(u.created).toLocaleString('vi-VN'):'')+'</div></div>'+acts+'</div>'+permsHtml+'</div>';
+    '<div class="meta">'+esc(u.email)+((u.createdLabel||fmtDateSafe(u.created))?' · '+(u.createdLabel||fmtDateSafe(u.created)):'')+'</div></div>'+acts+'</div>'+permsHtml+'</div>';
 }
 function readPerms(id){
   var box=document.getElementById('perms_'+id),out=[];
