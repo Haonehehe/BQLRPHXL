@@ -349,9 +349,18 @@ function fmtDateSafe(v){
   return s;
 }
 function normalizePerms(p){
-  if(Array.isArray(p)) return p.map(function(x){return String(x||'').trim().toLowerCase();}).filter(Boolean);
-  if(p==null || p==='') return ['pdf'];
-  return String(p).split(/[,;|]/).map(function(x){return x.trim().toLowerCase();}).filter(Boolean);
+  var valid = ALL_PERMS.slice();
+  var arr;
+  if(Array.isArray(p)) arr = p;
+  else if(p==null || p==='') arr = [];
+  else arr = String(p).split(/[,;|\/]/);
+  var out = [];
+  arr.forEach(function(x){
+    x = String(x||'').trim().toLowerCase();
+    if(valid.indexOf(x)>=0 && out.indexOf(x)<0) out.push(x);
+  });
+  if(out.indexOf('pdf')<0) out.push('pdf');
+  return out;
 }
 function normalizeUser(u, i){
   u = u || {};

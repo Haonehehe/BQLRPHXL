@@ -465,6 +465,19 @@ var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
 var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
 var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', pdf: 'Công cụ PDF' };
+var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','pdf'];
+function sanitizePerms(p){
+  var arr = Array.isArray(p) ? p : String(p==null?'':p).split(/[,;|\/]/);
+  var out = [];
+  arr.forEach(function(x){
+    x = String(x||'').trim().toLowerCase();
+    // chỉ nhận mã module — bỏ tên đơn vị / phòng ban
+    if(VALID_PERMS.indexOf(x)>=0 && out.indexOf(x)<0) out.push(x);
+  });
+  if(out.indexOf('pdf')<0) out.push('pdf');
+  return out;
+}
+
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -528,7 +541,8 @@ function canAccess(mod) {
   var s = getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
-  return Array.isArray(s.perms) && s.perms.indexOf(mod) >= 0;
+  var perms = sanitizePerms(s.perms);
+  return perms.indexOf(mod) >= 0;
 }
 function logoutUser() { setSession(null); }
 
@@ -575,8 +589,8 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
-        _pass: pass // dùng cho thao tác admin trên API
+        perms: sanitizePerms(u.perms), loginAt: new Date().toISOString(),
+        _pass: pass
       };
       setSession(sess);
       return sess;
@@ -590,7 +604,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
+    perms: sanitizePerms(u.perms), loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -800,11 +814,12 @@ function renderGrid(){
   document.getElementById('grid').innerHTML=html;
 }
 function render(){
+  (function(){var s=getSession();if(s){s.perms=sanitizePerms(s.perms);setSession(s);}})();
   document.getElementById('modeBadge').textContent=useCloud()?'Sheet sync':'Local';
   renderAuthBar();renderGrid();
   var s=currentUser();
   document.getElementById('hintBox').innerHTML=s
-    ?(s.role==='admin'?'Bạn là <b>Admin</b> — duyệt tài khoản tại Khu vực quản trị.':'Quyền module: <b>'+(s.perms||[]).map(function(p){return PERM_LABEL[p]||p;}).join(', ')+'</b>.')
+    ?(s.role==='admin'?'Bạn là <b>Admin</b> — duyệt tài khoản tại Khu vực quản trị.':'Quyền module: <b>'+(sanitizePerms(s.perms).map(function(p){return PERM_LABEL[p]||p;}).filter(function(x){return x!=='Công cụ PDF';}).join(', ')||'PDF')+'</b>.')
     :'Khách chỉ dùng <b>Công cụ PDF</b>. Module nghiệp vụ cần đăng nhập sau khi admin duyệt.';
 }
 document.addEventListener('keydown',function(e){
