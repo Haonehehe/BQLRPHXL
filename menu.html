@@ -124,6 +124,7 @@ body{
 .card.lamba .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
 .card.trongrung .card-icon{background:linear-gradient(135deg,#fbbf24,#d97706)}
 .card.tasks .card-icon{background:linear-gradient(135deg,#818cf8,#4f46e5)}
+.card.phapluat .card-icon{background:linear-gradient(135deg,#818cf8,#4338ca)}
 .card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
 .card .code{
   font-size:10px;font-weight:700;letter-spacing:.04em;
@@ -469,15 +470,37 @@ var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','pdf'];
 function sanitizePerms(p){
   var arr = Array.isArray(p) ? p : String(p==null?'':p).split(/[,;|\/]/);
   var out = [];
+  var ALIAS = {
+    'qlbvr':'qlbvr','vi phạm qlbvr':'qlbvr','vi pham qlbvr':'qlbvr',
+    'lamba':'lamba','lâm bạ':'lamba','lam ba':'lamba','đất đai':'lamba','dat dai':'lamba','lâm bạ / đất đai':'lamba',
+    'nhao':'nhao','nhà ở':'nhao','nha o':'nhao',
+    'mocgioi':'mocgioi','mốc giới':'mocgioi','moc gioi':'mocgioi',
+    'trongrung':'trongrung','trồng & chăm sóc':'trongrung','trồng rừng':'trongrung','trong rung':'trongrung',
+    'tasks':'tasks','gantt':'tasks','nhiệm vụ':'tasks','nhiem vu':'tasks','nhiệm vụ / gantt':'tasks',
+    'pdf':'pdf','công cụ pdf':'pdf','cong cu pdf':'pdf'
+  };
   arr.forEach(function(x){
     x = String(x||'').trim().toLowerCase();
-    // chỉ nhận mã module — bỏ tên đơn vị / phòng ban
-    if(VALID_PERMS.indexOf(x)>=0 && out.indexOf(x)<0) out.push(x);
+    if(!x) return;
+    var key = ALIAS[x] || (VALID_PERMS.indexOf(x)>=0 ? x : '');
+    if(key && out.indexOf(key)<0) out.push(key);
   });
   if(out.indexOf('pdf')<0) out.push('pdf');
   return out;
 }
-
+function looksLikePermList(v){
+  var s = String(v==null?'':v).toLowerCase();
+  return /(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|pdf)/.test(s);
+}
+/** API cũ từng map nhầm: perms = tên đơn vị, created = chuỗi quyền module */
+function extractPermsFromUser(u){
+  u = u || {};
+  if(looksLikePermList(u.perms)) return sanitizePerms(u.perms);
+  if(looksLikePermList(u.created)) return sanitizePerms(u.created);
+  if(looksLikePermList(u.permissions)) return sanitizePerms(u.permissions);
+  if(looksLikePermList(u.quyen)) return sanitizePerms(u.quyen);
+  return sanitizePerms(u.perms);
+}
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -537,7 +560,7 @@ function setSession(s) {
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
 function canAccess(mod) {
-  if (mod === 'pdf') return true;
+  if (mod === 'pdf' || mod === 'phapluat') return true;
   var s = getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
@@ -589,7 +612,7 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: sanitizePerms(u.perms), loginAt: new Date().toISOString(),
+        perms: extractPermsFromUser(u), loginAt: new Date().toISOString(),
         _pass: pass
       };
       setSession(sess);
@@ -604,7 +627,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: sanitizePerms(u.perms), loginAt: new Date().toISOString(), _pass: pass
+    perms: extractPermsFromUser(u), loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -751,7 +774,8 @@ function authModeLabel() {
 
 var MODULES={
   tienich:[
-    {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'}
+    {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'},
+    {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'}
   ],
   chuyenmon:[
     {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
