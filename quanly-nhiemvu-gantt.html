@@ -6,73 +6,190 @@
 <title>Nhiệm vụ / Gantt · BQLRPH Xuân Lộc</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--g:#059669;--g2:#047857;--sky:#0284c7;--vio:#7c3aed;--amber:#d97706;--red:#dc2626;--bg:#f0fdf4;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--shadow:0 4px 20px rgba(15,23,42,.06)}
+:root{
+  --g:#059669;--g2:#047857;--sky:#0284c7;--vio:#7c3aed;--amber:#d97706;--red:#dc2626;
+  --bg:#f1f5f9;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;
+  --card:#ffffff;--shadow:0 8px 30px rgba(15,23,42,.06);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;padding-bottom:40px;background:radial-gradient(1000px 500px at 0% -10%,rgba(37,99,235,.08),transparent 50%),radial-gradient(800px 400px at 100% 0%,rgba(5,150,105,.06),transparent 45%),#f3f7f5}
-button,input,select{font:inherit}button{cursor:pointer;border:none;background:none}
-a{color:inherit;text-decoration:none}
+body{
+  font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;
+  background:
+    radial-gradient(900px 420px at 0% -10%,#dbeafe 0%,transparent 55%),
+    radial-gradient(800px 400px at 100% 0%,#d1fae5 0%,transparent 50%),
+    var(--bg);
+  padding-bottom:48px;
+}
 .wrap{max-width:1280px;margin:0 auto;padding:0 16px}
-.top{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:40}
-.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap;padding:10px 0}
+
+.top{
+  position:sticky;top:0;z-index:40;
+  background:rgba(255,255,255,.82);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(226,232,240,.9);
+  box-shadow:0 4px 20px rgba(15,23,42,.04);
+}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:12px}
-.logo-i{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#3b82f6,#1d4ed8);color:#fff;display:grid;place-items:center;font-size:16px;box-shadow:0 8px 20px rgba(37,99,235,.35)}
-.logo h1{font-size:15px;font-weight:800}
-.logo p{font-size:11px;color:var(--mu);margin-top:1px}
-.acts{display:flex;gap:8px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border-radius:11px;font-size:12px;font-weight:600;border:1px solid transparent;transition:.15s;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn-g{background:linear-gradient(135deg,#10b981,#047857);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.28)}
-.btn-b{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.28)}
+.logo-i{
+  width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;font-size:18px;
+  background:linear-gradient(135deg,#0ea5e9,#0369a1);box-shadow:0 8px 20px rgba(14,165,233,.35);
+}
+.logo h1{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.logo p{font-size:11.5px;color:var(--mu);margin-top:2px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.btn{
+  height:38px;padding:0 14px;border-radius:12px;border:1px solid transparent;
+  font:600 12.5px/1 "Be Vietnam Pro",system-ui;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:inherit;
+  transition:transform .15s,box-shadow .2s,filter .15s,background .15s;
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.03)}
+.btn:active{transform:scale(.98)}
 .btn-o{background:#fff;border-color:var(--bd);color:#334155}
-.btn-o:hover{background:#f8fafc}
-.note{font-size:12px;color:#475569;line-height:1.5;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 14px;margin:12px 0}
-.bar{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;box-shadow:var(--shadow)}
-.bar input,.bar select{height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 12px;font-size:12.5px;background:#fff}
-.bar input{flex:1;min-width:180px}
-.bar input:focus,.bar select:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-.sync{margin-left:auto;font-size:11px;color:var(--mu);font-weight:500}
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
-@media(min-width:800px){.kpis{grid-template-columns:repeat(5,1fr)}}
-.kpi{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
-.kpi .l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
-.kpi .v{font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-.02em}
-.kpi.t .v{color:#1d4ed8}.kpi.g .v{color:var(--g)}.kpi.a .v{color:var(--amber)}.kpi.r .v{color:var(--red)}.kpi.s .v{color:var(--sky)}
-.card{background:#fff;border:1px solid var(--bd);border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
-.card-h{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(180deg,#f8fafc,#fff)}
-.card-h h2{font-size:13px;font-weight:800}
-.scroll{overflow:auto;max-height:68vh}
+.btn-o:hover{box-shadow:0 6px 16px rgba(15,23,42,.08)}
+.btn-b{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;box-shadow:0 6px 16px rgba(14,165,233,.3)}
+.btn-g{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 6px 16px rgba(16,185,129,.3)}
+.btn-v{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;box-shadow:0 6px 16px rgba(109,40,217,.28)}
+.btn-x{background:linear-gradient(135deg,#22c55e,#15803d);color:#fff;box-shadow:0 6px 16px rgba(34,197,94,.28)}
+
+.note{
+  margin:14px 0 10px;padding:12px 14px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(14,165,233,.08),rgba(16,185,129,.06));
+  border:1px solid rgba(14,165,233,.18);font-size:12.5px;color:#334155;line-height:1.5;
+}
+
+.bar{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0 14px;
+  padding:12px;border-radius:16px;background:var(--card);border:1px solid var(--bd);box-shadow:var(--shadow);
+}
+.bar input[type=search],.bar select{
+  height:40px;border-radius:12px;border:1px solid var(--bd);padding:0 12px;
+  font:500 13px "Be Vietnam Pro",system-ui;background:#f8fafc;color:var(--tx);outline:none;
+  transition:border .15s,box-shadow .15s;
+}
+.bar input[type=search]{flex:1;min-width:200px}
+.bar input[type=search]:focus,.bar select:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(14,165,233,.15);background:#fff}
+.bar select{min-width:150px}
+.sync{
+  font-size:12px;color:var(--mu);padding:6px 10px;border-radius:999px;
+  background:#f1f5f9;border:1px solid var(--bd);white-space:nowrap;
+}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.kpis{grid-template-columns:1fr}}
+.kpi{
+  background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.kpi .l{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mu)}
+.kpi .v{font-size:28px;font-weight:800;margin-top:4px;letter-spacing:-.5px}
+.kpi.t::before{background:#0ea5e9}.kpi.t .v{color:#0284c7}
+.kpi.g::before{background:#10b981}.kpi.g .v{color:#059669}
+.kpi.s::before{background:#06b6d4}.kpi.s .v{color:#0891b2}
+.kpi.a::before{background:#f59e0b}.kpi.a .v{color:#d97706}
+.kpi.r::before{background:#ef4444}.kpi.r .v{color:#dc2626}
+
+.card{
+  background:var(--card);border:1px solid var(--bd);border-radius:18px;
+  box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;
+}
+.card-h{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:14px 16px;border-bottom:1px solid var(--bd);
+  background:linear-gradient(180deg,#f8fafc,#fff);
+}
+.card-h h2{font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:8px}
+.card-h h2 i{color:#0284c7}
+.scroll{overflow:auto;max-height:min(62vh,720px)}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
-th{position:sticky;top:0;background:#0f172a;color:#fff;text-align:left;padding:10px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.03em;z-index:1;white-space:nowrap}
-td{padding:10px 12px;border-top:1px solid #f1f5f9;vertical-align:top;line-height:1.45}
-tr:hover td{background:#f8fafc}
-.sec-row td{background:#eff6ff!important;font-weight:700;color:#1e40af;border-top:2px solid #bfdbfe}
-.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;border:1px solid}
+thead th{
+  position:sticky;top:0;z-index:2;background:#0f172a;color:#e2e8f0;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;
+  padding:11px 10px;text-align:left;white-space:nowrap;
+}
+tbody td{padding:10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+tbody tr:hover td{background:#f8fafc}
+.sec-row td{
+  background:linear-gradient(90deg,#eff6ff,#f0fdf4)!important;
+  font-weight:800;font-size:12px;color:#0f172a;padding:9px 12px;
+  border-bottom:1px solid #dbeafe;
+}
+.tag{
+  display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;
+  font-size:11px;font-weight:700;white-space:nowrap;border:1px solid transparent;
+}
 .tag.ok{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
-.tag.early{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
-.tag.late{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
-.tag.soon{background:#fef3c7;color:#92400e;border-color:#fde68a}
-.tag.mu{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
-.muted{color:var(--mu);text-align:center;padding:28px}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;opacity:0;transition:.25s;z-index:60;box-shadow:0 12px 32px rgba(15,23,42,.3)}
-.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.foot{text-align:center;padding:18px;font-size:11px;color:#94a3b8}
-.fa-spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-.gantt-wrap{overflow:auto;padding:12px}
-.gantt-row{display:grid;grid-template-columns:220px 1fr;gap:8px;align-items:center;margin-bottom:8px;min-width:700px}
-.gantt-name{font-size:11px;line-height:1.35}
-.gantt-name b{display:block;font-size:11.5px}
-.gantt-track{position:relative;height:28px;background:#f1f5f9;border-radius:8px;overflow:hidden}
-.gantt-bar{position:absolute;top:4px;height:20px;border-radius:6px;font-size:9px;color:#fff;padding:3px 8px;white-space:nowrap;overflow:hidden;min-width:8px}
-.gantt-bar.ok{background:#059669}.gantt-bar.early{background:#2563eb}.gantt-bar.late{background:#dc2626}.gantt-bar.soon{background:#d97706}.gantt-bar.mu{background:#64748b}
+.tag.early{background:#ecfeff;color:#0e7490;border-color:#a5f3fc}
+.tag.soon{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.tag.late{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.tag.mu{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
+.muted{color:var(--mu);text-align:center;padding:28px;font-size:13px}
+
+.gantt-wrap{padding:14px 16px 18px}
+.tl-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;font-size:11.5px;color:var(--mu)}
+.tl-legend span{display:inline-flex;align-items:center;gap:6px}
+.tl-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+.tl-axis{
+  display:grid;grid-template-columns:minmax(200px,280px) 1fr;gap:8px;margin-bottom:6px;
+  font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;
+}
+.tl-months{position:relative;height:22px;border-radius:8px;background:#f8fafc;border:1px solid var(--bd);overflow:hidden}
+.tl-month{
+  position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;
+  border-right:1px solid #e2e8f0;font-size:10px;color:#64748b;white-space:nowrap;padding:0 4px;
+}
+.gantt-row{
+  display:grid;grid-template-columns:minmax(200px,280px) 1fr;gap:8px;align-items:center;
+  margin-bottom:6px;min-height:36px;
+}
+.gantt-name{font-size:11.5px;line-height:1.35;padding-right:6px}
+.gantt-name b{display:block;font-weight:700;color:#0f172a}
+.gantt-name span{color:#64748b;font-size:10.5px}
+.gantt-track{
+  position:relative;height:28px;border-radius:10px;
+  background:linear-gradient(180deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;overflow:visible;
+}
+.gantt-today{
+  position:absolute;top:-2px;bottom:-2px;width:2px;background:#ef4444;z-index:3;
+  box-shadow:0 0 0 3px rgba(239,68,68,.15);
+}
+.gantt-bar{
+  position:absolute;top:4px;height:20px;min-width:22px;border-radius:999px;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:800;color:#fff;padding:0 8px;
+  box-shadow:0 4px 12px rgba(15,23,42,.18);white-space:nowrap;
+  transform:translateX(-50%);
+}
+.gantt-bar.ok{background:linear-gradient(135deg,#34d399,#059669)}
+.gantt-bar.early{background:linear-gradient(135deg,#22d3ee,#0891b2)}
+.gantt-bar.soon{background:linear-gradient(135deg,#fbbf24,#d97706)}
+.gantt-bar.late{background:linear-gradient(135deg,#f87171,#dc2626)}
+.gantt-bar.mu{background:linear-gradient(135deg,#94a3b8,#64748b)}
+
+#toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+  background:#0f172a;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.25s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
 @media print{
-  body{background:#fff}.top,.bar,.acts,.note,.toast,.no-print{display:none!important}
+  body{background:#fff!important;padding:0}
+  .no-print{display:none!important}
+  .top{position:static;box-shadow:none;border:none;background:#fff}
+  .card{box-shadow:none;break-inside:avoid}
   .scroll{max-height:none;overflow:visible}
-  th{background:#eee!important;color:#000!important;-webkit-print-color-adjust:exact}
+  .gantt-wrap{padding:8px 0}
+  .kpis{grid-template-columns:repeat(5,1fr)}
+  thead th{background:#0f172a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gantt-bar,.kpi,.tag,.gantt-today{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 <script>
-/* Auth guard */
 (function(){
   var SESS_KEY='bqlrph_session_v1';
   function getSession(){
@@ -88,7 +205,7 @@ tr:hover td{background:#f8fafc}
   var ok=false;
   if(s){
     if(s.role==='admin') ok=true;
-    else if(Array.isArray(s.perms) && (s.perms.indexOf('tasks')>=0 || s.perms.indexOf('qlbvr')>=0)) ok=true;
+    else if(Array.isArray(s.perms) && (s.perms.indexOf('tasks')>=0 || s.perms.indexOf('all')>=0)) ok=true;
   }
   if(!ok){
     document.write('<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui;background:linear-gradient(160deg,#07111f,#1e3a8a);color:#fff"><div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px">Cần đăng nhập</h1><p style="color:#94a3b8;font-size:13px;margin:10px 0 18px">Module Nhiệm vụ / Gantt cần quyền <b>tasks</b>.</p><a href="menu.html" style="display:inline-flex;height:42px;align-items:center;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-weight:700;text-decoration:none">Về Menu</a></div></body></html>');
@@ -109,7 +226,9 @@ tr:hover td{background:#f8fafc}
     <div class="acts no-print">
       <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
       <button class="btn btn-o" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
-      <a class="btn btn-b" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe/edit?gid=1800611191#gid=1800611191"><i class="fa-solid fa-table"></i> Mở Sheet</a>
+      <button class="btn btn-x" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      <button class="btn btn-v" type="button" onclick="xuatWord()"><i class="fa-solid fa-file-word"></i> Word</button>
+      <a class="btn btn-b" target="_blank" rel="noopener" id="linkSheet" href="https://docs.google.com/spreadsheets/d/1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe/edit?gid=1800611191#gid=1800611191"><i class="fa-solid fa-table"></i> Sheet</a>
       <button class="btn btn-g" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> In / PDF</button>
     </div>
   </div>
@@ -117,9 +236,9 @@ tr:hover td{background:#f8fafc}
 
 <div class="wrap" style="padding-top:8px;padding-bottom:36px">
   <div class="note no-print">
-    <b>Nguồn tự động:</b> Google Sheet nhiệm vụ trọng tâm theo chỉ đạo Giám đốc.
-    Cập nhật trên Sheet → bấm <b>Làm mới</b> (hoặc F5) để thấy thay đổi.
-    Sheet cần chia sẻ <b>Anyone with the link · Viewer</b>.
+    <b>Nguồn tự động:</b> Google Sheet nhiệm vụ theo chỉ đạo Giám đốc.
+    Cột <b>H</b> = đơn vị thực hiện. Cập nhật trên Sheet → <b>Làm mới</b>.
+    Sheet cần <b>Anyone with the link · Viewer</b>.
   </div>
 
   <div class="bar no-print">
@@ -141,15 +260,15 @@ tr:hover td{background:#f8fafc}
 
   <div class="card">
     <div class="card-h">
-      <h2>Danh sách nhiệm vụ</h2>
+      <h2><i class="fa-solid fa-list-check"></i> Danh sách nhiệm vụ</h2>
       <span id="nDS" style="font-size:12px;color:var(--mu)"></span>
     </div>
     <div class="scroll">
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Đơn vị</th>
+            <th style="width:36px">#</th>
+            <th>Đơn vị TH</th>
             <th>Nội dung chỉ đạo / nhiệm vụ</th>
             <th>Văn bản chỉ đạo</th>
             <th>Thời hạn</th>
@@ -163,32 +282,34 @@ tr:hover td{background:#f8fafc}
     </div>
   </div>
 
-  <div class="card no-print">
-    <div class="card-h"><h2>Timeline (theo thời hạn có ngày)</h2><span style="font-size:11px;color:var(--mu)">Chỉ hiện nhiệm vụ có ngày hoàn thành</span></div>
+  <div class="card" id="cardTimeline">
+    <div class="card-h">
+      <h2><i class="fa-solid fa-timeline"></i> Timeline theo thời hạn</h2>
+      <span style="font-size:11px;color:var(--mu)">Mốc ngày hoàn thành · in kèm PDF</span>
+    </div>
     <div class="gantt-wrap" id="gantt"></div>
   </div>
 </div>
-<div class="foot">BQLRPH Xuân Lộc · Nhiệm vụ trọng tâm theo chỉ đạo Giám đốc · Đồng bộ Google Sheet</div>
-<div class="toast" id="toast"></div>
+
+<div id="toast"></div>
 
 <script>
 var SID='1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe';
 var GID='1800611191';
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
-var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
+var DEFAULT_SCRIPT_URL='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
 var dong=[];
 var lastSync=null;
 
+function bqlrphOkId(v){ return v && String(v).trim().length>20; }
+function bqlrphOkGid(v){ return v!=null && String(v).trim()!==''; }
 function bqlrphScriptUrl(){
-  try{ var u=localStorage.getItem('bqlrph_script_url'); if(u&&u.indexOf('http')===0) return u; }catch(e){}
-  return BQLRPH_DEFAULT_SCRIPT;
+  try{ var u=localStorage.getItem('bqlrph_script_url'); if(u) return u; }catch(e){}
+  return DEFAULT_SCRIPT_URL;
 }
 function bqlrphLoadSheetsLocal(){
-  try{ var r=localStorage.getItem(SHEET_CFG_KEY); if(r) return JSON.parse(r); }catch(e){}
-  return null;
+  try{ var t=localStorage.getItem(SHEET_CFG_KEY); return t?JSON.parse(t):null; }catch(e){ return null; }
 }
-function bqlrphOkId(s){ return s && String(s).trim().length>=30 && /^[a-zA-Z0-9-_]+$/.test(String(s).trim()); }
-function bqlrphOkGid(s){ return s!=null && String(s).trim()!=='' && /^[0-9]+$/.test(String(s).trim()); }
 function bqlrphFetchSheetSources(){
   var url=bqlrphScriptUrl();
   var local=bqlrphLoadSheetsLocal()||{};
@@ -213,6 +334,8 @@ function applyTasksSheet(sh){
   if(!sh) return;
   if(bqlrphOkId(sh.sid)) SID=String(sh.sid).trim();
   if(bqlrphOkGid(sh.gid)) GID=String(sh.gid).trim();
+  var a=document.getElementById('linkSheet');
+  if(a) a.href='https://docs.google.com/spreadsheets/d/'+SID+'/edit?gid='+GID+'#gid='+GID;
 }
 
 function toast(m){ var e=document.getElementById('toast'); e.textContent=m; e.classList.add('on'); setTimeout(function(){ e.classList.remove('on'); }, 2800); }
@@ -233,7 +356,6 @@ function parseDateVN(s){
   if(m) return new Date(+m[3], +m[2]-1, +m[1]);
   m=s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
   if(m) return new Date(+m[1], +m[2]-1, +m[3]);
-  // "ngày 16/7/2026" inside text
   m=s.match(/ngày\s+(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/i);
   if(m) return new Date(+m[3], +m[2]-1, +m[1]);
   return null;
@@ -282,7 +404,7 @@ function fetchGvizJsonp(){
         var matrix=[];
         resp.table.rows.forEach(function(r){
           var row=[];
-          for(var i=0;i<8;i++) row.push(cellGviz(r,i));
+          for(var i=0;i<10;i++) row.push(cellGviz(r,i));
           matrix.push(row);
         });
         resolve(parseMatrix(matrix));
@@ -308,26 +430,30 @@ function parseMatrix(matrix){
     var ld=String(c[4]||'').trim();
     var ht=String(c[5]||'').trim();
     var gt=String(c[6]||'').trim();
+    var dvH=String(c[7]||'').trim();
 
-    // group headers: A, B...
-    if(/^[A-Z]$/.test(stt) && nd){
-      group=nd;
-      continue;
-    }
-    // unit headers: I, II, III... or roman
+    if(/^[A-Z]$/.test(stt) && nd){ group=nd; continue; }
     if(/^[IVX]+$/i.test(stt) && nd){
       unit=nd.replace(/^PHÒNG\s+/i,'Phòng ').replace(/^PHÂN TRƯỜNG\s+/i,'Phân trường ');
       continue;
     }
-    // skip title / header
+    if(!stt && nd && !vb && !ld && !ht && !dvH){
+      if(/phòng|phân trường|đơn vị|ban /i.test(nd) && nd.length<80){
+        unit=nd.replace(/^PHÒNG\s+/i,'Phòng ').replace(/^PHÂN TRƯỜNG\s+/i,'Phân trường ');
+        continue;
+      }
+      if(/NHIỆM VỤ|CÁC NHIỆM VỤ|HOÀN THÀNH|ĐANG THỰC HIỆN/i.test(nd)){
+        group=nd; continue;
+      }
+    }
     if(!stt && !nd) continue;
     if(/Nội dung chỉ đạo|NHIỆM VỤ|CÁC NHIỆM VỤ/i.test(nd) && !/^\d+/.test(stt)) continue;
     if(!/^\d+/.test(stt) && !nd) continue;
 
-    // numeric STT = task
     if(/^\d+/.test(stt) && nd){
       var due=parseDateVN(th);
-      if(!due) due=parseDateVN(vb); // sometimes date only in văn bản text
+      if(!due) due=parseDateVN(vb);
+      var donViTH = dvH || unit || '—';
       out.push({
         stt: stt,
         noiDung: nd,
@@ -337,7 +463,8 @@ function parseMatrix(matrix){
         lanhDao: ld,
         danhGia: normStatus(ht),
         giaiTrinh: gt,
-        donVi: unit || '—',
+        donVi: donViTH,
+        donViSection: unit || '',
         nhom: group || ''
       });
     }
@@ -419,14 +546,14 @@ function veDS(list){
   document.getElementById('nDS').textContent=list.length+' nhiệm vụ';
   var lastUnit='';
   var html='';
-  list.forEach(function(d,i){
+  list.forEach(function(d){
     if(d.donVi!==lastUnit){
       lastUnit=d.donVi;
       html+='<tr class="sec-row"><td colspan="8"><i class="fa-solid fa-building"></i> '+esc(d.donVi)+(d.nhom?' <span style="font-weight:500;color:#64748b"> · '+esc(d.nhom)+'</span>':'')+'</td></tr>';
     }
     html+='<tr>'+
       '<td>'+esc(d.stt)+'</td>'+
-      '<td style="white-space:nowrap;font-size:11px">'+esc(d.donVi)+'</td>'+
+      '<td style="white-space:nowrap;font-size:11.5px;font-weight:600;color:#0369a1">'+esc(d.donVi)+'</td>'+
       '<td><b>'+esc(d.noiDung)+'</b></td>'+
       '<td style="font-size:11.5px">'+esc(d.vanBan||'—')+'</td>'+
       '<td style="white-space:nowrap">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||'—'))+'</td>'+
@@ -438,36 +565,139 @@ function veDS(list){
   document.getElementById('tbDS').innerHTML=html||'<tr><td colspan="8" class="muted">Không có dữ liệu</td></tr>';
 }
 
+function monthLabel(d){
+  return 'T'+String(d.getMonth()+1)+'/'+String(d.getFullYear()).slice(2);
+}
+
 function veGantt(list){
-  var withDate=list.filter(function(d){ return d.thoiHan; });
+  var withDate=list.filter(function(d){ return d.thoiHan; }).slice().sort(function(a,b){ return a.thoiHan-b.thoiHan; });
   if(!withDate.length){
-    document.getElementById('gantt').innerHTML='<div class="muted">Không có nhiệm vụ nào có ngày hoàn thành rõ để vẽ timeline</div>';
+    document.getElementById('gantt').innerHTML='<div class="muted">Không có nhiệm vụ nào có ngày để vẽ timeline</div>';
     return;
   }
   var times=withDate.map(function(d){ return d.thoiHan.getTime(); });
   var min=Math.min.apply(null, times);
   var max=Math.max.apply(null, times);
-  // pad 7 days
-  min-=7*864e5; max+=7*864e5;
-  var span=Math.max(max-min, 864e5);
-  var today=new Date(); today.setHours(0,0,0,0);
-  var html='';
-  withDate.slice(0,80).forEach(function(d){
+  min-=10*864e5; max+=10*864e5;
+  var span=Math.max(max-min, 30*864e5);
+  var today=new Date(); today.setHours(12,0,0,0);
+  var todayPct=((today.getTime()-min)/span)*100;
+  todayPct=Math.max(0, Math.min(100, todayPct));
+
+  var months=[];
+  var cur=new Date(min); cur=new Date(cur.getFullYear(), cur.getMonth(), 1);
+  var endM=new Date(max);
+  while(cur<=endM){
+    var t0=cur.getTime();
+    var t1=new Date(cur.getFullYear(), cur.getMonth()+1, 1).getTime();
+    var left=((t0-min)/span)*100;
+    var width=((Math.min(t1,max)-Math.max(t0,min))/span)*100;
+    if(width>0) months.push({label:monthLabel(cur), left:left, width:width});
+    cur=new Date(cur.getFullYear(), cur.getMonth()+1, 1);
+  }
+
+  var html='<div class="tl-legend">'+
+    '<span><i class="tl-dot" style="background:#059669"></i> Đúng hạn</span>'+
+    '<span><i class="tl-dot" style="background:#0891b2"></i> Trước hạn</span>'+
+    '<span><i class="tl-dot" style="background:#d97706"></i> Trong hạn</span>'+
+    '<span><i class="tl-dot" style="background:#dc2626"></i> Quá / trễ hạn</span>'+
+    '<span><i class="tl-dot" style="background:#ef4444;border-radius:0;width:2px;height:12px"></i> Hôm nay</span>'+
+  '</div>';
+  html+='<div class="tl-axis"><div>Nhiệm vụ</div><div class="tl-months">';
+  months.forEach(function(m){
+    html+='<div class="tl-month" style="left:'+m.left+'%;width:'+m.width+'%">'+esc(m.label)+'</div>';
+  });
+  html+='</div></div>';
+
+  withDate.slice(0,100).forEach(function(d){
     var t=d.thoiHan.getTime();
-    var left=Math.max(0, ((t-min)/span)*100);
+    var left=((t-min)/span)*100;
     var cls='mu';
     if(d.danhGia==='Đúng hạn') cls='ok';
     else if(d.danhGia==='Trước hạn') cls='early';
     else if(d.danhGia==='Quá hạn'||d.danhGia==='Trễ hạn') cls='late';
     else if(d.danhGia==='Trong hạn') cls='soon';
-    html+='<div class="gantt-row"><div class="gantt-name"><b>'+esc(d.stt+'. '+(d.noiDung||'').slice(0,60))+'</b><span style="color:#64748b">'+esc(d.donVi)+'</span></div>'+
-      '<div class="gantt-track"><div class="gantt-bar '+cls+'" style="left:'+left+'%;width:12px" title="'+fmtDate(d.thoiHan)+'">'+fmtDate(d.thoiHan)+'</div></div></div>';
+    var title=esc(d.stt+'. '+d.noiDung)+' — '+fmtDate(d.thoiHan)+' · '+esc(d.donVi);
+    html+='<div class="gantt-row">'+
+      '<div class="gantt-name"><b>'+esc(d.stt+'. '+(d.noiDung||'').slice(0,72))+(d.noiDung.length>72?'…':'')+'</b><span>'+esc(d.donVi)+'</span></div>'+
+      '<div class="gantt-track">'+
+        '<div class="gantt-today" style="left:'+todayPct+'%" title="Hôm nay"></div>'+
+        '<div class="gantt-bar '+cls+'" style="left:'+left+'%" title="'+title+'">'+fmtDate(d.thoiHan).slice(0,5)+'</div>'+
+      '</div></div>';
   });
   document.getElementById('gantt').innerHTML=html;
 }
 
+function xuatExcel(){
+  var list=locDong();
+  if(!list.length){ toast('Không có dữ liệu để xuất'); return; }
+  if(typeof XLSX==='undefined'){ toast('Chưa tải thư viện Excel'); return; }
+  var rows=[['STT','Đơn vị thực hiện','Nội dung chỉ đạo','Văn bản chỉ đạo','Thời hạn','Lãnh đạo','Đánh giá','Giải trình tiến độ','Nhóm']];
+  list.forEach(function(d){
+    rows.push([
+      d.stt, d.donVi, d.noiDung, d.vanBan||'',
+      d.thoiHan?fmtDate(d.thoiHan):(d.thoiHanRaw||''),
+      d.lanhDao||'', d.danhGia||'', d.giaiTrinh||'', d.nhom||''
+    ]);
+  });
+  var ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:6},{wch:18},{wch:55},{wch:32},{wch:12},{wch:18},{wch:12},{wch:40},{wch:24}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Nhiem vu');
+  XLSX.writeFile(wb, 'Nhiem_vu_BQLRPHXL_'+fmtFileDate()+'.xlsx');
+  toast('Đã xuất Excel ('+list.length+' dòng)');
+}
+
+function xuatWord(){
+  var list=locDong();
+  if(!list.length){ toast('Không có dữ liệu để xuất'); return; }
+  var now=new Date();
+  var rows='';
+  list.forEach(function(d,i){
+    rows+='<tr>'+
+      '<td style="text-align:center">'+(i+1)+'</td>'+
+      '<td>'+esc(d.donVi)+'</td>'+
+      '<td>'+esc(d.noiDung)+'</td>'+
+      '<td>'+esc(d.vanBan||'')+'</td>'+
+      '<td style="text-align:center">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||''))+'</td>'+
+      '<td>'+esc(d.lanhDao||'')+'</td>'+
+      '<td style="text-align:center">'+esc(d.danhGia||'')+'</td>'+
+      '<td>'+esc(d.giaiTrinh||'')+'</td>'+
+    '</tr>';
+  });
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'+
+    '<head><meta charset="utf-8"><title>Nhiệm vụ BQLRPHXL</title>'+
+    '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->'+
+    '<style>body{font-family:"Times New Roman",serif;font-size:12pt}'+
+    'h1{font-size:16pt;text-align:center}h2{font-size:13pt;text-align:center;font-weight:normal}'+
+    'table{border-collapse:collapse;width:100%;font-size:11pt}th,td{border:1px solid #000;padding:4px 6px;vertical-align:top}'+
+    'th{background:#e5e7eb;text-align:center} .meta{font-size:11pt;margin:8px 0 12px}</style></head><body>'+
+    '<h1>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</h1>'+
+    '<h2>DANH SÁCH NHIỆM VỤ THEO CHỈ ĐẠO</h2>'+
+    '<p class="meta">Xuất ngày: '+fmtDate(now)+' · Số nhiệm vụ: '+list.length+'</p>'+
+    '<table><thead><tr>'+
+    '<th>STT</th><th>Đơn vị TH</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Đánh giá</th><th>Giải trình</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<p style="margin-top:24px">Người tổng hợp: ………………………… &nbsp;&nbsp;&nbsp; Lãnh đạo: …………………………</p>'+
+    '</body></html>';
+  var blob=new Blob(['\ufeff', html], {type:'application/msword'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Nhiem_vu_BQLRPHXL_'+fmtFileDate()+'.doc';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  toast('Đã xuất Word ('+list.length+' dòng)');
+}
+
+function fmtFileDate(){
+  var d=new Date();
+  return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+}
+
 window.taiLai=taiLai;
 window.veLai=veLai;
+window.xuatExcel=xuatExcel;
+window.xuatWord=xuatWord;
 
 (function boot(){
   var done=false;
@@ -476,7 +706,6 @@ window.veLai=veLai;
     done=true;
     bqlrphFetchSheetSources().then(function(all){
       applyTasksSheet(all && all.tasks);
-      // fallback fixed link if admin chưa cấu hình
       if(!bqlrphOkId(SID)) SID='1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe';
       if(!bqlrphOkGid(GID)) GID='1800611191';
       taiLai(false);
