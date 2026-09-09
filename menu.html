@@ -126,6 +126,7 @@ body{
 .card.tasks .card-icon{background:linear-gradient(135deg,#818cf8,#4f46e5)}
 .card.phapluat .card-icon{background:linear-gradient(135deg,#818cf8,#4338ca)}
 .card.congcu .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
+.card.bando .card-icon{background:linear-gradient(135deg,#14b8a6,#115e59)}
 .card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
 .card .code{
   font-size:10px;font-weight:700;letter-spacing:.04em;
@@ -262,6 +263,26 @@ footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
 }
 .mbox.guide-box .support b{color:#6ee7b7}
 .mbox.guide-box .support a{color:#6ee7b7}
+
+
+.btn-badge{position:relative}
+.badge-dot{
+  position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;
+  border-radius:999px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 2px #0f172a,0 4px 10px rgba(239,68,68,.5);
+  line-height:1;animation:badgePulse 1.6s ease-in-out infinite;
+}
+@keyframes badgePulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.08)}
+}
+.notif-chip{
+  display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;
+  background:rgba(239,68,68,.15);border:1px solid rgba(248,113,113,.45);color:#fecaca;
+  font-size:11.5px;font-weight:700;text-decoration:none;
+}
+.notif-chip:hover{background:rgba(239,68,68,.25)}
 
 </style>
 </head>
@@ -568,6 +589,83 @@ function canAccess(mod) {
   var perms = sanitizePerms(s.perms);
   return perms.indexOf(mod) >= 0;
 }
+
+function countPendingFromUsers(users){
+  var n=0;
+  (users||[]).forEach(function(u){
+    var st=String(u.status||'').toLowerCase();
+    if(st==='pending'||st==='chờ'||st==='cho duyet'||st==='waiting') n++;
+  });
+  return n;
+}
+function updateAdminPendingBadge(n){
+  n=parseInt(n,10)||0;
+  // Admin button in auth bar
+  var adminBtn=document.querySelector('a.btn-v[href="admin.html"]');
+  if(adminBtn){
+    adminBtn.classList.add('btn-badge');
+    var old=adminBtn.querySelector('.badge-dot');
+    if(old) old.remove();
+    if(n>0){
+      var b=document.createElement('span');
+      b.className='badge-dot';
+      b.textContent=n>99?'99+':String(n);
+      b.title=n+' tài khoản chờ duyệt';
+      adminBtn.appendChild(b);
+    }
+  }
+  // Chip next to who
+  var bar=document.getElementById('authBar');
+  if(bar){
+    var oldChip=bar.querySelector('.notif-chip');
+    if(oldChip) oldChip.remove();
+    if(n>0 && isAdmin()){
+      var a=document.createElement('a');
+      a.className='notif-chip';
+      a.href='admin.html';
+      a.innerHTML='<span class="badge-dot" style="position:static;box-shadow:none;animation:none;min-width:16px;height:16px">'+n+'</span> Chờ duyệt';
+      // insert after first child or before logout
+      var who=bar.querySelector('.who');
+      if(who && who.nextSibling) bar.insertBefore(a, who.nextSibling);
+      else bar.appendChild(a);
+    }
+  }
+  // Card admin if exists
+  var card=document.querySelector('.card.admin, a[href="admin.html"].card');
+  if(card){
+    var d=card.querySelector('.badge-dot');
+    if(d) d.remove();
+    if(n>0){
+      card.style.position='relative';
+      var b2=document.createElement('span');
+      b2.className='badge-dot';
+      b2.style.top='10px'; b2.style.right='10px';
+      b2.textContent=n>99?'99+':String(n);
+      card.appendChild(b2);
+    }
+  }
+}
+function refreshPendingBadge(){
+  if(!isAdmin()) { updateAdminPendingBadge(0); return; }
+  var s=getSession();
+  if(!s || !s.email) return;
+  if(useCloud()){
+    apiCall({
+      action:'list',
+      adminEmail:s.email,
+      adminPass:s._pass||''
+    }).then(function(res){
+      if(!res || !res.ok) return;
+      updateAdminPendingBadge(countPendingFromUsers(res.users));
+    }).catch(function(){ /* silent */ });
+  } else {
+    try{
+      var db=_loadDB();
+      updateAdminPendingBadge(countPendingFromUsers(db.users));
+    }catch(e){}
+  }
+}
+
 function logoutUser() { setSession(null); }
 
 function adminCred() {
@@ -777,7 +875,7 @@ var MODULES={
   tienich:[
     {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'},
     {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'},
-    {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Diện tích · ngày · số chữ · tỷ lệ.'}
+    {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Tọa độ VN-2000 · tải lớp · mẫu VB.'}
   ],
   chuyenmon:[
     {id:'qlbvr',href:'index.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
@@ -797,7 +895,8 @@ function openRegister(){closeModal();document.getElementById('regErr').textConte
 function openCfg(){closeModal();document.getElementById('cfgUrl').value=CONFIG.SCRIPT_URL||'';document.getElementById('modalCfg').classList.add('on');}
 function openChangePass(){closeModal();document.getElementById('passErr').textContent='';['passOld','passNew','passNew2'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('modalPass').classList.add('on');}
 function openForgot(){closeModal();document.getElementById('forgotErr').style.color='#94a3b8';document.getElementById('forgotErr').innerHTML='Admin → Khu vực Admin → <b>Đặt lại MK</b>';document.getElementById('forgotEmail').value=document.getElementById('loginEmail').value||'';document.getElementById('modalForgot').classList.add('on');}
-function saveCfg(){var u=document.getElementById('cfgUrl').value.trim();CONFIG.SCRIPT_URL=u;try{localStorage.setItem('bqlrph_script_url',u);}catch(e){}closeModal();render();}
+function saveCfg(){var u=document.getElementById('cfgUrl').value.trim();CONFIG.SCRIPT_URL=u;try{localStorage.setItem('bqlrph_script_url',u);}catch(e){}closeModal();render();
+if(typeof isAdmin==='function' && isAdmin()) setInterval(refreshPendingBadge, 60000);}
 function doLogin(){var err=document.getElementById('loginErr'),btn=document.getElementById('btnLogin');err.textContent='';btn.disabled=true;loginUser(document.getElementById('loginEmail').value,document.getElementById('loginPass').value).then(function(){closeModal();render();}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doRegister(){var err=document.getElementById('regErr'),btn=document.getElementById('btnReg');err.style.color='#fda4af';err.textContent='';btn.disabled=true;registerUser(document.getElementById('regName').value,document.getElementById('regEmail').value,document.getElementById('regPass').value).then(function(){err.style.color='#6ee7b7';err.textContent='Đã gửi đăng ký. Chờ admin duyệt rồi đăng nhập.';setTimeout(function(){closeModal();openLogin();},1400);}).catch(function(e){err.style.color='#fda4af';err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doLogout(){logoutUser();render();}
@@ -842,7 +941,8 @@ function renderGrid(){
 function render(){
   (function(){var s=getSession();if(s){s.perms=sanitizePerms(s.perms);setSession(s);}})();
   document.getElementById('modeBadge').textContent=useCloud()?'Sheet sync':'Local';
-  renderAuthBar();renderGrid();
+  renderAuthBar();
+  refreshPendingBadge();renderGrid();
   var s=currentUser();
   document.getElementById('hintBox').innerHTML=s
     ?(s.role==='admin'?'Bạn là <b>Admin</b> — duyệt tài khoản tại Khu vực quản trị.':'Quyền module: <b>'+(sanitizePerms(s.perms).map(function(p){return PERM_LABEL[p]||p;}).filter(function(x){return x!=='Công cụ PDF';}).join(', ')||'PDF')+'</b>.')
