@@ -5,49 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bộ tiện ích · BQLRPH Xuân Lộc</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/shpjs@3.6.3/dist/shp.min.js"></script>
 <style>
-:root{--bg:#f1f5f9;--card:#fff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--g:#059669;--sky:#0284c7;--shadow:0 8px 28px rgba(15,23,42,.06)}
+:root{--bg:#f1f5f9;--card:#fff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--shadow:0 8px 28px rgba(15,23,42,.06)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;background:radial-gradient(900px 400px at 0% -10%,#dbeafe 0%,transparent 55%),radial-gradient(700px 360px at 100% 0%,#d1fae5 0%,transparent 50%),var(--bg);padding-bottom:40px}
-.wrap{max-width:920px;margin:0 auto;padding:0 16px}
-.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+.top{position:sticky;top:0;z-index:1100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
 .top-in{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:12px}
-.logo-i{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#14b8a6,#0f766e);box-shadow:0 8px 18px rgba(20,184,166,.3);font-size:17px}
+.logo-i{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#14b8a6,#0f766e);font-size:17px}
 .logo h1{font-size:16px;font-weight:800}
 .logo p{font-size:11.5px;color:var(--mu)}
 .btn{height:36px;padding:0 12px;border-radius:11px;border:1px solid var(--bd);background:#fff;font:600 12.5px "Be Vietnam Pro",system-ui;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit}
-.btn-g{background:linear-gradient(135deg,#14b8a6,#0d9488);color:#fff;border-color:transparent}
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 12px}
-.tab{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 12.5px "Be Vietnam Pro",system-ui;cursor:pointer;color:#475569}
-.tab.on{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(13,148,136,.28)}
-.panel{display:none;background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:18px 16px;box-shadow:var(--shadow)}
+.btn-g{background:linear-gradient(135deg,#14b8a6,#0d9488);color:#fff;border:0}
+.btn-b{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:0}
+.btn-v{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:0}
+.tabs{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.tab{height:34px;padding:0 11px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 11.5px "Be Vietnam Pro",system-ui;cursor:pointer;color:#475569}
+.tab.on{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-color:transparent}
+.panel{display:none;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
 .panel.on{display:block}
 .panel h2{font-size:15px;font-weight:800;margin-bottom:4px}
-.panel .sub{font-size:12.5px;color:var(--mu);margin-bottom:14px;line-height:1.45}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.panel .sub{font-size:12.5px;color:var(--mu);margin-bottom:12px;line-height:1.45}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
-.field label{display:block;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.03em;margin-bottom:5px}
-.field input,.field select{
-  width:100%;height:42px;border-radius:12px;border:1px solid var(--bd);padding:0 12px;
-  font:500 14px "Be Vietnam Pro",system-ui;background:#f8fafc;outline:none
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:4px}
+.field input,.field select,.field textarea{
+  width:100%;border-radius:11px;border:1px solid var(--bd);padding:0 11px;
+  font:500 13.5px "Be Vietnam Pro",system-ui;background:#f8fafc;outline:none
 }
-.field input:focus,.field select:focus{border-color:#2dd4bf;box-shadow:0 0 0 3px rgba(45,212,191,.18);background:#fff}
-.field{margin-bottom:12px}
+.field input,.field select{height:40px}
+.field textarea{padding:10px 11px;min-height:72px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#2dd4bf;background:#fff;box-shadow:0 0 0 3px rgba(45,212,191,.15)}
 .row-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.result{
-  margin-top:14px;padding:14px;border-radius:14px;
-  background:linear-gradient(135deg,rgba(13,148,136,.08),rgba(14,165,233,.06));
-  border:1px solid rgba(13,148,136,.2);font-size:14px;line-height:1.55
-}
+.result{margin-top:12px;padding:12px;border-radius:12px;background:linear-gradient(135deg,rgba(13,148,136,.08),rgba(14,165,233,.06));border:1px solid rgba(13,148,136,.2);font-size:13.5px;line-height:1.5}
 .result b{color:#0f766e}
-.result .big{font-size:22px;font-weight:800;color:#0f766e;margin:4px 0}
-.hint{font-size:12px;color:var(--mu);margin-top:10px;line-height:1.45}
-table.mini{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
-table.mini th,table.mini td{border:1px solid var(--bd);padding:8px 10px;text-align:left}
-table.mini th{background:#f8fafc;font-size:11px;text-transform:uppercase;color:var(--mu)}
-.note{margin:12px 0;padding:11px 13px;border-radius:12px;font-size:12.5px;color:#334155;background:#fff;border:1px solid var(--bd)}
+.result .big{font-size:20px;font-weight:800;color:#0f766e;margin:4px 0}
+.hint{font-size:12px;color:var(--mu);margin-top:8px;line-height:1.45}
+.note{margin:10px 0;padding:10px 12px;border-radius:12px;font-size:12.5px;color:#334155;background:#fff;border:1px solid var(--bd)}
+table.mini{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+table.mini th,table.mini td{border:1px solid var(--bd);padding:7px 8px;text-align:left;vertical-align:top}
+table.mini th{background:#f8fafc;font-size:10.5px;text-transform:uppercase;color:var(--mu)}
+.tabs-mini{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tab-m{height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 11px "Be Vietnam Pro",system-ui;cursor:pointer}
+.tab-m.on{background:#0f766e;color:#fff;border-color:#0f766e}
+#mapBox{height:400px;border-radius:12px;border:1px solid var(--bd);margin-top:8px;z-index:1}
+.attr-wrap{max-height:220px;overflow:auto;margin-top:8px;border:1px solid var(--bd);border-radius:10px}
+.attr-wrap table{font-size:11.5px}
+.drop{
+  border:2px dashed #99f6e4;border-radius:12px;padding:16px;text-align:center;background:#f0fdfa;
+  color:#0f766e;font-size:13px;cursor:pointer;margin-bottom:10px
+}
+.drop.drag{background:#ccfbf1;border-color:#14b8a6}
+.chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:11px;font-weight:700;margin:2px}
 </style>
 </head>
 <body>
@@ -65,280 +83,943 @@ table.mini th{background:#f8fafc;font-size:11px;text-transform:uppercase;color:v
 </div>
 
 <div class="wrap">
-  <div class="note"><b>Gợi ý:</b> Quy đổi diện tích khi làm hồ sơ · đếm ngày làm việc cho hạn báo cáo · đọc số bằng chữ khi soạn quyết định · tỷ lệ bản đồ khi in sơ đồ thửa.</div>
+  <div class="note">Diện tích · ngày · số chữ · tỷ lệ · tọa độ VN-2000 · tải lớp bản đồ · mẫu văn bản nhanh.</div>
 
   <div class="tabs">
-    <button type="button" class="tab on" data-tab="dien-tich" onclick="showTab(this)"><i class="fa-solid fa-ruler-combined"></i> Diện tích</button>
-    <button type="button" class="tab" data-tab="ngay" onclick="showTab(this)"><i class="fa-solid fa-calendar-days"></i> Ngày làm việc</button>
-    <button type="button" class="tab" data-tab="chu" onclick="showTab(this)"><i class="fa-solid fa-language"></i> Số → chữ</button>
-    <button type="button" class="tab" data-tab="tyle" onclick="showTab(this)"><i class="fa-solid fa-map"></i> Tỷ lệ bản đồ</button>
+    <button type="button" class="tab on" data-tab="dien-tich" onclick="showTab(this)">Diện tích</button>
+    <button type="button" class="tab" data-tab="ngay" onclick="showTab(this)">Ngày LV</button>
+    <button type="button" class="tab" data-tab="chu" onclick="showTab(this)">Số → chữ</button>
+    <button type="button" class="tab" data-tab="tyle" onclick="showTab(this)">Tỷ lệ</button>
+    <button type="button" class="tab" data-tab="toado" onclick="showTab(this)">Tọa độ</button>
+    <button type="button" class="tab" data-tab="bando" onclick="showTab(this)">Bản đồ</button>
+    <button type="button" class="tab" data-tab="vanban" onclick="showTab(this)">Mẫu VB</button>
   </div>
 
   <!-- Diện tích -->
   <div class="panel on" id="tab-dien-tich">
     <h2>Quy đổi diện tích</h2>
-    <p class="sub">m² · ha · sào (Nam Bộ ≈ 1.000 m²) · công (≈ 1.000 m², tùy địa phương có thể khác)</p>
+    <p class="sub">m² · ha · sào · công (≈ 1.000 m²)</p>
     <div class="grid2">
-      <div class="field">
-        <label>Giá trị</label>
-        <input type="number" id="dtVal" step="any" value="1" oninput="doiDienTich()">
-      </div>
-      <div class="field">
-        <label>Đơn vị nguồn</label>
+      <div class="field"><label>Giá trị</label><input type="number" id="dtVal" step="any" value="1" oninput="doiDienTich()"></div>
+      <div class="field"><label>Đơn vị</label>
         <select id="dtFrom" onchange="doiDienTich()">
-          <option value="m2">m²</option>
-          <option value="ha" selected>ha</option>
-          <option value="sao">Sào (1.000 m²)</option>
-          <option value="cong">Công (1.000 m²)</option>
+          <option value="m2">m²</option><option value="ha" selected>ha</option>
+          <option value="sao">Sào</option><option value="cong">Công</option>
         </select>
       </div>
     </div>
     <div class="result" id="dtOut"></div>
-    <p class="hint">Chỉ mang tính hỗ trợ nghiệp vụ. Hồ sơ chính thức theo đơn vị và hệ số địa phương quy định.</p>
   </div>
 
-  <!-- Ngày làm việc -->
   <div class="panel" id="tab-ngay">
-    <h2>Đếm ngày làm việc</h2>
-    <p class="sub">Tính số ngày giữa hai mốc hoặc cộng N ngày làm việc (mặc định trừ T7 &amp; CN)</p>
+    <h2>Ngày làm việc</h2>
     <div class="grid2">
-      <div class="field">
-        <label>Ngày bắt đầu</label>
-        <input type="date" id="dStart" onchange="tinhNgay()">
-      </div>
-      <div class="field">
-        <label>Ngày kết thúc (khoảng)</label>
-        <input type="date" id="dEnd" onchange="tinhNgay()">
-      </div>
-      <div class="field">
-        <label>Cộng thêm N ngày làm việc</label>
-        <input type="number" id="dAdd" value="5" min="0" step="1" oninput="tinhNgay()">
-      </div>
-      <div class="field">
-        <label>Trừ cuối tuần</label>
-        <select id="dWeekend" onchange="tinhNgay()">
-          <option value="1" selected>Có (T7 + CN)</option>
-          <option value="0">Không (đếm mọi ngày)</option>
-        </select>
+      <div class="field"><label>Bắt đầu</label><input type="date" id="dStart" onchange="tinhNgay()"></div>
+      <div class="field"><label>Kết thúc</label><input type="date" id="dEnd" onchange="tinhNgay()"></div>
+      <div class="field"><label>Cộng N ngày LV</label><input type="number" id="dAdd" value="5" oninput="tinhNgay()"></div>
+      <div class="field"><label>Trừ T7+CN</label>
+        <select id="dWeekend" onchange="tinhNgay()"><option value="1" selected>Có</option><option value="0">Không</option></select>
       </div>
     </div>
     <div class="result" id="ngayOut"></div>
-    <p class="hint">Chưa trừ ngày lễ. Dùng tham khảo hạn nội bộ; hạn pháp lý theo văn bản cụ thể.</p>
   </div>
 
-  <!-- Số thành chữ -->
   <div class="panel" id="tab-chu">
-    <h2>Đọc số thành chữ (tiếng Việt)</h2>
-    <p class="sub">Hỗ trợ số nguyên và một phần thập phân (diện tích, số tiền làm tròn)</p>
+    <h2>Số → chữ</h2>
     <div class="grid2">
-      <div class="field">
-        <label>Số cần đọc</label>
-        <input type="text" id="chuVal" value="12.5" oninput="docSo()" placeholder="vd: 12.5 hoặc 1500000">
-      </div>
-      <div class="field">
-        <label>Kiểu</label>
+      <div class="field"><label>Số</label><input type="text" id="chuVal" value="12.5" oninput="docSo()"></div>
+      <div class="field"><label>Kiểu</label>
         <select id="chuType" onchange="docSo()">
-          <option value="area">Diện tích (… héc-ta / mét vuông)</option>
-          <option value="money">Tiền Việt (… đồng)</option>
-          <option value="plain">Chỉ đọc số</option>
+          <option value="area">Diện tích</option><option value="money">Tiền</option><option value="plain">Số thuần</option>
         </select>
       </div>
     </div>
-    <div class="field">
-      <label>Đơn vị diện tích (khi chọn diện tích)</label>
-      <select id="chuUnit" onchange="docSo()">
-        <option value="ha">ha</option>
-        <option value="m2">m²</option>
-      </select>
+    <div class="field"><label>Đơn vị DT</label>
+      <select id="chuUnit" onchange="docSo()"><option value="ha">ha</option><option value="m2">m²</option></select>
     </div>
     <div class="result" id="chuOut"></div>
   </div>
 
-  <!-- Tỷ lệ bản đồ -->
   <div class="panel" id="tab-tyle">
-    <h2>Tỷ lệ bản đồ / sơ đồ</h2>
-    <p class="sub">Đổi chiều dài thực ↔ đoạn trên giấy theo tỷ lệ (vd 1/5000)</p>
+    <h2>Tỷ lệ bản đồ</h2>
     <div class="grid2">
-      <div class="field">
-        <label>Tỷ lệ 1 :</label>
-        <input type="number" id="tlScale" value="5000" min="1" step="1" oninput="tinhTyLe()">
-      </div>
-      <div class="field">
-        <label>Chiều dài thực (mét)</label>
-        <input type="number" id="tlThuc" value="100" step="any" oninput="tinhTyLe()">
-      </div>
-      <div class="field">
-        <label>Đoạn trên giấy (mm)</label>
-        <input type="number" id="tlGiay" step="any" oninput="tinhTyLeTuGiay()">
-      </div>
+      <div class="field"><label>1 :</label><input type="number" id="tlScale" value="5000" oninput="tinhTyLe()"></div>
+      <div class="field"><label>Thực (m)</label><input type="number" id="tlThuc" value="100" oninput="tinhTyLe()"></div>
+      <div class="field"><label>Giấy (mm)</label><input type="number" id="tlGiay" oninput="tinhTyLeTuGiay()"></div>
     </div>
     <div class="result" id="tlOut"></div>
-    <table class="mini">
-      <thead><tr><th>Tỷ lệ</th><th>100 m thực ≈ trên giấy</th></tr></thead>
-      <tbody>
-        <tr><td>1/1.000</td><td>100 mm</td></tr>
-        <tr><td>1/5.000</td><td>20 mm</td></tr>
-        <tr><td>1/10.000</td><td>10 mm</td></tr>
-        <tr><td>1/25.000</td><td>4 mm</td></tr>
-      </tbody>
-    </table>
   </div>
-</div>
 
+  <!-- Tọa độ -->
+  <div class="panel" id="tab-toado">
+    <h2>VN-2000 ↔ WGS84</h2>
+    <p class="sub">TM k=0.9999 · X₀=500000 · trục 107°45′ (Xuân Lộc)</p>
+    <div class="tabs-mini">
+      <button type="button" class="tab-m on" id="tabVN" onclick="setDir('vn')">VN → WGS84</button>
+      <button type="button" class="tab-m" id="tabWGS" onclick="setDir('wgs')">WGS84 → VN</button>
+    </div>
+    <div class="field"><label>Kinh tuyến trục</label>
+      <select id="zone" onchange="syncZoneUI()">
+        <option value="104.5">3° — 104°30′</option>
+        <option value="105.5">3° — 105°30′</option>
+        <option value="106.5">3° — 106°30′</option>
+        <option value="107.5">3° — 107°30′</option>
+        <option value="107.75" selected>3° — 107°45′ (Đồng Nai / Xuân Lộc)</option>
+        <option value="108.5">3° — 108°30′</option>
+        <option value="105">6° — 105°</option>
+        <option value="108">6° — 108°</option>
+        <option value="111">6° — 111°</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tham số datum VN-2000 → WGS84</label>
+      <select id="datumMode">
+        <option value="0">Đơn giản (ellps WGS84, không dịch — hay dùng)</option>
+        <option value="7" selected>7 tham số (chuẩn VN, giảm lệch nền vệ tinh)</option>
+      </select>
+    </div>
+    <div class="grid2" id="inVN">
+      <div class="field"><label>X (Đông, m)</label><input type="number" id="x" step="any"></div>
+      <div class="field"><label>Y (Bắc, m)</label><input type="number" id="y" step="any"></div>
+    </div>
+    <div class="grid2" id="inWGS" style="display:none">
+      <div class="field"><label>Lat</label><input type="number" id="lat" step="any"></div>
+      <div class="field"><label>Lng</label><input type="number" id="lng" step="any"></div>
+    </div>
+    <div class="row-actions">
+      <button type="button" class="btn btn-g" onclick="convert()">Đổi</button>
+      <button type="button" class="btn btn-b" onclick="convertToMap()">Đổi &amp; hiện map</button>
+    </div>
+    <div class="result" id="convOut">Nhập tọa độ.</div>
+  </div>
+
+  <!-- Bản đồ + upload -->
+  <div class="panel" id="tab-bando">
+    <h2>Bản đồ · tải lớp · thuộc tính</h2>
+    <p class="sub">
+      <b>MapInfo:</b> tải cặp <b>.MIF + .MID</b> (File → Export trong MapInfo) hoặc <b>GeoJSON / SHP.zip / CSV / KML</b>.
+      File <b>.TAB/.DAT/.MAP</b> binary không đọc được trên trình duyệt — trong MapInfo/QGIS xuất <b>MIF/MID</b> hoặc GeoJSON.
+    </p>
+    <div class="drop" id="dropZone" onclick="document.getElementById('fileMap').click()">
+      <i class="fa-solid fa-cloud-arrow-up"></i> Chọn hoặc kéo thả file bản đồ<br>
+      <span style="font-size:11.5px;opacity:.85">.mif+.mid (MapInfo) · .geojson · .shp.zip · .csv · .kml</span>
+      <input type="file" id="fileMap" accept=".geojson,.json,.kml,.csv,.zip,.txt,.mif,.mid,.MIF,.MID" multiple style="display:none" onchange="onFile(event)">
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Hệ tọa độ dữ liệu tải lên</label>
+        <select id="fileCRS">
+          <option value="vn10775" selected>VN-2000 · 107°45′ (Đồng Nai)</option>
+          <option value="vn1045">VN-2000 · 104°30′</option>
+          <option value="vn1055">VN-2000 · 105°30′</option>
+          <option value="vn1065">VN-2000 · 106°30′</option>
+          <option value="vn1075">VN-2000 · 107°30′</option>
+          <option value="vn1085">VN-2000 · 108°30′</option>
+          <option value="vn105">VN-2000 · 6° 105°</option>
+          <option value="vn108">VN-2000 · 6° 108°</option>
+          <option value="vn111">VN-2000 · 6° 111°</option>
+          <option value="wgs84">WGS84 (lng, lat độ)</option>
+        </select>
+      </div>
+      <div class="field"><label>Nền map</label>
+        <select id="basemap" onchange="setBasemap()">
+          <option value="osm">OSM</option>
+          <option value="sat">Vệ tinh</option>
+          <option value="topo">Topo</option>
+        </select>
+      </div>
+    </div>
+    <div id="mapBox"></div>
+    <div class="result" id="mapCoords" style="margin-top:8px;font-size:12px">Di chuyển chuột trên map để xem WGS84 &amp; VN-2000</div>
+    <div class="result" id="layerInfo">Chưa tải lớp.</div>
+    <div class="attr-wrap" id="attrBox" style="display:none">
+      <table class="mini" id="attrTable"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="row-actions">
+      <button type="button" class="btn" onclick="clearDraw()">Xóa vẽ/lớp</button>
+      <button type="button" class="btn btn-g" onclick="exportGeoJSON()">Tải GeoJSON (WGS84)</button>
+    </div>
+  </div>
+
+  <!-- Mẫu văn bản -->
+  <div class="panel" id="tab-vanban">
+    <h2>Mẫu soạn thảo theo NĐ 30/2020/NĐ-CP</h2>
+    <p class="sub">Thể thức văn bản hành chính: Quốc hiệu · tiêu ngữ · số/ký hiệu · địa danh–ngày · tên loại · trích yếu · nội dung · ký · nơi nhận</p>
+    <div class="field"><label>Loại văn bản</label>
+      <select id="vbLoai" onchange="fillMau()">
+        <option value="totrinh">Tờ trình</option>
+        <option value="congvan">Công văn</option>
+        <option value="thongbao">Thông báo</option>
+        <option value="baocao">Báo cáo</option>
+        <option value="bienban">Biên bản</option>
+        <option value="giaymoi">Giấy mời</option>
+        <option value="kehoach">Kế hoạch</option>
+      </select>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Cơ quan chủ quản (trên tên CQBH)</label><input type="text" id="vbChuQuan" value="SỞ NÔNG NGHIỆP VÀ MÔI TRƯỜNG ĐỒNG NAI"></div>
+      <div class="field"><label>Cơ quan ban hành</label><input type="text" id="vbCQ" value="BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC"></div>
+      <div class="field"><label>Địa danh</label><input type="text" id="vbDiaDanh" value="Xuân Lộc"></div>
+      <div class="field"><label>Số (chỉ số)</label><input type="text" id="vbSo" placeholder="12"></div>
+      <div class="field"><label>Ký hiệu</label><input type="text" id="vbKyHieu" placeholder="TTr-BQL"></div>
+      <div class="field"><label>Ngày ban hành</label><input type="date" id="vbNgay"></div>
+      <div class="field"><label>Người ký (họ tên)</label><input type="text" id="vbNguoiKy" placeholder="Nguyễn Văn A"></div>
+      <div class="field"><label>Chức vụ / cách ký</label>
+        <select id="vbCachKy">
+          <option value="GD">GIÁM ĐỐC</option>
+          <option value="PGD">PHÓ GIÁM ĐỐC</option>
+          <option value="TP">TRƯỞNG PHÒNG</option>
+          <option value="PTP">PHÓ TRƯỞNG PHÒNG</option>
+          <option value="KT_GD">KT. GIÁM ĐỐC — PHÓ GIÁM ĐỐC</option>
+          <option value="KT_PGD">KT. GIÁM ĐỐC — (ghi rõ)</option>
+          <option value="TL_GD">TL. GIÁM ĐỐC</option>
+          <option value="TUQ_GD">KT. GIÁM ĐỐC (thừa ủy quyền)</option>
+        </select>
+      </div>
+      <div class="field"><label>Dòng chức vụ bổ sung (nếu chọn KT ghi rõ)</label><input type="text" id="vbChucVuPhu" placeholder="vd: TRƯỞNG PHÒNG LÂM NGHIỆP"></div>
+    </div>
+    <div class="field"><label>Trích yếu nội dung</label><input type="text" id="vbTrich" placeholder="V/v …"></div>
+    <div class="field"><label>Kính gửi (nếu có)</label><input type="text" id="vbGui" placeholder="Giám đốc Sở…"></div>
+    <div class="field"><label>Nội dung văn bản</label><textarea id="vbNd" style="min-height:100px" placeholder="Nội dung chính…"></textarea></div>
+    <div class="field"><label>Nơi nhận</label><textarea id="vbNoiNhan" style="min-height:60px">- Như trên;
+- Lưu: VT, ….</textarea></div>
+    <div class="row-actions">
+      <button type="button" class="btn btn-v" onclick="xuatWord()"><i class="fa-solid fa-file-word"></i> Xuất Word (NĐ 30)</button>
+      <button type="button" class="btn" onclick="xemTruocVB()">Xem trước</button>
+    </div>
+    <div class="result" id="vbPreview" style="background:#fff;border:1px solid #e2e8f0;padding:16px;overflow:auto"></div>
+    <p class="hint">Mẫu hỗ trợ soạn thảo theo thể thức NĐ 30/2020/NĐ-CP. Cán bộ tự rà soát nội dung, thẩm quyền ký trước khi ban hành chính thức.</p>
+  </div>
 <script>
 function showTab(btn){
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on');});
   btn.classList.add('on');
-  document.getElementById('tab-'+btn.getAttribute('data-tab')).classList.add('on');
+  var id=btn.getAttribute('data-tab');
+  document.getElementById('tab-'+id).classList.add('on');
+  if(id==='bando') setTimeout(ensureMap,60);
 }
-
-/* ===== Diện tích ===== */
 var TO_M2={m2:1,ha:10000,sao:1000,cong:1000};
 function doiDienTich(){
-  var v=parseFloat(document.getElementById('dtVal').value);
-  var from=document.getElementById('dtFrom').value;
-  if(!isFinite(v)){document.getElementById('dtOut').innerHTML='Nhập số hợp lệ';return;}
+  var v=parseFloat(document.getElementById('dtVal').value), from=document.getElementById('dtFrom').value;
+  if(!isFinite(v)){document.getElementById('dtOut').innerHTML='Nhập số';return;}
   var m2=v*TO_M2[from];
-  document.getElementById('dtOut').innerHTML=
-    '<div>Tương đương:</div>'+
-    '<div class="big">'+(m2/10000).toLocaleString('vi-VN',{maximumFractionDigits:6})+' ha</div>'+
-    '<div><b>'+m2.toLocaleString('vi-VN',{maximumFractionDigits:2})+'</b> m²</div>'+
-    '<div><b>'+(m2/1000).toLocaleString('vi-VN',{maximumFractionDigits:4})+'</b> sào / công (theo 1.000 m²)</div>';
+  document.getElementById('dtOut').innerHTML='<div class="big">'+(m2/10000).toLocaleString('vi-VN',{maximumFractionDigits:6})+' ha</div><div><b>'+m2.toLocaleString('vi-VN',{maximumFractionDigits:2})+'</b> m² · <b>'+(m2/1000).toLocaleString('vi-VN',{maximumFractionDigits:4})+'</b> sào/công</div>';
 }
-
-/* ===== Ngày làm việc ===== */
 function isWeekend(d){var x=d.getDay();return x===0||x===6;}
-function addWorkDays(start,n,skipWe){
-  var d=new Date(start.getFullYear(),start.getMonth(),start.getDate());
-  var left=n;
-  if(left===0) return d;
-  var step=left>0?1:-1;
-  left=Math.abs(left);
-  while(left>0){
-    d.setDate(d.getDate()+step);
-    if(skipWe && isWeekend(d)) continue;
-    left--;
-  }
+function addWorkDays(start,n,skip){
+  var d=new Date(start.getFullYear(),start.getMonth(),start.getDate()), left=Math.abs(n), step=n>=0?1:-1;
+  if(!n) return d;
+  while(left>0){d.setDate(d.getDate()+step); if(skip&&isWeekend(d)) continue; left--;}
   return d;
 }
-function countWorkDays(a,b,skipWe){
+function countWorkDays(a,b,skip){
   if(b<a){var t=a;a=b;b=t;}
-  var d=new Date(a.getFullYear(),a.getMonth(),a.getDate());
-  var end=new Date(b.getFullYear(),b.getMonth(),b.getDate());
-  var n=0;
-  while(d<=end){
-    if(!(skipWe && isWeekend(d))) n++;
-    d.setDate(d.getDate()+1);
-  }
-  return n;
+  var d=new Date(a.getFullYear(),a.getMonth(),a.getDate()), end=new Date(b.getFullYear(),b.getMonth(),b.getDate()), n=0;
+  while(d<=end){if(!(skip&&isWeekend(d))) n++; d.setDate(d.getDate()+1);} return n;
 }
-function fmtD(d){
-  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
-}
+function fmtD(d){return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 function tinhNgay(){
-  var skip=document.getElementById('dWeekend').value==='1';
-  var s=document.getElementById('dStart').value;
-  var e=document.getElementById('dEnd').value;
-  var add=parseInt(document.getElementById('dAdd').value,10)||0;
-  var html='';
+  var skip=document.getElementById('dWeekend').value==='1', s=document.getElementById('dStart').value, e=document.getElementById('dEnd').value;
+  var add=parseInt(document.getElementById('dAdd').value,10)||0, html='';
   if(s){
     var start=new Date(s+'T00:00:00');
-    if(e){
-      var end=new Date(e+'T00:00:00');
-      var cal=Math.round((end-start)/864e5)+1;
-      var work=countWorkDays(start,end,skip);
-      html+='<div>Từ <b>'+fmtD(start)+'</b> đến <b>'+fmtD(end)+'</b></div>';
-      html+='<div class="big">'+work+' ngày'+(skip?' làm việc':'')+'</div>';
-      html+='<div>Tổng ngày lịch: <b>'+cal+'</b></div>';
-    }
-    var den=addWorkDays(start,add,skip);
-    html+='<div style="margin-top:8px">Bắt đầu <b>'+fmtD(start)+'</b> + <b>'+add+'</b> ngày'+(skip?' làm việc':'')+' → <b>'+fmtD(den)+'</b></div>';
-  } else html='Chọn ngày bắt đầu';
+    if(e){var end=new Date(e+'T00:00:00'); html+='<div class="big">'+countWorkDays(start,end,skip)+' ngày'+(skip?' LV':'')+'</div>';}
+    html+='<div>+'+add+' ngày → <b>'+fmtD(addWorkDays(start,add,skip))+'</b></div>';
+  } else html='Chọn ngày';
   document.getElementById('ngayOut').innerHTML=html;
 }
-
-/* ===== Số thành chữ ===== */
 var CHU=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
-function docBa(n){
-  n=n|0;
-  var tram=(n/100)|0, chuc=((n%100)/10)|0, don=n%10;
-  var s='';
-  if(tram) s+=CHU[tram]+' trăm';
-  if(chuc>1){ s+=(s?' ':'')+CHU[chuc]+' mươi'; if(don===1) s+=' mốt'; else if(don===5) s+=' lăm'; else if(don) s+=' '+CHU[don]; }
-  else if(chuc===1){ s+=(s?' ':'')+'mười'; if(don===5) s+=' lăm'; else if(don) s+=' '+CHU[don]; }
-  else if(don){ s+=(s?' ':'')+(tram?'lẻ ':'')+CHU[don]; }
-  return s||'không';
-}
-function docSoNguyen(n){
-  n=Math.floor(Math.abs(n));
-  if(n===0) return 'không';
-  var dv=['',' nghìn',' triệu',' tỷ',' nghìn tỷ'];
-  var parts=[], i=0;
-  while(n>0 && i<dv.length){
-    var block=n%1000;
-    if(block) parts.unshift(docBa(block)+dv[i]);
-    n=Math.floor(n/1000); i++;
-  }
-  return parts.join(' ').replace(/\s+/g,' ').trim();
-}
+function docBa(n){n=n|0;var tram=(n/100)|0,chuc=((n%100)/10)|0,don=n%10,s='';
+  if(tram)s+=CHU[tram]+' trăm';
+  if(chuc>1){s+=(s?' ':'')+CHU[chuc]+' mươi';if(don===1)s+=' mốt';else if(don===5)s+=' lăm';else if(don)s+=' '+CHU[don];}
+  else if(chuc===1){s+=(s?' ':'')+'mười';if(don===5)s+=' lăm';else if(don)s+=' '+CHU[don];}
+  else if(don)s+=(s?' ':'')+(tram?'lẻ ':'')+CHU[don];
+  return s||'không';}
+function docSoNguyen(n){n=Math.floor(Math.abs(n));if(!n)return 'không';var dv=['',' nghìn',' triệu',' tỷ'],p=[],i=0;while(n>0&&i<dv.length){var b=n%1000;if(b)p.unshift(docBa(b)+dv[i]);n=(n/1000)|0;i++;}return p.join(' ').trim();}
 function docSo(){
   var raw=String(document.getElementById('chuVal').value||'').replace(/\s/g,'').replace(',','.');
-  var type=document.getElementById('chuType').value;
-  var unit=document.getElementById('chuUnit').value;
-  var num=parseFloat(raw);
-  if(!isFinite(num)){document.getElementById('chuOut').innerHTML='Nhập số hợp lệ';return;}
-  var am=num<0?'âm ':'';
-  var abs=Math.abs(num);
-  var nguyen=Math.floor(abs);
-  var thap=String(raw).split('.')[1]||'';
-  var s=am+docSoNguyen(nguyen);
-  if(thap){
-    s+=' phẩy';
-    for(var i=0;i<thap.length;i++) s+=' '+CHU[parseInt(thap[i],10)||0];
-  }
-  if(type==='money') s+=' đồng';
-  else if(type==='area') s+=' '+(unit==='ha'?'héc-ta':'mét vuông');
-  s=s.charAt(0).toUpperCase()+s.slice(1);
-  document.getElementById('chuOut').innerHTML='<div class="big" style="font-size:16px;line-height:1.45">'+s+'</div>';
+  var type=document.getElementById('chuType').value, unit=document.getElementById('chuUnit').value, num=parseFloat(raw);
+  if(!isFinite(num)){document.getElementById('chuOut').innerHTML='Số không hợp lệ';return;}
+  var am=num<0?'âm ':'', abs=Math.abs(num), thap=String(raw).split('.')[1]||'';
+  var s=am+docSoNguyen(Math.floor(abs));
+  if(thap){s+=' phẩy';for(var i=0;i<thap.length;i++)s+=' '+CHU[+thap[i]||0];}
+  if(type==='money')s+=' đồng';else if(type==='area')s+=' '+(unit==='ha'?'héc-ta':'mét vuông');
+  document.getElementById('chuOut').innerHTML='<div class="big" style="font-size:15px">'+(s.charAt(0).toUpperCase()+s.slice(1))+'</div>';
+}
+var tlLock=false;
+function tinhTyLe(){if(tlLock)return;tlLock=true;var sc=parseFloat(document.getElementById('tlScale').value)||1,th=parseFloat(document.getElementById('tlThuc').value);
+  if(isFinite(th)){var mm=th*1000/sc;document.getElementById('tlGiay').value=Math.round(mm*1000)/1000;document.getElementById('tlOut').innerHTML='<div class="big">'+mm.toLocaleString('vi-VN',{maximumFractionDigits:3})+' mm</div>';}tlLock=false;}
+function tinhTyLeTuGiay(){if(tlLock)return;tlLock=true;var sc=parseFloat(document.getElementById('tlScale').value)||1,mm=parseFloat(document.getElementById('tlGiay').value);
+  if(isFinite(mm)){var th=mm*sc/1000;document.getElementById('tlThuc').value=Math.round(th*1000)/1000;document.getElementById('tlOut').innerHTML='<div class="big">'+th.toLocaleString('vi-VN',{maximumFractionDigits:3})+' m</div>';}tlLock=false;}
+
+/* CRS */
+function vnDef(lon0, with7){
+  // VN-2000 TM: k=0.9999, X0=500000, Y0=0, ellipsoid WGS84
+  // 7-param (BURSA) commonly used Vietnam: reduces shift vs Google/OSM imagery
+  var towgs = with7
+    ? ' +towgs84=-191.90441429,-39.30318279,-111.45032835,-0.00928836,0.01975479,-0.00427372,0.252906278'
+    : ' +towgs84=0,0,0,0,0,0,0';
+  return '+proj=tmerc +lat_0=0 +lon_0='+lon0+' +k=0.9999 +x_0=500000 +y_0=0 +ellps=WGS84'+towgs+' +units=m +no_defs';
+}
+function use7(){
+  var el=document.getElementById('datumMode');
+  return !el || el.value==='7';
+}
+function ensureVnProj(lon0){
+  var code='VN2000_'+lon0+(use7()?'_7':'_0');
+  if(!proj4.defs[code]) proj4.defs(code, vnDef(parseFloat(lon0), use7()));
+  return code;
+}
+proj4.defs('EPSG:4326','+proj=longlat +datum=WGS84 +no_defs');
+function currentProj(){
+  return ensureVnProj(document.getElementById('zone').value);
+}
+function fileProj(){
+  var v=document.getElementById('fileCRS').value;
+  if(v==='wgs84') return 'EPSG:4326';
+  var map={
+    vn1045:'104.5', vn1055:'105.5', vn1065:'106.5', vn1075:'107.5',
+    vn10775:'107.75', vn1085:'108.5', vn105:'105', vn108:'108', vn111:'111'
+  };
+  return ensureVnProj(map[v]||'107.75');
+}
+function syncZoneUI(){ /* zone change — rebuild proj next convert */ }
+function convert(){
+  try{
+    var code=currentProj();
+    if(dir==='vn'){
+      var x=+document.getElementById('x').value,y=+document.getElementById('y').value;
+      if(!isFinite(x)||!isFinite(y)) throw new Error('Nhập X,Y');
+      var ll=proj4(code,'EPSG:4326',[x,y]);
+      document.getElementById('lat').value=ll[1].toFixed(8);document.getElementById('lng').value=ll[0].toFixed(8);
+      document.getElementById('convOut').innerHTML='<b>WGS84</b><br>Lat <b>'+ll[1].toFixed(8)+'</b><br>Lng <b>'+ll[0].toFixed(8)+'</b>';
+      return {lat:ll[1],lng:ll[0],x:x,y:y};
+    } else {
+      var lat=+document.getElementById('lat').value,lng=+document.getElementById('lng').value;
+      if(!isFinite(lat)||!isFinite(lng)) throw new Error('Nhập lat,lng');
+      var xy=proj4('EPSG:4326',code,[lng,lat]);
+      document.getElementById('x').value=xy[0].toFixed(3);document.getElementById('y').value=xy[1].toFixed(3);
+      document.getElementById('convOut').innerHTML='<b>VN-2000</b><br>X <b>'+xy[0].toFixed(3)+'</b><br>Y <b>'+xy[1].toFixed(3)+'</b>';
+      return {lat:lat,lng:lng,x:xy[0],y:xy[1]};
+    }
+  }catch(e){document.getElementById('convOut').innerHTML='<span style="color:#b91c1c">'+e.message+'</span>';return null;}
+}
+function convertToMap(){
+  var r=convert(); if(!r) return;
+  document.querySelector('.tab[data-tab="bando"]').click();
+  setTimeout(function(){ensureMap();map.setView([r.lat,r.lng],15);L.marker([r.lat,r.lng]).addTo(drawnItems).bindPopup('X='+r.x.toFixed(2)+' Y='+r.y.toFixed(2)).openPopup();},100);
 }
 
-/* ===== Tỷ lệ ===== */
-var tlLock=false;
-function tinhTyLe(){
-  if(tlLock) return;
-  tlLock=true;
-  var scale=parseFloat(document.getElementById('tlScale').value)||1;
-  var thuc=parseFloat(document.getElementById('tlThuc').value); // m
-  if(isFinite(thuc)){
-    var mm=(thuc*1000)/scale; // m → mm trên giấy
-    document.getElementById('tlGiay').value=Math.round(mm*1000)/1000;
-    document.getElementById('tlOut').innerHTML=
-      '<div><b>'+thuc+' m</b> thực trên bản đồ <b>1/'+scale.toLocaleString('vi-VN')+'</b></div>'+
-      '<div class="big">'+mm.toLocaleString('vi-VN',{maximumFractionDigits:3})+' mm</div>'+
-      '<div>≈ '+(mm/10).toLocaleString('vi-VN',{maximumFractionDigits:3})+' cm trên giấy</div>';
+/* Map + layers */
+
+/* ===== Map + layers ===== */
+var map, drawnItems, uploadLayer, baseLayers={}, activeBase, mapReady=false, lastGJ=null;
+
+function ensureMap(){
+  try{
+    if(mapReady){
+      setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 50);
+      return;
+    }
+    var el=document.getElementById('mapBox');
+    if(!el){ console.error('mapBox missing'); return; }
+    map=L.map('mapBox').setView([10.92,107.25],11);
+    baseLayers.osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'OSM'});
+    baseLayers.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
+    baseLayers.topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'OTM'});
+    activeBase=baseLayers.osm; activeBase.addTo(map);
+    drawnItems=new L.FeatureGroup(); map.addLayer(drawnItems);
+    if(L.Control && L.Control.Draw){
+      map.addControl(new L.Control.Draw({
+        edit:{featureGroup:drawnItems,remove:true},
+        draw:{polygon:true,polyline:true,marker:true,rectangle:false,circle:false,circlemarker:false}
+      }));
+      map.on(L.Draw.Event.CREATED, function(e){ drawnItems.addLayer(e.layer); });
+    }
+    map.on('mousemove', function(e){
+      try{
+        var lat=e.latlng.lat, lng=e.latlng.lng;
+        var code=currentProj();
+        var xy=proj4('EPSG:4326', code, [lng, lat]);
+        var el=document.getElementById('mapCoords');
+        if(el) el.innerHTML=
+          '<b>WGS84</b> φ '+lat.toFixed(6)+'° · λ '+lng.toFixed(6)+'° &nbsp;|&nbsp; '+
+          '<b>VN-2000</b> (trục '+document.getElementById('zone').value+'°) X='+xy[0].toFixed(2)+' m · Y='+xy[1].toFixed(2)+' m'+
+          (use7()?' · <span style="color:#0f766e">7 tham số</span>':' · đơn giản');
+      }catch(err){}
+    });
+    // Đồng bộ zone dropdown với fileCRS khi có
+    mapReady=true;
+    setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 80);
+  }catch(err){
+    console.error(err);
+    var info=document.getElementById('layerInfo');
+    if(info) info.innerHTML='Lỗi khởi tạo map: '+err.message;
   }
-  tlLock=false;
 }
-function tinhTyLeTuGiay(){
-  if(tlLock) return;
-  tlLock=true;
-  var scale=parseFloat(document.getElementById('tlScale').value)||1;
-  var mm=parseFloat(document.getElementById('tlGiay').value);
-  if(isFinite(mm)){
-    var thuc=(mm*scale)/1000; // mm giấy → m thực
-    document.getElementById('tlThuc').value=Math.round(thuc*1000)/1000;
-    document.getElementById('tlOut').innerHTML=
-      '<div><b>'+mm+' mm</b> trên giấy (1/'+scale.toLocaleString('vi-VN')+')</div>'+
-      '<div class="big">'+thuc.toLocaleString('vi-VN',{maximumFractionDigits:3})+' m thực</div>';
+function setBasemap(){
+  if(!mapReady) return;
+  var k=document.getElementById('basemap').value;
+  if(activeBase) map.removeLayer(activeBase);
+  activeBase=baseLayers[k]; activeBase.addTo(map);
+}
+function clearDraw(){
+  try{
+    if(drawnItems) drawnItems.clearLayers();
+    if(uploadLayer){ map.removeLayer(uploadLayer); uploadLayer=null; }
+  }catch(e){}
+  lastGJ=null;
+  document.getElementById('layerInfo').innerHTML='Đã xóa lớp.';
+  document.getElementById('attrBox').style.display='none';
+}
+function exportGeoJSON(){
+  var fc={type:'FeatureCollection',features:[]};
+  if(lastGJ && lastGJ.features) fc.features=fc.features.concat(lastGJ.features);
+  if(drawnItems){
+    var g=drawnItems.toGeoJSON();
+    if(g.features) fc.features=fc.features.concat(g.features);
   }
-  tlLock=false;
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(fc,null,2)],{type:'application/geo+json'}));
+  a.download='lop_wgs84_'+Date.now()+'.geojson';
+  a.click();
+}
+
+function reprojectGeometry(geom, from){
+  if(!geom || from==='EPSG:4326') return geom;
+  function xy(c){
+    if(!c || c.length<2) return c;
+    var p=proj4(from,'EPSG:4326',[Number(c[0]),Number(c[1])]);
+    return [p[0],p[1]];
+  }
+  function ring(r){ return (r||[]).map(xy); }
+  var g=geom.type;
+  if(g==='Point') return {type:'Point',coordinates:xy(geom.coordinates)};
+  if(g==='MultiPoint') return {type:'MultiPoint',coordinates:(geom.coordinates||[]).map(xy)};
+  if(g==='LineString') return {type:'LineString',coordinates:ring(geom.coordinates)};
+  if(g==='MultiLineString') return {type:'MultiLineString',coordinates:(geom.coordinates||[]).map(ring)};
+  if(g==='Polygon') return {type:'Polygon',coordinates:(geom.coordinates||[]).map(ring)};
+  if(g==='MultiPolygon') return {type:'MultiPolygon',coordinates:(geom.coordinates||[]).map(function(p){return (p||[]).map(ring);})};
+  return geom;
+}
+function reprojectFC(fc, from){
+  return {
+    type:'FeatureCollection',
+    features:(fc.features||[]).map(function(f){
+      return {type:'Feature', properties:f.properties||{}, geometry:reprojectGeometry(f.geometry, from)};
+    })
+  };
+}
+
+/** Tự đoán: nếu |x|>180 hoặc |y|>90 → tọa độ mét (VN-2000), không phải WGS84 */
+function looksProjected(fc){
+  var n=0, hit=0;
+  (fc.features||[]).slice(0,20).forEach(function(f){
+    var g=f.geometry; if(!g) return;
+    var c=g.coordinates;
+    function check(pt){
+      if(!pt||pt.length<2) return;
+      n++;
+      if(Math.abs(pt[0])>180 || Math.abs(pt[1])>90) hit++;
+    }
+    if(g.type==='Point') check(c);
+    else if(g.type==='LineString'||g.type==='MultiPoint') (c||[]).forEach(check);
+    else if(g.type==='Polygon'||g.type==='MultiLineString') (c||[]).forEach(function(r){(r||[]).forEach(check);});
+    else if(g.type==='MultiPolygon') (c||[]).forEach(function(p){(p||[]).forEach(function(r){(r||[]).forEach(check);});});
+  });
+  return n>0 && hit/n>0.5;
+}
+
+function showLayer(fc){
+  try{
+    ensureMap();
+    if(!fc || !fc.features || !fc.features.length){
+      document.getElementById('layerInfo').innerHTML='<span style="color:#b91c1c">Không có đối tượng nào trong file.</span>';
+      return;
+    }
+    // lọc geometry null
+    fc={type:'FeatureCollection', features:fc.features.filter(function(f){return f && f.geometry;})};
+    if(!fc.features.length){
+      document.getElementById('layerInfo').innerHTML='<span style="color:#b91c1c">File không có hình học (geometry).</span>';
+      return;
+    }
+    if(uploadLayer){ try{map.removeLayer(uploadLayer);}catch(e){} }
+    lastGJ=fc;
+    uploadLayer=L.geoJSON(fc,{
+      style:{color:'#0f766e',weight:2,fillColor:'#2dd4bf',fillOpacity:0.28},
+      pointToLayer:function(f,latlng){
+        return L.circleMarker(latlng,{radius:6,color:'#0f766e',fillColor:'#5eead4',fillOpacity:0.9});
+      },
+      onEachFeature:function(f,layer){
+        var p=f.properties||{};
+        var keys=Object.keys(p);
+        if(!keys.length) return;
+        layer.bindPopup(keys.slice(0,15).map(function(k){return '<b>'+k+'</b>: '+p[k];}).join('<br>'));
+      }
+    }).addTo(map);
+    setTimeout(function(){
+      try{
+        var b=uploadLayer.getBounds();
+        if(b && b.isValid()) map.fitBounds(b,{padding:[28,28], maxZoom:16});
+        map.invalidateSize();
+      }catch(e){ console.warn(e); }
+    }, 100);
+
+    var fields={};
+    fc.features.forEach(function(f){ Object.keys(f.properties||{}).forEach(function(k){fields[k]=1;}); });
+    var fieldList=Object.keys(fields);
+    document.getElementById('layerInfo').innerHTML=
+      '<div style="color:#047857"><b>Đã tải '+fc.features.length+' đối tượng</b> · '+fieldList.length+' trường</div>'+
+      '<div style="margin-top:4px">'+fieldList.slice(0,20).map(function(k){return '<span class="chip">'+k+'</span>';}).join(' ')+'</div>';
+
+    var keys=fieldList.slice(0,10);
+    var thead='<tr><th>#</th>'+keys.map(function(k){return '<th>'+k+'</th>';}).join('')+'</tr>';
+    var body='';
+    fc.features.slice(0,50).forEach(function(f,i){
+      body+='<tr><td>'+(i+1)+'</td>'+keys.map(function(k){
+        var v=(f.properties||{})[k]; return '<td>'+String(v==null?'':v).slice(0,48)+'</td>';
+      }).join('')+'</tr>';
+    });
+    document.getElementById('attrTable').querySelector('thead').innerHTML=thead;
+    document.getElementById('attrTable').querySelector('tbody').innerHTML=body||'<tr><td colspan="10">Không có thuộc tính</td></tr>';
+    document.getElementById('attrBox').style.display='block';
+  }catch(err){
+    console.error(err);
+    document.getElementById('layerInfo').innerHTML='<span style="color:#b91c1c">Lỗi hiển thị: '+(err.message||err)+'</span>';
+  }
+}
+
+function applyCRS(fc){
+  var from=fileProj();
+  // nếu user chọn WGS84 nhưng data là mét → ép VN-2000 107.75
+  if(from==='EPSG:4326' && looksProjected(fc)){
+    from='VN2000_107.75';
+    document.getElementById('layerInfo').innerHTML='Phát hiện tọa độ mét → tự chuyển VN-2000 (107°45′)…';
+  } else if(from!=='EPSG:4326' && !looksProjected(fc)){
+    // user chọn VN nhưng data đã là WGS84
+    from='EPSG:4326';
+  }
+  if(from!=='EPSG:4326') fc=reprojectFC(fc, from);
+  return fc;
+}
+
+function parseCSV(text){
+  var lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(function(l){return l.trim();});
+  if(lines.length<2) throw new Error('CSV trống');
+  function split(line){
+    var out=[],cur='',q=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(c==='"'){q=!q;continue;}
+      if((c===','||c===';'||c==='\t')&&!q){out.push(cur.trim());cur='';continue;}
+      cur+=c;
+    }
+    out.push(cur.trim()); return out;
+  }
+  var rawHead=split(lines[0]);
+  var headers=rawHead.map(function(h){return h.toLowerCase();});
+  var ixX=-1, ixY=-1;
+  headers.forEach(function(h,i){
+    if(/^(x|east|easting|toa_do_x|tdx|coordx)$/.test(h)) ixX=i;
+    if(/^(y|north|northing|toa_do_y|tdy|coordy)$/.test(h)) ixY=i;
+    if(/^(lng|lon|long|kinh_do|longitude)$/.test(h)) ixX=i;
+    if(/^(lat|vi_do|latitude)$/.test(h)) ixY=i;
+  });
+  if(ixX<0||ixY<0) throw new Error('CSV cần cột X/Y hoặc lng/lat (tên cột dòng 1)');
+  var features=[];
+  for(var r=1;r<lines.length;r++){
+    var cols=split(lines[r]);
+    var x=parseFloat(String(cols[ixX]).replace(',','.'));
+    var y=parseFloat(String(cols[ixY]).replace(',','.'));
+    if(!isFinite(x)||!isFinite(y)) continue;
+    var props={};
+    rawHead.forEach(function(h,i){ if(i!==ixX && i!==ixY) props[h]=cols[i]; });
+    features.push({type:'Feature',properties:props,geometry:{type:'Point',coordinates:[x,y]}});
+  }
+  if(!features.length) throw new Error('Không đọc được điểm nào từ CSV');
+  return {type:'FeatureCollection',features:features};
+}
+
+function parseKML(text){
+  var dom=new DOMParser().parseFromString(text,'text/xml');
+  var placemarks=dom.getElementsByTagName('Placemark'), features=[];
+  function coords(s){
+    return s.trim().split(/\s+/).map(function(p){
+      var a=p.split(',');
+      return [parseFloat(a[0]),parseFloat(a[1])];
+    }).filter(function(c){return isFinite(c[0])&&isFinite(c[1]);});
+  }
+  for(var i=0;i<placemarks.length;i++){
+    var pm=placemarks[i];
+    var name=(pm.getElementsByTagName('name')[0]&&pm.getElementsByTagName('name')[0].textContent)||('P'+(i+1));
+    var coordEl=pm.getElementsByTagName('coordinates')[0];
+    if(!coordEl) continue;
+    var c=coords(coordEl.textContent);
+    if(!c.length) continue;
+    var geom;
+    if(pm.getElementsByTagName('Point').length) geom={type:'Point',coordinates:c[0]};
+    else if(pm.getElementsByTagName('LineString').length) geom={type:'LineString',coordinates:c};
+    else geom={type:'Polygon',coordinates:[c]};
+    features.push({type:'Feature',properties:{name:name},geometry:geom});
+  }
+  if(!features.length) throw new Error('KML không có Placemark/coordinates');
+  return {type:'FeatureCollection',features:features};
+}
+
+function parseMIF(mifText, midText){
+  var lines=mifText.replace(/^\uFEFF/,'').split(/\r?\n/);
+  var i=0, columns=[], delimiter=',';
+  while(i<lines.length){
+    var line=lines[i].trim(), up=line.toUpperCase();
+    if(/^DELIMITER/i.test(line)){
+      var m=line.match(/"([^"]*)"/); delimiter=m?m[1]:','; i++; continue;
+    }
+    if(/^COLUMNS/i.test(line)){
+      var n=parseInt(line.replace(/\D/g,''),10)||0; i++; columns=[];
+      for(var c=0;c<n && i<lines.length;c++,i++) columns.push(lines[i].trim().split(/\s+/)[0]);
+      continue;
+    }
+    if(/^DATA\b/i.test(up)){ i++; break; }
+    i++;
+  }
+  function splitDelim(row,d){
+    var out=[],cur='',q=false;
+    for(var k=0;k<row.length;k++){
+      var ch=row[k];
+      if(ch==='"'){q=!q;continue;}
+      if(ch===d && !q){out.push(cur.trim());cur='';continue;}
+      cur+=ch;
+    }
+    out.push(cur.trim()); return out;
+  }
+  var midRows=[];
+  if(midText){
+    midText.replace(/^\uFEFF/,'').split(/\r?\n/).forEach(function(row){
+      if(row.trim()) midRows.push(splitDelim(row, delimiter));
+    });
+  }
+  function readXY(){
+    var nums=lines[i].trim().split(/\s+/).map(function(x){return parseFloat(x.replace(',','.'));});
+    i++;
+    return [nums[0],nums[1]];
+  }
+  var features=[], featIdx=0;
+  while(i<lines.length){
+    var L=lines[i].trim(); if(!L){i++;continue;}
+    var U=L.toUpperCase();
+    var props={};
+    if(midRows[featIdx]) columns.forEach(function(col,ci){props[col]=midRows[featIdx][ci];});
+    if(/^POINT\b/i.test(U)){
+      var same=L.replace(/^POINT\b/i,'').trim().split(/\s+/).map(function(x){return parseFloat(x.replace(',','.'));});
+      i++;
+      var pt=(same.length>=2 && isFinite(same[0])) ? [same[0],same[1]] : readXY();
+      features.push({type:'Feature',properties:props,geometry:{type:'Point',coordinates:pt}});
+      featIdx++;
+    } else if(/^LINE\b/i.test(U)){
+      var a=L.replace(/^LINE\b/i,'').trim().split(/\s+/).map(function(x){return parseFloat(x.replace(',','.'));});
+      i++;
+      if(a.length>=4) features.push({type:'Feature',properties:props,geometry:{type:'LineString',coordinates:[[a[0],a[1]],[a[2],a[3]]]}});
+      featIdx++;
+    } else if(/^PLINE\b/i.test(U)){
+      i++;
+      if(/MULTIPLE/i.test(U)){ /* skip complex */ var nsec=parseInt(lines[i].trim(),10); i++; }
+      var cnt=parseInt(lines[i].trim(),10); i++;
+      var coords=[];
+      for(var p=0;p<cnt;p++) coords.push(readXY());
+      features.push({type:'Feature',properties:props,geometry:{type:'LineString',coordinates:coords}});
+      featIdx++;
+    } else if(/^REGION\b/i.test(U)){
+      i++;
+      var nPoly=parseInt(lines[i].trim(),10)||1; i++;
+      var rings=[];
+      for(var r=0;r<nPoly;r++){
+        var np=parseInt(lines[i].trim(),10); i++;
+        var ring=[];
+        for(var p=0;p<np;p++) ring.push(readXY());
+        if(ring.length>2){
+          var a=ring[0], b=ring[ring.length-1];
+          if(a[0]!==b[0]||a[1]!==b[1]) ring.push([a[0],a[1]]);
+          rings.push(ring);
+        }
+      }
+      if(rings.length) features.push({type:'Feature',properties:props,geometry:{type:'Polygon',coordinates:rings}});
+      featIdx++;
+    } else if(/^NONE\b/i.test(U)){ i++; featIdx++; }
+    else i++;
+  }
+  if(!features.length) throw new Error('MIF không có hình học POINT/LINE/PLINE/REGION');
+  return {type:'FeatureCollection',features:features};
+}
+
+function onFile(ev){
+  var files=ev.target.files;
+  if(!files || !files.length) return;
+  loadFiles(Array.prototype.slice.call(files));
+  try{ ev.target.value=''; }catch(e){}
+}
+function loadFiles(fileList){
+  var byExt={};
+  fileList.forEach(function(f){
+    var ext=(f.name.split('.').pop()||'').toLowerCase();
+    byExt[ext]=f;
+  });
+  document.getElementById('layerInfo').innerHTML='Đang xử lý file…';
+
+  if(byExt.tab || byExt.dat || byExt.map || byExt.id || byExt.ind){
+    document.getElementById('layerInfo').innerHTML=
+      '<span style="color:#b91c1c"><b>Không đọc được .TAB/.DAT/.MAP</b> (binary MapInfo).</span><br>'+
+      'MapInfo: <b>Table → Export → MIF</b> (lấy .mif + .mid), chọn cả 2 file khi tải lên.<br>'+
+      'Hoặc QGIS: Export → GeoJSON / Shapefile (.zip).';
+    return;
+  }
+  if(byExt.mif){
+    var fr1=new FileReader();
+    fr1.onerror=function(){ document.getElementById('layerInfo').innerHTML='Không đọc được file MIF'; };
+    fr1.onload=function(){
+      if(byExt.mid){
+        var fr2=new FileReader();
+        fr2.onload=function(){
+          try{ showLayer(applyCRS(parseMIF(fr1.result, fr2.result))); }
+          catch(e){ document.getElementById('layerInfo').innerHTML='Lỗi MIF: '+e.message; }
+        };
+        fr2.readAsText(byExt.mid, 'utf-8');
+      } else {
+        try{ showLayer(applyCRS(parseMIF(fr1.result, ''))); }
+        catch(e){ document.getElementById('layerInfo').innerHTML='Lỗi MIF: '+e.message; }
+      }
+    };
+    fr1.readAsText(byExt.mif, 'utf-8');
+    return;
+  }
+  loadFile(fileList[0]);
+}
+function loadFile(f){
+  if(!f) return;
+  var name=f.name.toLowerCase();
+  document.getElementById('layerInfo').innerHTML='Đang đọc <b>'+f.name+'</b> ('+Math.round(f.size/1024)+' KB)…';
+
+  if(/\.(tab|dat|map|id|ind)$/i.test(name)){
+    document.getElementById('layerInfo').innerHTML='File MapInfo binary — hãy Export MIF hoặc GeoJSON.';
+    return;
+  }
+  if(name.endsWith('.zip')){
+    var fr=new FileReader();
+    fr.onload=function(){
+      var shpFn = (typeof shp==='function') ? shp : (window.shp || (shp && shp.default));
+      if(typeof shpFn!=='function'){
+        document.getElementById('layerInfo').innerHTML='Thư viện Shapefile chưa tải. Dùng GeoJSON hoặc MIF.';
+        return;
+      }
+      shpFn(fr.result).then(function(geo){
+        var fc;
+        if(Array.isArray(geo)){
+          fc={type:'FeatureCollection',features:[]};
+          geo.forEach(function(g){ if(g && g.features) fc.features=fc.features.concat(g.features); });
+        } else fc=geo;
+        showLayer(applyCRS(fc));
+      }).catch(function(e){
+        document.getElementById('layerInfo').innerHTML='Lỗi Shapefile: '+(e.message||e);
+      });
+    };
+    fr.onerror=function(){ document.getElementById('layerInfo').innerHTML='Không đọc được file zip'; };
+    fr.readAsArrayBuffer(f);
+    return;
+  }
+
+  var reader=new FileReader();
+  reader.onerror=function(){ document.getElementById('layerInfo').innerHTML='Không đọc được file (FileReader error)'; };
+  reader.onload=function(){
+    try{
+      var text=reader.result, fc;
+      if(name.endsWith('.kml')) fc=parseKML(text);
+      else if(name.endsWith('.csv')||name.endsWith('.txt')) fc=parseCSV(text);
+      else if(name.endsWith('.mif')) fc=parseMIF(text,'');
+      else {
+        var json=JSON.parse(text);
+        if(json.type==='Feature') fc={type:'FeatureCollection',features:[json]};
+        else if(json.type==='FeatureCollection') fc=json;
+        else if(Array.isArray(json)) fc={type:'FeatureCollection',features:json};
+        else throw new Error('JSON không phải GeoJSON (cần FeatureCollection)');
+      }
+      showLayer(applyCRS(fc));
+    }catch(e){
+      document.getElementById('layerInfo').innerHTML='<span style="color:#b91c1c">Lỗi: '+(e.message||e)+'</span>';
+    }
+  };
+  reader.readAsText(f, 'utf-8');
+}
+
+// expose for inline handlers
+window.onFile=onFile;
+window.loadFiles=loadFiles;
+window.loadFile=loadFile;
+window.clearDraw=clearDraw;
+window.exportGeoJSON=exportGeoJSON;
+window.setBasemap=setBasemap;
+window.ensureMap=ensureMap;
+
+(function bindDrop(){
+  var z=document.getElementById('dropZone');
+  if(!z) return;
+  z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('drag');});
+  z.addEventListener('dragleave',function(){z.classList.remove('drag');});
+  z.addEventListener('drop',function(e){
+    e.preventDefault(); z.classList.remove('drag');
+    if(e.dataTransfer.files && e.dataTransfer.files.length)
+      loadFiles(Array.prototype.slice.call(e.dataTransfer.files));
+  });
+})();
+
+
+/* Văn bản mẫu — thể thức NĐ 30/2020/NĐ-CP */
+function tenLoaiVB(){
+  var m={totrinh:'TỜ TRÌNH',congvan:'',thongbao:'THÔNG BÁO',baocao:'BÁO CÁO',bienban:'BIÊN BẢN',giaymoi:'GIẤY MỜI',kehoach:'KẾ HOẠCH'};
+  return m[document.getElementById('vbLoai').value]||'';
+}
+function fillMau(){
+  var loai=document.getElementById('vbLoai').value;
+  var ky={totrinh:'TTr-BQL',congvan:'CV-BQL',thongbao:'TB-BQL',baocao:'BC-BQL',bienban:'BB-BQL',giaymoi:'GM-BQL',kehoach:'KH-BQL'};
+  document.getElementById('vbKyHieu').placeholder=ky[loai]||'BQL';
+  if(!document.getElementById('vbKyHieu').value) document.getElementById('vbKyHieu').value=ky[loai]||'BQL';
+  var map={
+    totrinh:{trich:'V/v xin ý kiến chỉ đạo về…', nd:'Căn cứ chức năng, nhiệm vụ được giao;\nQua rà soát thực tế,\nBan Quản lý rừng phòng hộ Xuân Lộc kính trình nội dung sau:\n1. …\n2. …', nn:'- Như trên;\n- Lưu: VT, phòng chuyên môn.'},
+    congvan:{trich:'V/v …', nd:'Ban Quản lý rừng phòng hộ Xuân Lộc có ý kiến như sau:\n…', nn:'- Như trên;\n- Lưu: VT.'},
+    thongbao:{trich:'V/v …', nd:'Ban Quản lý rừng phòng hộ Xuân Lộc thông báo:\n…', nn:'- Các phòng, phân trường;\n- Lưu: VT.'},
+    baocao:{trich:'V/v báo cáo …', nd:'I. Kết quả thực hiện\nII. Tồn tại, hạn chế\nIII. Kiến nghị, đề xuất', nn:'- Như trên;\n- Lưu: VT.'},
+    bienban:{trich:'V/v …', nd:'I. Thời gian, địa điểm\nII. Thành phần\nIII. Nội dung\nIV. Kết luận', nn:'- Thành phần;\n- Lưu: VT.'},
+    giaymoi:{trich:'V/v mời họp …', nd:'Ban Quản lý rừng phòng hộ Xuân Lộc trân trọng kính mời:\nThời gian:\nĐịa điểm:\nNội dung:', nn:'- Như trên;\n- Lưu: VT.'},
+    kehoach:{trich:'V/v …', nd:'I. Mục đích, yêu cầu\nII. Nội dung\nIII. Tổ chức thực hiện', nn:'- Các đơn vị;\n- Lưu: VT.'}
+  };
+  var x=map[loai]||map.totrinh;
+  document.getElementById('vbTrich').value=x.trich;
+  document.getElementById('vbNd').value=x.nd;
+  document.getElementById('vbNoiNhan').value=x.nn;
+}
+function ngayChu(iso){
+  if(!iso) return 'ngày … tháng … năm …';
+  var d=new Date(iso+'T00:00:00');
+  return 'ngày '+String(d.getDate()).padStart(2,'0')+' tháng '+String(d.getMonth()+1).padStart(2,'0')+' năm '+d.getFullYear();
+}
+function soKyHieu(){
+  var so=(document.getElementById('vbSo').value||'').trim();
+  var kh=(document.getElementById('vbKyHieu').value||'').trim();
+  if(so && kh) return so+'/'+kh;
+  if(so) return so;
+  if(kh) return '…/'+kh;
+  return '…/…';
+}
+function buildVBHtml(){
+  var chuQuan=(document.getElementById('vbChuQuan')&&document.getElementById('vbChuQuan').value||'').trim().toUpperCase();
+  var cq=(document.getElementById('vbCQ').value||'BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC').toUpperCase();
+  var dia=document.getElementById('vbDiaDanh').value||'Xuân Lộc';
+  var ngay=ngayChu(document.getElementById('vbNgay').value);
+  var skh=soKyHieu();
+  var loai=tenLoaiVB();
+  var trich=document.getElementById('vbTrich').value||'';
+  var gui=(document.getElementById('vbGui').value||'').trim();
+  var nd=(document.getElementById('vbNd').value||'').replace(/\n/g,'<br>');
+  var nn=(document.getElementById('vbNoiNhan').value||'').replace(/\n/g,'<br>');
+  var ten=document.getElementById('vbNguoiKy').value||'';
+  var cach=document.getElementById('vbCachKy').value;
+  var phu=(document.getElementById('vbChucVuPhu').value||'').trim().toUpperCase();
+
+  var kyLines=[];
+  if(cach==='GD') kyLines=['GIÁM ĐỐC'];
+  else if(cach==='PGD') kyLines=['PHÓ GIÁM ĐỐC'];
+  else if(cach==='TP') kyLines=['TRƯỞNG PHÒNG'];
+  else if(cach==='PTP') kyLines=['PHÓ TRƯỞNG PHÒNG'];
+  else if(cach==='KT_GD') kyLines=['KT. GIÁM ĐỐC','PHÓ GIÁM ĐỐC'];
+  else if(cach==='KT_PGD') kyLines=['KT. GIÁM ĐỐC', phu||'PHÓ GIÁM ĐỐC'];
+  else if(cach==='TL_GD') kyLines=['TL. GIÁM ĐỐC', phu||''].filter(Boolean);
+  else if(cach==='TUQ_GD') kyLines=['KT. GIÁM ĐỐC', phu||''].filter(Boolean);
+  else kyLines=['GIÁM ĐỐC'];
+
+  /* Header: 2 cột x 2 hàng
+     Hàng 1: tên CQ | Quốc hiệu+tiêu ngữ
+     Hàng 2: Số (dưới gạch trái) | địa danh-ngày (dưới gạch phải)
+     Gạch là border-top của hàng 2, chỉ rộng ~40-50% căn giữa từng ô */
+  var leftNames='';
+  if(chuQuan) leftNames+='<div style="font-size:12pt;font-weight:normal;text-transform:uppercase;line-height:1.3">'+escHtml(chuQuan)+'</div>';
+  leftNames+='<div style="font-size:13pt;font-weight:bold;text-transform:uppercase;line-height:1.3">'+escHtml(cq)+'</div>';
+
+  var rightNames=
+    '<div style="font-size:13pt;font-weight:bold;line-height:1.3">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>'+
+    '<div style="font-size:13pt;font-weight:bold;line-height:1.3">Độc lập - Tự do - Hạnh phúc</div>';
+
+  // gạch ngắn căn giữa: dùng div width 45%/55% margin auto border-bottom
+  var lineL='<div style="width:45%;margin:4px auto 0;border-bottom:1.5pt solid #000;"></div>';
+  var lineR='<div style="width:55%;margin:4px auto 0;border-bottom:1.5pt solid #000;"></div>';
+
+  var header=
+    '<table style="width:100%;border:none;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt" cellpadding="0" cellspacing="0" border="0">'+
+      '<tr>'+
+        '<td width="42%" style="width:42%;vertical-align:bottom;text-align:center;border:none;padding:0 8pt 0 0">'+leftNames+lineL+'</td>'+
+        '<td width="58%" style="width:58%;vertical-align:bottom;text-align:center;border:none;padding:0 0 0 8pt">'+rightNames+lineR+'</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td style="vertical-align:top;text-align:center;border:none;padding:6pt 8pt 0 0;font-size:13pt">Số: '+escHtml(skh)+'</td>'+
+        '<td style="vertical-align:top;text-align:center;border:none;padding:6pt 0 0 8pt;font-size:13pt;font-style:italic">'+escHtml(dia)+', '+escHtml(ngay)+'</td>'+
+      '</tr>'+
+    '</table>';
+
+  var titleBlock='';
+  if(loai){
+    titleBlock=
+      '<p style="text-align:center;margin:18pt 0 6pt;font-size:14pt;font-weight:bold;text-transform:uppercase">'+escHtml(loai)+'</p>'+
+      '<p style="text-align:center;margin:0 0 14pt;font-size:13pt;font-style:italic">'+escHtml(trich)+'</p>';
+  } else {
+    titleBlock='<p style="margin:16pt 0 12pt;font-size:13pt;font-weight:bold">'+escHtml(trich)+'</p>';
+  }
+
+  // 4 dòng trống (~4 x 14pt ≈ 56pt) giữa chức vụ và họ tên
+  var kyHtml=kyLines.map(function(line){
+    return '<div style="font-weight:bold;text-transform:uppercase;line-height:1.3">'+escHtml(line)+'</div>';
+  }).join('');
+  var kyBlock=
+    '<div style="text-align:center">'+
+      kyHtml+
+      '<div style="line-height:14pt">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</div>'+
+      '<div style="font-weight:bold">'+escHtml(ten)+'</div>'+
+    '</div>';
+
+  return (
+    '<div style="font-family:\'Times New Roman\',Times,serif;font-size:13pt;color:#000">'+
+    header+
+    titleBlock+
+    (gui?'<p style="margin:0 0 10pt"><b>Kính gửi:</b> '+escHtml(gui)+'</p>':'')+
+    '<div style="text-align:justify;line-height:1.5;margin:0 0 16pt">'+nd+'</div>'+
+    '<table style="width:100%;border:none;border-collapse:collapse" cellpadding="0" cellspacing="0" border="0">'+
+      '<tr>'+
+        '<td width="42%" style="width:42%;vertical-align:top;border:none;padding:0;font-size:12pt">'+
+          '<div style="font-weight:bold">Nơi nhận:</div>'+
+          '<div style="font-size:11pt;font-style:italic;line-height:1.4">'+nn+'</div>'+
+        '</td>'+
+        '<td width="58%" style="width:58%;vertical-align:top;border:none;padding:0">'+kyBlock+'</td>'+
+      '</tr>'+
+    '</table>'+
+    '</div>'
+  );
+}
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function xemTruocVB(){document.getElementById('vbPreview').innerHTML=buildVBHtml();}
+function xuatWord(){
+  var inner=buildVBHtml();
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">'+
+    '<head><meta charset="utf-8"><title>Van ban</title>'+
+    '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->'+
+    '<style>@page{size:A4;margin:2cm 1.5cm 2cm 3cm} body{font-family:"Times New Roman",Times,serif;font-size:13pt;color:#000} table,td,th{border:none !important;border-width:0 !important} table{border-collapse:collapse}</style>'+
+    '</head><body>'+inner+'</body></html>';
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff',html],{type:'application/msword'}));
+  a.download='VB_'+soKyHieu().replace(/[\\/]/g,'_')+'_'+Date.now()+'.doc';
+  a.click();
 }
 
 (function init(){
   var t=new Date();
   document.getElementById('dStart').value=t.toISOString().slice(0,10);
-  doiDienTich(); tinhNgay(); docSo(); tinhTyLe();
+  document.getElementById('vbNgay').value=t.toISOString().slice(0,10);
+  doiDienTich();tinhNgay();docSo();tinhTyLe();fillMau();
 })();
 </script>
 </body>
