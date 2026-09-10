@@ -242,8 +242,8 @@ table.mini th{background:#f8fafc;font-size:10.5px;text-transform:uppercase;color
 
   <!-- Mẫu văn bản -->
   <div class="panel" id="tab-vanban">
-    <h2>Mẫu soạn thảo theo NĐ 30/2020/NĐ-CP</h2>
-    <p class="sub">Thể thức văn bản hành chính: Quốc hiệu · tiêu ngữ · số/ký hiệu · địa danh–ngày · tên loại · trích yếu · nội dung · ký · nơi nhận</p>
+    <h2 id="vbTitle">Mẫu soạn thảo theo NĐ 30/2020/NĐ-CP</h2>
+    <p class="sub" id="vbSub">Thể thức văn bản hành chính theo Nghị định 30/2020/NĐ-CP</p>
     <div class="field"><label>Loại văn bản</label>
       <select id="vbLoai" onchange="fillMau()">
         <option value="totrinh">Tờ trình</option>
@@ -253,8 +253,10 @@ table.mini th{background:#f8fafc;font-size:10.5px;text-transform:uppercase;color
         <option value="bienban">Biên bản</option>
         <option value="giaymoi">Giấy mời</option>
         <option value="kehoach">Kế hoạch</option>
+        <option value="phieumat">Phiếu đề xuất độ mật</option>
       </select>
     </div>
+    <div id="vbCommonFields">
     <div class="grid2">
       <div class="field"><label>Cơ quan chủ quản (trên tên CQBH)</label><input type="text" id="vbChuQuan" value="SỞ NÔNG NGHIỆP VÀ MÔI TRƯỜNG ĐỒNG NAI"></div>
       <div class="field"><label>Cơ quan ban hành</label><input type="text" id="vbCQ" value="BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC"></div>
@@ -280,8 +282,44 @@ table.mini th{background:#f8fafc;font-size:10.5px;text-transform:uppercase;color
     <div class="field"><label>Trích yếu nội dung</label><input type="text" id="vbTrich" placeholder="V/v …"></div>
     <div class="field"><label>Kính gửi (nếu có)</label><input type="text" id="vbGui" placeholder="Giám đốc Sở…"></div>
     <div class="field"><label>Nội dung văn bản</label><textarea id="vbNd" style="min-height:100px" placeholder="Nội dung chính…"></textarea></div>
-    <div class="field"><label>Nơi nhận</label><textarea id="vbNoiNhan" style="min-height:60px">- Như trên;
+    
+    
+<div class="field"><label>Nơi nhận</label><textarea id="vbNoiNhan" style="min-height:60px">- Như trên;
 - Lưu: VT, ….</textarea></div>
+    </div><!-- /vbCommonFields -->
+    <div id="pmFields" style="display:none;margin-top:8px;padding:14px;border:1px dashed #99f6e4;border-radius:12px;background:#f0fdfa">
+      <div style="font-size:12px;font-weight:800;color:#0f766e;margin-bottom:10px">Phiếu đề xuất độ mật — chỉ các mục dưới đây</div>
+      <div class="field"><label>Kính gửi</label><input type="text" id="pmGui" value="Phó Giám đốc Nguyễn Duy Công"></div>
+      <div class="grid2">
+        <div class="field"><label>Cơ quan / Ban (dòng trên)</label><input type="text" id="pmCQ" value="BQL RỪNG PHÒNG HỘ XUÂN LỘC"></div>
+        <div class="field"><label>Đơn vị soạn (phòng / phân trường…)</label><input type="text" id="pmPhong" value="PHÒNG LÂM NGHIỆP" oninput="syncLanhDaoLabel()"></div>
+      </div>
+      <div class="field"><label>1. Tên gọi / trích yếu văn bản</label><input type="text" id="pmTrich" placeholder="Báo cáo …"></div>
+      <div class="field"><label>2. Đơn vị chủ trì xây dựng văn bản</label><input type="text" id="pmDonVi" value="Phòng Lâm nghiệp" oninput="syncLanhDaoLabel()"></div>
+      <div class="grid2">
+        <div class="field"><label>3. Họ tên cán bộ soạn thảo</label><input type="text" id="pmSoan" placeholder="vd: Hoàng Thị Lan"></div>
+        <div class="field"><label id="lblLanhDao">Họ tên lãnh đạo đơn vị ký ý kiến</label><input type="text" id="pmLanhDao" placeholder="Trưởng phòng / Phân trường trưởng"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>4. Đề xuất độ mật</label>
+          <select id="pmDoMat">
+            <option value="Mật (C)">Mật (C)</option>
+            <option value="Tối mật (B)">Tối mật (B)</option>
+            <option value="Tuyệt mật (A)">Tuyệt mật (A)</option>
+            <option value="Không mật">Không mật</option>
+          </select>
+        </div>
+        <div class="field"><label>6. Số lượng bản phát hành</label><input type="text" id="pmSoBan" value="02 bản"></div>
+      </div>
+      <div class="field"><label>5. Căn cứ đề xuất độ mật</label><textarea id="pmCanCu" style="min-height:56px">Nội dung văn bản chứa thông tin quan trọng, làm cơ sở cung cấp thông tin cho văn bản mật khác</textarea></div>
+      <div class="field"><label>7. Được phép sao, chụp tài liệu mật?</label>
+        <select id="pmSao">
+          <option value="Không được phép">Không được phép</option>
+          <option value="Được phép">Được phép</option>
+        </select>
+      </div>
+      <div class="field"><label>Ý kiến lãnh đạo đơn vị (nội dung)</label><textarea id="pmYKienPhong" style="min-height:56px">Đã dự thảo theo chỉ đạo. Kính trình Phó Giám đốc xem xét, cho ý kiến</textarea></div>
+    </div>
     <div class="row-actions">
       <button type="button" class="btn btn-v" onclick="xuatWord()"><i class="fa-solid fa-file-word"></i> Xuất Word (NĐ 30)</button>
       <button type="button" class="btn" onclick="xemTruocVB()">Xem trước</button>
@@ -870,25 +908,57 @@ window.ensureMap=ensureMap;
   });
 })();
 
-
 /* Văn bản mẫu — thể thức NĐ 30/2020/NĐ-CP */
 function tenLoaiVB(){
-  var m={totrinh:'TỜ TRÌNH',congvan:'',thongbao:'THÔNG BÁO',baocao:'BÁO CÁO',bienban:'BIÊN BẢN',giaymoi:'GIẤY MỜI',kehoach:'KẾ HOẠCH'};
+  var m={totrinh:'TỜ TRÌNH',congvan:'',thongbao:'THÔNG BÁO',baocao:'BÁO CÁO',bienban:'BIÊN BẢN',giaymoi:'GIẤY MỜI',kehoach:'KẾ HOẠCH',phieumat:'PHIẾU ĐỀ XUẤT ĐỘ MẬT CỦA VĂN BẢN'};
   return m[document.getElementById('vbLoai').value]||'';
 }
 function fillMau(){
   var loai=document.getElementById('vbLoai').value;
-  var ky={totrinh:'TTr-BQL',congvan:'CV-BQL',thongbao:'TB-BQL',baocao:'BC-BQL',bienban:'BB-BQL',giaymoi:'GM-BQL',kehoach:'KH-BQL'};
-  document.getElementById('vbKyHieu').placeholder=ky[loai]||'BQL';
-  if(!document.getElementById('vbKyHieu').value) document.getElementById('vbKyHieu').value=ky[loai]||'BQL';
+  var isMat=(loai==='phieumat');
+  var common=document.getElementById('vbCommonFields');
+  var pm=document.getElementById('pmFields');
+  if(common) common.style.display=isMat?'none':'block';
+  if(pm) pm.style.display=isMat?'block':'none';
+
+  var title=document.getElementById('vbTitle');
+  var sub=document.getElementById('vbSub');
+  if(isMat){
+    if(typeof syncLanhDaoLabel==='function') try{syncLanhDaoLabel();}catch(e){}
+    if(title) title.textContent='Phiếu đề xuất độ mật của văn bản';
+    if(sub) sub.textContent='Theo mẫu nội bộ Ban · điền đủ 7 mục · ý kiến lãnh đạo phòng / ký duyệt';
+  } else {
+    if(title) title.textContent='Mẫu soạn thảo theo NĐ 30/2020/NĐ-CP';
+    if(sub) sub.textContent='Thể thức văn bản hành chính: Quốc hiệu · tiêu ngữ · số/ký hiệu · địa danh–ngày · tên loại · trích yếu · nội dung · ký · nơi nhận';
+  }
+
+  var ky={totrinh:'TTr-BQL',congvan:'CV-BQL',thongbao:'TB-BQL',baocao:'BC-BQL',bienban:'BB-BQL',giaymoi:'GM-BQL',kehoach:'KH-BQL',phieumat:'PĐXM-BQL'};
+  var kh=document.getElementById('vbKyHieu');
+  if(kh){
+    kh.placeholder=ky[loai]||'BQL';
+    if(!kh.value || Object.values(ky).indexOf(kh.value)>=0) kh.value=ky[loai]||'BQL';
+  }
+
+  // Kính gửi: luôn hiện (cả phiếu mật)
+  var guiEl=document.getElementById('vbGui');
+  if(guiEl){
+    var gw=guiEl.closest?guiEl.closest('.field'):null;
+    // nếu kính gửi nằm trong common đã ẩn, nhân bản? — đưa kính gửi ra ngoài common tốt hơn
+    if(isMat){
+      guiEl.value=guiEl.value||'Phó Giám đốc Tô Thế Mạnh';
+    }
+  }
+
+  if(isMat) return;
+
   var map={
-    totrinh:{trich:'V/v xin ý kiến chỉ đạo về…', nd:'Căn cứ chức năng, nhiệm vụ được giao;\nQua rà soát thực tế,\nBan Quản lý rừng phòng hộ Xuân Lộc kính trình nội dung sau:\n1. …\n2. …', nn:'- Như trên;\n- Lưu: VT, phòng chuyên môn.'},
-    congvan:{trich:'V/v …', nd:'Ban Quản lý rừng phòng hộ Xuân Lộc có ý kiến như sau:\n…', nn:'- Như trên;\n- Lưu: VT.'},
-    thongbao:{trich:'V/v …', nd:'Ban Quản lý rừng phòng hộ Xuân Lộc thông báo:\n…', nn:'- Các phòng, phân trường;\n- Lưu: VT.'},
-    baocao:{trich:'V/v báo cáo …', nd:'I. Kết quả thực hiện\nII. Tồn tại, hạn chế\nIII. Kiến nghị, đề xuất', nn:'- Như trên;\n- Lưu: VT.'},
-    bienban:{trich:'V/v …', nd:'I. Thời gian, địa điểm\nII. Thành phần\nIII. Nội dung\nIV. Kết luận', nn:'- Thành phần;\n- Lưu: VT.'},
-    giaymoi:{trich:'V/v mời họp …', nd:'Ban Quản lý rừng phòng hộ Xuân Lộc trân trọng kính mời:\nThời gian:\nĐịa điểm:\nNội dung:', nn:'- Như trên;\n- Lưu: VT.'},
-    kehoach:{trich:'V/v …', nd:'I. Mục đích, yêu cầu\nII. Nội dung\nIII. Tổ chức thực hiện', nn:'- Các đơn vị;\n- Lưu: VT.'}
+    totrinh:{trich:'V/v xin ý kiến chỉ đạo về…', nd:'Căn cứ chức năng, nhiệm vụ được giao.\nQua rà soát thực tế kính trình:\n1. …\n2. …', nn:'- Như trên;\n- Lưu: VT.'},
+    congvan:{trich:'V/v …', nd:'Ban có ý kiến như sau:\n…', nn:'- Như trên;\n- Lưu: VT.'},
+    thongbao:{trich:'V/v …', nd:'Ban thông báo:\n…', nn:'- Các đơn vị;\n- Lưu: VT.'},
+    baocao:{trich:'V/v báo cáo …', nd:'I. Kết quả thực hiện\nII. Tồn tại, hạn chế\nIII. Kiến nghị', nn:'- Như trên;\n- Lưu: VT.'},
+    bienban:{trich:'V/v …', nd:'I. Thời gian\nII. Thành phần\nIII. Nội dung\nIV. Kết luận', nn:'- Thành phần;\n- Lưu: VT.'},
+    giaymoi:{trich:'V/v mời họp …', nd:'Kính mời:\nThời gian:\nĐịa điểm:\nNội dung:', nn:'- Như trên;\n- Lưu: VT.'},
+    kehoach:{trich:'V/v …', nd:'I. Mục đích\nII. Nội dung\nIII. Tổ chức thực hiện', nn:'- Các đơn vị;\n- Lưu: VT.'}
   };
   var x=map[loai]||map.totrinh;
   document.getElementById('vbTrich').value=x.trich;
@@ -908,7 +978,110 @@ function soKyHieu(){
   if(kh) return '…/'+kh;
   return '…/…';
 }
+
+
+function g(id){ var e=document.getElementById(id); return e ? (e.value||'').trim() : ''; }
+function endDot(s){
+  s=String(s||'').trim();
+  if(!s) return '…';
+  if(/[.!?…]$/.test(s)) return s;
+  return s+'.';
+}
+function syncLanhDaoLabel(){
+  var dv=(g('pmDonVi')||g('pmPhong')||'').toLowerCase();
+  var lbl=document.getElementById('lblLanhDao');
+  if(!lbl) return;
+  if(/phân\s*trường|phan\s*truong/.test(dv)) lbl.textContent='Họ tên lãnh đạo phân trường ký ý kiến';
+  else if(/phòng|phong/.test(dv)) lbl.textContent='Họ tên lãnh đạo phòng ký ý kiến';
+  else lbl.textContent='Họ tên lãnh đạo đơn vị ký ý kiến';
+}
+function lanhDaoTieuDe(){
+  var dv=(g('pmDonVi')||g('pmPhong')||'').toLowerCase();
+  if(/phân\s*trường|phan\s*truong/.test(dv)) return 'Ý kiến của Lãnh đạo phân trường';
+  if(/phòng|phong/.test(dv)) return 'Ý kiến của Lãnh đạo phòng';
+  return 'Ý kiến của Lãnh đạo đơn vị';
+}
+function buildPhieuMatHtml(){
+  var cq=(g('pmCQ')||'BQL RỪNG PHÒNG HỘ XUÂN LỘC').toUpperCase();
+  var phong=(g('pmPhong')||'PHÒNG LÂM NGHIỆP').toUpperCase();
+  var gui=(g('pmGui')||'Phó Giám đốc').replace(/[.]+$/,'');
+  var trich=endDot(g('pmTrich')||'…');
+  var donvi=endDot(g('pmDonVi')||'…');
+  var soan=(g('pmSoan')||'…').replace(/[.]+$/,'');
+  var lanhDao=(g('pmLanhDao')||'').replace(/[.]+$/,'');
+  var domat=(g('pmDoMat')||'Mật (C)').replace(/[.]+$/,'');
+  var cancu=endDot(g('pmCanCu')||'');
+  var soban=endDot(g('pmSoBan')||'…');
+  var sao=endDot(g('pmSao')||'Không được phép');
+  var ykien=endDot(g('pmYKienPhong')||'');
+  var tieuDeYKien=lanhDaoTieuDe();
+  var dongCham='';
+  for(var i=0;i<5;i++) dongCham+='<div style="line-height:1.9;letter-spacing:1pt">................................................................</div>';
+
+  return (
+    '<div style="font-family:\'Times New Roman\',Times,serif;font-size:13pt;color:#000">'+
+    '<table style="width:100%;border:none;border-collapse:collapse" cellpadding="0" cellspacing="0" border="0">'+
+      '<tr>'+
+        '<td width="45%" style="width:45%;text-align:center;vertical-align:top;border:none;padding:0 8pt 0 0">'+
+          '<div style="font-size:12pt;text-transform:uppercase">'+escHtml(cq)+'</div>'+
+          '<div style="font-size:13pt;font-weight:bold;text-transform:uppercase;margin-top:2px">'+escHtml(phong)+'</div>'+
+          '<div style="width:40%;margin:6px auto 0;border-bottom:1.5pt solid #000"></div>'+
+        '</td>'+
+        '<td width="55%" style="width:55%;text-align:center;vertical-align:top;border:none;padding:0 0 0 8pt">'+
+          '<div style="font-size:13pt;font-weight:bold">CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>'+
+          '<div style="font-size:13pt;font-weight:bold">Độc lập - Tự do - Hạnh phúc</div>'+
+          '<div style="width:55%;margin:6px auto 0;border-bottom:1.5pt solid #000"></div>'+
+        '</td>'+
+      '</tr>'+
+    '</table>'+
+    '<p style="text-align:center;margin:18pt 0 14pt;font-size:14pt;font-weight:bold;text-transform:uppercase">PHIẾU ĐỀ XUẤT ĐỘ MẬT CỦA VĂN BẢN</p>'+
+    '<p style="margin:0 0 12pt"><b>Kính gửi:</b> '+escHtml(gui)+'.</p>'+
+    '<p style="margin:0 0 8pt;text-align:justify"><b>1/</b> Tên gọi hoặc trích yếu nội dung văn bản: '+escHtml(trich)+'</p>'+
+    '<p style="margin:0 0 8pt;text-align:justify"><b>2/</b> Đơn vị chủ trì xây dựng văn bản: '+escHtml(donvi)+'</p>'+
+    '<p style="margin:0 0 8pt"><b>3/</b> Họ và tên cán bộ soạn thảo văn bản: '+escHtml(endDot(soan))+'</p>'+
+    '<p style="margin:0 0 8pt"><b>4/</b> Đề xuất độ mật: <b>'+escHtml(domat)+'</b>.</p>'+
+    '<p style="margin:0 0 8pt;text-align:justify"><b>5/</b> Căn cứ đề xuất độ mật: '+escHtml(cancu)+'</p>'+
+    '<p style="margin:0 0 8pt"><b>6/</b> Dự kiến số lượng bản phát hành: '+escHtml(soban)+'</p>'+
+    '<p style="margin:0 0 14pt;text-align:justify"><b>7/</b> Được phép hoặc không được phép sao, chụp tài liệu, vật chứa bí mật nhà nước: '+escHtml(sao)+'</p>'+
+    '<table style="width:100%;border-collapse:collapse;table-layout:fixed" cellpadding="0" cellspacing="0">'+
+      '<tr>'+
+        '<td width="50%" style="width:50%;border:1pt solid #000;padding:6pt 8pt;text-align:center;font-weight:bold">'+escHtml(tieuDeYKien)+'</td>'+
+        '<td width="50%" style="width:50%;border:1pt solid #000;border-left:none;padding:6pt 8pt;text-align:center;font-weight:bold">Người soạn thảo</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td style="border:1pt solid #000;border-top:none;padding:8pt;vertical-align:top;height:72pt;text-align:justify;font-size:12pt">'+escHtml(ykien)+'</td>'+
+        '<td style="border:1pt solid #000;border-top:none;border-left:none;padding:8pt;vertical-align:top;height:72pt">&nbsp;</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td style="border:1pt solid #000;border-top:none;height:48pt;padding:4pt">&nbsp;</td>'+
+        '<td style="border:1pt solid #000;border-top:none;border-left:none;height:48pt;padding:4pt">&nbsp;</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td style="border:1pt solid #000;border-top:none;padding:6pt 8pt;text-align:center;font-weight:bold">'+(lanhDao?escHtml(lanhDao):'&nbsp;')+'</td>'+
+        '<td style="border:1pt solid #000;border-top:none;border-left:none;padding:6pt 8pt;text-align:center;font-weight:bold">'+escHtml(soan)+'</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td colspan="2" style="border:1pt solid #000;border-top:none;padding:6pt 8pt;text-align:center;font-weight:bold">Ý kiến của Lãnh đạo ký duyệt</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td colspan="2" style="border:1pt solid #000;border-top:none;padding:8pt 12pt;height:90pt;vertical-align:top">'+
+          '<div style="line-height:1.85;letter-spacing:1pt">................................................................</div>'+
+          '<div style="line-height:1.85;letter-spacing:1pt">................................................................</div>'+
+          '<div style="line-height:1.85;letter-spacing:1pt">................................................................</div>'+
+          '<div style="line-height:1.85;letter-spacing:1pt">................................................................</div>'+
+          '<div style="line-height:1.85;letter-spacing:1pt">................................................................</div>'+
+        '</td>'+
+      '</tr>'+
+    '</table>'+
+    '</div>'
+  );
+}
 function buildVBHtml(){
+
+
+  if(document.getElementById('vbLoai') && document.getElementById('vbLoai').value==='phieumat')
+    return buildPhieuMatHtml();
+
   var chuQuan=(document.getElementById('vbChuQuan')&&document.getElementById('vbChuQuan').value||'').trim().toUpperCase();
   var cq=(document.getElementById('vbCQ').value||'BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC').toUpperCase();
   var dia=document.getElementById('vbDiaDanh').value||'Xuân Lộc';
