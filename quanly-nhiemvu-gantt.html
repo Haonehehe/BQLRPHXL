@@ -287,6 +287,7 @@ tbody tr:hover td{background:#f8fafc}
           <tr>
             <th style="width:36px">#</th>
             <th>Đơn vị TH</th>
+            <th>Cán bộ phụ trách</th>
             <th>Nội dung chỉ đạo / nhiệm vụ</th>
             <th>Văn bản chỉ đạo</th>
             <th>Thời hạn</th>
@@ -542,6 +543,9 @@ function parseMatrix(matrix){
     var ht=String(c[5]==null?'':c[5]).trim();
     var gt=String(c[6]==null?'':c[6]).trim();
     var dvH=String(c[7]==null?'':c[7]).trim();
+    var canBo=String(c[8]==null?'':c[8]).trim(); // Cột I - Cán bộ phụ trách
+    if(!canBo) canBo=String(c[24]==null?'':c[24]).trim(); // dự phòng cột Y
+    if(/^cán bộ phụ trách$/i.test(canBo)) canBo='';
 
     // Nhóm A/B/C
     if(/^[A-Z]$/.test(stt) && nd){ group=nd; continue; }
@@ -594,6 +598,7 @@ function parseMatrix(matrix){
       danhGia: statusByDate(due, ht),
       giaiTrinh: gt,
       donVi: donViTH,
+      canBo: canBo || '',
       donViSection: unit || '',
       nhom: group || ''
     });
@@ -643,7 +648,7 @@ function locDong(){
       } else if(d.danhGia!==fTT) return false;
     }
     if(!q) return true;
-    var b=[d.noiDung,d.vanBan,d.lanhDao,d.donVi,d.giaiTrinh,d.danhGia].join(' ').toLowerCase();
+    var b=[d.noiDung,d.vanBan,d.lanhDao,d.donVi,d.canBo,d.giaiTrinh,d.danhGia].join(' ').toLowerCase();
     return q.split(/\s+/).every(function(w){ return b.indexOf(w)>=0; });
   });
 }
@@ -678,11 +683,12 @@ function veDS(list){
   list.forEach(function(d){
     if(d.donVi!==lastUnit){
       lastUnit=d.donVi;
-      html+='<tr class="sec-row"><td colspan="8"><i class="fa-solid fa-building"></i> '+esc(d.donVi)+(d.nhom?' <span style="font-weight:500;color:#64748b"> · '+esc(d.nhom)+'</span>':'')+'</td></tr>';
+      html+='<tr class="sec-row"><td colspan="9"><i class="fa-solid fa-building"></i> '+esc(d.donVi)+(d.nhom?' <span style="font-weight:500;color:#64748b"> · '+esc(d.nhom)+'</span>':'')+'</td></tr>';
     }
     html+='<tr>'+
       '<td>'+esc(d.stt)+'</td>'+
       '<td style="white-space:nowrap;font-size:11.5px;font-weight:600;color:#0369a1">'+esc(d.donVi)+'</td>'+
+      '<td style="white-space:nowrap;font-size:11.5px;color:#0f766e;font-weight:600">'+esc(d.canBo||'—')+'</td>'+
       '<td><b>'+esc(cleanTaskTitle(d.noiDung||''))+'</b></td>'+
       '<td style="font-size:11.5px">'+esc(d.vanBan||'—')+'</td>'+
       '<td style="white-space:nowrap">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||'—'))+'</td>'+
@@ -691,7 +697,7 @@ function veDS(list){
       '<td style="font-size:11.5px;color:#475569">'+esc(d.giaiTrinh||'')+'</td>'+
     '</tr>';
   });
-  document.getElementById('tbDS').innerHTML=html||'<tr><td colspan="8" class="muted">Không có dữ liệu</td></tr>';
+  document.getElementById('tbDS').innerHTML=html||'<tr><td colspan="9" class="muted">Không có dữ liệu</td></tr>';
 }
 
 function monthLabel(d){
@@ -759,11 +765,11 @@ function veGantt(list){
     else if(dg==='Quá hạn'||dg==='Trễ hạn') cls='late';
     else if(dg==='Trong hạn') cls='soon';
     var name=cleanTaskTitle(d.noiDung||d.noiDungFull||'') || ('Nhiệm vụ '+d.stt);
-    var tipText=name+' — Hạn: '+fmtDate(d.thoiHan)+' · '+(d.donVi||'')+(dg?(' · '+dg):'');
+    var tipText=name+' — Hạn: '+fmtDate(d.thoiHan)+' · '+(d.donVi||'')+(d.canBo?(' · CB: '+d.canBo):'')+(dg?(' · '+dg):'');
     html+='<div class="gantt-row">'+
       '<div class="gantt-name" title="'+esc(tipText)+'">'+
         '<b>'+esc(name)+'</b>'+
-        '<span>'+esc(d.donVi||'')+(d.thoiHan?' · hạn '+fmtDate(d.thoiHan):'')+'</span>'+
+        '<span>'+esc(d.donVi||'')+(d.canBo?' · '+esc(d.canBo):'')+(d.thoiHan?' · hạn '+fmtDate(d.thoiHan):'')+'</span>'+
       '</div>'+
       '<div class="gantt-track">'+
         '<div class="gantt-today" style="left:'+todayPct+'%" title="Hôm nay '+fmtDate(today)+'"></div>'+
@@ -778,16 +784,16 @@ function xuatExcel(){
   var list=locDong();
   if(!list.length){ toast('Không có dữ liệu để xuất'); return; }
   if(typeof XLSX==='undefined'){ toast('Chưa tải thư viện Excel'); return; }
-  var rows=[['STT','Đơn vị thực hiện','Nội dung chỉ đạo','Văn bản chỉ đạo','Thời hạn','Lãnh đạo','Đánh giá','Giải trình tiến độ','Nhóm']];
+  var rows=[['STT','Đơn vị thực hiện','Cán bộ phụ trách','Nội dung chỉ đạo','Văn bản chỉ đạo','Thời hạn','Lãnh đạo','Đánh giá','Giải trình tiến độ','Nhóm']];
   list.forEach(function(d){
     rows.push([
-      d.stt, d.donVi, d.noiDung, d.vanBan||'',
+      d.stt, d.donVi, d.canBo||'', d.noiDung, d.vanBan||'',
       d.thoiHan?fmtDate(d.thoiHan):(d.thoiHanRaw||''),
       d.lanhDao||'', d.danhGia||'', d.giaiTrinh||'', d.nhom||''
     ]);
   });
   var ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:6},{wch:18},{wch:55},{wch:32},{wch:12},{wch:18},{wch:12},{wch:40},{wch:24}];
+  ws['!cols']=[{wch:6},{wch:18},{wch:18},{wch:55},{wch:32},{wch:12},{wch:18},{wch:12},{wch:40},{wch:24}];
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Nhiem vu');
   XLSX.writeFile(wb, 'Nhiem_vu_BQLRPHXL_'+fmtFileDate()+'.xlsx');
@@ -803,6 +809,7 @@ function xuatWord(){
     rows+='<tr>'+
       '<td style="text-align:center">'+(i+1)+'</td>'+
       '<td>'+esc(d.donVi)+'</td>'+
+      '<td>'+esc(d.canBo||'')+'</td>'+
       '<td>'+esc(d.noiDung)+'</td>'+
       '<td>'+esc(d.vanBan||'')+'</td>'+
       '<td style="text-align:center">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||''))+'</td>'+
@@ -822,7 +829,7 @@ function xuatWord(){
     '<h2>DANH SÁCH NHIỆM VỤ THEO CHỈ ĐẠO</h2>'+
     '<p class="meta">Xuất ngày: '+fmtDate(now)+' · Số nhiệm vụ: '+list.length+'</p>'+
     '<table><thead><tr>'+
-    '<th>STT</th><th>Đơn vị TH</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Đánh giá</th><th>Giải trình</th>'+
+    '<th>STT</th><th>Đơn vị TH</th><th>Cán bộ phụ trách</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Đánh giá</th><th>Giải trình</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table>'+
     '<p style="margin-top:24px">Người tổng hợp: ………………………… &nbsp;&nbsp;&nbsp; Lãnh đạo: …………………………</p>'+
     '</body></html>';
