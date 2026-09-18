@@ -134,7 +134,7 @@ tbody tr:hover td{background:#f8fafc}
 .tl-legend span{display:inline-flex;align-items:center;gap:6px}
 .tl-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
 .tl-axis{
-  display:grid;grid-template-columns:minmax(200px,280px) 1fr;gap:8px;margin-bottom:6px;
+  display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:10px;margin-bottom:8px;
   font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;
 }
 .tl-months{position:relative;height:22px;border-radius:8px;background:#f8fafc;border:1px solid var(--bd);overflow:hidden}
@@ -143,25 +143,25 @@ tbody tr:hover td{background:#f8fafc}
   border-right:1px solid #e2e8f0;font-size:10px;color:#64748b;white-space:nowrap;padding:0 4px;
 }
 .gantt-row{
-  display:grid;grid-template-columns:minmax(200px,280px) 1fr;gap:8px;align-items:center;
-  margin-bottom:6px;min-height:36px;
+  display:grid;grid-template-columns:minmax(260px,400px) 1fr;gap:10px;align-items:stretch;
+  margin-bottom:8px;min-height:48px;
 }
-.gantt-name{font-size:11.5px;line-height:1.35;padding-right:6px}
-.gantt-name b{display:block;font-weight:700;color:#0f172a}
-.gantt-name span{color:#64748b;font-size:10.5px}
+.gantt-name{font-size:12px;line-height:1.4;padding:6px 10px 6px 0;display:flex;flex-direction:column;justify-content:center}
+.gantt-name b{font-weight:650;color:#0f172a;font-size:12.5px;max-height:4.2em;overflow:hidden}
+.gantt-name span{color:#64748b;font-size:11px;margin-top:2px}
 .gantt-track{
-  position:relative;height:28px;border-radius:10px;
-  background:linear-gradient(180deg,#f8fafc,#f1f5f9);border:1px solid #e2e8f0;overflow:visible;
+  position:relative;height:32px;border-radius:12px;
+  background:linear-gradient(180deg,#f8fafc,#eef2f7);border:1px solid #e2e8f0;overflow:visible;
 }
 .gantt-today{
   position:absolute;top:-2px;bottom:-2px;width:2px;background:#ef4444;z-index:3;
   box-shadow:0 0 0 3px rgba(239,68,68,.15);
 }
 .gantt-bar{
-  position:absolute;top:4px;height:20px;min-width:22px;border-radius:999px;z-index:2;
+  position:absolute;top:5px;height:22px;min-width:52px;border-radius:999px;z-index:2;
   display:flex;align-items:center;justify-content:center;
-  font-size:9.5px;font-weight:800;color:#fff;padding:0 8px;
-  box-shadow:0 4px 12px rgba(15,23,42,.18);white-space:nowrap;
+  font-size:10px;font-weight:800;color:#fff;padding:0 10px;
+  box-shadow:0 4px 14px rgba(15,23,42,.16);white-space:nowrap;
   transform:translateX(-50%);
 }
 .gantt-bar.ok{background:linear-gradient(135deg,#34d399,#059669)}
@@ -285,7 +285,7 @@ tbody tr:hover td{background:#f8fafc}
   <div class="card" id="cardTimeline">
     <div class="card-h">
       <h2><i class="fa-solid fa-timeline"></i> Timeline theo thời hạn</h2>
-      <span style="font-size:11px;color:var(--mu)">Mốc ngày hoàn thành · in kèm PDF</span>
+      <span style="font-size:11px;color:var(--mu)">Mốc hạn hoàn thành · vạch đỏ = hôm nay</span>
     </div>
     <div class="gantt-wrap" id="gantt"></div>
   </div>
@@ -344,25 +344,112 @@ function esc(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,
 function cellGviz(r,i){
   if(!r||!r.c||!r.c[i]) return '';
   var v=r.c[i];
+  if(v.v!=null){
+    var raw=v.v;
+    if(typeof raw==='string' && /^Date\s*\(/.test(raw)){
+      var dm=raw.match(/Date\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if(dm) return pad2(+dm[3])+'/'+pad2(+dm[2]+1)+'/'+dm[1];
+    }
+    if(typeof raw==='number' && isFinite(raw)){
+      // STT số nguyên nhỏ
+      if(raw < 10000) return (v.f!=null && String(v.f).trim()!=='') ? String(v.f).trim() : String(Math.round(raw));
+      // Excel serial
+      if(raw>20000 && raw<80000){
+        var ed=new Date(Date.UTC(1899,11,30)+raw*86400000);
+        return pad2(ed.getUTCDate())+'/'+pad2(ed.getUTCMonth()+1)+'/'+ed.getUTCFullYear();
+      }
+    }
+  }
   if(v.f!=null && String(v.f).trim()!=='') return String(v.f).trim();
   if(v.v==null) return '';
   return String(v.v).trim();
 }
+function pad2(n){ n=Number(n)||0; return (n<10?'0':'')+n; }
 
 function parseDateVN(s){
-  s=String(s||'').trim();
+  if(s instanceof Date && !isNaN(s.getTime()))
+    return sanitizeDue(new Date(s.getFullYear(), s.getMonth(), s.getDate()));
+  s=String(s==null?'':s).trim();
   if(!s) return null;
-  var m=s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
-  m=s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-  if(m) return new Date(+m[1], +m[2]-1, +m[3]);
-  m=s.match(/ngày\s+(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/i);
-  if(m) return new Date(+m[3], +m[2]-1, +m[1]);
+  // Không phải ngày
+  if(/thường xuyên|thuong xuyen|định kỳ|dinh ky|hàng tháng|hang thang|đang làm|không xác định/i.test(s) && !/\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}/.test(s))
+    return null;
+
+  var dm=s.match(/Date\s*\(\s*(\d{4})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})/);
+  if(dm) return sanitizeDue(new Date(+dm[1], +dm[2], +dm[3]));
+
+  var m=s.match(/ngày\s+(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/i);
+  if(m) return sanitizeDue(new Date(+m[3], +m[2]-1, +m[1]));
+
+  m=s.match(/ngày\s+(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})(?!\d)/i);
+  if(m){
+    var y2=+m[3]; y2=y2<50?2000+y2:1900+y2;
+    return sanitizeDue(new Date(y2, +m[2]-1, +m[1]));
+  }
+
+  // dd/mm/yyyy đứng riêng hoặc trong chuỗi
+  m=s.match(/(?:^|[^\d])(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})(?:[^\d]|$)/);
+  if(m){
+    var d=+m[1], mo=+m[2], y=+m[3];
+    if(mo>=1&&mo<=12&&d>=1&&d<=31) return sanitizeDue(new Date(y, mo-1, d));
+  }
+
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if(m) return sanitizeDue(new Date(+m[3], +m[2]-1, +m[1]));
+
+  m=s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+  if(m) return sanitizeDue(new Date(+m[1], +m[2]-1, +m[3]));
+
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})$/);
+  if(m){
+    var yy=+m[3]; yy=yy<50?2000+yy:1900+yy;
+    return sanitizeDue(new Date(yy, +m[2]-1, +m[1]));
+  }
   return null;
 }
+
+/** Sửa năm bị Excel/Sheets auto-fill (2027, 2028… khi thực tế là 2026) */
+function sanitizeDue(d){
+  if(!d || isNaN(d.getTime())) return null;
+  var y=d.getFullYear();
+  var nowY=(new Date()).getFullYear();
+  if(y < 2018) return null;
+  if(y > nowY){
+    // Giữ ngày/tháng, kéo về năm hiện tại (Sheet hay autofill năm 2027, 2028…)
+    d=new Date(nowY, d.getMonth(), d.getDate());
+  }
+  return d;
+}
+
 function fmtDate(d){
   if(!d) return '';
-  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  if(!(d instanceof Date)) d=parseDateVN(d);
+  if(!d||isNaN(d.getTime())) return '';
+  return pad2(d.getDate())+'/'+pad2(d.getMonth()+1)+'/'+d.getFullYear();
+}
+function fmtDM(d){
+  if(!d) return '';
+  if(!(d instanceof Date)) d=parseDateVN(d);
+  if(!d||isNaN(d.getTime())) return '';
+  return pad2(d.getDate())+'/'+pad2(d.getMonth()+1);
+}
+function cleanTaskTitle(s){
+  s=String(s||'').replace(/\s+/g,' ').trim();
+  s=s.replace(/^\d{1,3}[\.\)\-\:]\s*/,'');
+  s=s.replace(/^[\-\–•]+\s*/,'');
+  return s.trim();
+}
+function statusByDate(due, sheetStatus){
+  var st=normStatus(sheetStatus);
+  if(st==='Trước hạn'||st==='Đúng hạn'||st==='Quá hạn'||st==='Trễ hạn'||st==='Trong hạn') return st;
+  if(!due) return st||'';
+  var today=new Date(); today.setHours(0,0,0,0);
+  var dd=new Date(due.getFullYear(), due.getMonth(), due.getDate());
+  var diff=Math.round((dd-today)/864e5);
+  if(diff<0) return 'Quá hạn';
+  if(diff===0) return 'Đúng hạn';
+  if(diff<=14) return 'Trong hạn';
+  return 'Trong hạn';
 }
 
 function normStatus(s){
@@ -420,54 +507,73 @@ function parseMatrix(matrix){
   var out=[];
   var unit='';
   var group='';
+  var auto=0;
   for(var i=0;i<matrix.length;i++){
     var c=matrix[i];
     if(!c||!c.length) continue;
-    var stt=String(c[0]||'').trim();
-    var nd=String(c[1]||'').trim();
-    var vb=String(c[2]||'').trim();
-    var th=String(c[3]||'').trim();
-    var ld=String(c[4]||'').trim();
-    var ht=String(c[5]||'').trim();
-    var gt=String(c[6]||'').trim();
-    var dvH=String(c[7]||'').trim();
+    var stt=String(c[0]==null?'':c[0]).trim();
+    var nd=String(c[1]==null?'':c[1]).trim();
+    var vb=String(c[2]==null?'':c[2]).trim();
+    var th=String(c[3]==null?'':c[3]).trim();
+    var ld=String(c[4]==null?'':c[4]).trim();
+    var ht=String(c[5]==null?'':c[5]).trim();
+    var gt=String(c[6]==null?'':c[6]).trim();
+    var dvH=String(c[7]==null?'':c[7]).trim();
 
+    // Nhóm A/B/C
     if(/^[A-Z]$/.test(stt) && nd){ group=nd; continue; }
-    if(/^[IVX]+$/i.test(stt) && nd){
+    // Mục La Mã → đơn vị
+    if(/^[IVXLC]+$/i.test(stt) && nd){
       unit=nd.replace(/^PHÒNG\s+/i,'Phòng ').replace(/^PHÂN TRƯỜNG\s+/i,'Phân trường ');
       continue;
     }
-    if(!stt && nd && !vb && !ld && !ht && !dvH){
-      if(/phòng|phân trường|đơn vị|ban /i.test(nd) && nd.length<80){
+    // Dòng tiêu đề đơn vị / nhóm
+    if((!stt || stt==='0') && nd && !vb && !th && !ld && !ht && !dvH){
+      if(/phòng|phân trường|đơn vị|^ban\b/i.test(nd) && nd.length<90){
         unit=nd.replace(/^PHÒNG\s+/i,'Phòng ').replace(/^PHÂN TRƯỜNG\s+/i,'Phân trường ');
         continue;
       }
-      if(/NHIỆM VỤ|CÁC NHIỆM VỤ|HOÀN THÀNH|ĐANG THỰC HIỆN/i.test(nd)){
+      if(/NHIỆM VỤ|CÁC NHIỆM VỤ|HOÀN THÀNH|ĐANG THỰC HIỆN|CHƯA HOÀN THÀNH/i.test(nd)){
         group=nd; continue;
       }
     }
-    if(!stt && !nd) continue;
-    if(/Nội dung chỉ đạo|NHIỆM VỤ|CÁC NHIỆM VỤ/i.test(nd) && !/^\d+/.test(stt)) continue;
-    if(!/^\d+/.test(stt) && !nd) continue;
+    // Bỏ header cột
+    if(/Nội dung chỉ đạo/i.test(nd) && /văn bản|thời hạn/i.test(vb+th)) continue;
+    if(!nd) continue;
 
-    if(/^\d+/.test(stt) && nd){
-      var due=parseDateVN(th);
-      if(!due) due=parseDateVN(vb);
-      var donViTH = dvH || unit || '—';
-      out.push({
-        stt: stt,
-        noiDung: nd,
-        vanBan: vb,
-        thoiHanRaw: th,
-        thoiHan: due,
-        lanhDao: ld,
-        danhGia: normStatus(ht),
-        giaiTrinh: gt,
-        donVi: donViTH,
-        donViSection: unit || '',
-        nhom: group || ''
-      });
+    // Nhận dòng nhiệm vụ: có STT số HOẶC có nội dung + (văn bản / lãnh đạo / đơn vị H / đánh giá)
+    var isStt=/^\d+(\.0+)?$/.test(stt);
+    var looksTask = isStt || !!(vb || ld || dvH || ht || th);
+    if(!looksTask) continue;
+    // Tránh nhận nhầm dòng tiêu đề dài không phải task
+    if(!isStt && !vb && !th && !ld && nd.length<40 && /phòng|phân trường/i.test(nd)) {
+      unit=nd; continue;
     }
+
+    auto++;
+    var due=null;
+    // Ưu tiên cột Thời hạn nếu là ngày thật (không phải "Thường xuyên")
+    if(th && !/thường xuyên|thuong xuyen/i.test(th)) due=parseDateVN(th);
+    if(!due) due=parseDateVN(vb);
+    // Không lấy ngày trong giải trình (dễ dính ngày báo cáo khác)
+    var donViTH = dvH || unit || '—';
+    var title=cleanTaskTitle(nd);
+    var sttShow = isStt ? String(parseInt(stt,10)||stt) : String(auto);
+
+    out.push({
+      stt: sttShow,
+      noiDung: title || nd,
+      noiDungFull: nd,
+      vanBan: vb,
+      thoiHanRaw: th || '',
+      thoiHan: due,
+      lanhDao: ld,
+      danhGia: statusByDate(due, ht),
+      giaiTrinh: gt,
+      donVi: donViTH,
+      donViSection: unit || '',
+      nhom: group || ''
+    });
   }
   return out;
 }
@@ -554,7 +660,7 @@ function veDS(list){
     html+='<tr>'+
       '<td>'+esc(d.stt)+'</td>'+
       '<td style="white-space:nowrap;font-size:11.5px;font-weight:600;color:#0369a1">'+esc(d.donVi)+'</td>'+
-      '<td><b>'+esc(d.noiDung)+'</b></td>'+
+      '<td><b>'+esc(cleanTaskTitle(d.noiDung||''))+'</b></td>'+
       '<td style="font-size:11.5px">'+esc(d.vanBan||'—')+'</td>'+
       '<td style="white-space:nowrap">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||'—'))+'</td>'+
       '<td>'+esc(d.lanhDao||'—')+'</td>'+
@@ -609,24 +715,32 @@ function veGantt(list){
   });
   html+='</div></div>';
 
-  withDate.slice(0,100).forEach(function(d){
-    var t=d.thoiHan.getTime();
-    var left=((t-min)/span)*100;
+  withDate.slice(0,200).forEach(function(d){
+    var tt=d.thoiHan.getTime();
+    if(!isFinite(tt)) return;
+    var left=((tt-min)/span)*100;
+    if(left<0) left=0; if(left>100) left=100;
+    var dg=statusByDate(d.thoiHan, d.danhGia);
     var cls='mu';
-    if(d.danhGia==='Đúng hạn') cls='ok';
-    else if(d.danhGia==='Trước hạn') cls='early';
-    else if(d.danhGia==='Quá hạn'||d.danhGia==='Trễ hạn') cls='late';
-    else if(d.danhGia==='Trong hạn') cls='soon';
-    var title=esc(d.stt+'. '+d.noiDung)+' — '+fmtDate(d.thoiHan)+' · '+esc(d.donVi);
+    if(dg==='Đúng hạn') cls='ok';
+    else if(dg==='Trước hạn') cls='early';
+    else if(dg==='Quá hạn'||dg==='Trễ hạn') cls='late';
+    else if(dg==='Trong hạn') cls='soon';
+    var name=cleanTaskTitle(d.noiDung||d.noiDungFull||'') || ('Nhiệm vụ '+d.stt);
+    var tipText=name+' — Hạn: '+fmtDate(d.thoiHan)+' · '+(d.donVi||'')+(dg?(' · '+dg):'');
     html+='<div class="gantt-row">'+
-      '<div class="gantt-name"><b>'+esc(d.stt+'. '+(d.noiDung||'').slice(0,72))+(d.noiDung.length>72?'…':'')+'</b><span>'+esc(d.donVi)+'</span></div>'+
+      '<div class="gantt-name" title="'+esc(tipText)+'">'+
+        '<b>'+esc(name)+'</b>'+
+        '<span>'+esc(d.donVi||'')+(d.thoiHan?' · hạn '+fmtDate(d.thoiHan):'')+'</span>'+
+      '</div>'+
       '<div class="gantt-track">'+
-        '<div class="gantt-today" style="left:'+todayPct+'%" title="Hôm nay"></div>'+
-        '<div class="gantt-bar '+cls+'" style="left:'+left+'%" title="'+title+'">'+fmtDate(d.thoiHan).slice(0,5)+'</div>'+
+        '<div class="gantt-today" style="left:'+todayPct+'%" title="Hôm nay '+fmtDate(today)+'"></div>'+
+        '<div class="gantt-bar '+cls+'" style="left:'+left+'%" title="'+esc(tipText)+'">'+fmtDM(d.thoiHan)+'</div>'+
       '</div></div>';
   });
   document.getElementById('gantt').innerHTML=html;
 }
+
 
 function xuatExcel(){
   var list=locDong();
