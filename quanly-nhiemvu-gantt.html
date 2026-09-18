@@ -178,16 +178,34 @@ tbody tr:hover td{background:#f8fafc}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media print{
-  body{background:#fff!important;padding:0}
+  body{background:#fff!important;padding:0;font-size:11pt}
   .no-print{display:none!important}
   .top{position:static;box-shadow:none;border:none;background:#fff}
-  .card{box-shadow:none;break-inside:avoid}
+  .card{box-shadow:none;break-inside:avoid;border:1px solid #cbd5e1}
   .scroll{max-height:none;overflow:visible}
   .gantt-wrap{padding:8px 0}
   .kpis{grid-template-columns:repeat(5,1fr)}
   thead th{background:#0f172a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .gantt-bar,.kpi,.tag,.gantt-today{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gantt-bar,.kpi,.tag,.gantt-today,.tl-dot,.tl-legend span i{
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;
+  }
+  .print-only{display:block!important}
+  .tl-legend{
+    border:1px solid #94a3b8;border-radius:8px;padding:8px 12px;margin:8px 0 14px;
+    background:#f8fafc!important;gap:14px;font-size:11pt;color:#0f172a;
+  }
+  .tl-legend span{color:#0f172a;font-weight:600}
+  .print-chu-thich{
+    display:block!important;margin:10px 0 14px;padding:10px 12px;
+    border:1px solid #94a3b8;border-radius:8px;font-size:10.5pt;line-height:1.55;color:#0f172a;
+  }
+  .print-chu-thich b{font-weight:700}
+  .print-head{display:block!important;text-align:center;margin-bottom:12px}
+  .print-head h1{font-size:14pt;margin:0 0 4px}
+  .print-head p{font-size:10.5pt;margin:0;color:#334155}
 }
+.print-only,.print-chu-thich,.print-head{display:none}
+
 </style>
 <script>
 (function(){
@@ -282,6 +300,11 @@ tbody tr:hover td{background:#f8fafc}
     </div>
   </div>
 
+  <div class="print-head print-only">
+    <h1>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</h1>
+    <p>Báo cáo timeline nhiệm vụ theo thời hạn hoàn thành</p>
+    <p id="printWhen"></p>
+  </div>
   <div class="card" id="cardTimeline">
     <div class="card-h">
       <h2><i class="fa-solid fa-timeline"></i> Timeline theo thời hạn</h2>
@@ -708,6 +731,15 @@ function veGantt(list){
     '<span><i class="tl-dot" style="background:#d97706"></i> Trong hạn</span>'+
     '<span><i class="tl-dot" style="background:#dc2626"></i> Quá / trễ hạn</span>'+
     '<span><i class="tl-dot" style="background:#ef4444;border-radius:0;width:2px;height:12px"></i> Hôm nay</span>'+
+  '</div>'+
+  '<div class="print-chu-thich print-only">'+
+    '<b>Chú thích:</b> '+
+    '● <b>Đúng hạn</b> — hoàn thành đúng ngày quy định; '+
+    '● <b>Trước hạn</b> — hoàn thành sớm hơn thời hạn; '+
+    '● <b>Trong hạn</b> — đang thực hiện, chưa đến hạn; '+
+    '● <b>Quá / trễ hạn</b> — đã quá thời hạn hoặc hoàn thành muộn; '+
+    '│ <b>Vạch đỏ</b> — mốc ngày in báo cáo (hôm nay: '+fmtDate(today)+'). '+
+    'Viên trên thanh timeline ghi ngày hạn (dd/mm).'+
   '</div>';
   html+='<div class="tl-axis"><div>Nhiệm vụ</div><div class="tl-months">';
   months.forEach(function(m){
@@ -812,6 +844,14 @@ window.taiLai=taiLai;
 window.veLai=veLai;
 window.xuatExcel=xuatExcel;
 window.xuatWord=xuatWord;
+
+window.addEventListener('beforeprint', function(){
+  var el=document.getElementById('printWhen');
+  if(el){
+    var now=new Date();
+    el.textContent='Ngày in: '+fmtDate(now)+' · '+now.toLocaleTimeString('vi-VN')+' · Số nhiệm vụ timeline: '+(document.querySelectorAll('.gantt-row').length);
+  }
+});
 
 (function boot(){
   var done=false;
