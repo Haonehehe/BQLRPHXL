@@ -126,6 +126,15 @@ body{background:
 input,select{transition:border-color .15s, box-shadow .15s}
 input:focus,select:focus{border-color:#34d399!important;box-shadow:0 0 0 3px rgba(52,211,153,.15)!important;outline:none}
 
+
+.onl-card .onl-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--bd)}
+.onl-card .onl-row:last-child{border-bottom:0}
+.onl-dot{width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.25);flex-shrink:0}
+.onl-dot.off{background:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.2)}
+.onl-meta{flex:1;min-width:0}
+.onl-meta b{display:block;font-size:13px;color:#0f172a}
+.onl-meta span{font-size:11.5px;color:#64748b}
+.onl-time{font-size:11px;color:#059669;font-weight:700;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -362,6 +371,17 @@ function normalizePerms(p){
   if(out.indexOf('pdf')<0) out.push('pdf');
   return out;
 }
+function looksLikePermList(v){
+  var s = String(v==null?'':v).toLowerCase();
+  return /\b(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|pdf)\b/.test(s);
+}
+function extractPermsFromUser(u){
+  u = u || {};
+  if(looksLikePermList(u.perms)) return normalizePerms(u.perms);
+  if(looksLikePermList(u.created)) return normalizePerms(u.created);
+  if(looksLikePermList(u.permissions)) return normalizePerms(u.permissions);
+  return normalizePerms(u.perms);
+}
 function normalizeUser(u, i){
   u = u || {};
   u.id = u.id || ('u_' + i + '_' + (u.email || ''));
@@ -369,11 +389,12 @@ function normalizeUser(u, i){
   u.name = u.name || u.fullName || u.hoTen || u.email || '';
   u.status = String(u.status || 'pending').toLowerCase();
   u.role = String(u.role || 'user').toLowerCase();
-  u.perms = normalizePerms(u.perms);
-  if(u.perms.indexOf('pdf')<0) u.perms.push('pdf');
-  // unify created field
-  u.created = u.created || u.createdAt || u.created_at || u.registeredAt || u.time || '';
-  u.createdLabel = fmtDateSafe(u.created);
+  // API từng trả perms = tên đơn vị, created = 'qlbvr,lamba,...'
+  u.perms = extractPermsFromUser(u);
+  var createdRaw = u.created || u.createdAt || u.created_at || u.registeredAt || u.time || '';
+  if(looksLikePermList(createdRaw)) createdRaw = u.approvedAt || '';
+  u.created = createdRaw;
+  u.createdLabel = fmtDateSafe(u.created) || fmtDateSafe(u.approvedAt);
   return u;
 }
 
@@ -629,23 +650,111 @@ function resetSheetSourcesUI(){
   }).catch(function(){ toast('Đã về mặc định (local)'); loadUsers(); });
 }
 
+
+function fetchOnlineUsers(){
+  // Thử cloud
+  if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
+    var sess=null;
+    try{ sess=JSON.parse(sessionStorage.getItem('bqlrph_session_v1')||localStorage.getItem('bqlrph_session_v1')||'null'); }catch(e){}
+    var payload={ action:'listonline' };
+    if(sess){ payload.adminEmail=sess.email; payload.adminPass=sess.pass||sess.password||''; payload.email=sess.email; }
+    // một số script dùng email/pass trong session khác
+    try{
+      var c=JSON.parse(localStorage.getItem('bqlrph_admin_cred')||'null');
+      if(c){ payload.adminEmail=c.email; payload.adminPass=c.pass; }
+    }catch(e){}
+    return apiCall(payload).then(function(res){
+      if(res && res.ok) return { online:res.online||[], recent:res.recent||[] };
+      throw new Error((res&&res.error)||'listonline fail');
+    }).catch(function(){
+      return readLocalPresence();
+    });
+  }
+  return Promise.resolve(readLocalPresence());
+}
+
+function readLocalPresence(){
+  var online=[], recent=[];
+  try{
+    var all=JSON.parse(localStorage.getItem('bqlrph_presence_v1')||'{}');
+    var now=Date.now();
+    Object.keys(all).forEach(function(k){
+      var u=all[k];
+      var t=Date.parse(u.at||0);
+      if(!t) return;
+      var age=now-t;
+      u.ageSec=Math.round(age/1000);
+      if(age<=5*60*1000) online.push(u);
+      else if(age<=60*60*1000) recent.push(u);
+    });
+  }catch(e){}
+  return { online:online, recent:recent, localOnly:true };
+}
+
+function fmtAge(sec){
+  if(sec==null) return '';
+  if(sec<60) return sec+' giây trước';
+  if(sec<3600) return Math.floor(sec/60)+' phút trước';
+  return Math.floor(sec/3600)+' giờ trước';
+}
+
+function renderOnlineCard(pres){
+  pres=pres||{online:[],recent:[]};
+  var html='<div class="card onl-card"><div class="card-h"><span><i class="fa-solid fa-signal" style="color:#059669;margin-right:6px"></i>Đang online / vừa truy cập</span>'+
+    '<button type="button" class="btn btn-o btn-sm" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button></div>';
+  if(pres.localOnly||pres.offline){
+    html+='<div class="empty" style="padding:12px;font-size:12.5px;color:#64748b">Chưa nhận được tín hiệu từ server. Cần cập nhật Apps Script (action <code>heartbeat</code> + <code>listonline</code>) rồi Deploy lại. Tạm hiện dữ liệu local (máy admin).</div>';
+  }
+  if(!(pres.online||[]).length && !(pres.recent||[]).length){
+    html+='<div class="empty">Chưa có user nào gửi tín hiệu. User cần mở <b>menu</b> khi đã đăng nhập.</div>';
+  } else {
+    (pres.online||[]).forEach(function(u){
+      html+='<div class="onl-row"><span class="onl-dot" title="Online"></span><div class="onl-meta"><b>'+esc(u.name||u.email)+'</b><span>'+esc(u.email)+(u.unit?(' · '+esc(u.unit)):'')+(u.page?(' · '+esc(u.page)):'')+'</span></div><div class="onl-time">'+fmtAge(u.ageSec)+'</div></div>';
+    });
+    (pres.recent||[]).forEach(function(u){
+      html+='<div class="onl-row"><span class="onl-dot off" title="Trong 1 giờ"></span><div class="onl-meta"><b>'+esc(u.name||u.email)+'</b><span>'+esc(u.email)+' · trong 1 giờ qua</span></div><div class="onl-time" style="color:#64748b">'+fmtAge(u.ageSec)+'</div></div>';
+    });
+  }
+  html+='</div>';
+  return html;
+}
+
+
+function pulsePresenceAdmin(){
+  try{
+    var s=JSON.parse(sessionStorage.getItem('bqlrph_session_v1')||localStorage.getItem('bqlrph_session_v1')||'null');
+    if(!s||!s.email) return;
+    if(typeof apiCall==='function' && useCloud()){
+      apiCall({action:'heartbeat', email:s.email, name:s.name||'', unit:s.unit||'', page:'admin.html'}).catch(function(){});
+    }
+  }catch(e){}
+}
 function loadUsers(){
+  pulsePresenceAdmin();
+
   if(!requireAdmin()) return;
   shell('<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách…</div>');
   // Đồng bộ nguồn sheet từ cloud trước khi vẽ form
   fetchSheetSourcesCloud().then(function(){}).catch(function(){});
-  listUsers().then(function(users){
+  Promise.all([
+    listUsers(),
+    fetchOnlineUsers().catch(function(){ return { online:[], recent:[], offline:true }; })
+  ]).then(function(pair){
+    var users=pair[0];
+    var pres=pair[1]||{online:[],recent:[]};
     var pending=users.filter(function(u){return u.status==='pending';}).length;
     var approved=users.filter(function(u){return u.status==='approved';}).length;
     var rejected=users.filter(function(u){return u.status==='rejected';}).length;
     var html='<div class="note"><b>Admin mặc định:</b> <code>admin@bqlrph.local</code> / <code>Admin@2026</code>'+
       (useCloud()?' · Dữ liệu đồng bộ Google Sheet.':' · Đang dùng localStorage — cấu hình Script URL ở menu (⚙) để đồng bộ.')+
-      '</div>';
+      ' · <b>Online</b> = có tín hiệu trong 5 phút (cần Apps Script heartbeat).</div>';
     html+='<div class="kpis">'+
       '<div class="kpi"><div class="l">Tổng TK</div><div class="v">'+users.length+'</div></div>'+
       '<div class="kpi"><div class="l">Chờ duyệt</div><div class="v">'+pending+'</div></div>'+
       '<div class="kpi"><div class="l">Đã duyệt</div><div class="v">'+approved+'</div></div>'+
-      '<div class="kpi"><div class="l">Từ chối</div><div class="v">'+rejected+'</div></div></div>';
+      '<div class="kpi"><div class="l">Đang online</div><div class="v" style="color:#059669">'+(pres.online||[]).length+'</div></div></div>';
+
+    html+=renderOnlineCard(pres);
 
     html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-clock" style="color:#d97706;margin-right:6px"></i>Chờ duyệt</span><span style="font-size:12px;font-weight:600;color:#64748b">'+pending+'</span></div>';
     var pend=users.filter(function(u){return u.status==='pending';});
