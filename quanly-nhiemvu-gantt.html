@@ -72,6 +72,29 @@ body{
 .bar input[type=search]{flex:1;min-width:200px}
 .bar input[type=search]:focus,.bar select:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(14,165,233,.15);background:#fff}
 .bar select{min-width:150px}
+
+.filt-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:100%;margin-top:2px}
+.filt-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.3px;margin-right:4px}
+.chip{
+  height:32px;padding:0 12px;border-radius:999px;border:1px solid #e2e8f0;
+  background:#f8fafc;font:600 12px "Be Vietnam Pro",system-ui;color:#334155;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s;
+}
+.chip:hover{border-color:#94a3b8;background:#fff}
+.chip.on{border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(15,23,42,.12)}
+.chip.on.ok{background:linear-gradient(135deg,#34d399,#059669)}
+.chip.on.early{background:linear-gradient(135deg,#22d3ee,#0891b2)}
+.chip.on.soon{background:linear-gradient(135deg,#fbbf24,#d97706)}
+.chip.on.late{background:linear-gradient(135deg,#f87171,#dc2626)}
+.chip.on.mu{background:linear-gradient(135deg,#94a3b8,#475569)}
+.chip.on.grp{background:linear-gradient(135deg,#818cf8,#4f46e5)}
+.chip .n{font-size:10px;opacity:.9;background:rgba(255,255,255,.25);padding:1px 6px;border-radius:999px}
+.chip:not(.on) .n{background:#e2e8f0;color:#475569}
+.kpi{cursor:pointer;transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(15,23,42,.1)}
+.kpi.active{outline:2px solid #0ea5e9;outline-offset:2px}
+.bar .grow{flex:1;min-width:180px}
+
 .sync{
   font-size:12px;color:var(--mu);padding:6px 10px;border-radius:999px;
   background:#f1f5f9;border:1px solid var(--bd);white-space:nowrap;
@@ -260,18 +283,35 @@ tbody tr:hover td{background:#f8fafc}
   </div>
 
   <div class="bar no-print">
-    <input type="search" id="q" placeholder="Tìm nội dung, văn bản, lãnh đạo, đơn vị…" oninput="veLai()">
+    <input type="search" id="q" class="grow" placeholder="Tìm nội dung, văn bản, lãnh đạo, cán bộ, đơn vị…" oninput="veLai()">
     <select id="fDonVi" onchange="veLai()"><option value="">Tất cả đơn vị</option></select>
-    <select id="fTT" onchange="veLai()">
-      <option value="">Tất cả đánh giá</option>
-      <option value="Đúng hạn">Đúng hạn</option>
-      <option value="Trước hạn">Trước hạn</option>
-      <option value="Quá hạn">Quá hạn</option>
-      <option value="Trong hạn">Trong hạn</option>
-      <option value="Trễ hạn">Trễ hạn</option>
-      <option value="other">Khác / trống</option>
+    <select id="fCanBo" onchange="veLai()"><option value="">Tất cả cán bộ</option></select>
+    <select id="fLanhDao" onchange="veLai()"><option value="">Tất cả lãnh đạo</option></select>
+    <select id="fNhom" onchange="veLai()"><option value="">Tất cả nhóm</option></select>
+    <select id="fThang" onchange="veLai()"><option value="">Tất cả tháng hạn</option></select>
+    <select id="fHan" onchange="veLai()">
+      <option value="">Mọi loại hạn</option>
+      <option value="has">Có ngày hạn</option>
+      <option value="none">Chưa có / thường xuyên</option>
+      <option value="week">Đến hạn ≤ 7 ngày</option>
+      <option value="month">Đến hạn ≤ 30 ngày</option>
+      <option value="over">Đã quá hạn (theo ngày)</option>
     </select>
+    <button type="button" class="btn btn-x" onclick="clearFilters()" title="Xóa bộ lọc"><i class="fa-solid fa-filter-circle-xmark"></i> Xóa lọc</button>
     <span class="sync" id="syncTxt">Chưa tải</span>
+    <div class="filt-chips" id="statusChips">
+      <span class="filt-label">Trạng thái</span>
+      <button type="button" class="chip" data-st="Đúng hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-circle-check"></i> Đúng hạn <span class="n" data-n="ok">0</span></button>
+      <button type="button" class="chip" data-st="Trước hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-forward"></i> Trước hạn <span class="n" data-n="early">0</span></button>
+      <button type="button" class="chip" data-st="Trong hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-clock"></i> Trong hạn <span class="n" data-n="soon">0</span></button>
+      <button type="button" class="chip" data-st="Quá hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-triangle-exclamation"></i> Quá hạn <span class="n" data-n="late">0</span></button>
+      <button type="button" class="chip" data-st="Trễ hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-hourglass-end"></i> Trễ hạn <span class="n" data-n="tre">0</span></button>
+      <button type="button" class="chip" data-st="other" onclick="toggleStatus(this)"><i class="fa-solid fa-ellipsis"></i> Khác/trống <span class="n" data-n="other">0</span></button>
+      <span class="filt-label" style="margin-left:8px">Nhóm nhanh</span>
+      <button type="button" class="chip" data-quick="canxu" onclick="toggleQuick(this)" title="Trong hạn + Quá hạn + Trễ hạn"><i class="fa-solid fa-bell"></i> Cần theo dõi</button>
+      <button type="button" class="chip" data-quick="daxong" onclick="toggleQuick(this)" title="Đúng hạn + Trước hạn"><i class="fa-solid fa-flag-checkered"></i> Đã hoàn thành</button>
+      <button type="button" class="chip" data-quick="danglam" onclick="toggleQuick(this)" title="Trong hạn"><i class="fa-solid fa-spinner"></i> Đang thực hiện</button>
+    </div>
   </div>
 
   <div class="kpis" id="kpis"></div>
@@ -626,29 +666,189 @@ function taiLai(silent){
     .then(function(){ if(ic) ic.classList.remove('fa-spin'); });
 }
 
+
+var statusSel = {}; // multi-select statuses
+var quickSel = '';  // one quick group
+
+function toggleStatus(btn){
+  var st = btn.getAttribute('data-st');
+  if(statusSel[st]){ delete statusSel[st]; btn.classList.remove('on','ok','early','soon','late','mu'); }
+  else {
+    statusSel[st]=1;
+    btn.classList.add('on');
+    if(st==='Đúng hạn') btn.classList.add('ok');
+    else if(st==='Trước hạn') btn.classList.add('early');
+    else if(st==='Trong hạn') btn.classList.add('soon');
+    else if(st==='Quá hạn'||st==='Trễ hạn') btn.classList.add('late');
+    else btn.classList.add('mu');
+  }
+  // clear quick when manual status
+  quickSel='';
+  document.querySelectorAll('#statusChips [data-quick]').forEach(function(b){ b.classList.remove('on','grp'); });
+  veLai();
+}
+
+function toggleQuick(btn){
+  var q = btn.getAttribute('data-quick');
+  document.querySelectorAll('#statusChips [data-quick]').forEach(function(b){ b.classList.remove('on','grp'); });
+  // clear status chips
+  statusSel={};
+  document.querySelectorAll('#statusChips [data-st]').forEach(function(b){
+    b.classList.remove('on','ok','early','soon','late','mu');
+  });
+  if(quickSel===q){ quickSel=''; }
+  else {
+    quickSel=q;
+    btn.classList.add('on','grp');
+    // sync statusSel for highlight
+    var map={ canxu:['Trong hạn','Quá hạn','Trễ hạn'], daxong:['Đúng hạn','Trước hạn'], danglam:['Trong hạn'] };
+    (map[q]||[]).forEach(function(st){
+      statusSel[st]=1;
+      var b=document.querySelector('#statusChips [data-st="'+st+'"]');
+      if(b){
+        b.classList.add('on');
+        if(st==='Đúng hạn') b.classList.add('ok');
+        else if(st==='Trước hạn') b.classList.add('early');
+        else if(st==='Trong hạn') b.classList.add('soon');
+        else if(st==='Quá hạn'||st==='Trễ hạn') b.classList.add('late');
+      }
+    });
+  }
+  veLai();
+}
+
+function clearFilters(){
+  statusSel={}; quickSel='';
+  ['q','fDonVi','fCanBo','fLanhDao','fNhom','fThang','fHan'].forEach(function(id){
+    var e=document.getElementById(id); if(e) e.value='';
+  });
+  document.querySelectorAll('#statusChips .chip').forEach(function(b){
+    b.classList.remove('on','ok','early','soon','late','mu','grp');
+  });
+  document.querySelectorAll('.kpi').forEach(function(k){ k.classList.remove('active'); });
+  veLai();
+}
+
+function filterByKpi(kind){
+  statusSel={}; quickSel='';
+  document.querySelectorAll('#statusChips .chip').forEach(function(b){
+    b.classList.remove('on','ok','early','soon','late','mu','grp');
+  });
+  var map={
+    all:[],
+    ok:['Đúng hạn'],
+    early:['Trước hạn'],
+    soon:['Trong hạn'],
+    late:['Quá hạn','Trễ hạn']
+  };
+  (map[kind]||[]).forEach(function(st){
+    statusSel[st]=1;
+    var b=document.querySelector('#statusChips [data-st="'+st+'"]');
+    if(b){
+      b.classList.add('on');
+      if(st==='Đúng hạn') b.classList.add('ok');
+      else if(st==='Trước hạn') b.classList.add('early');
+      else if(st==='Trong hạn') b.classList.add('soon');
+      else b.classList.add('late');
+    }
+  });
+  document.querySelectorAll('.kpi').forEach(function(k){ k.classList.remove('active'); });
+  var kpi=document.querySelector('.kpi[data-kpi="'+kind+'"]');
+  if(kpi) kpi.classList.add('active');
+  veLai();
+}
+
+
 function napBoLoc(){
-  var units={};
-  dong.forEach(function(d){ if(d.donVi) units[d.donVi]=1; });
-  var sel=document.getElementById('fDonVi');
-  var cur=sel.value;
-  sel.innerHTML='<option value="">Tất cả đơn vị</option>'+
-    Object.keys(units).sort().map(function(k){ return '<option value="'+esc(k)+'">'+esc(k)+'</option>'; }).join('');
-  if(cur) sel.value=cur;
+  var units={}, canBos={}, lanhDaos={}, nhoms={}, months={};
+  dong.forEach(function(d){
+    if(d.donVi) units[d.donVi]=1;
+    if(d.canBo) canBos[d.canBo]=1;
+    if(d.lanhDao) lanhDaos[d.lanhDao]=1;
+    if(d.nhom) nhoms[d.nhom]=1;
+    if(d.thoiHan){
+      var k=d.thoiHan.getFullYear()+'-'+String(d.thoiHan.getMonth()+1).padStart(2,'0');
+      months[k]=1;
+    }
+  });
+  function fill(id, map, allLabel){
+    var sel=document.getElementById(id); if(!sel) return;
+    var cur=sel.value;
+    var keys=Object.keys(map).sort(function(a,b){ return a.localeCompare(b,'vi'); });
+    if(id==='fThang') keys.sort(); // yyyy-mm already
+    sel.innerHTML='<option value="">'+allLabel+'</option>'+
+      keys.map(function(k){
+        var label=k;
+        if(id==='fThang'){ var p=k.split('-'); label='Tháng '+p[1]+'/'+p[0]; }
+        return '<option value="'+esc(k)+'">'+esc(label)+'</option>';
+      }).join('');
+    if(cur) sel.value=cur;
+  }
+  fill('fDonVi', units, 'Tất cả đơn vị');
+  fill('fCanBo', canBos, 'Tất cả cán bộ');
+  fill('fLanhDao', lanhDaos, 'Tất cả lãnh đạo');
+  fill('fNhom', nhoms, 'Tất cả nhóm');
+  fill('fThang', months, 'Tất cả tháng hạn');
+  // đếm chip
+  var cnt={ok:0,early:0,soon:0,late:0,tre:0,other:0};
+  dong.forEach(function(d){
+    if(d.danhGia==='Đúng hạn') cnt.ok++;
+    else if(d.danhGia==='Trước hạn') cnt.early++;
+    else if(d.danhGia==='Trong hạn') cnt.soon++;
+    else if(d.danhGia==='Quá hạn') cnt.late++;
+    else if(d.danhGia==='Trễ hạn') cnt.tre++;
+    else cnt.other++;
+  });
+  document.querySelectorAll('#statusChips [data-n]').forEach(function(sp){
+    var k=sp.getAttribute('data-n');
+    if(cnt[k]!=null) sp.textContent=cnt[k];
+  });
 }
 
 function locDong(){
   var q=(document.getElementById('q').value||'').toLowerCase().trim();
-  var fDV=document.getElementById('fDonVi').value;
-  var fTT=document.getElementById('fTT').value;
+  var fDV=(document.getElementById('fDonVi')||{}).value||'';
+  var fCB=(document.getElementById('fCanBo')||{}).value||'';
+  var fLD=(document.getElementById('fLanhDao')||{}).value||'';
+  var fNhom=(document.getElementById('fNhom')||{}).value||'';
+  var fThang=(document.getElementById('fThang')||{}).value||'';
+  var fHan=(document.getElementById('fHan')||{}).value||'';
+  var stKeys=Object.keys(statusSel||{});
+  var today=new Date(); today.setHours(0,0,0,0);
+
   return dong.filter(function(d){
     if(fDV && d.donVi!==fDV) return false;
-    if(fTT){
-      if(fTT==='other'){
-        if(['Đúng hạn','Trước hạn','Quá hạn','Trong hạn','Trễ hạn'].indexOf(d.danhGia)>=0) return false;
-      } else if(d.danhGia!==fTT) return false;
+    if(fCB && d.canBo!==fCB) return false;
+    if(fLD && d.lanhDao!==fLD) return false;
+    if(fNhom && d.nhom!==fNhom) return false;
+    if(fThang){
+      if(!d.thoiHan) return false;
+      var k=d.thoiHan.getFullYear()+'-'+String(d.thoiHan.getMonth()+1).padStart(2,'0');
+      if(k!==fThang) return false;
+    }
+    if(fHan){
+      if(fHan==='has' && !d.thoiHan) return false;
+      if(fHan==='none' && d.thoiHan) return false;
+      if(fHan==='week' || fHan==='month' || fHan==='over'){
+        if(!d.thoiHan) return false;
+        var diff=Math.round((new Date(d.thoiHan.getFullYear(),d.thoiHan.getMonth(),d.thoiHan.getDate())-today)/864e5);
+        if(fHan==='over' && diff>=0) return false;
+        if(fHan==='week' && (diff<0 || diff>7)) return false;
+        if(fHan==='month' && (diff<0 || diff>30)) return false;
+      }
+    }
+    if(stKeys.length){
+      var ok=false;
+      for(var i=0;i<stKeys.length;i++){
+        var st=stKeys[i];
+        if(st==='other'){
+          if(['Đúng hạn','Trước hạn','Quá hạn','Trong hạn','Trễ hạn'].indexOf(d.danhGia)<0){ ok=true; break; }
+        } else if(d.danhGia===st){ ok=true; break; }
+      }
+      if(!ok) return false;
     }
     if(!q) return true;
-    var b=[d.noiDung,d.vanBan,d.lanhDao,d.donVi,d.canBo,d.giaiTrinh,d.danhGia].join(' ').toLowerCase();
+    var b=[d.noiDung,d.vanBan,d.lanhDao,d.donVi,d.canBo,d.giaiTrinh,d.danhGia,d.nhom].join(' ').toLowerCase();
     return q.split(/\s+/).every(function(w){ return b.indexOf(w)>=0; });
   });
 }
@@ -669,11 +869,11 @@ function veKPI(list){
     else if(d.danhGia==='Trong hạn') soon++;
   });
   document.getElementById('kpis').innerHTML=
-    '<div class="kpi t"><div class="l">Tổng nhiệm vụ</div><div class="v">'+total+'</div></div>'+
-    '<div class="kpi g"><div class="l">Đúng hạn</div><div class="v">'+ok+'</div></div>'+
-    '<div class="kpi s"><div class="l">Trước hạn</div><div class="v">'+early+'</div></div>'+
-    '<div class="kpi a"><div class="l">Trong hạn</div><div class="v">'+soon+'</div></div>'+
-    '<div class="kpi r"><div class="l">Quá / trễ hạn</div><div class="v">'+late+'</div></div>';
+    '<div class="kpi t" data-kpi="all" onclick="filterByKpi(\'all\')" title="Hiện tất cả"><div class="l">Tổng nhiệm vụ</div><div class="v">'+total+'</div></div>'+
+    '<div class="kpi g" data-kpi="ok" onclick="filterByKpi(\'ok\')" title="Lọc Đúng hạn"><div class="l">Đúng hạn</div><div class="v">'+ok+'</div></div>'+
+    '<div class="kpi s" data-kpi="early" onclick="filterByKpi(\'early\')" title="Lọc Trước hạn"><div class="l">Trước hạn</div><div class="v">'+early+'</div></div>'+
+    '<div class="kpi a" data-kpi="soon" onclick="filterByKpi(\'soon\')" title="Lọc Trong hạn"><div class="l">Trong hạn</div><div class="v">'+soon+'</div></div>'+
+    '<div class="kpi r" data-kpi="late" onclick="filterByKpi(\'late\')" title="Lọc Quá / trễ hạn"><div class="l">Quá / trễ hạn</div><div class="v">'+late+'</div></div>';
 }
 
 function veDS(list){
@@ -848,6 +1048,10 @@ function fmtFileDate(){
 }
 
 window.taiLai=taiLai;
+window.toggleStatus=toggleStatus;
+window.toggleQuick=toggleQuick;
+window.clearFilters=clearFilters;
+window.filterByKpi=filterByKpi;
 window.veLai=veLai;
 window.xuatExcel=xuatExcel;
 window.xuatWord=xuatWord;
