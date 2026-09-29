@@ -144,7 +144,7 @@ input:focus,select:focus{border-color:#34d399!important;box-shadow:0 0 0 3px rgb
 /* ===== BQLRPH Auth (Google Sheet via Apps Script + local fallback) ===== */
 var CONFIG = {
   // Dán Web App URL sau khi Deploy Apps Script (kết thúc bằng /exec)
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec',
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec',
   // Ví dụ: 'https://script.google.com/macros/s/AKfycbx.../exec'
 };
 
@@ -652,22 +652,31 @@ function resetSheetSourcesUI(){
 
 
 function fetchOnlineUsers(){
-  // Thử cloud
   if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
-    var sess=null;
-    try{ sess=JSON.parse(sessionStorage.getItem('bqlrph_session_v1')||localStorage.getItem('bqlrph_session_v1')||'null'); }catch(e){}
-    var payload={ action:'listonline' };
-    if(sess){ payload.adminEmail=sess.email; payload.adminPass=sess.pass||sess.password||''; payload.email=sess.email; }
-    // một số script dùng email/pass trong session khác
-    try{
-      var c=JSON.parse(localStorage.getItem('bqlrph_admin_cred')||'null');
-      if(c){ payload.adminEmail=c.email; payload.adminPass=c.pass; }
-    }catch(e){}
-    return apiCall(payload).then(function(res){
-      if(res && res.ok) return { online:res.online||[], recent:res.recent||[] };
-      throw new Error((res&&res.error)||'listonline fail');
-    }).catch(function(){
-      return readLocalPresence();
+    var c = (typeof adminCred==='function') ? adminCred() : { adminEmail:'', adminPass:'' };
+    if(!c.adminEmail || !c.adminPass){
+      // fallback session
+      try{
+        var s=JSON.parse(sessionStorage.getItem('bqlrph_session_v1')||localStorage.getItem('bqlrph_session_v1')||'null');
+        if(s){ c.adminEmail=s.email||c.adminEmail; c.adminPass=s._pass||s.pass||s.password||c.adminPass; }
+      }catch(e){}
+    }
+    return apiCall({
+      action: 'listonline',
+      adminEmail: c.adminEmail,
+      adminPass: c.adminPass
+    }).then(function(res){
+      if(res && res.ok) return {
+        online: res.online||[],
+        recent: res.recent||[],
+        fromServer: true
+      };
+      throw new Error((res && res.error) || 'listonline fail');
+    }).catch(function(err){
+      console.warn('listonline', err);
+      var loc = readLocalPresence();
+      loc.serverError = String(err && err.message || err || '');
+      return loc;
     });
   }
   return Promise.resolve(readLocalPresence());
@@ -702,8 +711,10 @@ function renderOnlineCard(pres){
   pres=pres||{online:[],recent:[]};
   var html='<div class="card onl-card"><div class="card-h"><span><i class="fa-solid fa-signal" style="color:#059669;margin-right:6px"></i>Đang online / vừa truy cập</span>'+
     '<button type="button" class="btn btn-o btn-sm" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button></div>';
-  if(pres.localOnly||pres.offline){
-    html+='<div class="empty" style="padding:12px;font-size:12.5px;color:#64748b">Chưa nhận được tín hiệu từ server. Cần cập nhật Apps Script (action <code>heartbeat</code> + <code>listonline</code>) rồi Deploy lại. Tạm hiện dữ liệu local (máy admin).</div>';
+  if(pres.fromServer){
+    html+='<div class="empty" style="padding:10px 12px;font-size:12px;color:#059669;background:#ecfdf5">Đồng bộ từ server · Online ≤ 5 phút · Vừa truy cập ≤ 60 phút</div>';
+  } else if(pres.localOnly||pres.offline){
+    html+='<div class="empty" style="padding:12px;font-size:12.5px;color:#9a3412;background:#fff7ed">Chưa đọc được server'+(pres.serverError?(' ('+esc(pres.serverError)+')'):'')+'. Kiểm tra SCRIPT_URL trùng URL Deploy, và admin đã lưu mật khẩu khi đăng nhập. Tạm hiện dữ liệu local.</div>';
   }
   if(!(pres.online||[]).length && !(pres.recent||[]).length){
     html+='<div class="empty">Chưa có user nào gửi tín hiệu. User cần mở <b>menu</b> khi đã đăng nhập.</div>';
