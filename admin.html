@@ -157,7 +157,8 @@ var DEFAULT_SHEET_SOURCES={
   nhao:{sid:'1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT',label:'Nhà ở'},
   mocgioi:{sid:'1XOz-KdIhtWIyocSrV8ZvpOgusTLUOGCX',gid:'1646240187',label:'Mốc giới'},
   trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'},
-  tasks:{sid:'1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe',gid:'1800611191',label:'Nhiệm vụ / Gantt'}
+  tasks:{sid:'1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe',gid:'1800611191',label:'Nhiệm vụ / Gantt'},
+  tonghop:{sid:'1nP0UPmkija86oqcjHh66uoO77zKcawTB',gid:'688529358',label:'Tổng hợp đường dẫn'}
 };
 function loadSheetSourcesLocal(){
   try{
@@ -221,8 +222,8 @@ function pushSheetSourcesCloud(cfg){
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -592,7 +593,8 @@ function sheetSourcesCard(){
     {k:'nhao', title:'Nhà ở trên lâm phận', fields:[{f:'sid',l:'Spreadsheet ID'}]},
     {k:'mocgioi', title:'Mốc giới', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
-    {k:'tasks', title:'Nhiệm vụ / Gantt', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
+    {k:'tasks', title:'Nhiệm vụ / Gantt', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
+    {k:'tonghop', title:'Tổng hợp đường dẫn', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
   ];
   var h='<div class="card"><div class="card-h"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><span style="font-size:11px;font-weight:600;color:#64748b">Đồng bộ cho mọi user</span></div>';
   h+='<div style="padding:14px 16px;font-size:12px;color:#475569;line-height:1.5">Admin đổi link tại đây → lưu → các module đọc chung (localStorage + Apps Script nếu đã cập nhật <code>getsheets</code>/<code>setsheets</code>). Module con <b>không còn nút Đổi link Sheet</b>.</div>';
