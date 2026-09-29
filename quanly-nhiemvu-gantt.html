@@ -201,6 +201,11 @@ tbody tr:hover td{background:#f8fafc}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media print{
+  /* In danh sách: ẩn cán bộ phụ trách, hiện giải trình tiến độ */
+  .col-canbo{display:none!important}
+  .col-giai{display:table-cell!important;min-width:140px;max-width:220px}
+  table{font-size:10pt!important;width:100%!important}
+  th,td{padding:5px 6px!important}
   body{background:#fff!important;padding:0;font-size:11pt}
   .no-print{display:none!important}
   .top{position:static;box-shadow:none;border:none;background:#fff}
@@ -327,13 +332,13 @@ tbody tr:hover td{background:#f8fafc}
           <tr>
             <th style="width:36px">#</th>
             <th>Đơn vị TH</th>
-            <th>Cán bộ phụ trách</th>
+            <th class="col-canbo">Cán bộ phụ trách</th>
             <th>Nội dung chỉ đạo / nhiệm vụ</th>
             <th>Văn bản chỉ đạo</th>
             <th>Thời hạn</th>
             <th>Lãnh đạo</th>
             <th>Đánh giá</th>
-            <th>Giải trình tiến độ</th>
+            <th class="col-giai">Giải trình tiến độ</th>
           </tr>
         </thead>
         <tbody id="tbDS"></tbody>
@@ -888,13 +893,13 @@ function veDS(list){
     html+='<tr>'+
       '<td>'+esc(d.stt)+'</td>'+
       '<td style="white-space:nowrap;font-size:11.5px;font-weight:600;color:#0369a1">'+esc(d.donVi)+'</td>'+
-      '<td style="white-space:nowrap;font-size:11.5px;color:#0f766e;font-weight:600">'+esc(d.canBo||'—')+'</td>'+
+      '<td class="col-canbo" style="white-space:nowrap;font-size:11.5px;color:#0f766e;font-weight:600">'+esc(d.canBo||'—')+'</td>'+
       '<td><b>'+esc(cleanTaskTitle(d.noiDung||''))+'</b></td>'+
       '<td style="font-size:11.5px">'+esc(d.vanBan||'—')+'</td>'+
       '<td style="white-space:nowrap">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||'—'))+'</td>'+
       '<td>'+esc(d.lanhDao||'—')+'</td>'+
       '<td>'+tagStatus(d.danhGia)+'</td>'+
-      '<td style="font-size:11.5px;color:#475569">'+esc(d.giaiTrinh||'')+'</td>'+
+      '<td class="col-giai" style="font-size:11.5px;color:#475569;line-height:1.35">'+esc(d.giaiTrinh||'—')+'</td>'+
     '</tr>';
   });
   document.getElementById('tbDS').innerHTML=html||'<tr><td colspan="9" class="muted">Không có dữ liệu</td></tr>';
