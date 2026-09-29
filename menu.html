@@ -504,6 +504,21 @@ footer{
 }
 .fb-ok.on{display:block}
 
+
+.lock-badge.perm{
+  background:rgba(30,20,40,.92)!important;color:#f0abfc!important;
+  border:1px solid rgba(232,121,249,.35)!important;
+}
+.go-perm{background:linear-gradient(135deg,#a78bfa,#7c3aed)!important;opacity:.9}
+.locked-perm{opacity:.72!important;filter:none!important}
+.toast-perm{
+  position:fixed;left:50%;bottom:88px;transform:translateX(-50%);
+  z-index:60;max-width:92vw;padding:12px 16px;border-radius:14px;
+  background:rgba(15,23,42,.95);color:#f8fafc;font-size:13px;font-weight:600;
+  border:1px solid rgba(167,139,250,.35);box-shadow:0 12px 40px rgba(0,0,0,.35);
+  display:none;line-height:1.45;text-align:center;
+}
+.toast-perm.on{display:block;animation:fadeIn .2s ease}
 </style>
 </head>
 <body>
@@ -737,9 +752,9 @@ var CONFIG = {
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'pdf'];
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'pdf'];
 var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', pdf: 'Công cụ PDF' };
-var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','pdf'];
+var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','tonghop','pdf'];
 function sanitizePerms(p){
   var arr = Array.isArray(p) ? p : String(p==null?'':p).split(/[,;|\/]/);
   var out = [];
@@ -1155,6 +1170,78 @@ function doLogout(){logoutUser();render();}
 function doForgotHint(){var em=document.getElementById('forgotEmail').value.trim(),err=document.getElementById('forgotErr');if(em){err.style.color='#6ee7b7';err.textContent='Đã ghi nhận '+em+'. Liên hệ admin để đặt lại mật khẩu.';}else{err.style.color='#fda4af';err.textContent='Nhập email đã đăng ký.';}}
 function doChangePass(){var s=currentUser();if(!s){openLogin();return;}var err=document.getElementById('passErr'),btn=document.getElementById('btnPass');var n1=document.getElementById('passNew').value,n2=document.getElementById('passNew2').value;err.style.color='#fda4af';if(n1!==n2){err.textContent='Mật khẩu mới nhập lại không khớp';return;}btn.disabled=true;err.textContent='';changePassword(s.email,document.getElementById('passOld').value,n1).then(function(){err.style.color='#6ee7b7';err.textContent='Đã đổi mật khẩu';setTimeout(closeModal,800);}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 
+
+function toastPerm(title){
+  var el=document.getElementById('toastPerm');
+  if(!el){
+    el=document.createElement('div');
+    el.id='toastPerm';
+    el.className='toast-perm';
+    document.body.appendChild(el);
+  }
+  el.innerHTML='Bạn <b>đã đăng nhập</b> nhưng <b>chưa được cấp quyền</b> module <b>'+esc(title||'')+'</b>.<br><span style="font-weight:500;color:#cbd5e1;font-size:12px">Liên hệ admin để cấp quyền, rồi bấm «Làm mới quyền» hoặc tải lại trang.</span>';
+  el.classList.add('on');
+  clearTimeout(window._toastPermT);
+  window._toastPermT=setTimeout(function(){ el.classList.remove('on'); }, 4200);
+}
+function doRefreshPerms(){
+  refreshSessionPerms(false).then(function(ch){
+    if(ch) return;
+    var el=document.getElementById('toastPerm');
+    if(!el){ el=document.createElement('div'); el.id='toastPerm'; el.className='toast-perm'; document.body.appendChild(el); }
+    el.innerHTML='Quyền hiện tại đã là mới nhất.';
+    el.classList.add('on');
+    clearTimeout(window._toastPermT);
+    window._toastPermT=setTimeout(function(){ el.classList.remove('on'); }, 2200);
+  });
+}
+function refreshSessionPerms(silent){
+  var s=getSession();
+  if(!s || !s.email || !s._pass) return Promise.resolve(false);
+  var prev=JSON.stringify(sanitizePerms(s.perms||[]))+'|'+(s.role||'');
+  if(typeof useCloud==='function' && useCloud()){
+    return apiCall({ action:'login', email:s.email, pass:s._pass }).then(function(res){
+      if(!res || !res.ok || !res.user) return false;
+      var u=res.user;
+      var next={
+        email:u.email, name:u.name, role:u.role||'user',
+        perms:extractPermsFromUser(u), loginAt:s.loginAt||new Date().toISOString(),
+        _pass:s._pass, refreshedAt:new Date().toISOString()
+      };
+      setSession(next);
+      var now=JSON.stringify(sanitizePerms(next.perms||[]))+'|'+(next.role||'');
+      if(now!==prev){
+        if(typeof render==='function') render();
+        if(!silent){
+          var el=document.getElementById('toastPerm');
+          if(!el){ el=document.createElement('div'); el.id='toastPerm'; el.className='toast-perm'; document.body.appendChild(el); }
+          el.innerHTML='✓ Đã cập nhật quyền truy cập từ server.';
+          el.classList.add('on');
+          clearTimeout(window._toastPermT);
+          window._toastPermT=setTimeout(function(){ el.classList.remove('on'); }, 2800);
+        }
+        return true;
+      }
+      return false;
+    }).catch(function(){ return false; });
+  }
+  try{
+    var db=_loadDB();
+    var u=(db.users||[]).find(function(x){ return x.email===s.email; });
+    if(!u || u.status!=='approved') return Promise.resolve(false);
+    var next={
+      email:u.email, name:u.name, role:u.role||'user',
+      perms:sanitizePerms(u.perms), loginAt:s.loginAt||new Date().toISOString(),
+      _pass:s._pass, refreshedAt:new Date().toISOString()
+    };
+    setSession(next);
+    var now=JSON.stringify(sanitizePerms(next.perms||[]))+'|'+(next.role||'');
+    if(now!==prev){ if(typeof render==='function') render(); return Promise.resolve(true); }
+  }catch(e){}
+  return Promise.resolve(false);
+}
+
+
 function renderAuthBar(){
   var el=document.getElementById('authBar'),s=currentUser();
   if(!s){
@@ -1166,13 +1253,18 @@ function renderAuthBar(){
   }
   el.innerHTML='<span class="who">Xin chào, <b>'+esc(s.name)+'</b></span>'+
     (s.role==='admin'?'<a class="btn btn-v" href="admin.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>':'')+
+    '<button type="button" class="btn btn-o" title="Đồng bộ quyền mới từ server" onclick="doRefreshPerms()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới quyền</button>'+
     '<button type="button" class="btn btn-o" onclick="openChangePass()"><i class="fa-solid fa-key"></i> Đổi MK</button>'+
     '<button type="button" class="btn btn-o" onclick="openCfg()"><i class="fa-solid fa-gear"></i></button>'+
     '<button type="button" class="btn btn-o" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>';
 }
 function moduleCard(m, ok){
   if(ok) return '<a class="card '+m.cls+'" href="'+m.href+'"><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Mở <i class="fa-solid fa-arrow-right"></i></span></a>';
-  return '<div class="card '+m.cls+' locked" onclick="openLogin()"><span class="lock-badge"><i class="fa-solid fa-lock"></i> Cần đăng nhập</span><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Cần đăng nhập <i class="fa-solid fa-lock"></i></span></div>';
+  var s=getSession();
+  if(s){
+    return '<div class="card '+m.cls+' locked locked-perm" onclick="toastPerm(\''+String(m.title||'').replace(/'/g,'')+'\')"><span class="lock-badge perm"><i class="fa-solid fa-user-lock"></i> Chưa cấp quyền</span><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go go-perm">Chưa được cấp quyền <i class="fa-solid fa-ban"></i></span></div>';
+  }
+  return '<div class="card '+m.cls+' locked locked-guest" onclick="openLogin()"><span class="lock-badge"><i class="fa-solid fa-lock"></i> Cần đăng nhập</span><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Cần đăng nhập <i class="fa-solid fa-lock"></i></span></div>';
 }
 function renderGrid(){
   var html='';
@@ -1297,6 +1389,17 @@ function pulsePresence(){
 }
 setTimeout(pulsePresence, 800);
 setInterval(pulsePresence, 60000); // 1 phút
+
+// Đồng bộ quyền tự động khi vào menu / focus lại tab
+setTimeout(function(){ refreshSessionPerms(true); }, 600);
+setInterval(function(){ refreshSessionPerms(true); }, 45000);
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState==='visible') refreshSessionPerms(true);
+});
+window.refreshSessionPerms=refreshSessionPerms;
+window.toastPerm=toastPerm;
+window.doRefreshPerms=doRefreshPerms;
+
 window.addEventListener('focus', function(){ setTimeout(pulsePresence, 200); });
 
 
