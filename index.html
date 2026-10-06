@@ -51,6 +51,11 @@ input:focus,select:focus,textarea:focus{
 
 
 
+@media print{
+  .no-print, .contact-fab-wrap, #contactFabWrap, #siteFooter, .nav{display:none!important}
+  .print-keep, canvas{break-inside:avoid}
+  body{background:#fff!important}
+}
 </style>
 <script>
 /* BQLRPH Auth Guard (head) — QLBVR */
@@ -681,7 +686,9 @@ html.dark .qlbvr-sep{background:#334155!important}
                             <input type="date" id="statsTo" onchange="renderStats()" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs">
                         </div>
                     </div>
-                    <div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 border-t border-slate-100">
+                    <div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-2 pt-1 border-t border-slate-100">
+                        <select id="statsFilterCoQuan" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả cơ quan thụ lý</option></select>
+                        <select id="statsFilterKetQuaPL" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả KQ xử lý PL</option></select>
                         <select id="statsFilterNhom" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả nhóm xử lý</option></select>
                         <select id="statsFilterHanhVi" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả hành vi</option></select>
                         <select id="statsFilterTieuKhu" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả tiểu khu</option></select>
@@ -694,6 +701,9 @@ html.dark .qlbvr-sep{background:#334155!important}
                     </button>
                     <button onclick="exportStatsExcel()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
                         <i class="fa-solid fa-file-excel text-emerald-400"></i> Excel
+                    </button>
+                    <button onclick="exportBaoCaoGiaiDoan()" class="px-4 py-2 bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-lines"></i> BC giai đoạn
                     </button>
                     <button onclick="exportWordND30()" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
                         <i class="fa-solid fa-file-word"></i> Word NĐ 30
@@ -741,6 +751,23 @@ html.dark .qlbvr-sep{background:#334155!important}
                 </div>
                 <div class="overflow-x-auto max-h-96 custom-scrollbar">
                     <table class="w-full text-xs" id="statsDetailTable"><thead></thead><tbody></tbody></table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 print-keep">
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                        <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-building-columns text-indigo-500 mr-1.5"></i>Theo cơ quan thụ lý</h3>
+                    </div>
+                    <div class="p-3"><canvas id="chartCoQuan" height="180"></canvas></div>
+                    <div class="overflow-x-auto border-t border-slate-100"><table class="w-full text-xs" id="statsCoQuanTable"><thead></thead><tbody></tbody></table></div>
+                </div>
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+                        <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-scale-balanced text-amber-500 mr-1.5"></i>Kết quả xử lý theo pháp luật</h3>
+                    </div>
+                    <div class="p-3"><canvas id="chartKetQuaPL" height="180"></canvas></div>
+                    <div class="overflow-x-auto border-t border-slate-100"><table class="w-full text-xs" id="statsKetQuaPLTable"><thead></thead><tbody></tbody></table></div>
                 </div>
             </div>
         </div>
@@ -2639,6 +2666,8 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                 const colM3 = getVal(32);
                 const colAL = hasWideCols ? getVal(37) : (getVal(3) || getVal(4));
                 const colAM = hasWideCols ? getVal(38) : (getVal(4) || getVal(3));
+                const colCoQuan = hasWideCols ? getVal(35) : ''; // Cơ quan thụ lý
+                const colKetQuaPL = hasWideCols ? getVal(36) : ''; // Kết quả xử lý theo pháp luật
                 const colTuiHoSo = getVal(43); // AR - tên túi hồ sơ
                 const colLinkHoSo = getVal(44); // AS - link Drive trực tiếp
 
@@ -2685,11 +2714,12 @@ ${c.linkHoSo?`<p>Hồ sơ: <a href="${c.linkHoSo}">${c.tuiHoSo||c.linkHoSo}</a><
                         ngayKyHDTrongRung: colNgayKyHDTrongRung || "",
                         dienTichHDTrongRung: colDienTichHDTrongRung || "",
                         species: (colLoai || colSL || colM3 || colHa || colM2) ? [speciesLine] : [],
-                        // totals
                         soLuong: speciesLine.soLuong,
                         khoiLuongM3: speciesLine.khoiLuongM3,
                         dienTichHa: speciesLine.dienTichHa,
-                        dienTichM2: speciesLine.dienTichM2
+                        dienTichM2: speciesLine.dienTichM2,
+                        coQuanThuLy: (typeof colCoQuan!=='undefined' ? colCoQuan : '') || '',
+                        ketQuaXuLyPL: (typeof colKetQuaPL!=='undefined' ? colKetQuaPL : '') || ''
                     };
                 } else if (current) {
                     // Dòng phụ: chỉ gộp khi cùng hộ (tên trống hoặc trùng tên).
@@ -2916,9 +2946,13 @@ function toggleAdvFilter() {
             setSelectOptions('statsFilterTieuKhu', detailedCases.map(c => c.tieuKhu), 'Tất cả tiểu khu');
             setSelectOptions('statsFilterPhanTruong', detailedCases.map(c => c.phanTruong), 'Tất cả phân trường');
             setSelectOptions('statsFilterXa', detailedCases.map(c => c.xa), 'Tất cả xã');
+            setSelectOptions('statsFilterCoQuan', detailedCases.map(c => normalizeAgency(c.coQuanThuLy||'')).filter(Boolean), 'Tất cả cơ quan thụ lý');
+            setSelectOptions('statsFilterKetQuaPL', detailedCases.map(c => normalizeKetQuaPL(c.ketQuaXuLyPL||'')).filter(Boolean), 'Tất cả KQ xử lý PL');
         }
 
         function clearStatsFilters() {
+            ['statsFilterCoQuan','statsFilterKetQuaPL'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+
             ['statsFilterNhom','statsFilterHanhVi','statsFilterTieuKhu','statsFilterPhanTruong','statsFilterXa'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
             renderStats();
         }
@@ -3207,6 +3241,37 @@ function toggleAdvFilter() {
             return isNaN(d.getTime()) ? null : d;
         }
 
+        
+        function normalizeAgency(s){
+            s=String(s||'').replace(/\s+/g,' ').trim();
+            if(!s || /^\d+$/.test(s)) return '';
+            if(/hạt kiểm lâm|kiem lam/i.test(s)) return 'Hạt Kiểm lâm khu vực 2';
+            if(/xuân hòa|xuan hoa/i.test(s)) return 'UBND xã Xuân Hòa';
+            if(/xuân thành|xuan thanh/i.test(s)) return 'UBND xã Xuân Thành';
+            if(/xuân lộc|xuan loc/i.test(s)) return 'UBND xã/phường Xuân Lộc';
+            if(/ubnd/i.test(s)) return s.length>60 ? s.slice(0,57)+'…' : s;
+            return s.length>70 ? s.slice(0,67)+'…' : s;
+        }
+        function normalizeKetQuaPL(s){
+            s=String(s||'').replace(/\s+/g,' ').trim();
+            if(!s || /^\d+$/.test(s)) return '';
+            if(/chưa có kết quả/i.test(s)) return 'Chưa có kết quả xử lý';
+            if(/xử phạt|quyết định xử phạt|15\.000\.000|15000000/i.test(s)) return 'Đã xử phạt VPHC';
+            if(/lập biên bản|phối hợp.*hiện trường|xác minh hiện trường/i.test(s)) return 'Phối hợp xác minh / lập biên bản';
+            if(/tháo dỡ|khôi phục|chấp hành/i.test(s)) return 'Đã chấp hành / khắc phục tại hiện trường';
+            return s.length>80 ? s.slice(0,77)+'…' : s;
+        }
+        function classifyHanhViGroup(hv){
+            const h=String(hv||'').toLowerCase();
+            if(/phá hoại/.test(h)) return 'Phá hoại';
+            if(/khai thác|cưa hạ|tự ý/.test(h)) return 'Tự ý khai thác';
+            if(/xây dựng|công trình|cơi nới|nhà/.test(h)) return 'Xây dựng trái phép';
+            if(/đào|múc hồ|hồ/.test(h)) return 'Đào múc hồ trái phép';
+            if(/vận chuyển/.test(h)) return 'Vận chuyển';
+            return (hv||'Khác').toString();
+        }
+
+
         function getFilteredCases() {
             const mode = document.getElementById('statsTimeMode')?.value || 'all';
             const year = +((document.getElementById('statsYearTop')?.value || document.getElementById('statsYear')?.value) || document.getElementById('statsYearTop')?.value || new Date().getFullYear());
@@ -3243,6 +3308,10 @@ function toggleAdvFilter() {
                 if (tk && String(c.tieuKhu || '') !== tk) return false;
                 if (pt && String(c.phanTruong || '') !== pt) return false;
                 if (xa && String(c.xa || '') !== xa) return false;
+                const cq = document.getElementById('statsFilterCoQuan')?.value || '';
+                const kq = document.getElementById('statsFilterKetQuaPL')?.value || '';
+                if (cq && normalizeAgency(c.coQuanThuLy||'') !== cq) return false;
+                if (kq && normalizeKetQuaPL(c.ketQuaXuLyPL||'') !== kq) return false;
                 return true;
             });
         }
@@ -3507,8 +3576,142 @@ function toggleAdvFilter() {
                     });
                 }
             }
+
+            try{ renderLegalAgencyStats(cases); }catch(e){ console.warn(e); }
             if (typeof renderQuarterCompare === 'function') renderQuarterCompare();
         }
+
+        var _chartCoQuan=null, _chartKetQuaPL=null;
+        function renderLegalAgencyStats(cases){
+            cases=cases||[];
+            var byCQ={}, byKQ={}, byCQHV={};
+            cases.forEach(function(c){
+                var cq=normalizeAgency(c.coQuanThuLy)||'Chưa ghi nhận';
+                var kq=normalizeKetQuaPL(c.ketQuaXuLyPL)||'Chưa ghi nhận';
+                var hv=classifyHanhViGroup(c.hanhVi);
+                byCQ[cq]=(byCQ[cq]||0)+1;
+                byKQ[kq]=(byKQ[kq]||0)+1;
+                if(!byCQHV[cq]) byCQHV[cq]={};
+                byCQHV[cq][hv]=(byCQHV[cq][hv]||0)+1;
+            });
+            var cqTb=document.getElementById('statsCoQuanTable');
+            if(cqTb){
+                var rows=Object.keys(byCQ).map(function(k){return [k,byCQ[k]];}).sort(function(a,b){return b[1]-a[1];});
+                cqTb.querySelector('thead').innerHTML='<tr class="bg-slate-50 text-slate-600"><th class="py-2 px-3 text-left">Cơ quan thụ lý</th><th class="py-2 px-3 text-right">Số vụ</th><th class="py-2 px-3 text-left">Gồm hành vi</th></tr>';
+                cqTb.querySelector('tbody').innerHTML=rows.map(function(r){
+                    var hv=Object.keys(byCQHV[r[0]]||{}).map(function(h){return h+': '+byCQHV[r[0]][h];}).join('; ');
+                    return '<tr class="border-t border-slate-100"><td class="py-2 px-3 font-medium">'+escapeHtml(r[0])+'</td><td class="py-2 px-3 text-right font-semibold">'+r[1]+'</td><td class="py-2 px-3 text-slate-600">'+escapeHtml(hv)+'</td></tr>';
+                }).join('')||'<tr><td colspan="3" class="p-4 text-center text-slate-400">Không có dữ liệu</td></tr>';
+            }
+            var kqTb=document.getElementById('statsKetQuaPLTable');
+            if(kqTb){
+                var rows2=Object.keys(byKQ).map(function(k){return [k,byKQ[k]];}).sort(function(a,b){return b[1]-a[1];});
+                kqTb.querySelector('thead').innerHTML='<tr class="bg-slate-50 text-slate-600"><th class="py-2 px-3 text-left">Kết quả xử lý PL</th><th class="py-2 px-3 text-right">Số vụ</th></tr>';
+                kqTb.querySelector('tbody').innerHTML=rows2.map(function(r){
+                    return '<tr class="border-t border-slate-100"><td class="py-2 px-3">'+escapeHtml(r[0])+'</td><td class="py-2 px-3 text-right font-semibold">'+r[1]+'</td></tr>';
+                }).join('')||'<tr><td colspan="2" class="p-4 text-center text-slate-400">Không có dữ liệu</td></tr>';
+            }
+            if(typeof Chart==='undefined') return;
+            var palette=['#4f46e5','#059669','#d97706','#0284c7','#e11d48','#7c3aed','#0f766e'];
+            var cqLabels=Object.keys(byCQ), cqData=cqLabels.map(function(k){return byCQ[k];});
+            var kqLabels=Object.keys(byKQ), kqData=kqLabels.map(function(k){return byKQ[k];});
+            var ctx1=document.getElementById('chartCoQuan');
+            var ctx2=document.getElementById('chartKetQuaPL');
+            if(_chartCoQuan){ try{_chartCoQuan.destroy();}catch(e){} _chartCoQuan=null; }
+            if(_chartKetQuaPL){ try{_chartKetQuaPL.destroy();}catch(e){} _chartKetQuaPL=null; }
+            if(ctx1 && cqLabels.length){
+                _chartCoQuan=new Chart(ctx1,{type:'doughnut',data:{labels:cqLabels,datasets:[{data:cqData,backgroundColor:palette}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},cutout:'58%'}});
+            }
+            if(ctx2 && kqLabels.length){
+                _chartKetQuaPL=new Chart(ctx2,{type:'bar',data:{labels:kqLabels.map(function(l){return l.length>28?l.slice(0,26)+'…':l;}),datasets:[{label:'Số vụ',data:kqData,backgroundColor:'#6366f1',borderRadius:6}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{ticks:{font:{size:10}}}}}});
+            }
+        }
+
+        function getPeriodLabelStats(){
+            var mode=document.getElementById('statsTimeMode')&&document.getElementById('statsTimeMode').value||'all';
+            var periodLabel='Toàn bộ thời gian (theo bộ lọc)';
+            if(mode==='year') periodLabel='Năm '+(document.getElementById('statsYearTop')&&document.getElementById('statsYearTop').value||'');
+            if(mode==='month') periodLabel='Tháng '+(document.getElementById('statsMonth')&&document.getElementById('statsMonth').value||'');
+            if(mode==='quarter') periodLabel='Quý '+(document.getElementById('statsQuarter')&&document.getElementById('statsQuarter').value||'')+'/'+(document.getElementById('statsYearTop')&&document.getElementById('statsYearTop').value||'');
+            if(mode==='custom') periodLabel=(document.getElementById('statsFrom')&&document.getElementById('statsFrom').value||'…')+' → '+(document.getElementById('statsTo')&&document.getElementById('statsTo').value||'…');
+            return periodLabel;
+        }
+
+        function exportBaoCaoGiaiDoan(){
+            var cases=getFilteredCases();
+            var periodLabel=getPeriodLabelStats();
+            var totalCay=0,totalM3=0;
+            var byHV={};
+            cases.forEach(function(c){
+                var m=getReportMetrics(c);
+                totalCay+=m.cayGoLon||0; totalM3+=m.khoiLuongM3||0;
+                var g=classifyHanhViGroup(c.hanhVi);
+                if(!byHV[g]) byHV[g]={n:0,cay:0};
+                byHV[g].n++; byHV[g].cay+=m.cayGoLon||0;
+            });
+            var n=cases.length;
+            var hvText=Object.keys(byHV).map(function(k){ return k+' '+byHV[k].n+' vụ'+(byHV[k].cay? (', thiệt hại '+byHV[k].cay+' cây'):''); }).join('; ');
+            var summary='Từ kỳ <b>'+periodLabel+'</b> trên toàn lâm phận xảy ra <b>'+n+'</b> vụ vi phạm QLBVR'+(totalCay? (', gây thiệt hại <b>'+totalCay+'</b> cây gỗ lớn'):'')+(hvText? (' ('+hvText+')'):'')+'. Các vụ vi phạm nêu trên BQL đã phát hiện kịp thời, lập hồ sơ ban đầu báo cáo các cơ quan chức năng để xử lý theo quy định.';
+
+            function agencyTable(title, testFn){
+                var rows=cases.filter(function(c){ return testFn(normalizeAgency(c.coQuanThuLy)||''); });
+                if(!rows.length) return '';
+                var g={};
+                rows.forEach(function(c){
+                    var hv=classifyHanhViGroup(c.hanhVi);
+                    var kq=normalizeKetQuaPL(c.ketQuaXuLyPL)||'Chưa có kết quả xử lý';
+                    if(!g[hv]) g[hv]={tong:0,pending:0};
+                    g[hv].tong++;
+                    if(/chưa có kết quả/i.test(kq)) g[hv].pending++;
+                });
+                var body='', i=0, tot=0, pend=0;
+                Object.keys(g).forEach(function(hv){
+                    i++; tot+=g[hv].tong; pend+=g[hv].pending;
+                    var done=g[hv].tong-g[hv].pending;
+                    body+='<tr><td style="text-align:center">'+i+'</td><td>'+escapeHtml(hv)+'</td><td style="text-align:center">'+g[hv].tong+'</td><td style="text-align:center">'+(done||'-')+'</td><td style="text-align:center">'+(g[hv].pending||'-')+'</td></tr>';
+                });
+                body+='<tr><td colspan="2" style="font-weight:700;text-align:center">Tổng</td><td style="text-align:center;font-weight:700">'+tot+'</td><td style="text-align:center;font-weight:700">'+(tot-pend)+'</td><td style="text-align:center;font-weight:700">'+(pend||'-')+'</td></tr>';
+                return '<p style="font-weight:700;margin:18px 0 8px">'+title+'</p><table style="width:100%;border-collapse:collapse;font-size:11pt"><thead><tr><th style="border:1px solid #000;padding:4px">Stt</th><th style="border:1px solid #000;padding:4px">Hành vi</th><th style="border:1px solid #000;padding:4px">Tổng</th><th style="border:1px solid #000;padding:4px">Đã có kết quả / phối hợp xử lý</th><th style="border:1px solid #000;padding:4px">Chưa có kết quả xử lý</th></tr></thead><tbody>'+body+'</tbody></table>';
+            }
+            function listCases(testFn){
+                return cases.filter(testFn).map(function(c){
+                    return '<li><b>'+escapeHtml(c.hoTen)+'</b>'+(c.xa?(' ('+escapeHtml(c.xa)+')'):'')+' — '+escapeHtml(classifyHanhViGroup(c.hanhVi))+
+                        (c.coQuanThuLy?(' · CQ: '+escapeHtml(normalizeAgency(c.coQuanThuLy))):'')+
+                        (c.ketQuaXuLyPL?(' · '+escapeHtml(String(c.ketQuaXuLyPL).slice(0,140))):'')+'</li>';
+                }).join('');
+            }
+            var xd=listCases(function(c){ return /xây dựng/i.test(classifyHanhViGroup(c.hanhVi)); });
+            var dh=listCases(function(c){ return /đào múc/i.test(classifyHanhViGroup(c.hanhVi)); });
+            var m1=cases.filter(function(c){return c.nhomId===1;}).length;
+            var m2=cases.filter(function(c){return c.nhomId===2;}).length;
+            var m3=cases.filter(function(c){return c.nhomId===3;}).length;
+            var m4=cases.filter(function(c){return c.nhomId===4;}).length;
+            var m5=cases.filter(function(c){return c.nhomId===5;}).length;
+
+            var html='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>BC QLBVR</title>'+
+                '<style>body{font-family:"Times New Roman",serif;font-size:13pt;line-height:1.45;max-width:900px;margin:24px auto;padding:12px}'+
+                'h1{font-size:14pt;text-align:center;text-transform:uppercase}table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:5px 6px}'+
+                '@media print{body{margin:12mm} .no-print{display:none}}</style></head><body>'+
+                '<p class="no-print"><button onclick="window.print()">In / PDF</button></p>'+
+                '<h1>Báo cáo tình hình vi phạm công tác QLBVR</h1>'+
+                '<p style="text-align:center">Ban Quản lý Rừng phòng hộ Xuân Lộc · Kỳ: <b>'+escapeHtml(periodLabel)+'</b></p>'+
+                '<p><b>2.9. Tình hình vi phạm pháp luật trên lâm phận quản lý:</b> '+summary+'</p>'+
+                agencyTable('Bảng chi tiết xử lý vi phạm của Hạt Kiểm lâm khu vực 2', function(a){ return /Hạt Kiểm lâm/i.test(a); })+
+                agencyTable('Bảng chi tiết xử lý vi phạm của UBND các xã, phường', function(a){ return /UBND/i.test(a); })+
+                (xd?'<p style="margin-top:14px"><b>Xây dựng trái phép:</b></p><ul>'+xd+'</ul>':'')+
+                (dh?'<p style="margin-top:10px"><b>Đào múc hồ trái phép:</b></p><ul>'+dh+'</ul>':'')+
+                '<p style="margin-top:14px">Trong kỳ lọc, kết quả nhóm xử lý theo Hợp đồng giao khoán: VP mới/đang theo dõi <b>'+m1+'</b>; đang mời LV <b>'+m2+'</b>; chấp hành/khắc phục <b>'+m3+'</b>; niêm yết TB <b>'+m4+'</b>; chấm dứt HĐ <b>'+m5+'</b>.</p>'+
+                '<p>Trên đây là báo cáo tình hình vi phạm công tác QLBVR kỳ <b>'+escapeHtml(periodLabel)+'</b>, kính trình Lãnh đạo Ban xem xét, chỉ đạo./.</p>'+
+                '<table style="border:none;margin-top:28px;width:100%"><tr>'+
+                '<td style="border:none;width:50%"><i>Nơi nhận:</i><br>- Như trên;<br>- Lưu: VT, PLN.</td>'+
+                '<td style="border:none;width:50%;text-align:center"><b>KT. TRƯỞNG PHÒNG</b><br><b>PHÓ TRƯỞNG PHÒNG</b><br><i>(Ký, ghi rõ họ tên)</i><div style="height:72px"></div></td>'+
+                '</tr></table></body></html>';
+            var w=window.open('','_blank');
+            if(!w){ showToast('Cho phép pop-up để xem báo cáo','error'); return; }
+            w.document.write(html); w.document.close();
+            showToast('Đã mở báo cáo giai đoạn');
+        }
+
 
 
         function safeLocalStorageGet(key) {
@@ -3786,6 +3989,8 @@ function toggleAdvFilter() {
                     'Số lượng cây': m.cayGoLon || 0,
                     'Khối lượng m3': m.khoiLuongM3 || 0,
                     'Ngày BB': c.ngayViPham || '',
+                    'Cơ quan thụ lý': c.coQuanThuLy || '',
+                    'Kết quả xử lý PL': c.ketQuaXuLyPL || '',
                     'Nhóm xử lý': c.nhomTen,
                     'Tình trạng': c.tinhTrang || '',
                     'Tiểu khu': c.tieuKhu || '',
