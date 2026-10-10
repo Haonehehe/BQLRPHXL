@@ -848,7 +848,7 @@ function setSession(s) {
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
 function canAccess(mod) {
-  if (mod === 'pdf' || mod === 'phapluat' || mod === 'congcu') return true;
+  if (mod === 'pdf' || mod === 'phapluat' || mod === 'congcu' || mod === 'thongbao' || mod === 'bando') return true;
   var s = getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
@@ -1140,7 +1140,7 @@ function authModeLabel() {
 var MODULES={
   tienich:[
     {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'},
-    {id:'thongbao',href:'tienich-thongbao.html',cls:'congcu',icon:'fa-bullhorn',code:'TB',title:'Thông báo · Niêm yết',desc:'Đăng tin · niêm yết VB · hoạt động đơn vị.'},
+    {id:'thongbao',href:'tienich-thongbao.html',cls:'congcu',icon:'fa-bullhorn',code:'TB',title:'Thông báo · Niêm yết',desc:'Xem thông báo · niêm yết · hoạt động đơn vị.'},
     {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'},
     {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Tọa độ VN-2000 · tải lớp · mẫu VB.'}
   ],
