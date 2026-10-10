@@ -368,7 +368,7 @@ input:focus,select:focus,textarea:focus{
   </div>
   <div class="progress" id="prog"><i id="progBar"></i></div>
 <div class="panel on" id="p-noi">
-    <div class="hint"><b>Nối PDF:</b> chọn file → <b>Tạo bản xem trước</b> → <b>kéo-thả</b> sắp xếp trang nếu cần → <b>Tải về</b>. Tên file: <code>TênFileĐầu_DANOI.pdf</code></div>
+    
     <div class="card"><div class="card-h">Chọn file PDF</div><div class="card-b">
       <div class="drop" id="dropNoi" onclick="document.getElementById('inpNoi').click()"><i class="fa-solid fa-cloud-arrow-up"></i><p>Kéo thả hoặc bấm chọn (nhiều file)</p><span>Thứ tự file = thứ tự nối ban đầu</span></div>
       <input type="file" id="inpNoi" accept="application/pdf,.pdf" multiple hidden>
@@ -391,7 +391,7 @@ input:focus,select:focus,textarea:focus{
 
   <!-- TÁCH -->
   <div class="panel" id="p-tach">
-    <div class="hint"><b>Tách:</b> xem trang nguồn → nhập khoảng → <b>Tạo bản xem trước</b> → <b>kéo-thả</b> sắp xếp nếu cần → tải về.</div>
+    
     <div class="card"><div class="card-h">File nguồn</div><div class="card-b">
       <div class="drop" id="dropTach" onclick="document.getElementById('inpTach').click()"><i class="fa-solid fa-scissors"></i><p>Chọn 1 PDF cần tách</p></div>
       <input type="file" id="inpTach" accept="application/pdf,.pdf" hidden>
@@ -424,7 +424,7 @@ input:focus,select:focus,textarea:focus{
 
   <!-- SỬA -->
   <div class="panel" id="p-sua">
-    <div class="hint"><b>Chỉnh sửa:</b> xem trước → chọn / sắp xếp → xóa hoặc trích → tải về.</div>
+    
     <div class="card"><div class="card-h">File nguồn</div><div class="card-b">
       <div class="drop" id="dropSua" onclick="document.getElementById('inpSua').click()"><i class="fa-solid fa-pen-to-square"></i><p>Chọn PDF để chỉnh sửa</p></div>
       <input type="file" id="inpSua" accept="application/pdf,.pdf" hidden>
@@ -442,7 +442,7 @@ input:focus,select:focus,textarea:focus{
 
   <!-- XOAY -->
   <div class="panel" id="p-xoay">
-    <div class="hint"><b>Xoay:</b> bấm <b>↺ ↻</b> ngay dưới mỗi trang để xoay · xem thumbnail đổi hướng · rồi <b>Tải bản đã xoay</b>.</div>
+    
     <div class="card"><div class="card-h">File nguồn</div><div class="card-b">
       <div class="drop" id="dropXoay" onclick="document.getElementById('inpXoay').click()"><i class="fa-solid fa-rotate"></i><p>Chọn PDF cần xoay</p></div>
       <input type="file" id="inpXoay" accept="application/pdf,.pdf" hidden>
@@ -477,7 +477,7 @@ input:focus,select:focus,textarea:focus{
 
   <!-- OCR -->
   <div class="panel" id="p-ocr">
-    <div class="hint"><b>OCR:</b> nhận chữ từ PDF scan. Xuất <b>.txt</b> hoặc <b>Word (.doc)</b>.</div>
+    
     <div class="card"><div class="card-h">File nguồn</div><div class="card-b">
       <div class="drop" id="dropOcr" onclick="document.getElementById('inpOcr').click()"><i class="fa-solid fa-eye"></i><p>Chọn PDF (scan) để OCR</p><span>Model tiếng Việt tải lần đầu</span></div>
       <input type="file" id="inpOcr" accept="application/pdf,.pdf" hidden>
@@ -507,7 +507,7 @@ input:focus,select:focus,textarea:focus{
 
 </div>
 
-<div class="foot">BQLRPH Xuân Lộc · Phòng Lâm nghiệp · PDF trên trình duyệt</div>
+<div class="foot">BQLRPH Xuân Lộc · PDF trên trình duyệt</div>
 <div id="toast" class="toast"></div>
 
 <div class="modal" id="modalPv" onclick="if(event.target===this)dongPv()">

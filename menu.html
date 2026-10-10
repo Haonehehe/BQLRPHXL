@@ -526,7 +526,7 @@ footer{
   <div class="brand">
     <div class="brand-icon"><i class="fa-solid fa-tree"></i></div>
     <h1>Ban Quản lý Rừng phòng hộ Xuân Lộc</h1>
-    <p>Phòng Lâm nghiệp · Nền tảng số · Quản lý lâm nghiệp Xuân Lộc</p>
+    <p></p>
     <div class="pills">
       <span class="pill" id="modeBadge">Auth</span>
       <span class="pill">Tiện ích · Chuyên môn</span>
@@ -536,7 +536,7 @@ footer{
   <div class="authbar" id="authBar"></div>
   <div class="grid" id="grid"></div>
   <p class="hint" id="hintBox"></p>
-  <footer><i class="fa-solid fa-leaf" style="color:#34d399;margin-right:6px;opacity:.7"></i>BQLRPH Xuân Lộc · Phòng Lâm nghiệp · Hệ thống nội bộ</footer>
+  <footer><i class="fa-solid fa-leaf" style="color:#34d399;margin-right:6px;opacity:.7"></i>BQLRPH Xuân Lộc</footer>
 </div>
 
 
@@ -651,7 +651,7 @@ footer{
     <div class="sub">Hệ thống quản lý lâm nghiệp · BQLRPH Xuân Lộc (dành cho người mới)</div>
 
     <h4>1. Mở hệ thống</h4>
-    <p>Truy cập: <a href="https://www.bqlrphxuanloc.site/menu.html" target="_blank" rel="noopener">https://www.bqlrphxuanloc.site/menu.html</a><br>
+    <p>Truy cập: <a href="https://haonehehe.github.io/BQLRPHXL/menu" target="_blank" rel="noopener">https://haonehehe.github.io/BQLRPHXL/menu</a><br>
     Nên dùng trình duyệt <b>Chrome</b> hoặc <b>Edge</b>.</p>
 
     <h4>2. Lần đầu: Khách chỉ dùng được PDF</h4>
@@ -1140,6 +1140,7 @@ function authModeLabel() {
 var MODULES={
   tienich:[
     {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'},
+    {id:'thongbao',href:'tienich-thongbao.html',cls:'congcu',icon:'fa-bullhorn',code:'TB',title:'Thông báo · Niêm yết',desc:'Đăng tin · niêm yết VB · hoạt động đơn vị.'},
     {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'},
     {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Tọa độ VN-2000 · tải lớp · mẫu VB.'}
   ],
@@ -1284,7 +1285,7 @@ function renderGrid(){
 }
 function render(){
   (function(){var s=getSession();if(s){s.perms=sanitizePerms(s.perms);setSession(s);}})();
-  document.getElementById('modeBadge').textContent=useCloud()?'Sheet sync':'Local';
+  document.getElementById('modeBadge').textContent=useCloud()?'':'Local';
   renderAuthBar();
   refreshPendingBadge();renderGrid();
   var s=currentUser();

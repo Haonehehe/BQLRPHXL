@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thông báo · Niêm yết · Hoạt động — BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f172a;--card:rgba(30,41,59,.92);--line:rgba(148,163,184,.14);--tx:#e8eef7;--mu:#94a3b8}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;min-height:100vh;color:var(--tx);
+background:radial-gradient(ellipse 70% 40% at 10% -10%,rgba(56,189,248,.12),transparent 50%),radial-gradient(ellipse 50% 30% at 100% 0%,rgba(52,211,153,.08),transparent 45%),var(--bg)}
+.wrap{max-width:920px;margin:0 auto;padding:20px 16px 48px}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.brand h1{font-size:1.2rem;font-weight:800}
+.brand p{color:var(--mu);font-size:.8rem;margin-top:4px}
+.nav a{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--tx);text-decoration:none;font-size:.8rem;font-weight:600;border:1px solid var(--line)}
+.banner{font-size:12px;color:#a5b4fc;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);padding:10px 14px;border-radius:12px;margin-bottom:14px;line-height:1.45}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.tab{border:1px solid var(--line);background:transparent;color:var(--mu);font:600 12px inherit;padding:7px 12px;border-radius:999px;cursor:pointer}
+.tab.on{background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;border-color:transparent}
+.search-wrap{position:relative}
+.search-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:12px}
+.search{min-width:160px;height:36px;border-radius:10px;border:1px solid var(--line);background:rgba(15,23,42,.6);color:var(--tx);padding:0 12px 0 34px;font:500 13px inherit;outline:none}
+.btn{height:36px;padding:0 12px;border-radius:10px;border:none;cursor:pointer;font:600 12px inherit;display:inline-flex;align-items:center;gap:6px;color:#fff;background:linear-gradient(135deg,#64748b,#334155)}
+.meta{font-size:11px;color:var(--mu);margin-bottom:12px}
+.grid{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.card.pin{border-color:rgba(251,191,36,.45);background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(30,41,59,.92))}
+.card.expired{opacity:.55}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:8px}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{font-size:10px;font-weight:700;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid transparent}
+.b-thongbao{background:rgba(56,189,248,.15);color:#7dd3fc;border-color:rgba(56,189,248,.25)}
+.b-niemyet{background:rgba(248,113,113,.15);color:#fca5a5;border-color:rgba(248,113,113,.3)}
+.b-quantong{background:rgba(251,191,36,.15);color:#fcd34d;border-color:rgba(251,191,36,.3)}
+.b-hoatdong{background:rgba(52,211,153,.15);color:#6ee7b7;border-color:rgba(52,211,153,.3)}
+.b-pin{background:rgba(251,191,36,.2);color:#fde68a}
+.b-het{background:rgba(148,163,184,.15);color:#94a3b8}
+.title{font-size:1.05rem;font-weight:700;line-height:1.35;margin:4px 0 8px}
+.date{font-size:12px;color:var(--mu)}
+.body{font-size:13.5px;line-height:1.6;color:#cbd5e1;white-space:pre-wrap}
+.media{margin-top:12px}
+.media img{max-width:100%;max-height:360px;border-radius:12px;border:1px solid var(--line);display:block;object-fit:contain;background:#0f172a}
+.foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.dl{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#fff;text-decoration:none;padding:8px 12px;border-radius:10px;background:linear-gradient(135deg,#0ea5e9,#0369a1)}
+.dl:hover{filter:brightness(1.08)}
+.dl.sec{background:linear-gradient(135deg,#64748b,#334155)}
+.author{font-size:11px;color:var(--mu);margin-left:auto}
+.empty{text-align:center;padding:48px 16px;color:var(--mu);border:1px dashed var(--line);border-radius:16px}
+@media print{.toolbar,.nav,.banner,.btn{display:none!important}.card{break-inside:avoid;border:1px solid #ccc;background:#fff;color:#000}.body,.title,.date{color:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <h1><i class="fa-solid fa-bullhorn" style="color:#38bdf8"></i> Thông báo · Niêm yết · Hoạt động</h1>
+      <p>Ban Quản lý Rừng phòng hộ Xuân Lộc</p>
+    </div>
+    <div class="nav"><a href="menu.html"><i class="fa-solid fa-house"></i> Menu</a></div>
+  </div>
+  <div class="toolbar">
+    <div class="tabs" id="tabs">
+      <button type="button" class="tab on" data-f="all">Tất cả</button>
+      <button type="button" class="tab" data-f="thongbao">Thông báo</button>
+      <button type="button" class="tab" data-f="niemyet">Niêm yết VB</button>
+      <button type="button" class="tab" data-f="quantong">Tin quan trọng</button>
+      <button type="button" class="tab" data-f="hoatdong">Hoạt động</button>
+    </div>
+    <div class="search-wrap"><i class="fa-solid fa-magnifying-glass"></i>
+      <input class="search" id="q" placeholder="Tìm…" oninput="render()">
+    </div>
+    <button type="button" class="btn" onclick="loadData(false)"><i class="fa-solid fa-rotate"></i> Làm mới</button>
+  </div>
+  <div class="meta" id="meta">Đang tải…</div>
+  <div class="grid" id="list"></div>
+</div>
+<script>
+(function(){
+  var TYPE_META={
+    thongbao:{label:'Thông báo',cls:'b-thongbao',icon:'fa-bell'},
+    niemyet:{label:'Niêm yết VB',cls:'b-niemyet',icon:'fa-scroll'},
+    quantong:{label:'Tin quan trọng',cls:'b-quantong',icon:'fa-triangle-exclamation'},
+    hoatdong:{label:'Hoạt động',cls:'b-hoatdong',icon:'fa-people-group'}
+  };
+  var items=[], filter='all';
+  var STORAGE_KEY='bqlrph_thongbao_sheet';
+
+  function getSheetUrl(){
+    try{
+      var shared=JSON.parse(localStorage.getItem('bqlrph_sheet_sources_v1')||'{}');
+      if(shared.thongbao){
+        var t=shared.thongbao;
+        if(t.url) return t.url;
+        if(t.sid) return 'https://docs.google.com/spreadsheets/d/'+t.sid+'/edit'+(t.gid?('?gid='+t.gid+'#gid='+t.gid):'');
+      }
+    }catch(e){}
+    try{ return localStorage.getItem(STORAGE_KEY)||''; }catch(e){ return ''; }
+  }
+  function parseSheetId(url){ var m=String(url).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m?m[1]:''; }
+  function parseGid(url){ var m=String(url).match(/[?&#]gid=([0-9]+)/); return m?m[1]:'0'; }
+  function cell(c){ if(!c)return ''; var v=c.f!=null?c.f:c.v; return v==null?'':String(v).trim(); }
+  function normType(s){
+    s=String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'');
+    if(/niem|niemyet/.test(s)) return 'niemyet';
+    if(/quan|khan|quantong|important/.test(s)) return 'quantong';
+    if(/hoat|activity|hoatdong/.test(s)) return 'hoatdong';
+    return 'thongbao';
+  }
+  function parseDate(s){
+    s=String(s||'').trim(); if(!s) return null;
+    var m=s.match(/Date\((\d+),(\d+),(\d+)/); if(m) return new Date(+m[1],+m[2],+m[3]);
+    m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+    m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+    var d=new Date(s); return isNaN(d)?null:d;
+  }
+  function fmtDate(d){ if(!d)return ''; return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+  function isTruthy(s){ s=String(s||'').trim().toLowerCase(); return s==='1'||s==='x'||s==='true'||s==='co'||s==='có'||s==='yes'||s==='hien'||s==='hiện'; }
+  function isImageUrl(u){ return /\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(u)||/[?&](img|image)=/i.test(u)||/googleusercontent\.com|lh3\.google/i.test(u); }
+  function absUrl(u){ if(!u)return ''; if(/^https?:\/\//i.test(u)||/^mailto:/i.test(u)) return u; return 'https://'+u; }
+  function escapeHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+  function mapHeader(cols){
+    var idx={};
+    cols.forEach(function(c,i){
+      var h=String(c.label||c.id||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      if(/loai|type/.test(h)) idx.type=i;
+      else if(/tieu de|title|trich/.test(h)) idx.title=i;
+      else if(/noi dung|content|tom tat/.test(h)) idx.body=i;
+      else if(/ngay dang|posted|date/.test(h)&&idx.date==null) idx.date=i;
+      else if(/het han|expire/.test(h)) idx.exp=i;
+      else if(/link|file|dinh kem|van ban|url|drive/.test(h)&&idx.link==null) idx.link=i;
+      else if(/anh|hinh|image|photo/.test(h)) idx.image=i;
+      else if(/nguoi|author|dang boi/.test(h)) idx.author=i;
+      else if(/ghim|pin/.test(h)) idx.pin=i;
+      else if(/hien|status|trang thai/.test(h)) idx.show=i;
+    });
+    if(idx.type==null)idx.type=1; if(idx.title==null)idx.title=2; if(idx.body==null)idx.body=3;
+    if(idx.date==null)idx.date=4; if(idx.exp==null)idx.exp=5; if(idx.link==null)idx.link=6;
+    if(idx.image==null)idx.image=7; if(idx.author==null)idx.author=8; if(idx.pin==null)idx.pin=9; if(idx.show==null)idx.show=10;
+    return idx;
+  }
+
+  function fetchGviz(sheetId,gid){
+    return new Promise(function(resolve,reject){
+      var cb='bqlrphTb_'+Date.now();
+      var url='https://docs.google.com/spreadsheets/d/'+sheetId+'/gviz/tq?tqx=responseHandler:'+cb+'&headers=1';
+      if(gid) url+='&gid='+encodeURIComponent(gid);
+      window[cb]=function(json){
+        try{delete window[cb]}catch(e){}
+        if(script&&script.parentNode)script.parentNode.removeChild(script);
+        if(!json||!json.table) return reject(new Error('Sheet rỗng hoặc chưa công khai'));
+        resolve(json.table);
+      };
+      var script=document.createElement('script');
+      script.onerror=function(){reject(new Error('Không tải được Sheet'));};
+      script.src=url; document.body.appendChild(script);
+      setTimeout(function(){ if(window[cb]){try{delete window[cb]}catch(e){} reject(new Error('Hết thời gian chờ'));}},15000);
+    });
+  }
+
+  function sampleData(){
+    var now=new Date();
+    return [{type:'quantong',title:'Chào mừng đến kênh thông báo BQLRPH Xuân Lộc',body:'Trang này chỉ để xem tin và tải tệp đính kèm.\nĐăng tin / niêm yết do Admin thực hiện tại trang Quản trị.',date:now,exp:null,link:'',image:'',author:'Hệ thống',pin:true}];
+  }
+
+  function loadData(){
+    document.getElementById('meta').textContent='Đang tải…';
+    var url=getSheetUrl();
+    if(!url){ items=sampleData(); render(); return; }
+    var id=parseSheetId(url); if(!id){ items=sampleData(); render(); return; }
+    fetchGviz(id, parseGid(url)).then(function(table){
+      var idx=mapHeader(table.cols||[]);
+      var out=[];
+      (table.rows||[]).forEach(function(r){
+        var c=r.c||[];
+        var title=cell(c[idx.title]); if(!title) return;
+        var showRaw=cell(c[idx.show]); if(showRaw!=='' && !isTruthy(showRaw)) return;
+        var link=cell(c[idx.link]), image=cell(c[idx.image]);
+        if(!image && link && isImageUrl(link)) image=link;
+        out.push({type:normType(cell(c[idx.type])),title:title,body:cell(c[idx.body]),
+          date:parseDate(cell(c[idx.date])),exp:parseDate(cell(c[idx.exp])),
+          link:link,image:image,author:cell(c[idx.author]),pin:isTruthy(cell(c[idx.pin]))});
+      });
+      items=out.length?out:sampleData();
+      render();
+    }).catch(function(){ items=sampleData(); render(); });
+  }
+  window.loadData=loadData;
+
+  document.getElementById('tabs').addEventListener('click',function(e){
+    var btn=e.target.closest('.tab'); if(!btn) return;
+    filter=btn.getAttribute('data-f')||'all';
+    [].forEach.call(document.querySelectorAll('.tab'),function(t){t.classList.toggle('on',t===btn)});
+    render();
+  });
+
+  function render(){
+    var q=(document.getElementById('q').value||'').toLowerCase().trim();
+    var now=new Date(); now.setHours(0,0,0,0);
+    var list=items.filter(function(it){
+      if(filter!=='all'&&it.type!==filter) return false;
+      if(!q) return true;
+      return (it.title+' '+it.body+' '+(it.author||'')).toLowerCase().indexOf(q)>=0;
+    });
+    list.sort(function(a,b){ if(a.pin!==b.pin) return a.pin?-1:1; return (b.date?b.date.getTime():0)-(a.date?a.date.getTime():0); });
+    document.getElementById('meta').textContent=list.length+' tin';
+    var box=document.getElementById('list');
+    if(!list.length){ box.innerHTML='<div class="empty">Không có tin</div>'; return; }
+    box.innerHTML=list.map(function(it){
+      var tm=TYPE_META[it.type]||TYPE_META.thongbao;
+      var expired=it.exp&&it.exp<now;
+      var badges='<span class="badge '+tm.cls+'"><i class="fa-solid '+tm.icon+'"></i> '+tm.label+'</span>';
+      if(it.pin) badges+='<span class="badge b-pin"><i class="fa-solid fa-thumbtack"></i> Ghim</span>';
+      if(expired) badges+='<span class="badge b-het">Hết hạn</span>';
+      var dates=[]; if(it.date) dates.push('Đăng: '+fmtDate(it.date)); if(it.exp) dates.push('Hết hạn: '+fmtDate(it.exp));
+      var media='';
+      if(it.image){ media='<div class="media"><img src="'+escapeHtml(absUrl(it.image))+'" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>'; }
+      var dls=[];
+      if(it.link) dls.push('<a class="dl" href="'+escapeHtml(absUrl(it.link))+'" target="_blank" rel="noopener" download><i class="fa-solid fa-download"></i> Tải văn bản / file</a>');
+      if(it.image) dls.push('<a class="dl sec" href="'+escapeHtml(absUrl(it.image))+'" target="_blank" rel="noopener" download><i class="fa-solid fa-image"></i> Tải hình ảnh</a>');
+      return '<article class="card'+(it.pin?' pin':'')+(expired?' expired':'')+'">'+
+        '<div class="head"><div class="badges">'+badges+'</div><div class="date">'+escapeHtml(dates.join(' · '))+'</div></div>'+
+        '<div class="title">'+escapeHtml(it.title)+'</div>'+
+        (it.body?'<div class="body">'+escapeHtml(it.body)+'</div>':'')+media+
+        '<div class="foot">'+dls.join('')+'<span class="author">'+escapeHtml(it.author||'')+'</span></div></article>';
+    }).join('');
+  }
+  window.render=render;
+  loadData();
+})();
+</script>
+</body>
+</html>

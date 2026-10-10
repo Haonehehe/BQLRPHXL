@@ -304,7 +304,7 @@ body{padding-bottom:30px!important}
 <div class="contact-fab-wrap" id="contactFabWrap">
   <div id="contactPop" class="contact-pop" role="dialog" aria-label="Thông tin tác giả">
     <b>Huỳnh Nhựt Hào</b>
-    <span>Phòng Lâm nghiệp · BQLRPH Xuân Lộc</span>
+    <span> · BQLRPH Xuân Lộc</span>
     <a href="tel:0878884088"><i class="fa-solid fa-phone"></i> 0878 884 088</a>
     <a href="mailto:hnhao.213@gmail.com"><i class="fa-solid fa-envelope"></i> hnhao.213@gmail.com</a>
   </div>
@@ -338,7 +338,7 @@ var DEFAULT_NHA_SID = '1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT';
 
 /* ===== Đồng bộ nguồn Sheet (Admin → Apps Script → mọi máy) ===== */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
-var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec';
+var BQLRPH_DEFAULT_SCRIPT='https://script.google.com/macros/s/AKfycby91jGUTCwmJylbtRqvt2q0TA96qZeMraQZly2NP1S_5qsP4XOvnpSzVYjE_xu41Mnrow/exec';
 function bqlrphScriptUrl(){
   try{ var u=localStorage.getItem('bqlrph_script_url'); if(u&&u.indexOf('http')===0) return u; }catch(e){}
   return BQLRPH_DEFAULT_SCRIPT;
@@ -850,7 +850,7 @@ function moHoTro(){
     '</ul>'+
     '<p style="margin-top:12px"><b>Lưu ý SĐT:</b> hệ thống giữ số 0 đầu (vd 0945…). Nếu sheet lưu dạng số và mất 0, app tự thêm khi đủ 9 chữ số.</p>'+
     '<p style="margin-top:10px"><b>Phép:</b> mã <code>C</code> trên sheet = <b>Có phép</b>; giá trị khác / trống có nội dung = <b>Không phép</b>.</p>'+
-    '<p style="margin-top:12px;color:#64748b">BQLRPH Xuân Lộc · Phòng Lâm nghiệp</p>'+
+    '<p style="margin-top:12px;color:#64748b">BQLRPH Xuân Lộc</p>'+
     '</div>';
   document.getElementById('modal').classList.add('on');
 }

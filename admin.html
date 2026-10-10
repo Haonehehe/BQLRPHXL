@@ -585,6 +585,107 @@ function shell(inner){
 }
 
 
+
+function thongbaoAdminCard(){
+  var h='<div class="card" id="thongbaoAdminCard"><div class="card-h"><span><i class="fa-solid fa-bullhorn" style="color:#0284c7;margin-right:6px"></i>Đăng tin · Niêm yết · Hoạt động</span>';
+  h+='<a class="btn btn-o btn-sm" href="tienich-thongbao.html" target="_blank"><i class="fa-solid fa-eye"></i> Xem trang công khai</a></div>';
+  h+='<div style="padding:14px 16px;font-size:12.5px;color:#475569;line-height:1.5;background:#f0f9ff;border-bottom:1px solid #e0f2fe">';
+  h+='</div>';
+  h+='<div style="padding:16px;display:grid;gap:10px">';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Loại tin</label><select id="tbType" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"><option value="thongbao">Thông báo</option><option value="niemyet">Niêm yết văn bản</option><option value="quantong">Tin quan trọng</option><option value="hoatdong">Hoạt động đơn vị</option></select></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Ngày đăng</label><input id="tbDate" type="date" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tiêu đề *</label><input id="tbTitle" type="text" placeholder="Tiêu đề / trích yếu" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Nội dung</label><textarea id="tbBody" rows="4" style="width:100%;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:4px;font:inherit"></textarea></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải văn bản / PDF từ máy</label><input id="tbFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,image/*" style="width:100%;margin-top:6px;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải hình ảnh từ máy</label><input id="tbImgFile" type="file" accept="image/*" style="width:100%;margin-top:6px;font-size:12px"></div></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Hoặc dán link file (nếu đã có trên Drive)</label><input id="tbLink" type="url" placeholder="https://drive.google.com/..." style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Hoặc dán link ảnh</label><input id="tbImage" type="url" placeholder="https://..." style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div></div>';
+  
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Hết hạn niêm yết</label><input id="tbExp" type="date" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Người đăng</label><input id="tbAuthor" type="text" placeholder="Văn phòng Ban" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
+  h+='<div style="display:flex;align-items:flex-end;gap:14px;padding-bottom:6px"><label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="tbPin"> Ghim</label><label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="tbShow" checked> Hiện</label></div></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn btn-g" onclick="submitThongbao()"><i class="fa-solid fa-paper-plane"></i> Đăng tin</button><button type="button" class="btn btn-o" onclick="clearThongbaoForm()"><i class="fa-solid fa-eraser"></i> Xóa form</button></div>';
+  h+='</div></div>';
+  return h;
+}
+function clearThongbaoForm(){
+  ['tbTitle','tbBody','tbLink','tbImage','tbAuthor','tbDate','tbExp'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var p=document.getElementById('tbPin'); if(p) p.checked=false;
+  var s=document.getElementById('tbShow'); if(s) s.checked=true;
+}
+function submitThongbao(){
+  var title=String((document.getElementById('tbTitle')||{}).value||'').trim();
+  if(!title){ toast('Nhập tiêu đề'); return; }
+  var sess=null; try{ sess=JSON.parse(sessionStorage.getItem('bqlrph_session_v1')||localStorage.getItem('bqlrph_session_v1')||'null'); }catch(e){}
+  var payload={
+    action:'addthongbao',
+    adminEmail:(sess&&sess.email)||'',
+    adminPass:(sess&&sess._pass)||'',
+    type:(document.getElementById('tbType')||{}).value||'thongbao',
+    title:title,
+    body:(document.getElementById('tbBody')||{}).value||'',
+    link:(document.getElementById('tbLink')||{}).value||'',
+    image:(document.getElementById('tbImage')||{}).value||'',
+    date:(document.getElementById('tbDate')||{}).value||'',
+    exp:(document.getElementById('tbExp')||{}).value||'',
+    author:(document.getElementById('tbAuthor')||{}).value||((sess&&sess.name)||'Admin'),
+    pin:!!(document.getElementById('tbPin')||{}).checked,
+    show:document.getElementById('tbShow')?!!document.getElementById('tbShow').checked:true
+  };
+  function saveDraft(){
+    try{ var key='bqlrph_thongbao_drafts'; var arr=JSON.parse(localStorage.getItem(key)||'[]'); arr.unshift({ts:Date.now(),data:payload}); localStorage.setItem(key, JSON.stringify(arr.slice(0,50))); }catch(e){}
+  }
+  function readFileAsB64(file){
+    return new Promise(function(resolve,reject){
+      if(!file) return resolve(null);
+      if(file.size > 8*1024*1024) return reject(new Error('File "'+file.name+'" vượt 8MB — hãy tải lên Drive rồi dán link'));
+      var r=new FileReader();
+      r.onload=function(){
+        var s=String(r.result||'');
+        var i=s.indexOf(',');
+        resolve({ name:file.name, mime:file.type||'application/octet-stream', base64: i>=0?s.slice(i+1):s });
+      };
+      r.onerror=function(){ reject(new Error('Không đọc được file '+file.name)); };
+      r.readAsDataURL(file);
+    });
+  }
+  var fEl=document.getElementById('tbFile');
+  var iEl=document.getElementById('tbImgFile');
+  var f1=fEl&&fEl.files&&fEl.files[0];
+  var f2=iEl&&iEl.files&&iEl.files[0];
+  toast('Đang xử lý'+(f1||f2?' file…':'…'));
+  Promise.all([readFileAsB64(f1), readFileAsB64(f2)]).then(function(arr){
+    if(arr[0]) payload.fileUpload=arr[0];
+    if(arr[1]) payload.imageUpload=arr[1];
+    if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
+      return apiCall(payload).then(function(res){
+        if(res&&res.ok){
+          toast('Đã đăng tin'+(res.link||res.image?' · đã lưu file Drive':''));
+          clearThongbaoForm();
+          if(fEl) fEl.value='';
+          if(iEl) iEl.value='';
+        } else {
+          saveDraft();
+          toast((res&&res.error)||'Script chưa hỗ trợ upload — cập nhật Apps Script (xem APPS_SCRIPT_THONGBAO.md)');
+        }
+      });
+    }
+    saveDraft();
+    toast('Cần Apps Script (addthongbao + Drive) để tải file trực tiếp');
+  }).catch(function(e){ toast(e.message||String(e)); });
+}
+
+function clearThongbaoForm(){
+  ['tbTitle','tbBody','tbLink','tbImage','tbAuthor','tbDate','tbExp'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var p=document.getElementById('tbPin'); if(p) p.checked=false;
+  var s=document.getElementById('tbShow'); if(s) s.checked=true;
+  var f=document.getElementById('tbFile'); if(f) f.value='';
+  var i=document.getElementById('tbImgFile'); if(i) i.value='';
+}
 function sheetSourcesCard(){
   var cfg=getSheetSources();
   var fields=[
@@ -594,10 +695,11 @@ function sheetSourcesCard(){
     {k:'mocgioi', title:'Mốc giới', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'tasks', title:'Nhiệm vụ / Gantt', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
-    {k:'tonghop', title:'Tổng hợp đường dẫn', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
+    {k:'tonghop', title:'Tổng hợp đường dẫn', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
+    {k:'thongbao', title:'Thông báo / Niêm yết (công khai)', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
   ];
   var h='<div class="card"><div class="card-h"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><span style="font-size:11px;font-weight:600;color:#64748b">Đồng bộ cho mọi user</span></div>';
-  h+='<div style="padding:14px 16px;font-size:12px;color:#475569;line-height:1.5">Admin đổi link tại đây → lưu → các module đọc chung (localStorage + Apps Script nếu đã cập nhật <code>getsheets</code>/<code>setsheets</code>). Module con <b>không còn nút Đổi link Sheet</b>.</div>';
+  h+='';
   fields.forEach(function(sec){
     var o=cfg[sec.k]||{};
     h+='<div style="padding:12px 16px;border-top:1px solid #f1f5f9">';
@@ -714,7 +816,7 @@ function renderOnlineCard(pres){
   var html='<div class="card onl-card"><div class="card-h"><span><i class="fa-solid fa-signal" style="color:#059669;margin-right:6px"></i>Đang online / vừa truy cập</span>'+
     '<button type="button" class="btn btn-o btn-sm" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button></div>';
   if(pres.fromServer){
-    html+='<div class="empty" style="padding:10px 12px;font-size:12px;color:#059669;background:#ecfdf5">Đồng bộ từ server · Online ≤ 5 phút · Vừa truy cập ≤ 60 phút</div>';
+    html+='';
   } else if(pres.localOnly||pres.offline){
     html+='<div class="empty" style="padding:12px;font-size:12.5px;color:#9a3412;background:#fff7ed">Chưa đọc được server'+(pres.serverError?(' ('+esc(pres.serverError)+')'):'')+'. Kiểm tra SCRIPT_URL trùng URL Deploy, và admin đã lưu mật khẩu khi đăng nhập. Tạm hiện dữ liệu local.</div>';
   }
@@ -778,6 +880,7 @@ function loadUsers(){
     html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-users" style="color:#059669;margin-right:6px"></i>Tất cả tài khoản</span></div>';
     users.forEach(function(u,i){html+=userRow(u,'a'+i);});
     html+='</div>';
+    html+=thongbaoAdminCard();
     html+=sheetSourcesCard();
     shell(html);
   }).catch(function(e){

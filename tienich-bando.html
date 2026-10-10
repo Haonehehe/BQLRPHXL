@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bản đồ &amp; tọa độ · BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<style>
+:root{--bg:#f1f5f9;--card:#fff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--g:#0f766e;--shadow:0 8px 28px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;background:radial-gradient(900px 400px at 0% -10%,#ccfbf1 0%,transparent 55%),var(--bg);padding-bottom:40px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 14px}
+.top{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#14b8a6,#0f766e);font-size:16px}
+.logo h1{font-size:15.5px;font-weight:800}
+.logo p{font-size:11px;color:var(--mu)}
+.btn{height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--bd);background:#fff;font:600 12px "Be Vietnam Pro",system-ui;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit}
+.btn-g{background:linear-gradient(135deg,#14b8a6,#0d9488);color:#fff;border-color:transparent}
+.btn-b{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border-color:transparent}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:12px;margin-top:12px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 90px);overflow:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.card h2{font-size:13px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.card h2 i{color:#0d9488}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:4px}
+.field input,.field select{width:100%;height:36px;border-radius:10px;border:1px solid var(--bd);padding:0 10px;font:500 13px "Be Vietnam Pro",system-ui;background:#f8fafc;outline:none}
+.field input:focus{border-color:#2dd4bf;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.result{margin-top:8px;padding:10px;border-radius:10px;background:#f0fdfa;border:1px solid #99f6e4;font-size:12.5px;line-height:1.5}
+.result b{color:#0f766e}
+#map{height:calc(100vh - 100px);min-height:420px;border-radius:14px;border:1px solid var(--bd);box-shadow:var(--shadow);z-index:1}
+.hint{font-size:11px;color:var(--mu);line-height:1.45;margin-top:6px}
+.meas{font-size:12.5px;line-height:1.5}
+.meas div{padding:4px 0;border-bottom:1px dashed var(--bd)}
+.tabs-mini{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tab-m{height:30px;padding:0 10px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 11.5px "Be Vietnam Pro",system-ui;cursor:pointer;color:#475569}
+.tab-m.on{background:#0f766e;color:#fff;border-color:#0f766e}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="wrap top-in">
+    <div class="logo">
+      <div class="logo-i"><i class="fa-solid fa-map-location-dot"></i></div>
+      <div>
+        <h1>Bản đồ &amp; tọa độ</h1>
+        <p>VN-2000 · WGS84 · đo khoảng cách / diện tích</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
+      <a class="btn" href="tienich-congcu.html"><i class="fa-solid fa-wrench"></i> Tiện ích khác</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <div class="side">
+    <div class="card">
+      <h2><i class="fa-solid fa-right-left"></i> Chuyển hệ tọa độ</h2>
+      <div class="tabs-mini">
+        <button type="button" class="tab-m on" id="tabVN" onclick="setDir('vn')">VN-2000 → WGS84</button>
+        <button type="button" class="tab-m" id="tabWGS" onclick="setDir('wgs')">WGS84 → VN-2000</button>
+      </div>
+      <div class="field">
+        <label>Múi chiếu / kinh tuyến trục</label>
+        <select id="zone">
+          <option value="105.5">3° — 105°30' (Tây)</option>
+          <option value="107.75" selected>3° — 107°45' (Đồng Nai / Xuân Lộc)</option>
+          <option value="108.5">3° — 108°30'</option>
+          <option value="105">6° — 105°</option>
+          <option value="111">6° — 111°</option>
+        </select>
+      </div>
+      <div class="grid2" id="inVN">
+        <div class="field"><label>X (m) — Đông</label><input type="number" id="x" step="any" placeholder="vd: 412345.67"></div>
+        <div class="field"><label>Y (m) — Bắc</label><input type="number" id="y" step="any" placeholder="vd: 1201234.56"></div>
+      </div>
+      <div class="grid2" id="inWGS" style="display:none">
+        <div class="field"><label>Vĩ độ (lat)</label><input type="number" id="lat" step="any" placeholder="10.92"></div>
+        <div class="field"><label>Kinh độ (lng)</label><input type="number" id="lng" step="any" placeholder="107.25"></div>
+      </div>
+      <div class="row-btns">
+        <button type="button" class="btn btn-g" onclick="convert()"><i class="fa-solid fa-calculator"></i> Đổi</button>
+        <button type="button" class="btn btn-b" onclick="convertAndShow()"><i class="fa-solid fa-location-crosshairs"></i> Đổi &amp; hiện map</button>
+        <button type="button" class="btn" onclick="useMapClick()">Lấy điểm trên map</button>
+      </div>
+      <div class="result" id="convOut">Nhập tọa độ rồi bấm Đổi.</div>
+      <p class="hint">VN-2000 (TM, k=0.9999, X₀=500000). Phù hợp tra cứu thực địa khu vực Xuân Lộc — không thay đo đạc chính thức.</p>
+    </div>
+
+    <div class="card">
+      <h2><i class="fa-solid fa-pencil"></i> Đo &amp; vẽ trên bản đồ</h2>
+      <p class="hint" style="margin-top:0">Dùng thanh công cụ góc trái bản đồ: polyline (đo dài), polygon (diện tích), marker. Kết quả hiện bên dưới.</p>
+      <div class="meas" id="measOut"><div>Chưa có hình vẽ</div></div>
+      <div class="row-btns">
+        <button type="button" class="btn" onclick="clearDraw()"><i class="fa-solid fa-trash"></i> Xóa vẽ</button>
+        <button type="button" class="btn" onclick="exportGeoJSON()"><i class="fa-solid fa-download"></i> GeoJSON</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><i class="fa-solid fa-layer-group"></i> Nền bản đồ</h2>
+      <div class="field">
+        <label>Lớp nền</label>
+        <select id="basemap" onchange="setBasemap()">
+          <option value="osm">OpenStreetMap</option>
+          <option value="sat">Esri World Imagery</option>
+          <option value="topo">OpenTopoMap</option>
+        </select>
+      </div>
+      <p class="hint">Đây là công cụ hỗ trợ nhẹ (kiểu tra cứu / đo nhanh). Biên tập chuyên sâu (topology, symbology, print layout…) dùng QGIS.</p>
+    </div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<script>
+/* VN-2000 TM zones on WGS84 ellipsoid */
+function vn2000Def(lon0){
+  return '+proj=tmerc +lat_0=0 +lon_0='+lon0+' +k=0.9999 +x_0=500000 +y_0=0 +ellps=WGS84 +units=m +no_defs';
+}
+proj4.defs('EPSG:4326','+proj=longlat +datum=WGS84 +no_defs');
+
+var dir='vn';
+var pickMode=false;
+var map, drawnItems, baseLayers={}, activeBase;
+
+function setDir(d){
+  dir=d;
+  document.getElementById('tabVN').classList.toggle('on', d==='vn');
+  document.getElementById('tabWGS').classList.toggle('on', d==='wgs');
+  document.getElementById('inVN').style.display=d==='vn'?'grid':'none';
+  document.getElementById('inWGS').style.display=d==='wgs'?'grid':'none';
+}
+
+function currentProj(){
+  var lon0=parseFloat(document.getElementById('zone').value);
+  var code='VN2000_'+lon0;
+  if(!proj4.defs[code]) proj4.defs(code, vn2000Def(lon0));
+  return code;
+}
+
+function convert(){
+  try{
+    var code=currentProj();
+    if(dir==='vn'){
+      var x=parseFloat(document.getElementById('x').value);
+      var y=parseFloat(document.getElementById('y').value);
+      if(!isFinite(x)||!isFinite(y)) throw new Error('Nhập X, Y hợp lệ');
+      var ll=proj4(code,'EPSG:4326',[x,y]);
+      document.getElementById('lat').value=ll[1].toFixed(8);
+      document.getElementById('lng').value=ll[0].toFixed(8);
+      document.getElementById('convOut').innerHTML=
+        '<div><b>WGS84</b></div>'+
+        '<div>Vĩ độ (lat): <b>'+ll[1].toFixed(8)+'</b></div>'+
+        '<div>Kinh độ (lng): <b>'+ll[0].toFixed(8)+'</b></div>'+
+        '<div style="margin-top:4px;color:#64748b">VN-2000 X='+x.toLocaleString('vi-VN')+' · Y='+y.toLocaleString('vi-VN')+' · trục '+document.getElementById('zone').value+'°</div>';
+      return {lat:ll[1],lng:ll[0],x:x,y:y};
+    } else {
+      var lat=parseFloat(document.getElementById('lat').value);
+      var lng=parseFloat(document.getElementById('lng').value);
+      if(!isFinite(lat)||!isFinite(lng)) throw new Error('Nhập lat, lng hợp lệ');
+      var xy=proj4('EPSG:4326',code,[lng,lat]);
+      document.getElementById('x').value=xy[0].toFixed(3);
+      document.getElementById('y').value=xy[1].toFixed(3);
+      document.getElementById('convOut').innerHTML=
+        '<div><b>VN-2000</b> (trục '+document.getElementById('zone').value+'°)</div>'+
+        '<div>X (Đông): <b>'+xy[0].toFixed(3)+'</b> m</div>'+
+        '<div>Y (Bắc): <b>'+xy[1].toFixed(3)+'</b> m</div>'+
+        '<div style="margin-top:4px;color:#64748b">WGS84 '+lat.toFixed(6)+', '+lng.toFixed(6)+'</div>';
+      return {lat:lat,lng:lng,x:xy[0],y:xy[1]};
+    }
+  }catch(e){
+    document.getElementById('convOut').innerHTML='<span style="color:#b91c1c">'+(e.message||e)+'</span>';
+    return null;
+  }
+}
+
+function convertAndShow(){
+  var r=convert();
+  if(!r) return;
+  map.setView([r.lat,r.lng],15);
+  L.marker([r.lat,r.lng]).addTo(drawnItems)
+    .bindPopup('WGS84: '+r.lat.toFixed(6)+', '+r.lng.toFixed(6)+'<br>VN-2000: X='+r.x.toFixed(2)+' Y='+r.y.toFixed(2)).openPopup();
+}
+
+function useMapClick(){
+  pickMode=true;
+  document.getElementById('convOut').innerHTML='<b>Chạm / click</b> một điểm trên bản đồ…';
+  map.getContainer().style.cursor='crosshair';
+}
+
+function onMapClick(e){
+  if(!pickMode) return;
+  pickMode=false;
+  map.getContainer().style.cursor='';
+  dir='wgs'; setDir('wgs');
+  document.getElementById('lat').value=e.latlng.lat.toFixed(8);
+  document.getElementById('lng').value=e.latlng.lng.toFixed(8);
+  convert();
+  L.circleMarker(e.latlng,{radius:6,color:'#0f766e',fillColor:'#2dd4bf',fillOpacity:0.9}).addTo(drawnItems);
+}
+
+function formatLen(m){
+  if(m>=1000) return (m/1000).toLocaleString('vi-VN',{maximumFractionDigits:3})+' km';
+  return m.toLocaleString('vi-VN',{maximumFractionDigits:2})+' m';
+}
+function formatArea(m2){
+  var ha=m2/10000;
+  return m2.toLocaleString('vi-VN',{maximumFractionDigits:1})+' m² · '+ha.toLocaleString('vi-VN',{maximumFractionDigits:4})+' ha';
+}
+
+function updateMeasure(){
+  var html='';
+  var i=0;
+  drawnItems.eachLayer(function(layer){
+    i++;
+    if(layer instanceof L.Polygon && !(layer instanceof L.Rectangle) && layer.getLatLngs){
+      var latlngs=layer.getLatLngs()[0]||layer.getLatLngs();
+      var area=ringArea(latlngs);
+      var per=ringLength(latlngs,true);
+      html+='<div><b>Polygon #'+i+'</b><br>Diện tích: '+formatArea(area)+'<br>Chu vi: '+formatLen(per)+'</div>';
+    } else if(layer instanceof L.Polyline && !(layer instanceof L.Polygon)){
+      var ll=layer.getLatLngs();
+      html+='<div><b>Đường #'+i+'</b><br>Chiều dài: '+formatLen(lineLength(ll))+'</div>';
+    } else if(layer instanceof L.Marker){
+      var p=layer.getLatLng();
+      var code=currentProj();
+      var xy=proj4('EPSG:4326',code,[p.lng,p.lat]);
+      html+='<div><b>Điểm #'+i+'</b><br>WGS84: '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'<br>VN-2000: X='+xy[0].toFixed(2)+' Y='+xy[1].toFixed(2)+'</div>';
+    }
+  });
+  document.getElementById('measOut').innerHTML=html||'<div>Chưa có hình vẽ</div>';
+}
+
+function lineLength(latlngs){
+  var s=0;
+  for(var i=1;i<latlngs.length;i++) s+=map.distance(latlngs[i-1],latlngs[i]);
+  return s;
+}
+function ringLength(latlngs,closed){
+  var s=lineLength(latlngs);
+  if(closed && latlngs.length>2) s+=map.distance(latlngs[latlngs.length-1],latlngs[0]);
+  return s;
+}
+/* Spherical ring area (m2) approx */
+function ringArea(latlngs){
+  if(!latlngs||latlngs.length<3) return 0;
+  var R=6378137, a=0;
+  for(var i=0;i<latlngs.length;i++){
+    var j=(i+1)%latlngs.length;
+    var p1=latlngs[i], p2=latlngs[j];
+    a+=toRad(p2.lng-p1.lng)*(2+Math.sin(toRad(p1.lat))+Math.sin(toRad(p2.lat)));
+  }
+  return Math.abs(a*R*R/2);
+}
+function toRad(d){return d*Math.PI/180;}
+
+function clearDraw(){drawnItems.clearLayers();updateMeasure();}
+function exportGeoJSON(){
+  var gj=drawnItems.toGeoJSON();
+  var blob=new Blob([JSON.stringify(gj,null,2)],{type:'application/geo+json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='bando_bqlrph_'+Date.now()+'.geojson';
+  a.click();
+}
+
+function setBasemap(){
+  var k=document.getElementById('basemap').value;
+  if(activeBase) map.removeLayer(activeBase);
+  activeBase=baseLayers[k];
+  activeBase.addTo(map);
+}
+
+function initMap(){
+  map=L.map('map').setView([10.92,107.25],11);
+  baseLayers.osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OSM'});
+  baseLayers.sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri'});
+  baseLayers.topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'© OpenTopoMap'});
+  activeBase=baseLayers.osm; activeBase.addTo(map);
+
+  drawnItems=new L.FeatureGroup();
+  map.addLayer(drawnItems);
+  var drawControl=new L.Control.Draw({
+    edit:{featureGroup:drawnItems, remove:true},
+    draw:{
+      polygon:true, polyline:true, marker:true,
+      rectangle:false, circle:false, circlemarker:false
+    }
+  });
+  map.addControl(drawControl);
+  map.on(L.Draw.Event.CREATED, function(e){
+    drawnItems.addLayer(e.layer);
+    updateMeasure();
+  });
+  map.on(L.Draw.Event.EDITED, updateMeasure);
+  map.on(L.Draw.Event.DELETED, updateMeasure);
+  map.on('click', onMapClick);
+}
+
+initMap();
+</script>
+</body>
+</html>
