@@ -89,16 +89,45 @@ background:radial-gradient(ellipse 70% 40% at 10% -10%,rgba(56,189,248,.12),tran
   var items=[], filter='all';
   var STORAGE_KEY='bqlrph_thongbao_sheet';
 
-  function getSheetUrl(){
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec';
+  function sheetUrlFromCfg(t){
+    if(!t) return '';
+    if(t.url) return t.url;
+    if(t.sid) return 'https://docs.google.com/spreadsheets/d/'+t.sid+'/edit'+(t.gid?('?gid='+t.gid+'#gid='+t.gid):'');
+    return '';
+  }
+  function getSheetUrlLocal(){
     try{
       var shared=JSON.parse(localStorage.getItem('bqlrph_sheet_sources_v1')||'{}');
-      if(shared.thongbao){
-        var t=shared.thongbao;
-        if(t.url) return t.url;
-        if(t.sid) return 'https://docs.google.com/spreadsheets/d/'+t.sid+'/edit'+(t.gid?('?gid='+t.gid+'#gid='+t.gid):'');
-      }
+      var u=sheetUrlFromCfg(shared.thongbao);
+      if(u) return u;
     }catch(e){}
     try{ return localStorage.getItem(STORAGE_KEY)||''; }catch(e){ return ''; }
+  }
+  function fetchSheetUrlCloud(){
+    if(!SCRIPT_URL) return Promise.resolve('');
+    return fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({action:'getsheets'}),
+      redirect:'follow'
+    }).then(function(r){ return r.text(); }).then(function(txt){
+      try{
+        var res=JSON.parse(txt);
+        if(res && res.ok && res.sheets && res.sheets.thongbao){
+          var u=sheetUrlFromCfg(res.sheets.thongbao);
+          if(u){
+            try{
+              var all=JSON.parse(localStorage.getItem('bqlrph_sheet_sources_v1')||'{}');
+              all.thongbao=res.sheets.thongbao;
+              localStorage.setItem('bqlrph_sheet_sources_v1', JSON.stringify(all));
+            }catch(e){}
+            return u;
+          }
+        }
+      }catch(e){}
+      return '';
+    }).catch(function(){ return ''; });
   }
   function parseSheetId(url){ var m=String(url).match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m?m[1]:''; }
   function parseGid(url){ var m=String(url).match(/[?&#]gid=([0-9]+)/); return m?m[1]:'0'; }
@@ -167,9 +196,7 @@ background:radial-gradient(ellipse 70% 40% at 10% -10%,rgba(56,189,248,.12),tran
     return [{type:'quantong',title:'Chào mừng đến kênh thông báo BQLRPH Xuân Lộc',body:'Trang này chỉ để xem tin và tải tệp đính kèm.\nĐăng tin / niêm yết do Admin thực hiện tại trang Quản trị.',date:now,exp:null,link:'',image:'',author:'Hệ thống',pin:true}];
   }
 
-  function loadData(){
-    document.getElementById('meta').textContent='Đang tải…';
-    var url=getSheetUrl();
+  function loadFromUrl(url){
     if(!url){ items=sampleData(); render(); return; }
     var id=parseSheetId(url); if(!id){ items=sampleData(); render(); return; }
     fetchGviz(id, parseGid(url)).then(function(table){
@@ -188,6 +215,18 @@ background:radial-gradient(ellipse 70% 40% at 10% -10%,rgba(56,189,248,.12),tran
       items=out.length?out:sampleData();
       render();
     }).catch(function(){ items=sampleData(); render(); });
+  }
+  function loadData(){
+    document.getElementById('meta').textContent='Đang tải…';
+    var local=getSheetUrlLocal();
+    if(local){ loadFromUrl(local); }
+    fetchSheetUrlCloud().then(function(cloud){
+      var url=cloud||local||'';
+      if(url && url!==local) loadFromUrl(url);
+      else if(!local && !cloud){ items=sampleData(); render(); }
+      else if(local){ /* already loading */ }
+      else loadFromUrl(url);
+    });
   }
   window.loadData=loadData;
 
