@@ -219,7 +219,7 @@ body{
   };
   var items=[], filter='all';
   var STORAGE_KEY='bqlrph_thongbao_sheet';
-  var SCRIPT_URL = https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec;
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec';
 
   function sheetUrlFromCfg(t){
     if(!t) return '';
@@ -386,13 +386,31 @@ body{
   function loadData(){
     document.getElementById('meta').textContent='Đang tải…';
     var local=getSheetUrlLocal();
-    if(local) loadFromUrl(local);
-    fetchSheetUrlCloud().then(function(cloud){
+    var done=false;
+    function finishEmpty(msg){
+      if(done) return;
+      done=true;
+      items=[];
+      render();
+      document.getElementById('meta').textContent=msg||'Không có dữ liệu';
+    }
+    function tryUrl(url){
+      if(!url) return;
+      loadFromUrl(url);
+      done=true;
+    }
+    if(local) tryUrl(local);
+    var cloudWait=fetchSheetUrlCloud().then(function(cloud){
       var url=cloud||local||'';
-      if(!url){ items=[]; render(); document.getElementById('meta').textContent='Chưa cấu hình nguồn Thông báo'; return; }
-      if(url!==local) loadFromUrl(url);
-      else if(!local) loadFromUrl(url);
+      if(!url){ finishEmpty('Chưa cấu hình nguồn Thông báo'); return; }
+      if(!local || (cloud && cloud!==local)) tryUrl(url);
+      else if(local) done=true;
+    }).catch(function(){
+      if(!local) finishEmpty('Không kết nối được máy chủ cấu hình');
     });
+    setTimeout(function(){
+      if(!done) finishEmpty('Hết thời gian tải — kiểm tra chia sẻ Sheet hoặc bấm Làm mới');
+    }, 12000);
   }
   window.loadData=loadData;
 
