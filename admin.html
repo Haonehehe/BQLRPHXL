@@ -195,6 +195,36 @@ a{color:inherit}
   box-shadow:0 12px 32px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:.2s;z-index:100;
 }
 .toast.on{opacity:1}
+
+/* Online presence */
+.onl-card{background:#fff;border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-top:4px}
+.onl-card .card-h{
+  padding:12px 14px;display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;font-weight:700;border-bottom:1px solid #f1f5f9;background:#f8fafc;
+}
+.onl-row{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border-bottom:1px solid #f1f5f9;
+}
+.onl-row:last-child{border-bottom:none}
+.onl-row:hover{background:#f8fafc}
+.onl-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+  background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.18);
+}
+.onl-dot.off{
+  background:#94a3b8;box-shadow:0 0 0 4px rgba(148,163,184,.15);
+}
+.onl-meta{flex:1;min-width:0}
+.onl-meta b{display:block;font-size:13.5px;font-weight:700;color:var(--tx);line-height:1.3}
+.onl-meta span{display:block;font-size:12px;color:var(--mu);margin-top:3px;line-height:1.35;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.onl-time{
+  flex-shrink:0;font-size:11.5px;font-weight:600;color:#059669;
+  background:#ecfdf5;padding:4px 9px;border-radius:999px;white-space:nowrap;
+}
+.onl-time.muted{color:#64748b;background:#f1f5f9}
+
 </style>
 </head>
 <body>
@@ -921,22 +951,29 @@ function fmtAge(sec){
 
 function renderOnlineCard(pres){
   pres=pres||{online:[],recent:[]};
-  var html='<div class="card onl-card"><div class="card-h"><span><i class="fa-solid fa-signal" style="color:#059669;margin-right:6px"></i>Đang online / vừa truy cập</span>'+
+  var html='<div class="onl-card"><div class="card-h"><span><i class="fa-solid fa-signal" style="color:#059669;margin-right:8px"></i>Đang online / vừa truy cập</span>'+
     '<button type="button" class="btn btn-o btn-sm" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button></div>';
-  if(pres.fromServer){
-    html+='';
-  } else if(pres.localOnly||pres.offline){
-    html+='<div class="empty" style="padding:12px;font-size:12.5px;color:#9a3412;background:#fff7ed">Chưa đọc được server'+(pres.serverError?(' ('+esc(pres.serverError)+')'):'')+'. Kiểm tra SCRIPT_URL trùng URL Deploy, và admin đã lưu mật khẩu khi đăng nhập. Tạm hiện dữ liệu local.</div>';
+  if(pres.localOnly||pres.offline){
+    html+='<div class="empty" style="padding:12px;font-size:12.5px;color:#9a3412;background:#fff7ed">Chưa đọc được server'+(pres.serverError?(' ('+esc(pres.serverError)+')'):'')+'.</div>';
   }
-  if(!(pres.online||[]).length && !(pres.recent||[]).length){
-    html+='<div class="empty">Chưa có user nào gửi tín hiệu. User cần mở <b>menu</b> khi đã đăng nhập.</div>';
+  var online=pres.online||[];
+  var recent=pres.recent||[];
+  if(!online.length && !recent.length){
+    html+='<div class="empty">Chưa có tín hiệu. User cần mở menu khi đã đăng nhập.</div>';
   } else {
-    (pres.online||[]).forEach(function(u){
-      html+='<div class="onl-row"><span class="onl-dot" title="Online"></span><div class="onl-meta"><b>'+esc(u.name||u.email)+'</b><span>'+esc(u.email)+(u.unit?(' · '+esc(u.unit)):'')+(u.page?(' · '+esc(u.page)):'')+'</span></div><div class="onl-time">'+fmtAge(u.ageSec)+'</div></div>';
-    });
-    (pres.recent||[]).forEach(function(u){
-      html+='<div class="onl-row"><span class="onl-dot off" title="Trong 1 giờ"></span><div class="onl-meta"><b>'+esc(u.name||u.email)+'</b><span>'+esc(u.email)+' · trong 1 giờ qua</span></div><div class="onl-time" style="color:#64748b">'+fmtAge(u.ageSec)+'</div></div>';
-    });
+    if(online.length){
+      html+='<div style="padding:8px 14px 4px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#059669">Online · '+online.length+'</div>';
+      online.forEach(function(u){
+        var sub=[u.email,u.unit,u.page].filter(Boolean).map(function(x){return esc(x);}).join(' · ');
+        html+='<div class="onl-row"><span class="onl-dot" title="Online"></span><div class="onl-meta"><b>'+esc(u.name||u.email)+'</b><span>'+sub+'</span></div><div class="onl-time">'+fmtAge(u.ageSec)+'</div></div>';
+      });
+    }
+    if(recent.length){
+      html+='<div style="padding:10px 14px 4px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#64748b">Vừa truy cập · '+recent.length+'</div>';
+      recent.forEach(function(u){
+        html+='<div class="onl-row"><span class="onl-dot off" title="Trong 1 giờ"></span><div class="onl-meta"><b>'+esc(u.name||u.email)+'</b><span>'+esc(u.email)+'</span></div><div class="onl-time muted">'+fmtAge(u.ageSec)+'</div></div>';
+      });
+    }
   }
   html+='</div>';
   return html;
