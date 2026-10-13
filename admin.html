@@ -8,179 +8,193 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f1f5f9;--card:#ffffff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;
-  --g:#059669;--amber:#d97706;--violet:#7c3aed;--sky:#0284c7;--rose:#e11d48;
-  --shadow:0 4px 24px rgba(15,23,42,.06);--r:16px;
+  --bg:#eef2f7; --card:#fff; --bd:#e2e8f0; --tx:#0f172a; --mu:#64748b;
+  --amber:#d97706; --green:#059669; --sky:#0284c7; --violet:#7c3aed; --rose:#e11d48;
+  --r:18px; --shadow:0 8px 30px rgba(15,23,42,.06);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;
   background:
-    radial-gradient(900px 420px at 0% -10%, rgba(251,191,36,.12), transparent 50%),
-    radial-gradient(700px 380px at 100% 0%, rgba(16,185,129,.08), transparent 45%),
+    radial-gradient(1000px 480px at -10% -20%, rgba(251,191,36,.14), transparent 55%),
+    radial-gradient(800px 400px at 110% 0%, rgba(14,165,233,.1), transparent 50%),
+    radial-gradient(600px 300px at 50% 100%, rgba(16,185,129,.06), transparent 50%),
     var(--bg);
-  padding-bottom:48px;
+  padding-bottom:56px;
 }
 button{cursor:pointer;border:none;background:none;font:inherit}
-.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+a{color:inherit}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+.main{padding-top:8px}
 
-/* Top bar */
+/* ===== TOP ===== */
 .top{
-  background:rgba(255,255,255,.92);backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:40;
-  box-shadow:0 1px 0 rgba(255,255,255,.9);
+  background:rgba(255,255,255,.88);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(226,232,240,.9);
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 4px 24px rgba(15,23,42,.04);
 }
-.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;flex-wrap:wrap;padding:10px 0}
-.logo{display:flex;align-items:center;gap:12px}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:68px;flex-wrap:wrap;padding:12px 0}
+.logo{display:flex;align-items:center;gap:14px}
 .logo-i{
-  width:44px;height:44px;border-radius:14px;
+  width:46px;height:46px;border-radius:15px;
   background:linear-gradient(145deg,#fbbf24,#d97706);color:#fff;
-  display:grid;place-items:center;font-size:17px;
-  box-shadow:0 8px 20px rgba(217,119,6,.3);
+  display:grid;place-items:center;font-size:18px;
+  box-shadow:0 10px 24px rgba(217,119,6,.32);
 }
-.logo h1{font-size:15.5px;font-weight:800;letter-spacing:-.02em}
-.logo p{font-size:11px;color:var(--mu);margin-top:2px}
+.logo h1{font-size:16px;font-weight:800;letter-spacing:-.03em}
+.logo p{font-size:11.5px;color:var(--mu);margin-top:2px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 .btn{
-  display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;
-  border-radius:11px;font-size:12px;font-weight:600;transition:.12s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;
+  border-radius:12px;font-size:12.5px;font-weight:600;transition:.15s;text-decoration:none;
 }
 .btn:active{transform:scale(.97)}
 .btn-o{background:#fff;border:1px solid var(--bd);color:#334155}
 .btn-o:hover{background:#f8fafc;border-color:#cbd5e1}
-.btn-g{background:linear-gradient(135deg,#10b981,#047857);color:#fff;box-shadow:0 4px 12px rgba(5,150,105,.25)}
+.btn-g{background:linear-gradient(135deg,#10b981,#047857);color:#fff;box-shadow:0 6px 16px rgba(5,150,105,.28)}
 .btn-r{background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff}
 .btn-v{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff}
 .btn-a{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
-.btn-sm{height:32px;padding:0 11px;font-size:11px;border-radius:9px}
+.btn-dark{background:#0f172a;color:#fff}
+.btn-dark:hover{background:#1e293b}
+.btn-sm{height:32px;padding:0 11px;font-size:11.5px;border-radius:10px}
 
-/* KPIs */
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0}
-@media(min-width:720px){.kpis{grid-template-columns:repeat(4,1fr)}}
+/* ===== ZONES ===== */
+.zone{
+  margin:18px 0 22px;
+  background:rgba(255,255,255,.55);
+  border:1px solid rgba(226,232,240,.85);
+  border-radius:22px;
+  padding:16px;
+  box-shadow:var(--shadow);
+}
+.zone-h{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:0 2px}
+.zone-ico{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  color:#fff;font-size:16px;flex-shrink:0;
+}
+.z-amber{background:linear-gradient(145deg,#fbbf24,#d97706);box-shadow:0 8px 18px rgba(217,119,6,.25)}
+.z-green{background:linear-gradient(145deg,#34d399,#059669);box-shadow:0 8px 18px rgba(5,150,105,.25)}
+.z-sky{background:linear-gradient(145deg,#38bdf8,#0284c7);box-shadow:0 8px 18px rgba(2,132,199,.25)}
+.z-violet{background:linear-gradient(145deg,#a78bfa,#7c3aed);box-shadow:0 8px 18px rgba(124,58,237,.25)}
+.zone-t{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.zone-d{font-size:12px;color:var(--mu);margin-top:2px}
+
+/* ===== KPIs ===== */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media(min-width:760px){.kpis{grid-template-columns:repeat(4,1fr)}}
 .kpi{
-  background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:16px;
-  box-shadow:var(--shadow);position:relative;overflow:hidden;
+  background:#fff;border:1px solid var(--bd);border-radius:16px;padding:14px 14px;
+  display:flex;align-items:center;gap:12px;transition:.15s;
 }
-.kpi::after{
-  content:'';position:absolute;right:-10px;top:-10px;width:56px;height:56px;border-radius:50%;
-  background:rgba(245,158,11,.1);
+.kpi:hover{border-color:#cbd5e1;transform:translateY(-1px)}
+.kpi-ico{
+  width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:15px;flex-shrink:0;
 }
-.kpi .l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mu)}
-.kpi .v{font-size:26px;font-weight:800;margin-top:6px;letter-spacing:-.03em;color:#b45309}
+.k1 .kpi-ico{background:#fff7ed;color:#c2410c}
+.k2 .kpi-ico{background:#fffbeb;color:#d97706}
+.k3 .kpi-ico{background:#ecfdf5;color:#059669}
+.k4 .kpi-ico{background:#eff6ff;color:#2563eb}
+.kpi .l{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mu)}
+.kpi .v{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-top:2px;color:var(--tx)}
+.k2 .v{color:#d97706}
+.k4 .v{color:#2563eb}
 
-/* Accordion */
-.acc{
-  border:1px solid var(--bd);border-radius:var(--r);margin-bottom:12px;overflow:hidden;
-  background:var(--card);box-shadow:var(--shadow);
+/* ===== PANELS (accordion) ===== */
+.panel{
+  background:#fff;border:1px solid var(--bd);border-radius:16px;margin-bottom:10px;overflow:hidden;
 }
-.acc-h{
-  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
-  cursor:pointer;user-select:none;font-size:13px;font-weight:800;gap:10px;
-  background:linear-gradient(180deg,#fffefb,#fff);
-  transition:background .15s;
+.panel-h{
+  width:100%;padding:13px 15px;display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;font-weight:700;color:var(--tx);text-align:left;gap:10px;
+  background:#fff;transition:background .12s;
 }
-.acc-h:hover{background:#fffbeb}
-.acc-h .left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.acc-h .chev{color:#94a3b8;transition:transform .2s;font-size:12px}
-.acc.open .acc-h .chev{transform:rotate(180deg)}
-.acc-b{display:none;border-top:1px solid #f1f5f9}
-.acc.open .acc-b{display:block}
+.panel-h:hover{background:#f8fafc}
+.panel-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.panel-b{display:none;border-top:1px solid #f1f5f9}
+.panel.open .panel-b{display:block}
+.panel.open .chev{transform:rotate(180deg)}
+.chev{color:#94a3b8;font-size:12px;transition:transform .2s}
 
-.badge-dot-live{
+.c-amber{color:#d97706}.c-green{color:#059669}.c-sky{color:#0284c7}.c-violet{color:#7c3aed}
+.pill-red{
   display:inline-flex;min-width:20px;height:20px;padding:0 6px;border-radius:999px;
   background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;font-size:10px;font-weight:800;
-  align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(225,29,72,.35);
+  align-items:center;justify-content:center;
+}
+.pill-mute{
+  display:inline-flex;padding:2px 8px;border-radius:999px;background:#f1f5f9;color:#64748b;
+  font-size:11px;font-weight:700;
 }
 
+/* legacy acc alias */
+.acc{background:#fff;border:1px solid var(--bd);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.acc-h{padding:13px 15px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:13px;font-weight:700}
+.acc-b{display:none;border-top:1px solid #f1f5f9}
+.acc.open .acc-b{display:block}
+.acc.open .chev{transform:rotate(180deg)}
+.badge-dot-live{display:inline-flex;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#e11d48;color:#fff;font-size:10px;font-weight:800;align-items:center;justify-content:center}
+
 /* Users */
-.user{
-  padding:16px;border-bottom:1px solid #f1f5f9;
-  display:grid;gap:12px;transition:background .12s;
-}
-.user:hover{background:#fffbeb}
+.user{padding:15px 16px;border-bottom:1px solid #f1f5f9;display:grid;gap:11px}
+.user:hover{background:#fafbfc}
 .user:last-child{border-bottom:none}
 .user .row1{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
-.user .name{font-weight:700;font-size:14.5px}
+.user .name{font-weight:700;font-size:14px}
 .user .meta{font-size:12px;color:var(--mu);margin-top:3px}
-.tag{
-  display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;
-  font-size:10px;font-weight:700;border:1px solid;margin-left:6px;
-}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;border:1px solid;margin-left:6px}
 .tag.pending{background:#fffbeb;color:#b45309;border-color:#fde68a}
 .tag.approved{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
 .tag.rejected{background:#fff1f2;color:#e11d48;border-color:#fecdd3}
 .tag.disabled{background:#f1f5f9;color:#64748b;border-color:#e2e8f0}
 .tag.admin{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
-
-.perms{display:flex;flex-wrap:wrap;gap:8px}
+.perms{display:flex;flex-wrap:wrap;gap:7px}
 .perms label{
   display:inline-flex;align-items:center;gap:6px;font-size:12px;
-  padding:7px 11px;border:1px solid var(--bd);border-radius:10px;
-  background:#f8fafc;cursor:pointer;transition:.12s;
+  padding:6px 10px;border:1px solid var(--bd);border-radius:10px;background:#f8fafc;cursor:pointer;
 }
 .perms label:hover{border-color:#fcd34d;background:#fffbeb}
 .perms input{accent-color:#d97706}
 .acts{display:flex;flex-wrap:wrap;gap:6px}
 
-/* Thong bao posts */
-.tb-item{
-  padding:14px 16px;border-bottom:1px solid #f1f5f9;
-  display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;justify-content:space-between;
-}
+.tb-item{padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;justify-content:space-between}
 .tb-item:last-child{border-bottom:none}
 .tb-item .t{font-weight:700;font-size:13.5px;line-height:1.35}
 .tb-item .m{font-size:12px;color:var(--mu);margin-top:4px}
 .tb-item.hidden-row{opacity:.5}
 
-/* Form fields inside post */
-.acc-b input[type="text"],
-.acc-b input[type="url"],
-.acc-b input[type="date"],
-.acc-b input[type="password"],
-.acc-b select,
-.acc-b textarea{
-  width:100%;border:1px solid var(--bd);border-radius:10px;padding:0 11px;
+.panel-b input[type=text],.panel-b input[type=url],.panel-b input[type=date],
+.panel-b input[type=password],.panel-b select,.panel-b textarea,
+.acc-b input[type=text],.acc-b input[type=url],.acc-b input[type=date],.acc-b select,.acc-b textarea{
+  width:100%;border:1px solid var(--bd);border-radius:11px;padding:0 12px;
   font-size:13px;font-family:inherit;background:#fff;color:var(--tx);
 }
-.acc-b input[type="text"],
-.acc-b input[type="url"],
-.acc-b input[type="date"],
-.acc-b select{height:38px}
-.acc-b textarea{padding:10px 11px;resize:vertical}
-.acc-b label{font-size:11px;font-weight:700;color:var(--mu)}
+.panel-b input[type=text],.panel-b input[type=url],.panel-b input[type=date],.panel-b select,
+.acc-b input[type=text],.acc-b input[type=url],.acc-b input[type=date],.acc-b select{height:40px}
+.panel-b textarea,.acc-b textarea{padding:10px 12px;resize:vertical}
+.panel-b label,.acc-b label{font-size:11px;font-weight:700;color:var(--mu)}
 
 .empty{padding:28px 16px;text-align:center;color:var(--mu);font-size:13px}
-.note{
-  font-size:12.5px;color:#475569;line-height:1.55;
-  background:linear-gradient(135deg,#fffbeb,#f0fdf4);
-  border:1px solid #fde68a;border-radius:14px;padding:14px 16px;margin:14px 0 0;
-}
-.loading{padding:48px;text-align:center;color:var(--mu)}
+.loading{padding:64px;text-align:center;color:var(--mu)}
+.note{display:none}
+.card{background:#fff;border:1px solid var(--bd);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.card-h{padding:13px 15px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
 
 .gate{
-  max-width:400px;margin:100px auto;background:#fff;border:1px solid var(--bd);
-  border-radius:20px;padding:32px;text-align:center;box-shadow:0 16px 48px rgba(15,23,42,.08);
+  max-width:420px;margin:100px auto;background:#fff;border:1px solid var(--bd);
+  border-radius:22px;padding:36px;text-align:center;box-shadow:0 20px 50px rgba(15,23,42,.08);
 }
 .gate h2{font-size:18px;margin-bottom:8px}
-.gate p{color:var(--mu);font-size:13px;margin-bottom:18px}
+.gate p{color:var(--mu);font-size:13px;margin-bottom:18px;line-height:1.5}
 
 .toast{
-  position:fixed;bottom:20px;right:20px;background:#0f766e;color:#fff;
+  position:fixed;bottom:22px;right:22px;background:#0f766e;color:#fff;
   padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;
-  box-shadow:0 10px 30px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.2s;z-index:100;
+  box-shadow:0 12px 32px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:.2s;z-index:100;
 }
 .toast.on{opacity:1}
-
-/* Online card polish */
-.onl-card .card-h, .card-h{
-  padding:14px 16px;border-bottom:1px solid #f1f5f9;
-  display:flex;justify-content:space-between;align-items:center;
-  background:linear-gradient(180deg,#fffcf5,#fff);font-size:13px;font-weight:800;
-}
-.card{
-  background:var(--card);border:1px solid var(--bd);border-radius:var(--r);
-  margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);
-}
 </style>
 </head>
 <body>
@@ -622,18 +636,18 @@ function shell(inner){
   document.getElementById('app').innerHTML=
     '<div class="top"><div class="wrap top-in">'+
     '<div class="logo"><div class="logo-i"><i class="fa-solid fa-user-shield"></i></div>'+
-    '<div><h1>Khu vực quản trị</h1><p>Duyệt tài khoản · Cấp quyền · '+esc(mode)+'</p></div></div>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<div><h1>Quản trị hệ thống</h1><p>BQLRPH Xuân Lộc · '+esc(mode)+'</p></div></div>'+
+    '<div class="top-actions">'+
     '<a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>'+
     '<button type="button" class="btn btn-o" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button>'+
-    '<button type="button" class="btn btn-o" onclick="logoutUser();location.href=\'menu.html\'"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>'+
-    '</div></div></div><div class="wrap">'+inner+'</div>';
+    '<button type="button" class="btn btn-dark" onclick="logoutUser();location.href=\'menu.html\'"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>'+
+    '</div></div></div><div class="wrap main">'+inner+'</div>';
 }
 
 
 
 function thongbaoAdminCard(){
-  var h='<div class="acc open" id="acc-postform"><div class="acc-h" onclick="toggleAcc(\'acc-postform\')"><span><i class="fa-solid fa-bullhorn" style="color:#0284c7;margin-right:6px"></i>Đăng tin · Niêm yết</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">';
+  var h='<div class="panel open" id="acc-postform"><button type="button" class="panel-h" onclick="toggleAcc(\'acc-postform\')"><span class="panel-left"><i class="fa-solid fa-pen-to-square c-sky"></i> Soạn tin mới</span><i class="fa-solid fa-chevron-down chev"></i></button><div class="panel-b">';
   h+='<div style="padding:10px 16px;display:flex;justify-content:flex-end"><a class="btn btn-o btn-sm" href="tienich-thongbao.html" target="_blank"><i class="fa-solid fa-eye"></i> Xem trang công khai</a></div>';
   h+='<div style="padding:14px 16px;font-size:12.5px;color:#475569;line-height:1.5;background:#f0f9ff;border-bottom:1px solid #e0f2fe">';
   h+='</div>';
@@ -954,34 +968,56 @@ function loadUsers(){
     var pending=users.filter(function(u){return u.status==='pending';}).length;
     var approved=users.filter(function(u){return u.status==='approved';}).length;
     var rejected=users.filter(function(u){return u.status==='rejected';}).length;
-    var html='<div class="note"><b>Admin mặc định:</b> <code>admin@bqlrph.local</code> / <code>Admin@2026</code>'+
-      (useCloud()?' · Dữ liệu đồng bộ Google Sheet.':' · Đang dùng localStorage — cấu hình Script URL ở menu (⚙) để đồng bộ.')+
-      ' · <b>Online</b> = có tín hiệu trong 5 phút (cần Apps Script heartbeat).</div>';
-    html+='<div class="kpis">'+
-      '<div class="kpi"><div class="l">Tổng TK</div><div class="v">'+users.length+'</div></div>'+
-      '<div class="kpi"><div class="l">Chờ duyệt</div><div class="v">'+pending+'</div></div>'+
-      '<div class="kpi"><div class="l">Đã duyệt</div><div class="v">'+approved+'</div></div>'+
-      '<div class="kpi"><div class="l">Đang online</div><div class="v" style="color:#059669">'+(pres.online||[]).length+'</div></div></div>';
+    var mode=useCloud()?'Đồng bộ Google Sheet':'Local (máy này)';
+    var html='';
 
+    // ===== ZONE: Tổng quan =====
+    html+='<div class="zone">';
+    html+='<div class="zone-h"><div class="zone-ico z-amber"><i class="fa-solid fa-chart-pie"></i></div><div><div class="zone-t">Tổng quan</div><div class="zone-d">'+esc(mode)+'</div></div></div>';
+    html+='<div class="kpis">';
+    html+='<div class="kpi k1"><div class="kpi-ico"><i class="fa-solid fa-users"></i></div><div><div class="l">Tổng tài khoản</div><div class="v">'+users.length+'</div></div></div>';
+    html+='<div class="kpi k2"><div class="kpi-ico"><i class="fa-solid fa-clock"></i></div><div><div class="l">Chờ duyệt</div><div class="v">'+pending+'</div></div></div>';
+    html+='<div class="kpi k3"><div class="kpi-ico"><i class="fa-solid fa-circle-check"></i></div><div><div class="l">Đã duyệt</div><div class="v">'+approved+'</div></div></div>';
+    html+='<div class="kpi k4"><div class="kpi-ico"><i class="fa-solid fa-signal"></i></div><div><div class="l">Đang online</div><div class="v">'+(pres.online||[]).length+'</div></div></div>';
+    html+='</div>';
     html+=renderOnlineCard(pres);
+    html+='</div>';
 
-    html+='<div class="acc'+(pending?' open':'')+'" id="acc-pending">';
-    html+='<div class="acc-h" onclick="toggleAcc(\'acc-pending\')"><span><i class="fa-solid fa-clock" style="color:#d97706;margin-right:6px"></i>Chờ duyệt';
-    if(pending) html+='<span class="badge-dot-live">'+pending+'</span>';
-    html+='</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">';
+    // ===== ZONE: Người dùng =====
+    html+='<div class="zone">';
+    html+='<div class="zone-h"><div class="zone-ico z-green"><i class="fa-solid fa-user-shield"></i></div><div><div class="zone-t">Người dùng & quyền</div><div class="zone-d">Duyệt đăng ký · cấp quyền module</div></div></div>';
+
+    html+='<div class="panel'+(pending?' open':'')+'" id="acc-pending">';
+    html+='<button type="button" class="panel-h" onclick="toggleAcc(\'acc-pending\')"><span class="panel-left"><i class="fa-solid fa-hourglass-half c-amber"></i> Chờ duyệt';
+    if(pending) html+='<span class="pill-red">'+pending+'</span>';
+    html+='</span><i class="fa-solid fa-chevron-down chev"></i></button><div class="panel-b">';
     var pend=users.filter(function(u){return u.status==='pending';});
     if(!pend.length) html+='<div class="empty">Không có yêu cầu mới</div>';
     pend.forEach(function(u,i){html+=userRow(u,'p'+i);});
     html+='</div></div>';
 
-    html+='<div class="acc" id="acc-users"><div class="acc-h" onclick="toggleAcc(\'acc-users\')"><span><i class="fa-solid fa-users" style="color:#059669;margin-right:6px"></i>Tất cả tài khoản <span style="font-weight:600;color:#64748b;font-size:12px">('+users.length+')</span></span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">';
+    html+='<div class="panel" id="acc-users">';
+    html+='<button type="button" class="panel-h" onclick="toggleAcc(\'acc-users\')"><span class="panel-left"><i class="fa-solid fa-users c-green"></i> Tất cả tài khoản <span class="pill-mute">'+users.length+'</span></span><i class="fa-solid fa-chevron-down chev"></i></button><div class="panel-b">';
     users.forEach(function(u,i){html+=userRow(u,'a'+i);});
     html+='</div></div>';
+    html+='</div>';
 
+    // ===== ZONE: Nội dung =====
+    html+='<div class="zone">';
+    html+='<div class="zone-h"><div class="zone-ico z-sky"><i class="fa-solid fa-bullhorn"></i></div><div><div class="zone-t">Thông báo · Niêm yết</div><div class="zone-d">Đăng tin công khai · quản lý tin đã đăng</div></div></div>';
     html+=thongbaoAdminCard();
-    html+='<div class="acc open" id="acc-posts"><div class="acc-h" onclick="toggleAcc(\'acc-posts\')"><span><i class="fa-solid fa-list" style="color:#0284c7;margin-right:6px"></i>Tin đã đăng</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b" id="tbPostsBox"><div class="empty">Đang tải tin…</div></div></div>';
+    html+='<div class="panel open" id="acc-posts">';
+    html+='<button type="button" class="panel-h" onclick="toggleAcc(\'acc-posts\')"><span class="panel-left"><i class="fa-solid fa-newspaper c-sky"></i> Tin đã đăng</span><i class="fa-solid fa-chevron-down chev"></i></button>';
+    html+='<div class="panel-b" id="tbPostsBox"><div class="empty">Đang tải tin…</div></div></div>';
+    html+='</div>';
 
-    html+='<div class="acc" id="acc-sheets"><div class="acc-h" onclick="toggleAcc(\'acc-sheets\')"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">'+sheetSourcesCardInner()+'</div></div>';
+    // ===== ZONE: Hệ thống =====
+    html+='<div class="zone">';
+    html+='<div class="zone-h"><div class="zone-ico z-violet"><i class="fa-solid fa-database"></i></div><div><div class="zone-t">Hệ thống</div><div class="zone-d">Nguồn Google Sheet đồng bộ cho mọi user</div></div></div>';
+    html+='<div class="panel" id="acc-sheets">';
+    html+='<button type="button" class="panel-h" onclick="toggleAcc(\'acc-sheets\')"><span class="panel-left"><i class="fa-solid fa-link c-violet"></i> Nguồn Google Sheet</span><i class="fa-solid fa-chevron-down chev"></i></button>';
+    html+='<div class="panel-b">'+sheetSourcesCardInner()+'</div></div>';
+    html+='</div>';
 
     shell(html);
     loadThongbaoPosts();
