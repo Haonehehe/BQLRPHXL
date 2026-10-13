@@ -587,8 +587,8 @@ function shell(inner){
 
 
 function thongbaoAdminCard(){
-  var h='<div class="card" id="thongbaoAdminCard"><div class="card-h"><span><i class="fa-solid fa-bullhorn" style="color:#0284c7;margin-right:6px"></i>Đăng tin · Niêm yết · Hoạt động</span>';
-  h+='<a class="btn btn-o btn-sm" href="tienich-thongbao.html" target="_blank"><i class="fa-solid fa-eye"></i> Xem trang công khai</a></div>';
+  var h='<div class="acc open" id="acc-postform"><div class="acc-h" onclick="toggleAcc(\'acc-postform\')"><span><i class="fa-solid fa-bullhorn" style="color:#0284c7;margin-right:6px"></i>Đăng tin · Niêm yết</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">';
+  h+='<div style="padding:10px 16px;display:flex;justify-content:flex-end"><a class="btn btn-o btn-sm" href="tienich-thongbao.html" target="_blank"><i class="fa-solid fa-eye"></i> Xem trang công khai</a></div>';
   h+='<div style="padding:14px 16px;font-size:12.5px;color:#475569;line-height:1.5;background:#f0f9ff;border-bottom:1px solid #e0f2fe">';
   h+='</div>';
   h+='<div style="padding:16px;display:grid;gap:10px">';
@@ -608,7 +608,7 @@ function thongbaoAdminCard(){
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Hết hạn niêm yết</label><input id="tbExp" type="date" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Người đăng</label><input id="tbAuthor" type="text" placeholder="Văn phòng Ban" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
   h+='<div style="display:flex;align-items:flex-end;gap:14px;padding-bottom:6px"><label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="tbPin"> Ghim</label><label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="tbShow" checked> Hiện</label></div></div>';
-  h+='<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn btn-g" onclick="submitThongbao()"><i class="fa-solid fa-paper-plane"></i> Đăng tin</button><button type="button" class="btn btn-o" onclick="clearThongbaoForm()"><i class="fa-solid fa-eraser"></i> Xóa form</button></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 16px"><button type="button" class="btn btn-g" onclick="submitThongbao()"><i class="fa-solid fa-paper-plane"></i> Đăng tin</button><button type="button" class="btn btn-o" onclick="clearThongbaoForm()"><i class="fa-solid fa-eraser"></i> Xóa form</button></div>';
   h+='</div></div>';
   return h;
 }
@@ -666,6 +666,7 @@ function submitThongbao(){
         if(res&&res.ok){
           toast('Đã đăng tin'+(res.link||res.image?' · đã lưu file Drive':''));
           clearThongbaoForm();
+          loadThongbaoPosts();
           if(fEl) fEl.value='';
           if(iEl) iEl.value='';
         } else {
@@ -686,7 +687,7 @@ function clearThongbaoForm(){
   var f=document.getElementById('tbFile'); if(f) f.value='';
   var i=document.getElementById('tbImgFile'); if(i) i.value='';
 }
-function sheetSourcesCard(){
+function sheetSourcesCardInner(){
   var cfg=getSheetSources();
   var fields=[
     {k:'qlbvr', title:'QLBVR — Vi phạm', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
@@ -698,8 +699,7 @@ function sheetSourcesCard(){
     {k:'tonghop', title:'Tổng hợp đường dẫn', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'thongbao', title:'Thông báo / Niêm yết (công khai)', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
   ];
-  var h='<div class="card"><div class="card-h"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><span style="font-size:11px;font-weight:600;color:#64748b">Đồng bộ cho mọi user</span></div>';
-  h+='';
+  var h='';
   fields.forEach(function(sec){
     var o=cfg[sec.k]||{};
     h+='<div style="padding:12px 16px;border-top:1px solid #f1f5f9">';
@@ -713,9 +713,57 @@ function sheetSourcesCard(){
   h+='<div style="padding:12px 16px;border-top:1px solid #f1f5f9;display:flex;gap:8px;flex-wrap:wrap">';
   h+='<button type="button" class="btn btn-g" onclick="saveSheetSourcesUI()"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu nguồn Sheet</button>';
   h+='<button type="button" class="btn btn-o" onclick="resetSheetSourcesUI()"><i class="fa-solid fa-rotate-left"></i> Về mặc định</button>';
-  h+='</div></div>';
+  h+='</div>';
   return h;
 }
+function sheetSourcesCard(){ return '<div class="card">'+sheetSourcesCardInner()+'</div>'; }
+function toggleAcc(id){
+  var el=document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+function adminCred(){
+  var s=getSession();
+  return { adminEmail:(s&&s.email)||'', adminPass:(s&&s._pass)||'' };
+}
+function loadThongbaoPosts(){
+  var box=document.getElementById('tbPostsBox');
+  if(!box) return;
+  if(!(typeof useCloud==='function' && useCloud())){
+    box.innerHTML='<div class="empty">Cần kết nối Apps Script để xem danh sách tin</div>';
+    return;
+  }
+  var c=adminCred();
+  apiCall({action:'listthongbao', adminEmail:c.adminEmail, adminPass:c.adminPass}).then(function(res){
+    if(!res||!res.ok){
+      box.innerHTML='<div class="empty">'+(res&&res.error?esc(res.error):'Không tải được danh sách tin — Deploy Script bản có listthongbao')+'</div>';
+      return;
+    }
+    var items=res.items||[];
+    if(!items.length){ box.innerHTML='<div class="empty">Chưa có tin nào</div>'; return; }
+    box.innerHTML=items.map(function(it){
+      var shown=!(it.show===''||it.show==='0'||String(it.show).toLowerCase()==='ẩn');
+      return '<div class="tb-item'+(shown?'':' hidden-row')+'">'+
+        '<div style="flex:1;min-width:200px"><div class="t">'+esc(it.title)+'</div>'+
+        '<div class="m">'+esc(it.type)+' · '+esc(it.date)+(it.author?(' · '+esc(it.author)):'')+(shown?'':' · <b>Đã ẩn</b>')+'</div></div>'+
+        '<div class="acts">'+
+        (it.link?'<a class="btn btn-o btn-sm" href="'+esc(it.link)+'" target="_blank" rel="noopener"><i class="fa-solid fa-paperclip"></i></a>':'')+
+        (shown
+          ?'<button type="button" class="btn btn-o btn-sm" onclick="toggleThongbaoRow('+it.row+',0)"><i class="fa-solid fa-eye-slash"></i> Ẩn</button>'
+          :'<button type="button" class="btn btn-g btn-sm" onclick="toggleThongbaoRow('+it.row+',1)"><i class="fa-solid fa-eye"></i> Hiện</button>')+
+        '</div></div>';
+    }).join('');
+  }).catch(function(e){
+    box.innerHTML='<div class="empty">'+esc(e.message||e)+'</div>';
+  });
+}
+function toggleThongbaoRow(row, show){
+  var c=adminCred();
+  apiCall({action:'hidethongbao', row:row, show:show, adminEmail:c.adminEmail, adminPass:c.adminPass}).then(function(res){
+    if(res&&res.ok){ toast(show?'Đã hiện tin':'Đã ẩn tin'); loadThongbaoPosts(); }
+    else toast((res&&res.error)||'Lỗi cập nhật');
+  }).catch(function(e){ toast(e.message||e); });
+}
+
 function parseSidFromInput(v){
   v=String(v||'').trim();
   var m=v.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
@@ -871,18 +919,26 @@ function loadUsers(){
 
     html+=renderOnlineCard(pres);
 
-    html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-clock" style="color:#d97706;margin-right:6px"></i>Chờ duyệt</span><span style="font-size:12px;font-weight:600;color:#64748b">'+pending+'</span></div>';
+    html+='<div class="acc'+(pending?' open':'')+'" id="acc-pending">';
+    html+='<div class="acc-h" onclick="toggleAcc(\'acc-pending\')"><span><i class="fa-solid fa-clock" style="color:#d97706;margin-right:6px"></i>Chờ duyệt';
+    if(pending) html+='<span class="badge-dot-live">'+pending+'</span>';
+    html+='</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">';
     var pend=users.filter(function(u){return u.status==='pending';});
     if(!pend.length) html+='<div class="empty">Không có yêu cầu mới</div>';
     pend.forEach(function(u,i){html+=userRow(u,'p'+i);});
-    html+='</div>';
+    html+='</div></div>';
 
-    html+='<div class="card"><div class="card-h"><span><i class="fa-solid fa-users" style="color:#059669;margin-right:6px"></i>Tất cả tài khoản</span></div>';
+    html+='<div class="acc" id="acc-users"><div class="acc-h" onclick="toggleAcc(\'acc-users\')"><span><i class="fa-solid fa-users" style="color:#059669;margin-right:6px"></i>Tất cả tài khoản <span style="font-weight:600;color:#64748b;font-size:12px">('+users.length+')</span></span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">';
     users.forEach(function(u,i){html+=userRow(u,'a'+i);});
-    html+='</div>';
+    html+='</div></div>';
+
     html+=thongbaoAdminCard();
-    html+=sheetSourcesCard();
+    html+='<div class="acc open" id="acc-posts"><div class="acc-h" onclick="toggleAcc(\'acc-posts\')"><span><i class="fa-solid fa-list" style="color:#0284c7;margin-right:6px"></i>Tin đã đăng</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b" id="tbPostsBox"><div class="empty">Đang tải tin…</div></div></div>';
+
+    html+='<div class="acc" id="acc-sheets"><div class="acc-h" onclick="toggleAcc(\'acc-sheets\')"><span><i class="fa-solid fa-database" style="color:#0284c7;margin-right:6px"></i>Nguồn Google Sheet</span><i class="fa-solid fa-chevron-down chev"></i></div><div class="acc-b">'+sheetSourcesCardInner()+'</div></div>';
+
     shell(html);
+    loadThongbaoPosts();
   }).catch(function(e){
     shell('<div class="note" style="background:#fff1f2;border-color:#fecdd3;color:#9f1239"><b>Lỗi tải:</b> '+esc(e.message||e)+'</div>');
   });
