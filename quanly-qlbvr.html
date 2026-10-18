@@ -2685,6 +2685,8 @@ ${(c.linkHoSo||c.tuiHoSo)?qrHoSoBlock(buildHoSoUrl(c.linkHoSo||'', c.tuiHoSo), c
                 const colAM = hasWideCols ? getVal(38) : (getVal(4) || getVal(3));
                 const colCoQuan = hasWideCols ? getVal(35) : ''; // Cơ quan thụ lý
                 const colKetQuaPL = hasWideCols ? getVal(36) : ''; // Kết quả xử lý theo pháp luật
+                const colLoaiRung = getVal(19); // T - Phòng hộ / Sản xuất
+                const colNguonVon = getVal(20); // U - VNN / Tự đầu tư (TĐT)
                 const colTuiHoSo = getVal(43); // AR - tên túi hồ sơ
                 const colLinkHoSo = getVal(44); // AS - link Drive trực tiếp
 
@@ -2723,6 +2725,8 @@ ${(c.linkHoSo||c.tuiHoSo)?qrHoSoBlock(buildHoSoUrl(c.linkHoSo||'', c.tuiHoSo), c
                         hoHopDong: colHoHopDong || "",
                         diaChi: colDiaChi || "",
                         nguonGocDat: colNguonGocDat || "",
+                        loaiRung: colLoaiRung || "",
+                        nguonVon: colNguonVon || "",
                         quaTrinhCanhTac: colNguonGocDat || "", // alias cũ
                         soHDKhoan: colSoHDKhoan || "",
                         ngayKyHDKhoan: colNgayKyHDKhoan || "",
@@ -4066,9 +4070,8 @@ function toggleAdvFilter() {
                     'Tiểu khu': c.tieuKhu || '',
                     'Phân trường': c.phanTruong,
                     'Xã': c.xa,
-                    'Loại rừng': detectLoaiRung(c),
-                    'VNN': detectVNN(c),
-                    'TĐT': detectTDT(c),
+                    'Loại rừng (cột T)': detectLoaiRung(c),
+                    'Nguồn vốn (cột U)': detectNguonVon(c),
                     'Hồ sơ': c.linkHoSo || c.tuiHoSo || ''
                 };
             });
@@ -4080,40 +4083,42 @@ function toggleAdvFilter() {
             }
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sheetCount(detectLoaiRung)), 'TH loai rung PH-SX');
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sheetCount(detectVNN)), 'TH VNN');
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sheetCount(detectTDT)), 'TH TDT');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sheetCount(detectNguonVon)), 'TH nguon von VNN-TDT');
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Danh sach');
             XLSX.writeFile(wb, 'ThongKe_ViPham_LamNghiep_'+new Date().toISOString().slice(0,10)+'.xlsx');
             showToast('Đã xuất Excel · có sheet PH-SX, VNN, TĐT');
         }
 
 
-        /** Phân loại phục vụ bảng tổng hợp (từ nguồn gốc đất, hành vi, tình trạng) */
+        
+        /** Cột T: loại rừng PH/SX · Cột U: nguồn vốn VNN / Tự đầu tư (TĐT) */
         function detectLoaiRung(c) {
-            const t = [c.nguonGocDat, c.hanhVi, c.doiTuong, c.tinhTrang, c.loaiRung].filter(Boolean).join(' ').toLowerCase();
-            if (/phòng\s*hộ|\brừng\s*ph\b|\bph\b(?![a-z])|r\.?\s*ph/i.test(t) || /\bPH\b/.test(String(c.nguonGocDat||'')+' '+String(c.loaiRung||''))) return 'Phòng hộ (PH)';
-            if (/sản\s*xuất|\brừng\s*sx\b|\bsx\b(?![a-z])|r\.?\s*sx/i.test(t) || /\bSX\b/.test(String(c.nguonGocDat||'')+' '+String(c.loaiRung||''))) return 'Sản xuất (SX)';
-            if (/đặc\s*dụng|\bđd\b|rừng\s*đặc/i.test(t)) return 'Đặc dụng (ĐD)';
-            return 'Chưa phân loại';
+            const raw = String(c.loaiRung || c.nguonGocDat || '').trim();
+            const t = raw.toLowerCase();
+            if (!raw) return 'Chưa ghi (cột T)';
+            if (/phòng\s*hộ|^ph\b|\bph\b|rừng\s*ph/i.test(t) || /^PH\b/i.test(raw)) return 'Phòng hộ (PH)';
+            if (/sản\s*xuất|^sx\b|\bsx\b|rừng\s*sx/i.test(t) || /^SX\b/i.test(raw)) return 'Sản xuất (SX)';
+            if (/đặc\s*dụng|\bđd\b/i.test(t)) return 'Đặc dụng (ĐD)';
+            return raw; // giữ nguyên text trên sheet
         }
-        function detectVNN(c) {
-            const t = [c.nguonGocDat, c.doiTuong, c.hanhVi, c.tinhTrang, c.vnn].filter(Boolean).join(' ').toLowerCase();
-            if (/\bvnn\b|vốn\s*nhà\s*nước|rừng\s*nhà\s*nước|đất\s*nhà\s*nước|nn\s*quản\s*lý/i.test(t)) return 'VNN (vốn / rừng nhà nước)';
-            if (/giao\s*khoán|nhận\s*khoán|hộ\s*gia\s*đình|người\s*dân/i.test(t)) return 'Giao khoán / hộ dân';
-            return 'Chưa rõ VNN';
+        function detectNguonVon(c) {
+            const raw = String(c.nguonVon || '').trim();
+            const t = raw.toLowerCase();
+            if (!raw) return 'Chưa ghi (cột U)';
+            if (/\bvnn\b|vốn\s*nhà\s*nước|nhà\s*nước/i.test(t) || /^VNN\b/i.test(raw)) return 'Vốn nhà nước (VNN)';
+            if (/\btđt\b|\btdt\b|tự\s*đầu\s*tư|tu\s*dau\s*tu/i.test(t) || /TĐT|TDT/i.test(raw)) return 'Tự đầu tư (TĐT)';
+            return raw;
         }
-        function detectTDT(c) {
-            const t = [c.tinhTrang, c.hanhVi, c.nguonGocDat, c.amRaw, c.alRaw, c.tdt].filter(Boolean).join(' ').toLowerCase();
-            if (/\btđt\b|\btdt\b|tái\s*diễn|tái\s*phạm|vi\s*phạm\s*lại|lần\s*2|lần\s*hai/i.test(t)) return 'Tái diễn (TĐT)';
-            return 'Không ghi nhận TĐT';
-        }
+        // alias cũ (báo cáo/Excel) — map về nguồn vốn
+        function detectVNN(c) { return detectNguonVon(c); }
+        function detectTDT(c) { return detectNguonVon(c); }
         function countBy(cases, fn) {
             const m = {};
             cases.forEach(c => { const k = fn(c) || '—'; m[k] = (m[k]||0)+1; });
             return m;
         }
 
-        function exportStatsReport() {
+function exportStatsReport() {
             const cases = getFilteredCases();
             const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
             const fmt = (n, d) => {
@@ -4173,7 +4178,7 @@ function toggleAdvFilter() {
             let khaiThacVu=0,khaiThacCay=0,khaiThacM3=0,haDieu=0,haKeo=0,haCaoSu=0;
             let xayDungVu=0,xayM2=0,daoMucVu=0,daoM2=0;
             const hvRows={}, cqRows={}, kqRows={}, ptRows={}, tkRows={};
-            const lrRows={}, vnnRows={}, tdtRows={};
+            const lrRows={}, vnnRows={};
 
             cases.forEach(c => {
                 const m = getReportMetrics(c);
@@ -4199,8 +4204,7 @@ function toggleAdvFilter() {
                 const pt = c.phanTruong || '—';
                 ptRows[pt]=(ptRows[pt]||0)+1;
                 const lr = detectLoaiRung(c); lrRows[lr]=(lrRows[lr]||0)+1;
-                const vn = detectVNN(c); vnnRows[vn]=(vnnRows[vn]||0)+1;
-                const td = detectTDT(c); tdtRows[td]=(tdtRows[td]||0)+1;
+                const nv = detectNguonVon(c); vnnRows[nv]=(vnnRows[nv]||0)+1;
                 const tk = c.tieuKhu || '—';
                 tkRows[tk]=(tkRows[tk]||0)+1;
             });
@@ -4226,7 +4230,7 @@ function toggleAdvFilter() {
             if (fPT||fTK||fXa) noteBits.push('Đang giới hạn theo đơn vị địa bàn đã chọn (phân trường / tiểu khu / xã).');
             if (fCQ) noteBits.push('Đang giới hạn theo cơ quan thụ lý: <b>'+esc(fCQ)+'</b>.');
             if (fKQ) noteBits.push('Đang giới hạn theo kết quả xử lý PL: <b>'+esc(fKQ)+'</b>.');
-            noteBits.push('Phân loại PH/SX, VNN, TĐT suy từ nội dung nguồn gốc đất / hành vi / tình trạng (bổ sung từ khóa PH, SX, VNN, tái diễn trên Sheet để chính xác hơn).');
+            noteBits.push('Loại rừng lấy từ cột T (PH/SX). Nguồn vốn lấy từ cột U: Vốn nhà nước (VNN) hoặc Tự đầu tư (TĐT).');
             noteBits.push('Nguồn: Google Sheets QLBVR · Xuất '+new Date().toLocaleString('vi-VN')+'.');
 
             const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>BC QLBVR — ${esc(periodLabel)}</title>
@@ -4299,18 +4303,14 @@ td{padding:7px 8px;border-top:1px solid #f1f5f9;vertical-align:top}
 </div>
 
 <div class="grid2">
-  <div class="card"><h2>Theo loại rừng (PH / SX / ĐD)</h2>
-    ${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(lrRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không nhận diện được — bổ sung chữ PH/SX trong nguồn gốc đất</p>'}
-  <table style="margin-top:8px"><thead><tr><th>Loại rừng</th><th class="right">Số vụ</th></tr></thead>
+  <div class="card"><h2>Theo loại rừng — cột T (PH / SX)</h2>
+    ${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(lrRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Chưa có dữ liệu cột T</p>'}
+  <table style="margin-top:8px"><thead><tr><th>Loại rừng (PH / SX)</th><th class="right">Số vụ</th></tr></thead>
   <tbody>${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
-  <div class="card"><h2>Theo VNN</h2>
-    ${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(vnnRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
-  <table style="margin-top:8px"><thead><tr><th>Nhóm VNN</th><th class="right">Số vụ</th></tr></thead>
+  <div class="card"><h2>Theo nguồn vốn — cột U (VNN / TĐT)</h2>
+    ${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(vnnRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Chưa có dữ liệu cột U</p>'}
+  <table style="margin-top:8px"><thead><tr><th>Nguồn vốn</th><th class="right">Số vụ</th></tr></thead>
   <tbody>${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
-  <div class="card"><h2>Theo tái diễn (TĐT)</h2>
-    ${Object.entries(tdtRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(tdtRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
-  <table style="margin-top:8px"><thead><tr><th>TĐT</th><th class="right">Số vụ</th></tr></thead>
-  <tbody>${Object.entries(tdtRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
 </div>
 
 <div class="card"><h2>Bảng tổng hợp theo hành vi</h2>
