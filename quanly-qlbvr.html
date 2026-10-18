@@ -4089,8 +4089,8 @@ function toggleAdvFilter() {
                     'Tiểu khu': c.tieuKhu || '',
                     'Phân trường': c.phanTruong,
                     'Xã': c.xa,
-                    'Loại rừng (cột T)': detectLoaiRung(c),
-                    'Nguồn vốn (cột U)': detectNguonVon(c),
+                    'Loại rừng': detectLoaiRung(c),
+                    'Nguồn vốn': detectNguonVon(c),
                     'Hồ sơ': c.linkHoSo || c.tuiHoSo || ''
                 };
             });
@@ -4114,7 +4114,7 @@ function toggleAdvFilter() {
         function detectLoaiRung(c) {
             const raw = String(c.loaiRung || c.nguonGocDat || '').trim();
             const t = raw.toLowerCase();
-            if (!raw) return 'Chưa ghi (cột T)';
+            if (!raw) return 'Chưa ghi';
             if (/phòng\s*hộ|^ph\b|\bph\b|rừng\s*ph/i.test(t) || /^PH\b/i.test(raw)) return 'Phòng hộ (PH)';
             if (/sản\s*xuất|^sx\b|\bsx\b|rừng\s*sx/i.test(t) || /^SX\b/i.test(raw)) return 'Sản xuất (SX)';
             if (/đặc\s*dụng|\bđd\b/i.test(t)) return 'Đặc dụng (ĐD)';
@@ -4123,7 +4123,7 @@ function toggleAdvFilter() {
         function detectNguonVon(c) {
             const raw = String(c.nguonVon || '').trim();
             const t = raw.toLowerCase();
-            if (!raw) return 'Chưa ghi (cột U)';
+            if (!raw) return 'Chưa ghi';
             if (/\bvnn\b|vốn\s*nhà\s*nước|nhà\s*nước/i.test(t) || /^VNN\b/i.test(raw)) return 'Vốn nhà nước (VNN)';
             if (/\btđt\b|\btdt\b|tự\s*đầu\s*tư|tu\s*dau\s*tu/i.test(t) || /TĐT|TDT/i.test(raw)) return 'Tự đầu tư (TĐT)';
             return raw;
@@ -4189,7 +4189,7 @@ function exportStatsReport() {
             if (byGroup['Hành vi']) scopeParts.push('Hành vi: ' + byGroup['Hành vi'].join('; '));
             if (byGroup['Nhóm HĐ khoán']) scopeParts.push('Nhóm xử lý HĐ: ' + byGroup['Nhóm HĐ khoán'].join('; '));
             if (scopeParts.length) subTitle += ' · ' + scopeParts.join(' · ');
-            else subTitle += ' · Toàn lâm phận (không giới hạn đơn vị / cơ quan)';
+            else subTitle += '';
 
             // Metrics
             let totalHa=0,totalM2=0,totalCay=0,totalM3=0;
@@ -4240,17 +4240,9 @@ function exportStatsReport() {
 
             const tagsHtml = filterTags.length
                 ? `<div class="tags">${filterTags.map(x=>`<span class="tag"><b>${esc(x.g)}:</b> ${esc(x.t)}</span>`).join('')}</div>`
-                : `<div class="tags"><span class="tag muted">Không áp dụng lọc đơn vị / cơ quan / kết quả — thống kê toàn bộ theo kỳ thời gian</span></div>`;
+                : '';
 
             const noteBits = [];
-            noteBits.push('Số liệu tổng hợp theo bộ lọc đang chọn trên trang Thống kê.');
-            noteBits.push('Diện tích Điều / Keo / Cao su chỉ tính trên các vụ <b>tự ý khai thác</b>.');
-            noteBits.push('Xây dựng trái phép và đào múc hồ tính theo m², không quy đổi cây gỗ lớn.');
-            if (fPT||fTK||fXa) noteBits.push('Đang giới hạn theo đơn vị địa bàn đã chọn (phân trường / tiểu khu / xã).');
-            if (fCQ) noteBits.push('Đang giới hạn theo cơ quan thụ lý: <b>'+esc(fCQ)+'</b>.');
-            if (fKQ) noteBits.push('Đang giới hạn theo kết quả xử lý PL: <b>'+esc(fKQ)+'</b>.');
-            noteBits.push('Loại rừng lấy từ cột T (PH/SX). Nguồn vốn lấy từ cột U: Vốn nhà nước (VNN) hoặc Tự đầu tư (TĐT).');
-            noteBits.push('Nguồn: Google Sheets QLBVR · Xuất '+new Date().toLocaleString('vi-VN')+'.');
 
             const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>BC QLBVR — ${esc(periodLabel)}</title>
 <style>
@@ -4322,12 +4314,12 @@ td{padding:7px 8px;border-top:1px solid #f1f5f9;vertical-align:top}
 </div>
 
 <div class="grid2">
-  <div class="card"><h2>Theo loại rừng — cột T (PH / SX)</h2>
-    ${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(lrRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Chưa có dữ liệu cột T</p>'}
-  <table style="margin-top:8px"><thead><tr><th>Loại rừng (PH / SX)</th><th class="right">Số vụ</th></tr></thead>
+  <div class="card"><h2>Theo loại rừng (PH / SX)</h2>
+    ${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(lrRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
+  <table style="margin-top:8px"><thead><tr><th>Loại rừng</th><th class="right">Số vụ</th></tr></thead>
   <tbody>${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
-  <div class="card"><h2>Theo nguồn vốn — cột U (VNN / TĐT)</h2>
-    ${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(vnnRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Chưa có dữ liệu cột U</p>'}
+  <div class="card"><h2>Theo nguồn vốn (VNN / TĐT)</h2>
+    ${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(vnnRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
   <table style="margin-top:8px"><thead><tr><th>Nguồn vốn</th><th class="right">Số vụ</th></tr></thead>
   <tbody>${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
 </div>
@@ -4367,7 +4359,6 @@ td{padding:7px 8px;border-top:1px solid #f1f5f9;vertical-align:top}
   </tr>`;
 }).join('')||'<tr><td colspan="10" class="center" style="color:#94a3b8">Không có hồ sơ</td></tr>'}</tbody></table></div>
 
-<div class="notes"><b>Ghi chú</b><ul>${noteBits.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
 <div class="footer">Ban Quản lý Rừng phòng hộ Xuân Lộc · Báo cáo thống kê theo kỳ lọc</div>
 <script>setTimeout(function(){ try{ window.print(); }catch(e){} }, 500);<\/script>
 </body></html>`;
