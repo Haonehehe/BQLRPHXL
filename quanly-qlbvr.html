@@ -1197,35 +1197,54 @@ let detailedCases = [
         };
 
         function detectNhom(alText, amText) {
-            // 1 = VP mới chưa mời (AL trống)
-            // 2 = Đang mời lần 1–3
-            // 3 = Chấp hành / Khắc phục
-            // 4 = Đã niêm yết
-            // 5 = Chấm dứt HĐ
+            /**
+             * Phân nhóm theo XỬ LÝ HỢP ĐỒNG (cột AL + AM), KHÔNG lấy AK (kết quả PL).
+             * 1 = VP mới chưa mời
+             * 2 = Đang mời làm việc (kể cả mời mà hộ không đến)
+             * 3 = Chấp hành / Khắc phục (theo HĐ — đã đến LV hoặc đã KP theo yêu cầu HĐ)
+             * 4 = Đã niêm yết TB xác định trách nhiệm
+             * 5 = Chấm dứt / thu hồi HĐ
+             *
+             * Quy tắc: "Hộ không đến làm việc" = KHÔNG chấp hành ở mức HĐ → không bao giờ nhóm 3,
+             * dù cột AK (PL) có ghi chấp hành trả hiện trạng.
+             */
             const al = (alText || "").toLowerCase().trim();
             const am = (amText || "").toLowerCase().trim();
-            const both = al + " " + am;
+            const both = (al + " " + am).trim();
 
-            if (al.includes("chấm dứt") || al.includes("thu hồi") || both.includes("quyết định chấm")) return 5;
-
-            if (am.includes("đến làm việc") && (
-                am.includes("cam kết") || am.includes("khắc phục") || am.includes("tháo dỡ") ||
-                am.includes("chấp hành") || am.includes("ký biên bản") || am.includes("thừa nhận") ||
-                am.includes("nhìn nhận") || am.includes("chủ động")
-            )) return 3;
-            if (am.includes("cam kết khắc phục") || am.includes("chủ động tháo dỡ") || am.includes("đã khắc phục")) return 3;
-
-            if (al.includes("thông báo") || al.includes("niêm yết") || al.includes("xác định trách nhiệm")) return 4;
-
-            // AL có mời lần 1/2/3 → Đang mời
-            if (al.includes("mời làm việc") || al.includes("đã mời") || /lần\s*[123]/.test(al)) return 2;
-
-            if (am.includes("không đến")) {
-                if (al.includes("thông báo")) return 4;
-                return 2; // đã mời nhưng không đến
+            // --- 5. Chấm dứt / thu hồi HĐ ---
+            if (/chấm\s*dứt|thu\s*hồi\s*hđ|thu\s*hồi\s*hợp\s*đồng|quyết\s*định\s*chấm|qđ\s*thu\s*hồi/.test(both)) {
+                return 5;
             }
 
-            // AL trống → Vi phạm mới (chưa mời)
+            // --- 4. Niêm yết / xác định trách nhiệm ---
+            if (/niêm\s*yết|thông\s*báo.*trách\s*nhiệm|xác\s*định\s*trách\s*nhiệm|tb\s*xác\s*định/.test(both)) {
+                return 4;
+            }
+
+            // --- Không đến / không hợp tác (AM) → KHÔNG phải chấp hành HĐ ---
+            // Phải xét TRƯỚC điều kiện "đến làm việc" vì "không đến làm việc" chứa cụm "đến làm việc".
+            const khongChapHanhHD = /không\s*đến|ko\s*đến|vắng\s*mặt|từ\s*chối\s*làm\s*việc|không\s*hợp\s*tác|không\s*chấp\s*hành\s*theo\s*giấy\s*mời|không\s*lên\s*làm\s*việc/.test(am);
+
+            if (khongChapHanhHD) {
+                // Đã mời hoặc có nội dung mời → nhóm 2; không thì vẫn 2 nếu AM nói không đến
+                return 2;
+            }
+
+            // --- 3. Chấp hành / Khắc phục theo HĐ (AM tích cực, không phủ định) ---
+            const chapHanhHD = (
+                /đã\s*đến\s*làm\s*việc|đến\s*làm\s*việc\s*và|đã\s*làm\s*việc/.test(am) ||
+                /chấp\s*hành|đã\s*khắc\s*phục|cam\s*kết\s*khắc\s*phục|chủ\s*động\s*tháo\s*dỡ|đã\s*tháo\s*dỡ/.test(am) ||
+                /ký\s*biên\s*bản|thừa\s*nhận|nhìn\s*nhận|trả\s*lại\s*hiện\s*trạng|hoàn\s*trả\s*hiện\s*trạng/.test(am)
+            );
+            if (chapHanhHD) return 3;
+
+            // --- 2. Đang mời làm việc (AL) ---
+            if (/mời\s*làm\s*việc|đã\s*mời|giấy\s*mời|lần\s*[123]/.test(al) || /mời\s*làm\s*việc|đã\s*mời/.test(am)) {
+                return 2;
+            }
+
+            // --- 1. VP mới — AL trống, chưa mời ---
             if (!al) return 1;
 
             return 1;
