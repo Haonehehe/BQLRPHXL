@@ -4111,21 +4111,34 @@ function toggleAdvFilter() {
         
         /** Cột T: loại rừng PH/SX · Cột U: nguồn vốn VNN / Tự đầu tư (TĐT) */
         function detectLoaiRung(c) {
-            const raw = String(c.loaiRung || c.nguonGocDat || '').trim();
-            const t = raw.toLowerCase();
+            // Chỉ cột T (loaiRung). Không lấy nguồn gốc đất / quá trình canh tác.
+            const raw = String(c.loaiRung || '').trim();
             if (!raw) return 'Chưa ghi';
-            if (/phòng\s*hộ|^ph\b|\bph\b|rừng\s*ph/i.test(t) || /^PH\b/i.test(raw)) return 'Phòng hộ (PH)';
-            if (/sản\s*xuất|^sx\b|\bsx\b|rừng\s*sx/i.test(t) || /^SX\b/i.test(raw)) return 'Sản xuất (SX)';
-            if (/đặc\s*dụng|\bđd\b/i.test(t)) return 'Đặc dụng (ĐD)';
-            return raw; // giữ nguyên text trên sheet
+            const t = raw.toLowerCase().replace(/\s+/g, ' ');
+            // Chuẩn hóa giá trị ngắn trên sheet
+            if (/^(ph|phòng\s*hộ|rừng\s*phòng\s*hộ|phong\s*ho)$/i.test(t) || /^ph\b/i.test(t) || /phòng\s*hộ/.test(t)) {
+                // Tránh khớp nhầm đoạn văn dài
+                if (raw.length <= 40 || /phòng\s*hộ|^ph\b/i.test(raw)) return 'Phòng hộ (PH)';
+            }
+            if (/^(sx|sản\s*xuất|rừng\s*sản\s*xuất|san\s*xuat)$/i.test(t) || /^sx\b/i.test(t) || /sản\s*xuất/.test(t)) {
+                if (raw.length <= 40 || /sản\s*xuất|^sx\b/i.test(raw)) return 'Sản xuất (SX)';
+            }
+            if (/đặc\s*dụng|^đd\b/i.test(t) && raw.length <= 40) return 'Đặc dụng (ĐD)';
+            // Đoạn văn dài (hợp đồng, canh tác…) → không phải loại rừng
+            if (raw.length > 40) return 'Chưa ghi';
+            if (/phòng\s*hộ|\bph\b/i.test(t)) return 'Phòng hộ (PH)';
+            if (/sản\s*xuất|\bsx\b/i.test(t)) return 'Sản xuất (SX)';
+            return 'Chưa ghi';
         }
         function detectNguonVon(c) {
+            // Chỉ cột U (nguonVon). Không lấy mô tả khác.
             const raw = String(c.nguonVon || '').trim();
-            const t = raw.toLowerCase();
             if (!raw) return 'Chưa ghi';
+            if (raw.length > 60) return 'Chưa ghi';
+            const t = raw.toLowerCase();
             if (/\bvnn\b|vốn\s*nhà\s*nước|nhà\s*nước/i.test(t) || /^VNN\b/i.test(raw)) return 'Vốn nhà nước (VNN)';
-            if (/\btđt\b|\btdt\b|tự\s*đầu\s*tư|tu\s*dau\s*tu/i.test(t) || /TĐT|TDT/i.test(raw)) return 'Tự đầu tư (TĐT)';
-            return raw;
+            if (/\btđt\b|\btdt\b|tự\s*đầu\s*tư/i.test(t) || /TĐT|TDT/i.test(raw)) return 'Tự đầu tư (TĐT)';
+            return 'Chưa ghi';
         }
         // alias cũ (báo cáo/Excel) — map về nguồn vốn
         function detectVNN(c) { return detectNguonVon(c); }
