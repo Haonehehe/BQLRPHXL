@@ -251,6 +251,7 @@ tr:hover td{background:#f0fdf4}
 @media print{
   body{background:#fff;padding:0}
   .top,.bar,.router,.acts,.motto-ticker,.toast,.no-print,.note,.charts{display:none!important}
+  #cardTH{break-inside:avoid}
   .scroll{max-height:none;overflow:visible}
   .card{box-shadow:none;border:1px solid #ccc}
   th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -303,8 +304,6 @@ tr:hover td{background:#f0fdf4}
     </a>
   </div>
 
-  <p class="note no-print">Nguồn: Google Sheet mốc giới · Nếu không tải được → Chia sẻ sheet → <b>Anyone with the link (Viewer)</b>.</p>
-
   <div class="bar no-print">
     <input type="search" id="q" placeholder="Tìm số hiệu mốc, tiểu khu, ghi chú…" oninput="veLai()">
     <select id="fPT" onchange="veLai()"><option value="">Phân trường</option></select>
@@ -318,9 +317,30 @@ tr:hover td{background:#f0fdf4}
     <div class="chart-box"><h3>Theo loại mốc</h3><div id="chartLoai"></div></div>
   </div>
 
+  <div class="card" id="cardTH">
+    <div class="card-h">
+      <h2>Bảng tổng hợp</h2>
+      <span style="font-size:11px;color:var(--mu)">Theo bộ lọc hiện tại</span>
+    </div>
+    <div style="display:grid;gap:0;grid-template-columns:1fr;padding:0">
+      <div class="scroll" style="max-height:none">
+        <table>
+          <thead><tr><th>Phân trường</th><th class="r">Số mốc</th><th class="r">Tỷ lệ %</th></tr></thead>
+          <tbody id="tbTH_PT"></tbody>
+        </table>
+      </div>
+      <div class="scroll" style="max-height:none;border-top:1px solid #f1f5f9">
+        <table>
+          <thead><tr><th>Loại mốc</th><th class="r">Số mốc</th><th class="r">Tỷ lệ %</th></tr></thead>
+          <tbody id="tbTH_Loai"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div class="print-only" style="text-align:center;margin-bottom:12px">
     <div style="font-weight:700;text-transform:uppercase">Ban Quản lý Rừng phòng hộ Xuân Lộc</div>
-    <div style="font-size:14px;font-weight:700;margin-top:6px">DANH SÁCH MỐC GIỚI HIỆN CÒN</div>
+    <div style="font-size:14px;font-weight:700;margin-top:6px">BÁO CÁO TỔNG HỢP MỐC GIỚI</div>
     <div style="font-size:11px;color:#555;margin-top:4px" id="printMeta"></div>
   </div>
 
@@ -593,9 +613,26 @@ function locDong(){
   });
 }
 
+function veTongHop(list){
+  var byPT={}, byLoai={}, n=list.length||1;
+  list.forEach(function(d){
+    byPT[d.phanTruong||'—']=(byPT[d.phanTruong||'—']||0)+1;
+    byLoai[d.loai||'—']=(byLoai[d.loai||'—']||0)+1;
+  });
+  function rows(map){
+    return Object.keys(map).sort(function(a,b){return map[b]-map[a];}).map(function(k){
+      var pct=(100*map[k]/list.length).toFixed(1);
+      return '<tr><td>'+esc(k)+'</td><td class="r"><b>'+map[k]+'</b></td><td class="r">'+pct+'%</td></tr>';
+    }).join('')||'<tr><td colspan="3" class="muted">Không có dữ liệu</td></tr>';
+  }
+  var elPT=document.getElementById('tbTH_PT');
+  var elLoai=document.getElementById('tbTH_Loai');
+  if(elPT) elPT.innerHTML=rows(byPT);
+  if(elLoai) elLoai.innerHTML=rows(byLoai);
+}
 function veLai(){
   var list=locDong();
-  veKPI(list);veCharts(list);veDS(list);
+  veKPI(list);veCharts(list);veTongHop(list);veDS(list);
   document.getElementById('printMeta').textContent=
     'Bộ lọc: '+(document.getElementById('fPT').value||'Tất cả PT')+' · '+(document.getElementById('fLoai').value||'Tất cả loại')+
     ' · '+list.length+' mốc · In '+new Date().toLocaleString('vi-VN');
@@ -653,15 +690,37 @@ function veDS(list){
 function xuatExcel(){
   var list=locDong();
   if(!list.length){toast('Không có dữ liệu');return;}
-  var rows=list.map(function(d){return{
-    'STT':d.stt,'Số hiệu mốc':d.soHieu,'X (m)':d.xRaw,'Y (m)':d.yRaw,
+  var rows=list.map(function(d,i){return{
+    'STT':i+1,'Số hiệu mốc':d.soHieu,'X (m)':d.xRaw,'Y (m)':d.yRaw,
     'Lô':d.lo,'Khoảnh':d.khoanh,'Tiểu khu':d.tieuKhu,'Phân trường':d.phanTruong,
     'Loại mốc':d.loai,'Ghi chú':d.ghiChu
   };});
-  var ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Moc gioi');
-  XLSX.writeFile(wb,'moc-gioi-'+new Date().toISOString().slice(0,10)+'.xlsx');
-  toast('Đã xuất Excel · '+rows.length+' dòng');
+  var byPT={}, byLoai={};
+  list.forEach(function(d){
+    byPT[d.phanTruong||'—']=(byPT[d.phanTruong||'—']||0)+1;
+    byLoai[d.loai||'—']=(byLoai[d.loai||'—']||0)+1;
+  });
+  var thPT=Object.keys(byPT).sort(function(a,b){return byPT[b]-byPT[a];}).map(function(k){
+    return {'Phân trường':k,'Số mốc':byPT[k],'Tỷ lệ %':list.length?Math.round(1000*byPT[k]/list.length)/10:0};
+  });
+  var thLoai=Object.keys(byLoai).sort(function(a,b){return byLoai[b]-byLoai[a];}).map(function(k){
+    return {'Loại mốc':k,'Số mốc':byLoai[k],'Tỷ lệ %':list.length?Math.round(1000*byLoai[k]/list.length)/10:0};
+  });
+  var meta=[{
+    'Đơn vị':'Ban Quản lý rừng phòng hộ Xuân Lộc',
+    'Báo cáo':'Tổng hợp mốc giới',
+    'Bộ lọc PT':document.getElementById('fPT').value||'Tất cả',
+    'Bộ lọc loại':document.getElementById('fLoai').value||'Tất cả',
+    'Số mốc':list.length,
+    'Ngày xuất':new Date().toLocaleString('vi-VN')
+  }];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(meta), 'Thong tin');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(thPT), 'TH phan truong');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(thLoai), 'TH loai moc');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Danh sach');
+  XLSX.writeFile(wb,'moc-gioi-tong-hop-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('Đã xuất Excel tổng hợp · '+rows.length+' mốc');
 }
 
 function inBaoCao(){

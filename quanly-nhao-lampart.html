@@ -197,7 +197,15 @@ tr:hover td{background:#f8fafc}
 @keyframes motto-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 body{padding-bottom:30px!important}
 .contact-fab-wrap{bottom:48px!important}
-@media print{.motto-ticker{display:none!important}}
+@media print{
+  .motto-ticker,.top .acts,.nav,.bar,.contact-fab-wrap,.support-footer,.no-print,.charts{display:none!important}
+  body{background:#fff;padding:0!important}
+  .card{box-shadow:none;border:1px solid #ccc}
+  .scroll{max-height:none;overflow:visible}
+  th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.print-only{display:none}
+@media print{.print-only{display:block}}
 
 </style>
 </head>
@@ -214,9 +222,9 @@ body{padding-bottom:30px!important}
     </div>
     <div class="acts">
       <a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>
-      <button class="btn btn-o" type="button" onclick="moHoTro()"><i class="fa-solid fa-circle-info"></i> Hỗ trợ</button>
       <button class="btn btn-b" type="button" onclick="taiLai()"><i class="fa-solid fa-arrows-rotate" id="icoReload"></i> Làm mới</button>
-      <button class="btn btn-g" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Xuất Excel</button>
+      <button class="btn btn-g" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      <button class="btn btn-o" type="button" onclick="inBaoCao()"><i class="fa-solid fa-print"></i> In</button>
     </div>
   </div>
   <div class="wrap">
@@ -251,6 +259,11 @@ body{padding-bottom:30px!important}
       <div class="chart-box"><h3>Phân loại công trình</h3><canvas id="cLoai"></canvas></div>
       <div class="chart-box"><h3>Có phép / Không phép</h3><canvas id="cPhep"></canvas></div>
       <div class="chart-box"><h3>Công trình vi phạm</h3><canvas id="cVP"></canvas></div>
+    </div>
+    <div class="print-only" style="text-align:center;margin-bottom:12px">
+      <div style="font-weight:700;text-transform:uppercase">Ban Quản lý Rừng phòng hộ Xuân Lộc</div>
+      <div style="font-size:14px;font-weight:700;margin-top:6px">BÁO CÁO TỔNG HỢP NHÀ Ở TRÊN LÂM PHẬN</div>
+      <div style="font-size:11px;color:#555;margin-top:4px" id="printMeta"></div>
     </div>
     <div class="card">
       <div class="card-h"><h2>Theo phân trường</h2></div>
@@ -676,6 +689,8 @@ function veLai(){
   vePT(list);
   veDS(list);
   vePTCards(list);
+  var el=document.getElementById('printMeta');
+  if(el) el.textContent='PT: '+(ptFilter==='ALL'?'Tất cả':ptFilter)+' · '+tongSoNha(list)+' nhà · '+list.length+' dòng · '+new Date().toLocaleString('vi-VN');
 }
 
 function veKPI(list){
@@ -858,10 +873,10 @@ function moHoTro(){
 function xuatExcel(){
   var list=locDong();
   if(!list.length){ toast('Không có dữ liệu'); return; }
-  var rows=list.map(function(d){
+  var rows=list.map(function(d,i){
     return {
+      'STT': i+1,
       'Phân trường': d.ptTen,
-      'STT': d.stt,
       'Hộ hợp đồng': d.hoHD,
       'Người SD nhà': d.nguoiSD,
       'Địa chỉ': d.diaChi,
@@ -883,17 +898,67 @@ function xuatExcel(){
       'Ghi chú': d.ghiChu
     };
   });
-  var ws=XLSX.utils.json_to_sheet(rows);
+  var ag={};
+  list.forEach(function(d){
+    var k=d.ptTen||'—';
+    if(!ag[k]) ag[k]={soNha:0,dtXD:0,co:0,khong:0,ho:{}};
+    ag[k].soNha+=(d.soNha||0);
+    ag[k].dtXD=Math.round((ag[k].dtXD+(d.dtXD||0))*100)/100;
+    if(d.phep==='CO') ag[k].co+=(d.soNha||0);
+    else if(d.phep==='KHONG') ag[k].khong+=(d.soNha||0);
+    if(d.hoHD) ag[k].ho[d.hoHD.toLowerCase()]=1;
+  });
+  var thPT=Object.keys(ag).sort().map(function(k){
+    return {
+      'Phân trường':k,
+      'Hộ HĐ':Object.keys(ag[k].ho).length,
+      'Số nhà':ag[k].soNha,
+      'DT XD (m2)':ag[k].dtXD,
+      'Có phép':ag[k].co,
+      'Không phép':ag[k].khong
+    };
+  });
+  var byLoai={}, byPhep={'Có phép':0,'Không phép':0,'Chưa ghi':0};
+  list.forEach(function(d){
+    var n=d.soNha||0;
+    byLoai[d.loaiNha||'Khác']=(byLoai[d.loaiNha||'Khác']||0)+n;
+    byPhep[nhanPhep(d.phep)]=(byPhep[nhanPhep(d.phep)]||0)+n;
+  });
+  var thLoai=Object.keys(byLoai).sort(function(a,b){return byLoai[b]-byLoai[a];}).map(function(k){
+    return {'Phân loại':k,'Số nhà':byLoai[k]};
+  });
+  var thPhep=Object.keys(byPhep).map(function(k){ return {'Tình trạng phép':k,'Số nhà':byPhep[k]}; });
+  var meta=[{
+    'Đơn vị':'Ban Quản lý rừng phòng hộ Xuân Lộc',
+    'Báo cáo':'Tổng hợp nhà ở trên lâm phận',
+    'Phân trường': ptFilter==='ALL'?'Tất cả':ptFilter,
+    'Số dòng':list.length,
+    'Tổng số nhà':tongSoNha(list),
+    'Ngày xuất':new Date().toLocaleString('vi-VN')
+  }];
   var wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Nha o lam phan');
-  XLSX.writeFile(wb, 'nha-o-lam-phan-'+new Date().toISOString().slice(0,10)+'.xlsx');
-  toast('Đã xuất '+rows.length+' dòng');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(meta), 'Thong tin');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(thPT), 'TH phan truong');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(thLoai), 'TH phan loai');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(thPhep), 'TH phep');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Danh sach');
+  XLSX.writeFile(wb, 'nha-o-tong-hop-'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('Đã xuất Excel tổng hợp · '+rows.length+' dòng');
 }
+function inBaoCao(){
+  var list=locDong();
+  var el=document.getElementById('printMeta');
+  if(el) el.textContent='PT: '+(ptFilter==='ALL'?'Tất cả':ptFilter)+' · '+tongSoNha(list)+' nhà · '+list.length+' dòng · In '+new Date().toLocaleString('vi-VN');
+  doiTab('tongquan');
+  setTimeout(function(){ window.print(); }, 150);
+}
+
 
 window.taiLai=taiLai;
 window.doiPT=doiPT;
 window.doiTab=doiTab;
 window.xuatExcel=xuatExcel;
+window.inBaoCao=inBaoCao;
 window.dongModal=dongModal;
 window.doiLinkSheet=doiLinkSheet;
 window.moHoTro=moHoTro;
