@@ -210,8 +210,6 @@ tr:hover td{background:#f0fdf4}
     <a class="r-card pdf" href="quanly-pdf.html"><div class="ic"><i class="fa-solid fa-file-pdf"></i></div><b>Công cụ PDF</b><span>Tách · nối · OCR</span></a>
   </div>
 
-  <p class="note no-print">Nguồn: Google Sheet <b>Tiến độ trồng và chăm sóc rừng năm 2026</b>. Nếu không tải được → Sheet phải <b>Công khai (Anyone with the link · Viewer)</b>. Nguồn Sheet do <b>Admin</b> cấu hình (trang Admin → Nguồn Google Sheet).</p>
-
   <div class="bar no-print">
     <input type="search" id="q" placeholder="Tìm hạng mục…" oninput="veLai()">
     <select id="fNhom" onchange="veLai()">
@@ -695,7 +693,7 @@ function xuatWord(){
     h+='</tr>';
   });
   h+='</table>';
-  h+='<p style="margin-top:16px;font-size:10pt;color:#555">Nguồn: Google Sheet tiến độ trồng &amp; chăm sóc rừng · Hệ thống BQLRPH Xuân Lộc</p>';
+  
   var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bao cao trong cham soc rung 2026</title></head><body>'+h+'</body></html>';
   var blob=new Blob(['\ufeff'+html],{type:'application/msword;charset=utf-8'});
   var a=document.createElement('a');
