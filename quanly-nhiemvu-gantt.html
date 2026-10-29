@@ -999,7 +999,20 @@ function buildThongKe(list){
     }
   });
   var rows=Object.keys(map).map(function(k){ return map[k]; });
-  rows.sort(function(a,b){ return a.donVi.localeCompare(b.donVi,'vi'); });
+  rows.sort(function(a,b){
+    function sk(name){
+      var s=String(name||'');
+      var k=typeof stripVN==='function'?stripVN(s):s.toLowerCase();
+      if(/phong\s*lam\s*nghiep|lam\s*nghiep/.test(k) && /phong/.test(k)) return '1_'+k;
+      if(/hanh\s*chinh|hc\s*-?\s*th|tong\s*hop/.test(k) && /phong/.test(k)) return '2_'+k;
+      if(/phan\s*truong/.test(k)) return '3_'+k;
+      if(/phong/.test(k)) return '2b_'+k;
+      return '9_'+k;
+    }
+    var ka=sk(a.donVi), kb=sk(b.donVi);
+    if(ka!==kb) return ka<kb?-1:1;
+    return a.donVi.localeCompare(b.donVi,'vi');
+  });
   var tot={tong:0,htTruoc:0,htTrong:0,htTre:0,chtTrong:0,chtTre:0};
   rows.forEach(function(r){
     tot.tong+=r.tong; tot.htTruoc+=r.htTruoc; tot.htTrong+=r.htTrong; tot.htTre+=r.htTre;
@@ -1222,8 +1235,22 @@ function groupReportSections(list){
     if(!bag[u]) bag[u]=[];
     bag[u].push(d);
   });
+  function unitSortKey(name){
+    var s=String(name||'');
+    var k=typeof stripVN==='function'?stripVN(s):s.toLowerCase();
+    // 1 Phòng Lâm nghiệp · 2 Phòng HC-TH / Hành chính · 3 Phân trường · 9 khác
+    if(/phong\s*lam\s*nghiep|lam\s*nghiep/.test(k) && /phong/.test(k)) return '1_'+k;
+    if(/hanh\s*chinh|hc\s*-?\s*th|tong\s*hop/.test(k) && /phong/.test(k)) return '2_'+k;
+    if(/phan\s*truong/.test(k)) return '3_'+k;
+    if(/phong/.test(k)) return '2b_'+k;
+    return '9_'+k;
+  }
   function toSections(bag, title){
-    var units=Object.keys(bag).sort(function(a,b){ return a.localeCompare(b,'vi'); });
+    var units=Object.keys(bag).sort(function(a,b){
+      var ka=unitSortKey(a), kb=unitSortKey(b);
+      if(ka!==kb) return ka<kb?-1:1;
+      return a.localeCompare(b,'vi');
+    });
     if(!units.length) return null;
     return {
       title: title,
@@ -1295,7 +1322,7 @@ function xuatWord(){
     '<h2>DANH SÁCH NHIỆM VỤ THEO CHỈ ĐẠO GIÁM ĐỐC</h2>'+
     '<p class="meta">Xuất ngày: '+fmtDate(now)+' · Số nhiệm vụ: '+list.length+'</p>'+
     renderThongKeTable(list, true)+
-    '<p style="margin:14pt 0 6pt;font-weight:bold;font-size:12pt;text-align:center">DANH SÁCH CHI TIẾT NHIỆM VỤ</p>'+
+    '<p style="margin:14pt 0 6pt;font-weight:bold;font-size:12pt;text-align:center">DANH SÁCH CHI TIẾT</p>'+
     '<table><thead><tr>'+
     '<th style="width:4%">STT</th>'+
     '<th style="width:10%">Đơn vị TH</th>'+
@@ -1308,7 +1335,7 @@ function xuatWord(){
     '<th style="width:8%">Thời hạn HT</th>'+
     '<th style="width:12%">Giải trình tiến độ</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<p style="margin-top:18pt">Người tổng hợp: ………………………… &nbsp;&nbsp;&nbsp;&nbsp; Lãnh đạo: …………………………</p>'+
+    
     '</div></body></html>';
   var blob=new Blob(['\ufeff', html], {type:'application/msword'});
   var a=document.createElement('a');
@@ -1339,11 +1366,11 @@ function inBaoCao(){
     '<h2>BÁO CÁO NHIỆM VỤ THEO CHỈ ĐẠO GIÁM ĐỐC</h2>'+
     '<p class="meta">Ngày in: '+fmtDate(now)+' · Số nhiệm vụ: '+list.length+'</p>'+
     renderThongKeTable(list, true)+
-    '<p style="margin:12pt 0 6pt;font-weight:bold;text-align:center">DANH SÁCH CHI TIẾT (Hoàn thành → đơn vị · Chưa hoàn thành → đơn vị)</p>'+
+    '<p style="margin:12pt 0 6pt;font-weight:bold;text-align:center">DANH SÁCH CHI TIẾT</p>'+
     '<table><thead><tr>'+
     '<th>STT</th><th>Đơn vị TH</th><th>Cán bộ</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Hoàn thành</th><th>Thời hạn HT</th><th>Giải trình</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<p style="margin-top:16pt">Người tổng hợp: ………………………… &nbsp;&nbsp;&nbsp; Lãnh đạo: …………………………</p>'+
+    
     '<script>window.onload=function(){window.print();}<\/script>'+
     '</body></html>';
   var w=window.open('','_blank');
