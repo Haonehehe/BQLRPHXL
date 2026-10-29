@@ -617,7 +617,7 @@ function parseMatrix(matrix){
       continue;
     }
     // Dòng tiêu đề đơn vị / nhóm
-    if((!stt || stt==='0') && nd && !vb && !th && !ld && !ht && !dvH){
+    if((!stt || stt==='0') && nd && !vb && !th && !ld && !htDone && !htHan && !dvH){
       if(/phòng|phân trường|đơn vị|^ban\b/i.test(nd) && nd.length<90){
         unit=nd.replace(/^PHÒNG\s+/i,'Phòng ').replace(/^PHÂN TRƯỜNG\s+/i,'Phân trường ');
         continue;
