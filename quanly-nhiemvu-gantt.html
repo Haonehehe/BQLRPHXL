@@ -306,6 +306,8 @@ tbody tr:hover td{background:#f8fafc}
       <button type="button" class="chip" data-st="Trong hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-clock"></i> Trong hạn <span class="n" data-n="soon">0</span></button>
       <button type="button" class="chip" data-st="Quá hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-triangle-exclamation"></i> Quá hạn <span class="n" data-n="late">0</span></button>
       <button type="button" class="chip" data-st="Trễ hạn" onclick="toggleStatus(this)"><i class="fa-solid fa-hourglass-end"></i> Trễ hạn <span class="n" data-n="tre">0</span></button>
+      <button type="button" class="chip" data-st="Hoàn thành" onclick="toggleStatus(this)"><i class="fa-solid fa-flag-checkered"></i> Hoàn thành <span class="n" data-n="done">0</span></button>
+      <button type="button" class="chip" data-st="Chưa hoàn thành" onclick="toggleStatus(this)"><i class="fa-solid fa-spinner"></i> Chưa HT <span class="n" data-n="todo">0</span></button>
       <button type="button" class="chip" data-st="other" onclick="toggleStatus(this)"><i class="fa-solid fa-ellipsis"></i> Khác/trống <span class="n" data-n="other">0</span></button>
       <span class="filt-label" style="margin-left:8px">Nhóm nhanh</span>
       <button type="button" class="chip" data-quick="canxu" onclick="toggleQuick(this)" title="Trong hạn + Quá hạn + Trễ hạn"><i class="fa-solid fa-bell"></i> Cần theo dõi</button>
@@ -332,7 +334,8 @@ tbody tr:hover td{background:#f8fafc}
             <th>Văn bản chỉ đạo</th>
             <th>Thời hạn</th>
             <th>Lãnh đạo</th>
-            <th>Đánh giá</th>
+            <th>Hoàn thành</th>
+            <th>Thời hạn HT</th>
             <th class="col-giai">Giải trình tiến độ</th>
           </tr>
         </thead>
@@ -516,6 +519,13 @@ function statusByDate(due, sheetStatus){
   return 'Trong hạn';
 }
 
+function normHoanThanh(s){
+  s=String(s||'').trim();
+  if(!s) return '';
+  if(/chưa\s*hoàn\s*thành|chua\s*hoan\s*thanh|chưa\s*xong/i.test(s)) return 'Chưa hoàn thành';
+  if(/hoàn\s*thành|hoan\s*thanh|đã\s*xong/i.test(s)) return 'Hoàn thành';
+  return s;
+}
 function normStatus(s){
   s=String(s||'').trim();
   if(!s) return '';
@@ -524,7 +534,6 @@ function normStatus(s){
   if(/quá hạn|qua han/i.test(s)) return 'Quá hạn';
   if(/trễ hạn|tre han|trễ|tre/i.test(s)) return 'Trễ hạn';
   if(/trong hạn|trong han/i.test(s)) return 'Trong hạn';
-  if(/hoàn thành|hoan thanh/i.test(s)) return 'Đúng hạn';
   return s;
 }
 
@@ -536,6 +545,13 @@ function tagStatus(st){
   if(st==='Trong hạn') return '<span class="tag soon">Trong hạn</span>';
   if(st) return '<span class="tag mu">'+esc(st)+'</span>';
   return '<span class="tag mu">—</span>';
+}
+function tagHoanThanh(st){
+  st=normHoanThanh(st);
+  if(st==='Hoàn thành') return '<span class="tag ok">Hoàn thành</span>';
+  if(st==='Chưa hoàn thành') return '<span class="tag late">Chưa hoàn thành</span>';
+  if(!st) return '<span class="tag mu">—</span>';
+  return '<span class="tag mu">'+esc(st)+'</span>';
 }
 
 function fetchGvizJsonp(){
@@ -580,12 +596,18 @@ function parseMatrix(matrix){
     var vb=String(c[2]==null?'':c[2]).trim();
     var th=String(c[3]==null?'':c[3]).trim();
     var ld=String(c[4]==null?'':c[4]).trim();
-    var ht=String(c[5]==null?'':c[5]).trim();
-    var gt=String(c[6]==null?'':c[6]).trim();
-    var dvH=String(c[7]==null?'':c[7]).trim();
-    var canBo=String(c[8]==null?'':c[8]).trim(); // Cột I - Cán bộ phụ trách
-    if(!canBo) canBo=String(c[24]==null?'':c[24]).trim(); // dự phòng cột Y
+    // F hoàn thành · G trạng thái thời hạn · H giải trình · I đơn vị · J cán bộ
+    var htDone=String(c[5]==null?'':c[5]).trim();
+    var htHan=String(c[6]==null?'':c[6]).trim();
+    var gt=String(c[7]==null?'':c[7]).trim();
+    var dvH=String(c[8]==null?'':c[8]).trim();
+    var canBo=String(c[9]==null?'':c[9]).trim();
+    if(!canBo) canBo=String(c[8]==null?'':c[8]).trim();
     if(/^cán bộ phụ trách$/i.test(canBo)) canBo='';
+    if(/^đơn vị$/i.test(dvH)) dvH='';
+    if(/^giải trình/i.test(gt)) gt='';
+    if(/^trạng thái/i.test(htDone)) htDone='';
+    if(/^trạng thái/i.test(htHan)) htHan='';
 
     // Nhóm A/B/C
     if(/^[A-Z]$/.test(stt) && nd){ group=nd; continue; }
@@ -610,7 +632,7 @@ function parseMatrix(matrix){
 
     // Nhận dòng nhiệm vụ: có STT số HOẶC có nội dung + (văn bản / lãnh đạo / đơn vị H / đánh giá)
     var isStt=/^\d+(\.0+)?$/.test(stt);
-    var looksTask = isStt || !!(vb || ld || dvH || ht || th);
+    var looksTask = isStt || !!(vb || ld || dvH || htDone || htHan || th);
     if(!looksTask) continue;
     // Tránh nhận nhầm dòng tiêu đề dài không phải task
     if(!isStt && !vb && !th && !ld && nd.length<40 && /phòng|phân trường/i.test(nd)) {
@@ -635,7 +657,8 @@ function parseMatrix(matrix){
       thoiHanRaw: th || '',
       thoiHan: due,
       lanhDao: ld,
-      danhGia: statusByDate(due, ht),
+      hoanThanh: (typeof normHoanThanh==='function'?normHoanThanh(htDone):htDone),
+      danhGia: statusByDate(due, htHan),
       giaiTrinh: gt,
       donVi: donViTH,
       canBo: canBo || '',
@@ -676,10 +699,10 @@ function toggleStatus(btn){
   else {
     statusSel[st]=1;
     btn.classList.add('on');
-    if(st==='Đúng hạn') btn.classList.add('ok');
+    if(st==='Đúng hạn'||st==='Hoàn thành') btn.classList.add('ok');
     else if(st==='Trước hạn') btn.classList.add('early');
     else if(st==='Trong hạn') btn.classList.add('soon');
-    else if(st==='Quá hạn'||st==='Trễ hạn') btn.classList.add('late');
+    else if(st==='Quá hạn'||st==='Trễ hạn'||st==='Chưa hoàn thành') btn.classList.add('late');
     else btn.classList.add('mu');
   }
   // clear quick when manual status
@@ -790,14 +813,16 @@ function napBoLoc(){
   fill('fNhom', nhoms, 'Tất cả nhóm');
   fill('fThang', months, 'Tất cả tháng hạn');
   // đếm chip
-  var cnt={ok:0,early:0,soon:0,late:0,tre:0,other:0};
+  var cnt={ok:0,early:0,soon:0,late:0,tre:0,done:0,todo:0,other:0};
   dong.forEach(function(d){
     if(d.danhGia==='Đúng hạn') cnt.ok++;
     else if(d.danhGia==='Trước hạn') cnt.early++;
     else if(d.danhGia==='Trong hạn') cnt.soon++;
     else if(d.danhGia==='Quá hạn') cnt.late++;
     else if(d.danhGia==='Trễ hạn') cnt.tre++;
-    else cnt.other++;
+    else if(!d.danhGia) cnt.other++;
+    if(d.hoanThanh==='Hoàn thành') cnt.done++;
+    else if(d.hoanThanh==='Chưa hoàn thành') cnt.todo++;
   });
   document.querySelectorAll('#statusChips [data-n]').forEach(function(sp){
     var k=sp.getAttribute('data-n');
@@ -842,7 +867,10 @@ function locDong(){
       for(var i=0;i<stKeys.length;i++){
         var st=stKeys[i];
         if(st==='other'){
-          if(['Đúng hạn','Trước hạn','Quá hạn','Trong hạn','Trễ hạn'].indexOf(d.danhGia)<0){ ok=true; break; }
+          if(['Đúng hạn','Trước hạn','Quá hạn','Trong hạn','Trễ hạn','Hoàn thành','Chưa hoàn thành'].indexOf(d.danhGia)<0
+              && ['Hoàn thành','Chưa hoàn thành'].indexOf(d.hoanThanh)<0){ ok=true; break; }
+        } else if(st==='Hoàn thành' || st==='Chưa hoàn thành'){
+          if(d.hoanThanh===st){ ok=true; break; }
         } else if(d.danhGia===st){ ok=true; break; }
       }
       if(!ok) return false;
@@ -883,7 +911,7 @@ function veDS(list){
   list.forEach(function(d){
     if(d.donVi!==lastUnit){
       lastUnit=d.donVi;
-      html+='<tr class="sec-row"><td colspan="9"><i class="fa-solid fa-building"></i> '+esc(d.donVi)+(d.nhom?' <span style="font-weight:500;color:#64748b"> · '+esc(d.nhom)+'</span>':'')+'</td></tr>';
+      html+='<tr class="sec-row"><td colspan="10"><i class="fa-solid fa-building"></i> '+esc(d.donVi)+(d.nhom?' <span style="font-weight:500;color:#64748b"> · '+esc(d.nhom)+'</span>':'')+'</td></tr>';
     }
     html+='<tr>'+
       '<td>'+esc(d.stt)+'</td>'+
@@ -893,11 +921,12 @@ function veDS(list){
       '<td style="font-size:11.5px">'+esc(d.vanBan||'—')+'</td>'+
       '<td style="white-space:nowrap">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||'—'))+'</td>'+
       '<td>'+esc(d.lanhDao||'—')+'</td>'+
+      '<td>'+tagHoanThanh(d.hoanThanh)+'</td>'+
       '<td>'+tagStatus(d.danhGia)+'</td>'+
       '<td class="col-giai" style="font-size:11.5px;color:#475569;line-height:1.35">'+esc(d.giaiTrinh||'—')+'</td>'+
     '</tr>';
   });
-  document.getElementById('tbDS').innerHTML=html||'<tr><td colspan="9" class="muted">Không có dữ liệu</td></tr>';
+  document.getElementById('tbDS').innerHTML=html||'<tr><td colspan="10" class="muted">Không có dữ liệu</td></tr>';
 }
 
 function monthLabel(d){
