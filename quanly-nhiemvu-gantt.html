@@ -303,7 +303,7 @@ tbody tr:hover td{background:#f8fafc}
       <button class="btn btn-x" type="button" onclick="xuatExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
       <button class="btn btn-v" type="button" onclick="xuatWord()"><i class="fa-solid fa-file-word"></i> Word</button>
       <a class="btn btn-b" target="_blank" rel="noopener" id="linkSheet" href="https://docs.google.com/spreadsheets/d/1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe/edit?gid=1800611191#gid=1800611191"><i class="fa-solid fa-table"></i> Sheet</a>
-      <button class="btn btn-g" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> In / PDF</button>
+      <button class="btn btn-g" type="button" onclick="inBaoCao()"><i class="fa-solid fa-print"></i> In / PDF</button>
     </div>
   </div>
 </div>
@@ -1212,25 +1212,70 @@ function xuatExcel(){
   toast('Đã xuất Excel ('+list.length+' dòng)');
 }
 
+
+/** Nhóm: Hoàn thành → đơn vị, rồi Chưa hoàn thành → đơn vị */
+function groupReportSections(list){
+  var done={}, todo={};
+  (list||[]).forEach(function(d){
+    var u=d.donVi||'—';
+    var bag=isHoanThanh(d)?done:todo;
+    if(!bag[u]) bag[u]=[];
+    bag[u].push(d);
+  });
+  function toSections(bag, title){
+    var units=Object.keys(bag).sort(function(a,b){ return a.localeCompare(b,'vi'); });
+    if(!units.length) return null;
+    return {
+      title: title,
+      units: units.map(function(u){ return { donVi:u, items:bag[u] }; })
+    };
+  }
+  var out=[];
+  var a=toSections(done, 'A. NHIỆM VỤ ĐÃ HOÀN THÀNH');
+  var b=toSections(todo, 'B. NHIỆM VỤ CHƯA HOÀN THÀNH');
+  if(a) out.push(a);
+  if(b) out.push(b);
+  return out;
+}
+function rowTaskHtml(d, stt){
+  return '<tr>'+
+    '<td style="text-align:center">'+stt+'</td>'+
+    '<td>'+esc(d.donVi)+'</td>'+
+    '<td>'+esc(d.canBo||'')+'</td>'+
+    '<td>'+esc(d.noiDung)+'</td>'+
+    '<td>'+esc(d.vanBan||'')+'</td>'+
+    '<td style="text-align:center">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||''))+'</td>'+
+    '<td>'+esc(d.lanhDao||'')+'</td>'+
+    '<td style="text-align:center">'+esc(d.hoanThanh||'')+'</td>'+
+    '<td style="text-align:center">'+esc(d.danhGia||'')+'</td>'+
+    '<td>'+esc(d.giaiTrinh||'')+'</td>'+
+  '</tr>';
+}
+function buildDetailRowsGrouped(list){
+  var sections=groupReportSections(list);
+  var rows='', n=0;
+  if(!sections.length){
+    (list||[]).forEach(function(d,i){ rows+=rowTaskHtml(d, i+1); });
+    return rows;
+  }
+  sections.forEach(function(sec){
+    rows+='<tr class="sec-main"><td colspan="10" style="background:#0f172a;color:#fff;font-weight:bold;padding:8px 10px">'+esc(sec.title)+'</td></tr>';
+    sec.units.forEach(function(u){
+      rows+='<tr class="sec-unit"><td colspan="10" style="background:#e2e8f0;font-weight:700;padding:6px 10px">'+esc(u.donVi)+' <span style="font-weight:500;color:#64748b">('+u.items.length+')</span></td></tr>';
+      u.items.forEach(function(d){
+        n++;
+        rows+=rowTaskHtml(d, n);
+      });
+    });
+  });
+  return rows;
+}
+
 function xuatWord(){
   var list=locDong();
   if(!list.length){ toast('Không có dữ liệu để xuất'); return; }
   var now=new Date();
-  var rows='';
-  list.forEach(function(d,i){
-    rows+='<tr>'+
-      '<td style="text-align:center">'+(i+1)+'</td>'+
-      '<td>'+esc(d.donVi)+'</td>'+
-      '<td>'+esc(d.canBo||'')+'</td>'+
-      '<td>'+esc(d.noiDung)+'</td>'+
-      '<td>'+esc(d.vanBan||'')+'</td>'+
-      '<td style="text-align:center">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||''))+'</td>'+
-      '<td>'+esc(d.lanhDao||'')+'</td>'+
-      '<td style="text-align:center">'+esc(d.hoanThanh||'')+'</td>'+
-      '<td style="text-align:center">'+esc(d.danhGia||'')+'</td>'+
-      '<td>'+esc(d.giaiTrinh||'')+'</td>'+
-    '</tr>';
-  });
+  var rows=buildDetailRowsGrouped(list);
   var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'+
     '<head><meta charset="utf-8"><title>Nhiệm vụ BQLRPHXL</title>'+
     '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>'+
@@ -1272,6 +1317,38 @@ function xuatWord(){
   document.body.appendChild(a); a.click();
   setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
   toast('Đã xuất Word khổ ngang ('+list.length+' dòng)');
+}
+
+
+function inBaoCao(){
+  var list=locDong();
+  if(!list.length){ toast('Không có dữ liệu để in'); return; }
+  var now=new Date();
+  var rows=buildDetailRowsGrouped(list);
+  var html='<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Báo cáo nhiệm vụ</title>'+
+    '<style>'+
+    '@page{size:A4 landscape;margin:10mm}'+
+    'body{font-family:"Times New Roman",serif;font-size:11pt;color:#000}'+
+    'h1{font-size:15pt;text-align:center;margin:0 0 4pt}h2{font-size:12pt;text-align:center;margin:0 0 8pt}'+
+    'table{border-collapse:collapse;width:100%;font-size:10pt}th,td{border:1px solid #000;padding:3px 5px;vertical-align:top}'+
+    'th{background:#e5e7eb;text-align:center}'+
+    '.tk-table{margin-bottom:12pt}.tk-table th{background:#dbeafe}'+
+    '.meta{font-size:10pt;margin:4pt 0 8pt}'+
+    '</style></head><body>'+
+    '<h1>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</h1>'+
+    '<h2>BÁO CÁO NHIỆM VỤ THEO CHỈ ĐẠO GIÁM ĐỐC</h2>'+
+    '<p class="meta">Ngày in: '+fmtDate(now)+' · Số nhiệm vụ: '+list.length+'</p>'+
+    renderThongKeTable(list, true)+
+    '<p style="margin:12pt 0 6pt;font-weight:bold;text-align:center">DANH SÁCH CHI TIẾT (Hoàn thành → đơn vị · Chưa hoàn thành → đơn vị)</p>'+
+    '<table><thead><tr>'+
+    '<th>STT</th><th>Đơn vị TH</th><th>Cán bộ</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Hoàn thành</th><th>Thời hạn HT</th><th>Giải trình</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<p style="margin-top:16pt">Người tổng hợp: ………………………… &nbsp;&nbsp;&nbsp; Lãnh đạo: …………………………</p>'+
+    '<script>window.onload=function(){window.print();}<\/script>'+
+    '</body></html>';
+  var w=window.open('','_blank');
+  if(!w){ toast('Trình duyệt chặn cửa sổ in'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
 }
 
 function fmtFileDate(){
