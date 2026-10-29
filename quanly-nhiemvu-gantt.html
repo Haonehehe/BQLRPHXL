@@ -1,6 +1,38 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<script>
+(function(){
+  var SESS_KEY='bqlrph_session_v1';
+  function getSession(){
+    try{
+      var s=sessionStorage.getItem(SESS_KEY);
+      if(s) return JSON.parse(s);
+      s=localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  var s=getSession();
+  var ok=false;
+  if(s){
+    if(s.role==='admin') ok=true;
+    else if(Array.isArray(s.perms) && (s.perms.indexOf('tasks')>=0 || s.perms.indexOf('all')>=0)) ok=true;
+  }
+  if(ok) return;
+  try{ window.stop(); }catch(e){}
+  var logged = !!s;
+  var title = logged ? 'Chưa được cấp quyền' : 'Cần đăng nhập';
+  var msg = logged
+    ? 'Bạn đã đăng nhập nhưng chưa được cấp quyền truy cập module <b>Nhiệm vụ / Gantt</b>. Liên hệ admin để cấp quyền <b>tasks</b>.'
+    : 'Module <b>Nhiệm vụ / Gantt</b> yêu cầu đăng nhập. Vui lòng đăng nhập trên Menu rồi mở lại.';
+  var btn = logged ? 'Về Menu' : 'Đăng nhập';
+  document.open();
+  document.write('<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#1e3a8a);color:#fff"><div style="text-align:center;max-width:420px"><div style="font-size:42px;margin-bottom:12px">🔒</div><h1 style="font-size:20px;margin:0 0 10px">'+title+'</h1><p style="color:#94a3b8;font-size:14px;line-height:1.55;margin:0 0 20px">'+msg+'</p><a href="menu.html" style="display:inline-flex;height:44px;align-items:center;padding:0 22px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-weight:700;text-decoration:none">'+btn+'</a></div></body></html>');
+  document.close();
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nhiệm vụ / Gantt · BQLRPH Xuân Lộc</title>
@@ -101,6 +133,24 @@ body{
 }
 
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.tk-wrap{overflow:auto;margin-top:4px}
+.tk-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+.tk-table th,.tk-table td{border:1px solid #cbd5e1;padding:7px 8px;text-align:center}
+.tk-table th{background:#0f172a;color:#f8fafc;font-weight:700;font-size:11.5px}
+.tk-table th.grp{background:#1e293b}
+.tk-table th.sub{background:#334155;font-weight:600;font-size:11px}
+.tk-table td.left{text-align:left;font-weight:600;color:#0f172a}
+.tk-table tr.total td{background:#f1f5f9;font-weight:800}
+.tk-table td.num{font-variant-numeric:tabular-nums;font-weight:600}
+.tk-table td.zero{color:#94a3b8;font-weight:500}
+@media print{
+  #cardTK .card-h h2:after{content:"";}
+  #cardTK{break-inside:avoid;}
+
+  .tk-table th{background:#111!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .tk-table tr.total td{background:#eee!important}
+}
+
 @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.kpis{grid-template-columns:1fr}}
 .kpi{
@@ -235,29 +285,7 @@ tbody tr:hover td{background:#f8fafc}
 .print-only,.print-chu-thich,.print-head{display:none}
 
 </style>
-<script>
-(function(){
-  var SESS_KEY='bqlrph_session_v1';
-  function getSession(){
-    try{
-      var s=sessionStorage.getItem(SESS_KEY);
-      if(s) return JSON.parse(s);
-      s=localStorage.getItem(SESS_KEY);
-      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
-    }catch(e){}
-    return null;
-  }
-  var s=getSession();
-  var ok=false;
-  if(s){
-    if(s.role==='admin') ok=true;
-    else if(Array.isArray(s.perms) && (s.perms.indexOf('tasks')>=0 || s.perms.indexOf('all')>=0)) ok=true;
-  }
-  if(!ok){
-    document.write('<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui;background:linear-gradient(160deg,#07111f,#1e3a8a);color:#fff"><div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px">Cần đăng nhập</h1><p style="color:#94a3b8;font-size:13px;margin:10px 0 18px">Module Nhiệm vụ / Gantt cần quyền <b>tasks</b>.</p><a href="menu.html" style="display:inline-flex;height:42px;align-items:center;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-weight:700;text-decoration:none">Về Menu</a></div></body></html>');
-  }
-})();
-</script>
+
 </head>
 <body>
 <div class="top">
@@ -317,6 +345,14 @@ tbody tr:hover td{background:#f8fafc}
   </div>
 
   <div class="kpis" id="kpis"></div>
+
+  <div class="card" id="cardTK">
+    <div class="card-h">
+      <h2><i class="fa-solid fa-table"></i> Thống kê theo đơn vị</h2>
+      <span style="font-size:12px;color:var(--mu)">Hoàn thành / Chưa hoàn thành × thời hạn</span>
+    </div>
+    <div class="tk-wrap" id="tkBox"></div>
+  </div>
 
   <div class="card">
     <div class="card-h">
@@ -928,9 +964,109 @@ function locDong(){
   });
 }
 
+
+function isHoanThanh(d){
+  return (d.hoanThanh||'')==='Hoàn thành';
+}
+function isTreHan(d){
+  var s=d.danhGia||'';
+  return s==='Trễ hạn'||s==='Quá hạn';
+}
+function isTruocHan(d){
+  return (d.danhGia||'')==='Trước hạn';
+}
+function isTrongHan(d){
+  var s=d.danhGia||'';
+  return s==='Trong hạn'||s==='Đúng hạn';
+}
+
+/** Tổng hợp theo đơn vị — khớp bảng thống kê chỉ đạo */
+function buildThongKe(list){
+  var map={};
+  (list||[]).forEach(function(d){
+    var u=d.donVi||'—';
+    if(!map[u]) map[u]={donVi:u, tong:0, htTruoc:0, htTrong:0, htTre:0, chtTrong:0, chtTre:0};
+    var r=map[u];
+    r.tong++;
+    var done=isHoanThanh(d);
+    if(done){
+      if(isTruocHan(d)) r.htTruoc++;
+      else if(isTreHan(d)) r.htTre++;
+      else r.htTrong++; // Trong hạn / Đúng hạn / trống
+    }else{
+      if(isTreHan(d)) r.chtTre++;
+      else r.chtTrong++; // chưa HT + trước/trong hạn/trống
+    }
+  });
+  var rows=Object.keys(map).map(function(k){ return map[k]; });
+  rows.sort(function(a,b){ return a.donVi.localeCompare(b.donVi,'vi'); });
+  var tot={tong:0,htTruoc:0,htTrong:0,htTre:0,chtTrong:0,chtTre:0};
+  rows.forEach(function(r){
+    tot.tong+=r.tong; tot.htTruoc+=r.htTruoc; tot.htTrong+=r.htTrong; tot.htTre+=r.htTre;
+    tot.chtTrong+=r.chtTrong; tot.chtTre+=r.chtTre;
+  });
+  return {rows:rows, tot:tot};
+}
+function cellNum(n){
+  n=Number(n)||0;
+  if(!n) return '<td class="num zero">-</td>';
+  return '<td class="num">'+n+'</td>';
+}
+function renderThongKeTable(list, forPrint){
+  var tk=buildThongKe(list);
+  var body='';
+  tk.rows.forEach(function(r,i){
+    body+='<tr>'+
+      '<td class="num">'+(i+1)+'</td>'+
+      '<td class="left">'+esc(r.donVi)+'</td>'+
+      '<td class="num">'+(r.tong||0)+'</td>'+
+      cellNum(r.htTruoc)+cellNum(r.htTrong)+cellNum(r.htTre)+
+      cellNum(r.chtTrong)+cellNum(r.chtTre)+
+    '</tr>';
+  });
+  body+='<tr class="total">'+
+    '<td colspan="2">Tổng</td>'+
+    '<td class="num">'+(tk.tot.tong||0)+'</td>'+
+    cellNum(tk.tot.htTruoc)+cellNum(tk.tot.htTrong)+cellNum(tk.tot.htTre)+
+    cellNum(tk.tot.chtTrong)+cellNum(tk.tot.chtTre)+
+  '</tr>';
+  var title = forPrint
+    ? '<p style="text-align:center;font-weight:bold;font-size:13pt;margin:0 0 8pt">BẢNG THỐNG KÊ KẾT QUẢ THỰC HIỆN CÁC NỘI DUNG CHỈ ĐẠO CỦA LÃNH ĐẠO BAN QUẢN LÝ</p>'
+    : '';
+  return title+
+    '<table class="tk-table">'+
+    '<thead>'+
+    '<tr>'+
+      '<th rowspan="3">STT</th>'+
+      '<th rowspan="3">Tên đơn vị</th>'+
+      '<th rowspan="3">Tổng số nhiệm vụ</th>'+
+      '<th colspan="5" class="grp">NHIỆM VỤ TRỌNG TÂM</th>'+
+    '</tr>'+
+    '<tr>'+
+      '<th colspan="3" class="sub">Hoàn thành</th>'+
+      '<th colspan="2" class="sub">Chưa hoàn thành</th>'+
+    '</tr>'+
+    '<tr>'+
+      '<th class="sub">Trước hạn</th><th class="sub">Trong hạn</th><th class="sub">Trễ hạn</th>'+
+      '<th class="sub">Trong hạn</th><th class="sub">Trễ hạn</th>'+
+    '</tr>'+
+    '</thead><tbody>'+body+'</tbody></table>';
+}
+function veThongKe(list){
+  var box=document.getElementById('tkBox');
+  if(!box) return;
+  if(!list||!list.length){
+    box.innerHTML='<p class="muted" style="padding:12px">Không có dữ liệu</p>';
+    return;
+  }
+  box.innerHTML=renderThongKeTable(list,false);
+}
+
+
 function veLai(){
   var list=locDong();
   veKPI(list);
+  veThongKe(list);
   veDS(list);
   veGantt(list);
 }
@@ -1107,12 +1243,14 @@ function xuatWord(){
     'body{font-family:"Times New Roman",serif;font-size:11pt}'+
     'h1{font-size:15pt;text-align:center;margin:0 0 4pt}h2{font-size:12pt;text-align:center;font-weight:bold;margin:0 0 8pt}'+
     'table{border-collapse:collapse;width:100%;font-size:10pt}th,td{border:1px solid #000;padding:3px 5px;vertical-align:top}'+
-    'th{background:#e5e7eb;text-align:center;font-weight:bold} .meta{font-size:10pt;margin:4pt 0 8pt}'+
+    'th{background:#e5e7eb;text-align:center;font-weight:bold} .meta{font-size:10pt;margin:4pt 0 8pt}.tk-table{border-collapse:collapse;width:100%;font-size:10pt;margin-bottom:12pt}.tk-table th,.tk-table td{border:1px solid #000;padding:3px 5px;text-align:center}.tk-table th{background:#dbeafe}.tk-table td.left{text-align:left}.tk-table tr.total td{font-weight:bold;background:#f3f4f6}.tk-table td.zero{color:#666}'+
     '</style></head><body>'+
     '<div class="WordSection1">'+
     '<h1>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</h1>'+
     '<h2>DANH SÁCH NHIỆM VỤ THEO CHỈ ĐẠO GIÁM ĐỐC</h2>'+
     '<p class="meta">Xuất ngày: '+fmtDate(now)+' · Số nhiệm vụ: '+list.length+'</p>'+
+    renderThongKeTable(list, true)+
+    '<p style="margin:14pt 0 6pt;font-weight:bold;font-size:12pt;text-align:center">DANH SÁCH CHI TIẾT NHIỆM VỤ</p>'+
     '<table><thead><tr>'+
     '<th style="width:4%">STT</th>'+
     '<th style="width:10%">Đơn vị TH</th>'+
