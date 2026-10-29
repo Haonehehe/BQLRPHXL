@@ -1268,7 +1268,6 @@ function rowTaskHtml(d, stt){
   return '<tr>'+
     '<td style="text-align:center">'+stt+'</td>'+
     '<td>'+esc(d.donVi)+'</td>'+
-    '<td>'+esc(d.canBo||'')+'</td>'+
     '<td>'+esc(d.noiDung)+'</td>'+
     '<td>'+esc(d.vanBan||'')+'</td>'+
     '<td style="text-align:center">'+(d.thoiHan?fmtDate(d.thoiHan):esc(d.thoiHanRaw||''))+'</td>'+
@@ -1286,9 +1285,9 @@ function buildDetailRowsGrouped(list){
     return rows;
   }
   sections.forEach(function(sec){
-    rows+='<tr class="sec-main"><td colspan="10" style="background:#0f172a;color:#fff;font-weight:bold;padding:8px 10px">'+esc(sec.title)+'</td></tr>';
+    rows+='<tr class="sec-main"><td colspan="9" style="background:#0f172a;color:#fff;font-weight:bold;padding:8px 10px">'+esc(sec.title)+'</td></tr>';
     sec.units.forEach(function(u){
-      rows+='<tr class="sec-unit"><td colspan="10" style="background:#e2e8f0;font-weight:700;padding:6px 10px">'+esc(u.donVi)+' <span style="font-weight:500;color:#64748b">('+u.items.length+')</span></td></tr>';
+      rows+='<tr class="sec-unit"><td colspan="9" style="background:#e2e8f0;font-weight:700;padding:6px 10px">'+esc(u.donVi)+' <span style="font-weight:500;color:#64748b">('+u.items.length+')</span></td></tr>';
       u.items.forEach(function(d){
         n++;
         rows+=rowTaskHtml(d, n);
@@ -1325,9 +1324,8 @@ function xuatWord(){
     '<p style="margin:14pt 0 6pt;font-weight:bold;font-size:12pt;text-align:center">DANH SÁCH CHI TIẾT</p>'+
     '<table><thead><tr>'+
     '<th style="width:4%">STT</th>'+
-    '<th style="width:10%">Đơn vị TH</th>'+
-    '<th style="width:9%">Cán bộ phụ trách</th>'+
-    '<th style="width:22%">Nội dung chỉ đạo</th>'+
+    '<th style="width:11%">Đơn vị TH</th>'+
+    '<th style="width:24%">Nội dung chỉ đạo</th>'+
     '<th style="width:10%">Văn bản</th>'+
     '<th style="width:8%">Thời hạn</th>'+
     '<th style="width:9%">Lãnh đạo</th>'+
@@ -1368,7 +1366,7 @@ function inBaoCao(){
     renderThongKeTable(list, true)+
     '<p style="margin:12pt 0 6pt;font-weight:bold;text-align:center">DANH SÁCH CHI TIẾT</p>'+
     '<table><thead><tr>'+
-    '<th>STT</th><th>Đơn vị TH</th><th>Cán bộ</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Hoàn thành</th><th>Thời hạn HT</th><th>Giải trình</th>'+
+    '<th>STT</th><th>Đơn vị TH</th><th>Nội dung chỉ đạo</th><th>Văn bản</th><th>Thời hạn</th><th>Lãnh đạo</th><th>Hoàn thành</th><th>Thời hạn HT</th><th>Giải trình</th>'+
     '</tr></thead><tbody>'+rows+'</tbody></table>'+
     
     '<script>window.onload=function(){window.print();}<\/script>'+
