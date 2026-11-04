@@ -4303,11 +4303,11 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
               +' ('+fmt(sumCay(ktChiGo),0)+' cây · '+fmt(sumM3(ktChiGo))+' m³) — '
               +actorPhrase(ktGoS.self.length, ktGoS.other.length, ktGoS.unknown.length)+'.<br>';
             p+='• Chỉ tự ý khai thác cây phụ trợ, công nghiệp (điều, keo lai, cao su…): <b>'+ktChiTrong.length+'</b> vụ'
-              +' (Điều '+fmt(sumDieu(ktChiTrong))+' ha · Keo '+fmt(sumKeo(ktChiTrong))+' ha · Cao su '+fmt(sumCaoSu(ktChiTrong))+' ha) — '
+              +' (Điều '+fmt(sumDieu(ktChiTrong))+' ha; Keo lai '+fmt(sumKeo(ktChiTrong))+' ha; Cao su '+fmt(sumCaoSu(ktChiTrong))+' ha) — '
               +actorPhrase(ktTrongS.self.length, ktTrongS.other.length, ktTrongS.unknown.length)+'.<br>';
             p+='• Tự ý khai thác <b>cả gỗ lớn và cây phụ trợ/công nghiệp</b> trong cùng một vụ: <b>'+ktCaHai.length+'</b> vụ'
               +' (gỗ: '+fmt(sumCay(ktCaHai),0)+' cây · '+fmt(sumM3(ktCaHai))+' m³; '
-              +'Điều '+fmt(sumDieu(ktCaHai))+' · Keo '+fmt(sumKeo(ktCaHai))+' · Cao su '+fmt(sumCaoSu(ktCaHai))+' ha) — '
+              +'Điều '+fmt(sumDieu(ktCaHai))+' ha; Keo lai '+fmt(sumKeo(ktCaHai))+' ha; Cao su '+fmt(sumCaoSu(ktCaHai))+' ha) — '
               +actorPhrase(ktCaHaiS.self.length, ktCaHaiS.other.length, ktCaHaiS.unknown.length)+'.<br>';
             if(ktKhac.length){
               p+='• Khai thác khác / chưa tách số liệu gỗ–trồng: <b>'+ktKhac.length+'</b> vụ.<br>';
@@ -4391,8 +4391,11 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
             mrow('Xây dựng công trình', xay, fmt(sumM2(xay))+' m²');
             mrow('Đào múc hồ', dao, fmt(sumM2(dao))+' m²');
             mrow('Chỉ khai thác gỗ lớn', ktChiGo, fmt(sumCay(ktChiGo),0)+' cây · '+fmt(sumM3(ktChiGo))+' m³');
-            mrow('Chỉ khai thác cây phụ trợ, công nghiệp', ktChiTrong, 'Đ '+fmt(sumDieu(ktChiTrong))+' · K '+fmt(sumKeo(ktChiTrong))+' · CS '+fmt(sumCaoSu(ktChiTrong))+' ha');
-            mrow('Khai thác gỗ lớn + cây phụ trợ/công nghiệp (1 vụ)', ktCaHai, 'Gỗ '+fmt(sumCay(ktCaHai),0)+'cây/'+fmt(sumM3(ktCaHai))+'m³; Đ'+fmt(sumDieu(ktCaHai))+' K'+fmt(sumKeo(ktCaHai))+' CS'+fmt(sumCaoSu(ktCaHai))+' ha');
+            mrow('Chỉ khai thác cây phụ trợ, công nghiệp', ktChiTrong,
+                'Điều '+fmt(sumDieu(ktChiTrong))+' ha; Keo lai '+fmt(sumKeo(ktChiTrong))+' ha; Cao su '+fmt(sumCaoSu(ktChiTrong))+' ha');
+            mrow('Khai thác gỗ lớn + cây phụ trợ/công nghiệp (1 vụ)', ktCaHai,
+                'Gỗ lớn: '+fmt(sumCay(ktCaHai),0)+' cây · '+fmt(sumM3(ktCaHai))+' m³; '
+                +'Điều '+fmt(sumDieu(ktCaHai))+' ha; Keo lai '+fmt(sumKeo(ktCaHai))+' ha; Cao su '+fmt(sumCaoSu(ktCaHai))+' ha');
             ;(function(){
                 const s={self:0, other:phS.other.length, unknown:phS.self.length+phS.unknown.length};
                 matrix+='<tr><td>'+esc('Phá hoại cây rừng')+'</td><td class="right"><b>'+treePH.length+'</b></td>'
