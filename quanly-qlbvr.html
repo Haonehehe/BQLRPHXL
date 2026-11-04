@@ -691,6 +691,12 @@ html.dark .qlbvr-sep{background:#334155!important}
                         <select id="statsFilterKetQuaPL" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả KQ xử lý PL</option></select>
                         <select id="statsFilterNhom" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả nhóm xử lý</option></select>
                         <select id="statsFilterHanhVi" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả hành vi</option></select>
+                        <select id="statsFilterDoiTuong" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white" title="Đối tượng thực hiện hành vi">
+                            <option value="">Tất cả đối tượng thực hiện</option>
+                            <option value="self">Hộ nhận khoán tự thực hiện</option>
+                            <option value="other">Người khác thực hiện (trên đất hộ nhận khoán)</option>
+                            <option value="unknown">Không xác định đối tượng</option>
+                        </select>
                         <select id="statsFilterTieuKhu" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả tiểu khu</option></select>
                         <select id="statsFilterPhanTruong" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả phân trường</option></select>
                         <select id="statsFilterXa" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả xã</option></select>
@@ -2727,7 +2733,7 @@ ${(c.linkHoSo||c.tuiHoSo)?qrHoSoBlock(buildHoSoUrl(c.linkHoSo||'', c.tuiHoSo), c
                     current = {
                         id: newCases.length + 1,
                         hoTen: hoTen,
-                        doiTuong: colDoiTuong || hoTen,
+                        doiTuong: colDoiTuong || '',
                         nhomId: nhomId,
                         nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[1].ten,
                         tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
@@ -2878,7 +2884,7 @@ function parsePastedTextData() {
                         current = {
                             id: newCases.length + 1,
                             hoTen: colHo || ("Hộ #" + colSTT),
-                            doiTuong: colDoiTuong || colHo,
+                            doiTuong: colDoiTuong || '',
                             nhomId,
                             nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[3].ten,
                             tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
@@ -3119,7 +3125,7 @@ function toggleAdvFilter() {
             const itemData = {
                 id: activeEditIndex >= 0 ? detailedCases[activeEditIndex].id : detailedCases.length + 1,
                 hoTen,
-                doiTuong: doiTuong || hoTen,
+                doiTuong: doiTuong || '',
                 nhomId,
                 nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[3].ten,
                 tinhTrang: tinhTrang || "Đang xử lý theo quy định.",
@@ -3311,7 +3317,42 @@ function toggleAdvFilter() {
         }
 
 
-        function getFilteredCases() {
+        
+        /** Chuẩn hóa tên để so hộ nhận khoán vs đối tượng thực hiện */
+        function normPersonName(s){
+            try{ s=String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){ s=String(s||''); }
+            return s.toLowerCase().replace(/\s+/g,' ').trim();
+        }
+        /**
+         * self = hộ nhận khoán tự thực hiện
+         * other = người khác thực hiện trên diện tích hộ nhận khoán
+         * unknown = không xác định đối tượng
+         */
+        function actorKind(c){
+            const ho = normPersonName(c.hoTen);
+            const dt = normPersonName(c.doiTuong);
+            if(!dt || /khong xac dinh|chua (ro|xac dinh)|vo danh|an danh|^\-+$|^—$|^n\/a$/.test(dt)) return 'unknown';
+            if(!ho) return 'other';
+            if(dt === ho) return 'self';
+            // trùng họ tên gần như nhau
+            if(ho.length>=5 && dt.length>=5 && (ho.includes(dt) || dt.includes(ho))) return 'self';
+            return 'other';
+        }
+        function actorKindLabel(k){
+            if(k==='self') return 'Hộ nhận khoán tự thực hiện hành vi';
+            if(k==='other') return 'Người khác thực hiện hành vi trên diện tích hộ nhận khoán';
+            return 'Không xác định đối tượng';
+        }
+        /** Chỉ nêu các nhánh có số > 0 — tránh máy móc khi không xác định = 0 */
+        function actorPhrase(selfN, otherN, unkN){
+            const parts=[];
+            parts.push('hộ nhận khoán tự thực hiện hành vi <b>'+selfN+'</b>');
+            parts.push('người khác thực hiện hành vi <b>'+otherN+'</b>');
+            if((unkN||0)>0) parts.push('không xác định đối tượng <b>'+unkN+'</b>');
+            return parts.join('; ');
+        }
+
+function getFilteredCases() {
             const mode = document.getElementById('statsTimeMode')?.value || 'all';
             const year = +((document.getElementById('statsYearTop')?.value || document.getElementById('statsYear')?.value) || document.getElementById('statsYearTop')?.value || new Date().getFullYear());
             const nhom = document.getElementById('statsFilterNhom')?.value || '';
@@ -3351,6 +3392,8 @@ function toggleAdvFilter() {
                 const kq = document.getElementById('statsFilterKetQuaPL')?.value || '';
                 if (cq && normalizeAgency(c.coQuanThuLy||'') !== cq) return false;
                 if (kq && normalizeKetQuaPL(c.ketQuaXuLyPL||'') !== kq) return false;
+                const fActor = document.getElementById('statsFilterDoiTuong')?.value || '';
+                if (fActor && actorKind(c) !== fActor) return false;
                 return true;
             });
         }
@@ -3934,136 +3977,180 @@ function toggleAdvFilter() {
         /** Xuất Word theo bố cục văn bản hành chính (NĐ 30/2020) */
         function exportWordND30() {
             const cases = typeof getFilteredCases === 'function' ? getFilteredCases() : detailedCases;
-            let totalCay = 0, totalM3 = 0, totalHa = 0, totalM2 = 0;
-            cases.forEach(c => {
-                const m = getReportMetrics(c);
-                totalCay += m.cayGoLon || 0;
-                totalM3 += m.khoiLuongM3 || 0;
-                totalHa += m.dienTichHa || 0;
-                totalM2 += m.dienTichM2 || 0;
-            });
-            const mode = document.getElementById('statsTimeMode')?.value || 'all';
+            const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+            const fmt = (n, d) => {
+                if (typeof fmtNum === 'function') return fmtNum(n, d);
+                const x = Number(n)||0;
+                return x.toLocaleString('vi-VN', { maximumFractionDigits: d==null?2:d });
+            };
             let periodLabel = 'toàn bộ thời gian';
-            if (mode === 'month') periodLabel = 'tháng ' + (document.getElementById('statsMonth')?.value || '');
-            if (mode === 'quarter') periodLabel = 'Quý ' + document.getElementById('statsQuarter')?.value + '/' + (document.getElementById('statsYearTop')?.value || document.getElementById('statsYear')?.value);
-            if (mode === 'custom') periodLabel = 'từ ' + (document.getElementById('statsFrom')?.value || '…') + ' đến ' + (document.getElementById('statsTo')?.value || '…');
-
+            try { if (typeof getPeriodLabelStats === 'function') periodLabel = getPeriodLabelStats(); } catch(e) {}
+            const mode = document.getElementById('statsTimeMode')?.value || 'all';
+            if (!periodLabel || String(periodLabel).indexOf('Toàn bộ')>=0) {
+                if (mode === 'year') periodLabel = 'năm ' + (document.getElementById('statsYearTop')?.value || document.getElementById('statsYear')?.value || '');
+                if (mode === 'month') periodLabel = 'tháng ' + (document.getElementById('statsMonth')?.value || '');
+                if (mode === 'quarter') periodLabel = 'Quý ' + (document.getElementById('statsQuarter')?.value || '') + '/' + (document.getElementById('statsYearTop')?.value || document.getElementById('statsYear')?.value || '');
+                if (mode === 'custom') periodLabel = 'từ ' + (document.getElementById('statsFrom')?.value || '…') + ' đến ' + (document.getElementById('statsTo')?.value || '…');
+            }
             const today = new Date();
             const dd = String(today.getDate()).padStart(2, '0');
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const yyyy = today.getFullYear();
+            const detailBlocks = typeof buildDetailedStatsBlocks === 'function'
+                ? buildDetailedStatsBlocks(cases, esc, fmt)
+                : { narrative: '', matrix: '', details: '' };
 
-            const rows = cases.map((c, i) => {
+            // Bảng tổng hợp đơn giản (Word/NĐ30 — Times)
+            const td = (s, extra) => '<td style="border:1px solid #000;padding:4px 6px;'+(extra||'')+'">'+s+'</td>';
+            const th = (s) => '<th style="border:1px solid #000;padding:4px 6px;background:#f0f0f0;font-weight:bold">'+s+'</th>';
+
+            // Biểu tổng hợp text-only (không dùng class HTML PDF)
+            function plainMatrix(){
+                // tái sử dụng narrative đã có; matrix HTML từ PDF có class — chuyển border inline đơn giản
+                return (detailBlocks.matrix||'')
+                    .replace(/class="card"/g,'style="margin:12pt 0"')
+                    .replace(/<h2>/g,'<p style="font-weight:bold;margin:10pt 0 6pt">')
+                    .replace(/<\/h2>/g,'</p>')
+                    .replace(/class="right"/g,'style="text-align:right;border:1px solid #000;padding:4px"')
+                    .replace(/<th>/g,'<th style="border:1px solid #000;padding:4px;background:#eee">')
+                    .replace(/<td>/g,'<td style="border:1px solid #000;padding:4px">')
+                    .replace(/class="center"/g,'style="text-align:center;border:1px solid #000;padding:4px"');
+            }
+            function plainDetails(){
+                return (detailBlocks.details||'')
+                    .replace(/class="card"/g,'style="margin:12pt 0"')
+                    .replace(/<h2>/g,'<p style="font-weight:bold;margin:10pt 0 6pt">')
+                    .replace(/<\/h2>/g,'</p>')
+                    .replace(/class="right"/g,'style="text-align:right;border:1px solid #000;padding:3px 4px"')
+                    .replace(/class="center"/g,'style="text-align:center;border:1px solid #000;padding:3px 4px"')
+                    .replace(/<th>/g,'<th style="border:1px solid #000;padding:3px 4px;background:#eee;font-size:10.5pt">')
+                    .replace(/<td>/g,'<td style="border:1px solid #000;padding:3px 4px;font-size:10.5pt">')
+                    .replace(/style="font-size:10\.5px"/g,'style="font-size:10.5pt;border:1px solid #000;padding:3px 4px"')
+                    .replace(/style="color:#b45309;font-size:10px"/g,'style="color:#000;font-size:10pt"')
+                    .replace(/style="color:#64748b;font-size:10px"/g,'style="color:#000;font-size:10pt"');
+            }
+
+            // Danh sách tổng hợp cuối
+            let allRows = '';
+            cases.forEach((c,i)=>{
                 const m = getReportMetrics(c);
-                return `<tr>
-                    <td style="border:1px solid #000;padding:4px;text-align:center">${i + 1}</td>
-                    <td style="border:1px solid #000;padding:4px">${c.hoTen || ''}</td>
-                    <td style="border:1px solid #000;padding:4px">${c.hanhVi || ''}</td>
-                    <td style="border:1px solid #000;padding:4px;text-align:center">${m.cayGoLon || 0}</td>
-                    <td style="border:1px solid #000;padding:4px;text-align:center">${(m.khoiLuongM3 || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</td>
-                    <td style="border:1px solid #000;padding:4px;text-align:center">${(m.dienTichHa || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</td>
-                    <td style="border:1px solid #000;padding:4px;text-align:center">${(m.dienTichM2 || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}</td>
-                    <td style="border:1px solid #000;padding:4px">${(NHOM_MAP[c.nhomId] || {}).short || ''}</td>
-                </tr>`;
-            }).join('');
+                const ak = typeof actorKind==='function' ? actorKind(c) : '';
+                const akLab = ak==='other'?' (người khác)':(ak==='unknown'?' (chưa rõ)':'');
+                allRows += '<tr>'
+                    + td(String(i+1),'text-align:center')
+                    + td(esc(c.hoTen||''))
+                    + td(esc(c.doiTuong||'')+akLab)
+                    + td(esc(c.hanhVi||''))
+                    + td(esc(c.phanTruong||''))
+                    + td(fmt(m.cayGoLon||0,0),'text-align:right')
+                    + td(fmt(m.khoiLuongM3||0),'text-align:right')
+                    + td(fmt(m.dienTichM2||0)+' m² / '+fmt(m.dienTichHa||0)+' ha','text-align:right')
+                    + td(esc(c.ngayViPham||''),'text-align:center')
+                    + '</tr>';
+            });
 
-            const html = `
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-<head><meta charset="utf-8">
-<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+            const narrativeHtml = (detailBlocks.narrative||'')
+                .replace(/<br\s*\/?>/gi,'</p><p style="text-align:justify">');
+
+            const html = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Báo cáo QLBVR</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->
 <style>
-  body { font-family: 'Times New Roman', Times, serif; font-size: 13pt; color: #000; }
-  .qh { text-align: center; font-weight: bold; text-transform: uppercase; font-size: 13pt; }
-  .tn { text-align: center; font-weight: bold; font-size: 13pt; }
-  .line { border-bottom: 1px solid #000; width: 40%; margin: 2px auto 8px; }
-  table { border-collapse: collapse; width: 100%; font-size: 11pt; }
-  p { margin: 6px 0; text-align: justify; }
-  .center { text-align: center; }
-  .right { text-align: right; }
-  .bold { font-weight: bold; }
-  .mt { margin-top: 18px; }
-</style></head>
+  @page { size: A4; margin: 2cm 1.5cm 2cm 3cm; }
+  body { font-family: "Times New Roman", Times, serif; font-size: 13pt; color: #000; line-height: 1.3; }
+  p { margin: 6pt 0; text-align: justify; }
+  table { border-collapse: collapse; }
+  .national { font-weight: bold; text-transform: uppercase; font-size: 13pt; text-align: center; line-height: 1.3; }
+  .slogan { font-weight: bold; font-size: 13pt; text-align: center; }
+  .title { font-weight: bold; font-size: 14pt; text-align: center; margin: 16pt 0 6pt; text-transform: uppercase; }
+  .subtitle { text-align: center; font-size: 13pt; margin-bottom: 12pt; }
+</style>
+</head>
 <body>
-<table width="100%" style="border:none;margin-bottom:8px;border-collapse:collapse"><tr>
-  <td width="42%" style="border:none;vertical-align:top;text-align:center;font-family:'Times New Roman',Times,serif">
+
+<table width="100%" style="border:none;border-collapse:collapse;margin-bottom:8pt">
+<tr>
+  <td width="42%" style="border:none;vertical-align:top;text-align:center">
     <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.35">BQL RỪNG PHÒNG HỘ XUÂN LỘC</div>
-    <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.35;text-decoration:underline">PHÒNG LÂM NGHIỆP</div>
-    <div style="margin-top:10px;font-size:13pt">Số:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/BC-PLN</div>
+    <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.25;margin-top:2pt">PHÒNG LÂM NGHIỆP</div>
+    <div style="border-top:1px solid #000;width:55%;margin:4pt auto 0"></div>
+    <div style="margin-top:8pt;font-size:13pt">Số:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/BC-PLN</div>
   </td>
-  <td width="58%" style="border:none;vertical-align:top;text-align:center;font-family:'Times New Roman',Times,serif">
-    <div style="font-weight:bold;text-transform:uppercase;font-size:13pt;line-height:1.35">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
-    <div style="font-weight:bold;font-size:13pt;line-height:1.35;text-decoration:underline">Độc lập – Tự do – Hạnh phúc</div>
-    <div style="margin-top:10px;font-size:13pt;font-style:italic">Xuân Hòa, ngày ${dd} tháng ${mm} năm ${yyyy}</div>
+  <td width="58%" style="border:none;vertical-align:top;text-align:center">
+    <div class="national">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+    <div class="slogan">Độc lập - Tự do - Hạnh phúc</div>
+    <div style="border-top:1px solid #000;width:45%;margin:4pt auto 0"></div>
+    <div style="margin-top:8pt;font-style:italic;font-size:13pt">Xuân Lộc, ngày ${dd} tháng ${mm} năm ${yyyy}</div>
   </td>
-</tr></table>
-
-<p class="center bold" style="font-size:14pt;margin-top:22px;letter-spacing:1px">BÁO CÁO</p>
-<p class="center bold" style="font-size:13pt;margin-top:6px">Tình hình vi phạm công tác quản lý bảo vệ rừng (QLBVR)<br>trên lâm phận Ban Quản lý Rừng phòng hộ Xuân Lộc</p>
-<p class="center" style="font-style:italic;margin-top:4px">(Kỳ báo cáo: ${periodLabel})</p>
-<div style="width:80px;border-bottom:1.5px solid #000;margin:10px auto 16px"></div>
-
-<p style="text-align:left"><b>Kính gửi:</b> Giám đốc Ban Quản lý rừng phòng hộ Xuân Lộc.</p>
-
-<p>Căn cứ chức năng, nhiệm vụ được giao; căn cứ dữ liệu theo dõi vi phạm hợp đồng khoán lâm nghiệp,  kính báo cáo như sau:</p>
-
-<p class="bold">I. TÌNH HÌNH CHUNG</p>
-<p>Trong kỳ báo cáo (${periodLabel}), trên lâm phận BQLRPH Xuân Lộc ghi nhận <b>${cases.length}</b> vụ vi phạm liên quan công tác QLBVR, gây thiệt hại ước tính <b>${totalCay.toLocaleString('vi-VN')}</b> cây gỗ lớn (khoảng <b>${totalM3.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> m³); diện tích khai thác Điều/Keo lai/Cao su khoảng <b>${totalHa.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> ha; diện tích phá hoại/xây dựng/đào hồ khoảng <b>${totalM2.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}</b> m².</p>
-
-<p class="bold">II. PHÂN LOẠI THEO NHÓM XỬ LÝ</p>
-<p>Các hộ vi phạm được phân nhóm theo tiến độ xử lý hợp đồng (mời làm việc, chấp hành khắc phục, niêm yết thông báo, chấm dứt thu hồi HĐ) và theo dõi trên hệ thống báo cáo đồng bộ dữ liệu.</p>
-
-<p class="bold">III. DANH SÁCH CHI TIẾT</p>
-<table>
-  <thead>
-    <tr>
-      <th style="border:1px solid #000;padding:4px">STT</th>
-      <th style="border:1px solid #000;padding:4px">Hộ nhận khoán</th>
-      <th style="border:1px solid #000;padding:4px">Hành vi</th>
-      <th style="border:1px solid #000;padding:4px">Cây</th>
-      <th style="border:1px solid #000;padding:4px">m³</th>
-      <th style="border:1px solid #000;padding:4px">ha</th>
-      <th style="border:1px solid #000;padding:4px">m²</th>
-      <th style="border:1px solid #000;padding:4px">Nhóm xử lý</th>
-    </tr>
-  </thead>
-  <tbody>${rows}</tbody>
+</tr>
 </table>
 
-<p class="bold mt">IV. KIẾN NGHỊ</p>
-<p>1. Tiếp tục đôn đốc các hộ thuộc nhóm đang mời làm việc và đã niêm yết thông báo đến làm việc, cam kết khắc phục.</p>
-<p>2. Đối với trường hợp cố tình không chấp hành, đề nghị xem xét trình ban hành quyết định chấm dứt, thu hồi hợp đồng theo quy định.</p>
+<div class="title">BÁO CÁO</div>
+<div class="subtitle">Tình hình vi phạm công tác quản lý bảo vệ rừng<br>
+<i>(Kỳ báo cáo: ${esc(periodLabel)})</i></div>
+
+<p>Kính gửi: Giám đốc Ban Quản lý rừng phòng hộ Xuân Lộc.</p>
+
+<p>Thực hiện công tác theo dõi, tổng hợp vi phạm QLBVR trên lâm phần quản lý, Phòng Lâm nghiệp báo cáo kết quả trong kỳ <b>${esc(periodLabel)}</b> như sau:</p>
+
+<p><b>I. TỔNG HỢP KẾT QUẢ</b></p>
+<p style="text-align:justify">${narrativeHtml}</p>
+
+<p><b>II. BIỂU TỔNG HỢP THEO NHÓM HÀNH VI VÀ ĐỐI TƯỢNG THỰC HIỆN</b></p>
+${plainMatrix()}
+
+<p><b>III. DANH SÁCH CHI TIẾT THEO NHÓM</b></p>
+${plainDetails()}
+
+<p><b>IV. DANH SÁCH TỔNG HỢP HỒ SƠ TRONG KỲ LỌC</b></p>
+<table width="100%" style="border-collapse:collapse;font-size:11pt;margin-top:6pt">
+<thead><tr>
+${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${th('Hành vi')}${th('Phân trường')}${th('Cây')}${th('m³')}${th('Diện tích')}${th('Ngày')}
+</tr></thead>
+<tbody>${allRows || '<tr>'+td('Không có hồ sơ','text-align:center')+'</tr>'}</tbody>
+</table>
+
+<p><b>V. ĐỀ XUẤT, KIẾN NGHỊ</b></p>
+<p>1. Tiếp tục đôn đốc các trường hợp chưa chấp hành đến làm việc, khắc phục hậu quả theo quy định.</p>
+<p>2. Đối với các vụ đủ điều kiện, phối hợp xử lý theo thẩm quyền hoặc chuyển cơ quan chức năng thụ lý.</p>
 <p>3. Tăng cường tuần tra, phối hợp Kiểm lâm và chính quyền địa phương để ngăn chặn vi phạm mới.</p>
 
-<p>Trên đây là báo cáo tình hình vi phạm công tác QLBVR kỳ <b>${periodLabel}</b>, kính trình Giám đốc Ban xem xét, chỉ đạo./.</p>
+<p>Trên đây là báo cáo tình hình vi phạm công tác QLBVR kỳ <b>${esc(periodLabel)}</b>, kính trình Giám đốc Ban xem xét, chỉ đạo./.</p>
 
-<table width="100%" style="border:none;margin-top:28px"><tr>
-  <td width="50%" style="border:none;text-align:center;vertical-align:top">
+<table width="100%" style="border:none;margin-top:24pt;border-collapse:collapse">
+<tr>
+  <td width="45%" style="border:none;vertical-align:top">
     <div style="font-style:italic">Nơi nhận:</div>
-    <div style="text-align:left;display:inline-block;font-size:11pt;margin-top:4px">
+    <div style="font-size:11pt;margin-top:4pt">
       - Như trên;<br>
       - Lưu: VT, PLN.
     </div>
   </td>
-  <td width="50%" style="border:none;text-align:center;vertical-align:top">
-    <div class="bold">KT. TRƯỞNG PHÒNG</div>
-    <div class="bold">PHÓ TRƯỞNG PHÒNG</div>
-    <div style="font-style:italic;margin-top:4px">(Ký, ghi rõ họ tên)</div>
-    <div style="height:70px"></div>
+  <td width="55%" style="border:none;text-align:center;vertical-align:top">
+    <div style="font-weight:bold">KT. TRƯỞNG PHÒNG</div>
+    <div style="font-weight:bold">PHÓ TRƯỞNG PHÒNG</div>
+    <div style="height:72pt"></div>
   </td>
-</tr></table>
+</tr>
+</table>
+
 </body></html>`;
 
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const blob = new Blob(['﻿', html], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `BaoCao_QLBVR_BQLRPH_XuanLoc_${yyyy}${mm}${dd}.doc`;
+            a.download = 'BaoCao_QLBVR_BQLRPH_XuanLoc_'+yyyy+mm+dd+'.doc';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            if (typeof showToast === 'function') showToast('Đã tải file Word (mẫu NĐ 30/2020)!');
+            if (typeof showToast === 'function') showToast('Đã tải file Word (thể thức NĐ 30)');
         }
+
 
 
         function exportStatsExcel() {
@@ -4149,7 +4236,241 @@ function toggleAdvFilter() {
             return m;
         }
 
-function exportStatsReport() {
+
+        function buildDetailedStatsBlocks(cases, esc, fmt){
+            const land=[], treeKT=[], treePH=[], other=[];
+            let nSelf=0,nOther=0,nUnk=0;
+            cases.forEach(c=>{
+                const m=getReportMetrics(c);
+                const ak=actorKind(c);
+                if(ak==='self') nSelf++; else if(ak==='other') nOther++; else nUnk++;
+                const row={c,m,ak};
+                if(m.isXayDung||m.isDaoMuc) land.push(row);
+                else if(m.isKhaiThac) treeKT.push(row);
+                else if(m.isPhaHoai) treePH.push(row);
+                else other.push(row);
+            });
+            function splitActor(arr){
+                const o={self:[],other:[],unknown:[]};
+                arr.forEach(r=>o[r.ak]?o[r.ak].push(r):o.unknown.push(r));
+                return o;
+            }
+            function sumM2(arr){ return arr.reduce((s,r)=>s+(r.m.dienTichM2||0),0); }
+            function sumHa(arr){ return arr.reduce((s,r)=>s+(r.m.dienTichHa||0),0); }
+            function sumCay(arr){ return arr.reduce((s,r)=>s+(r.m.cayGoLon||0),0); }
+            function sumM3(arr){ return arr.reduce((s,r)=>s+(r.m.khoiLuongM3||0),0); }
+            function sumDieu(arr){ return arr.reduce((s,r)=>s+(r.m.haDieu||0),0); }
+            function sumKeo(arr){ return arr.reduce((s,r)=>s+(r.m.haKeo||0),0); }
+            function sumCaoSu(arr){ return arr.reduce((s,r)=>s+(r.m.haCaoSu||0),0); }
+
+            const landS=splitActor(land);
+            const xay=land.filter(r=>r.m.isXayDung);
+            const dao=land.filter(r=>r.m.isDaoMuc);
+            const xayS=splitActor(xay), daoS=splitActor(dao);
+
+            // Khai thác: phân LOẠI MUTUALLY EXCLUSIVE theo từng VỤ (1 hồ sơ = 1 vụ)
+            // - chỉ gỗ lớn · chỉ cây trồng · cả hai (gỗ lớn + điều/keo/cao su)
+            const hasGo = r => (r.m.cayGoLon||0)>0 || (r.m.khoiLuongM3||0)>0;
+            const hasTrong = r => ((r.m.haDieu||0)+(r.m.haKeo||0)+(r.m.haCaoSu||0))>0;
+            const ktChiGo = treeKT.filter(r => hasGo(r) && !hasTrong(r));
+            const ktChiTrong = treeKT.filter(r => hasTrong(r) && !hasGo(r));
+            const ktCaHai = treeKT.filter(r => hasGo(r) && hasTrong(r));
+            const ktKhac = treeKT.filter(r => !hasGo(r) && !hasTrong(r)); // khai thác ghi nhận nhưng chưa tách số liệu
+            const ktGoS = splitActor(ktChiGo);
+            const ktTrongS = splitActor(ktChiTrong);
+            const ktCaHaiS = splitActor(ktCaHai);
+            const phS = splitActor(treePH);
+            // Tổng vụ xâm hại cây = từng hồ sơ 1 lần (không cộng chồng gỗ + trồng)
+            const nXamHaiCay = treeKT.length + treePH.length;
+
+            // Narrative
+            let p='';
+            p+='Trong kỳ báo cáo có <b>'+cases.length+'</b> vụ vi phạm';
+            p+=', trong đó <b>'+land.length+'</b> vụ liên quan đất đai / xây dựng – đào múc hồ';
+            p+=' (diện tích <b>'+fmt(sumM2(land))+'</b> m²)';
+            p+=' và <b>'+nXamHaiCay+'</b> vụ liên quan tài nguyên cây rừng';
+            p+='.<br><br>';
+
+            p+='<b>1. Vi phạm về đất đai, tài nguyên đất</b> — <b>'+land.length+'</b> vụ'
+              +' (diện tích <b>'+fmt(sumM2(land))+'</b> m²).<br>';
+            p+='• Xây dựng công trình: <b>'+xay.length+'</b> vụ ('+fmt(sumM2(xay))+' m²) — '
+              +actorPhrase(xayS.self.length, xayS.other.length, xayS.unknown.length)+'.<br>';
+            p+='• Đào múc hồ: <b>'+dao.length+'</b> vụ ('+fmt(sumM2(dao))+' m²) — '
+              +actorPhrase(daoS.self.length, daoS.other.length, daoS.unknown.length)+'.<br><br>';
+
+            p+='<b>2. Xâm hại cây rừng</b> — <b>'+nXamHaiCay+'</b> vụ (mỗi hồ sơ tính 1 vụ; vừa gỗ lớn vừa cây trồng tính 1 vụ kết hợp).<br>';
+            p+='• Chỉ tự ý khai thác cây gỗ lớn (dầu, sao, xà cừ…): <b>'+ktChiGo.length+'</b> vụ'
+              +' ('+fmt(sumCay(ktChiGo),0)+' cây · '+fmt(sumM3(ktChiGo))+' m³) — '
+              +actorPhrase(ktGoS.self.length, ktGoS.other.length, ktGoS.unknown.length)+'.<br>';
+            p+='• Chỉ tự ý khai thác cây phụ trợ, công nghiệp (điều, keo lai, cao su…): <b>'+ktChiTrong.length+'</b> vụ'
+              +' (Điều '+fmt(sumDieu(ktChiTrong))+' ha · Keo '+fmt(sumKeo(ktChiTrong))+' ha · Cao su '+fmt(sumCaoSu(ktChiTrong))+' ha) — '
+              +actorPhrase(ktTrongS.self.length, ktTrongS.other.length, ktTrongS.unknown.length)+'.<br>';
+            p+='• Tự ý khai thác <b>cả gỗ lớn và cây phụ trợ/công nghiệp</b> trong cùng một vụ: <b>'+ktCaHai.length+'</b> vụ'
+              +' (gỗ: '+fmt(sumCay(ktCaHai),0)+' cây · '+fmt(sumM3(ktCaHai))+' m³; '
+              +'Điều '+fmt(sumDieu(ktCaHai))+' · Keo '+fmt(sumKeo(ktCaHai))+' · Cao su '+fmt(sumCaoSu(ktCaHai))+' ha) — '
+              +actorPhrase(ktCaHaiS.self.length, ktCaHaiS.other.length, ktCaHaiS.unknown.length)+'.<br>';
+            if(ktKhac.length){
+              p+='• Khai thác khác / chưa tách số liệu gỗ–trồng: <b>'+ktKhac.length+'</b> vụ.<br>';
+            }
+            // Phá hoại: không quy kết "hộ tự thực hiện" — đa số không phát hiện đối tượng
+            // Chỉ phân: đã ghi nhận đối tượng (other) vs không xác định; self coi như chưa đủ cơ sở quy kết → gộp unknown nếu chỉ trùng tên hộ
+            const phIdent = phS.other.length; // chỉ người khác khác hộ mới coi là xác định được đối tượng gây hại
+            const phUnk = phS.self.length + phS.unknown.length; // trùng tên hộ hoặc trống → không khẳng định đối tượng phá hoại
+            p+='• Phá hoại cây rừng trồng: <b>'+treePH.length+'</b> vụ'
+              +' ('+fmt(sumCay(treePH),0)+' cây · '+fmt(sumM2(treePH))+' m²)';
+            if(phIdent>0) p+=' — xác định được đối tượng <b>'+phIdent+'</b> vụ';
+            if(phUnk>0) p+=(phIdent>0?'; ':' — ')+'không xác định đối tượng <b>'+phUnk+'</b> vụ';
+            p+='.<br><br>';
+
+            // Tổng hợp: với phá hoại, self được tính vào unknown cho thống kê đối tượng gây hại
+            let nSelf2=0,nOther2=0,nUnk2=0;
+            cases.forEach(c=>{
+              const m=getReportMetrics(c);
+              let k=actorKind(c);
+              if(m.isPhaHoai && k==='self') k='unknown';
+              if(k==='self') nSelf2++; else if(k==='other') nOther2++; else nUnk2++;
+            });
+            p+='<b>Tổng hợp đối tượng thực hiện hành vi (mỗi hồ sơ 1 lần):</b> '
+              +actorPhrase(nSelf2, nOther2, nUnk2)+'.';
+
+            function detailTableBody(arr){
+                if(!arr||!arr.length) return '<p style="font-size:12px;color:#64748b;margin:4px 0 10px">Không có hồ sơ.</p>';
+                let h='<table><thead><tr>'
+                  +'<th class="center">STT</th><th>Hộ nhận khoán</th><th>Đối tượng thực hiện</th><th>Hành vi</th>'
+                  +'<th>Phân trường</th><th class="right">Cây</th><th class="right">m³</th><th class="right">m²/ha</th><th class="center">Ngày</th>'
+                  +'</tr></thead><tbody>';
+                arr.forEach((r,i)=>{
+                    const c=r.c, m=r.m;
+                    const dt=c.doiTuong||'—';
+                    const area = (m.isXayDung||m.isDaoMuc||m.isPhaHoai)
+                      ? (fmt(m.dienTichM2)+' m²')
+                      : ((m.dienTichHa?fmt(m.dienTichHa)+' ha':'—'));
+                    h+='<tr><td class="center">'+(i+1)+'</td>'
+                      +'<td><b>'+esc(c.hoTen||'—')+'</b></td>'
+                      +'<td style="font-size:10.5px">'+esc(dt)+'</td>'
+                      +'<td style="font-size:10.5px">'+esc(c.hanhVi||'—')+'</td>'
+                      +'<td>'+esc(c.phanTruong||'—')+'</td>'
+                      +'<td class="right">'+fmt(m.cayGoLon||0,0)+'</td>'
+                      +'<td class="right">'+fmt(m.khoiLuongM3||0)+'</td>'
+                      +'<td class="right">'+area+'</td>'
+                      +'<td class="center">'+esc(c.ngayViPham||'—')+'</td></tr>';
+                });
+                h+='</tbody></table>';
+                return h;
+            }
+            function h2(s){ return '<h2 style="margin:18px 0 8px;font-size:14px;font-weight:800;color:#0f172a;border-bottom:2px solid #059669;padding-bottom:4px">'+s+'</h2>'; }
+            function h3(s){ return '<h3 style="margin:12px 0 6px;font-size:13px;font-weight:800;color:#0f172a">'+s+'</h3>'; }
+            function h4(s){ return '<h4 style="margin:8px 0 4px;font-size:12.5px;font-weight:700;color:#334155">'+s+'</h4>'; }
+            function subActor(splitObj, labelSelf, labelOther, labelUnk){
+                let html='';
+                const blocks=[];
+                if(splitObj.self && splitObj.self.length) blocks.push({t:labelSelf, a:splitObj.self});
+                if(splitObj.other && splitObj.other.length) blocks.push({t:labelOther, a:splitObj.other});
+                if(splitObj.unknown && splitObj.unknown.length) blocks.push({t:labelUnk, a:splitObj.unknown});
+                if(!blocks.length) return '<p style="font-size:12px;color:#64748b;margin:4px 0 10px">Không có hồ sơ.</p>';
+                blocks.forEach((b,i)=>{
+                    const letter=String.fromCharCode(65+i);
+                    html+=h4(letter+') '+b.t+' ('+b.a.length+')');
+                    html+=detailTableBody(b.a);
+                });
+                return html;
+            }
+
+            
+            // Biểu tổng hợp theo nhóm hành vi × đối tượng
+            let matrix='<div class="card"><h2>Biểu tổng hợp theo nhóm hành vi và đối tượng thực hiện</h2>'
+              +'<table><thead><tr><th>Nhóm hành vi</th><th class="right">Tổng vụ</th>'
+              +'<th class="right">Hộ tự thực hiện</th><th class="right">Người khác</th><th class="right">Không xác định</th>'
+              +'<th class="right">Khối lượng / diện tích</th></tr></thead><tbody>';
+            function mrow(lab, arr, metric){
+                const s=splitActor(arr);
+                matrix+='<tr><td>'+esc(lab)+'</td><td class="right"><b>'+arr.length+'</b></td>'
+                  +'<td class="right">'+s.self.length+'</td><td class="right">'+s.other.length+'</td><td class="right">'+s.unknown.length+'</td>'
+                  +'<td class="right">'+metric+'</td></tr>';
+            }
+            mrow('Xây dựng công trình', xay, fmt(sumM2(xay))+' m²');
+            mrow('Đào múc hồ', dao, fmt(sumM2(dao))+' m²');
+            mrow('Chỉ khai thác gỗ lớn', ktChiGo, fmt(sumCay(ktChiGo),0)+' cây · '+fmt(sumM3(ktChiGo))+' m³');
+            mrow('Chỉ khai thác cây phụ trợ, công nghiệp', ktChiTrong, 'Đ '+fmt(sumDieu(ktChiTrong))+' · K '+fmt(sumKeo(ktChiTrong))+' · CS '+fmt(sumCaoSu(ktChiTrong))+' ha');
+            mrow('Khai thác gỗ lớn + cây phụ trợ/công nghiệp (1 vụ)', ktCaHai, 'Gỗ '+fmt(sumCay(ktCaHai),0)+'cây/'+fmt(sumM3(ktCaHai))+'m³; Đ'+fmt(sumDieu(ktCaHai))+' K'+fmt(sumKeo(ktCaHai))+' CS'+fmt(sumCaoSu(ktCaHai))+' ha');
+            ;(function(){
+                const s={self:0, other:phS.other.length, unknown:phS.self.length+phS.unknown.length};
+                matrix+='<tr><td>'+esc('Phá hoại cây rừng')+'</td><td class="right"><b>'+treePH.length+'</b></td>'
+                  +'<td class="right">0</td><td class="right">'+s.other+'</td><td class="right">'+s.unknown+'</td>'
+                  +'<td class="right">'+fmt(sumCay(treePH),0)+' cây · '+fmt(sumM2(treePH))+' m²</td></tr>';
+            })();
+            if(other.length) mrow('Hành vi khác', other, '—');
+            matrix+='<tr style="font-weight:800;background:#f1f5f9"><td>Tổng</td><td class="right">'+cases.length+'</td>'
+              +'<td class="right">'+nSelf+'</td><td class="right">'+nOther+'</td><td class="right">'+nUnk+'</td><td class="right">—</td></tr>';
+            matrix+='</tbody></table></div>';
+
+let details = '<div class="card">';
+            details += h2('BIỂU CHI TIẾT VI PHẠM TRÊN ĐẤT NHẬN KHOÁN');
+
+            // ===== I. ĐẤT ĐAI =====
+            details += h2('I. VI PHẠM VỀ ĐẤT ĐAI, TÀI NGUYÊN');
+
+            details += h3('1. Xây dựng công trình trên đất nhận khoán ('+xay.length+')');
+            details += subActor(xayS,
+                'Xây dựng công trình trên đất nhận khoán do hộ nhận khoán trực tiếp thực hiện hành vi',
+                'Xây dựng công trình trên đất nhận khoán do người khác thực hiện hành vi',
+                'Xây dựng công trình trên đất nhận khoán — không xác định đối tượng');
+
+            details += h3('2. Đào múc hồ trên đất nhận khoán ('+dao.length+')');
+            details += subActor(daoS,
+                'Đào múc hồ trên đất nhận khoán do hộ nhận khoán trực tiếp thực hiện hành vi',
+                'Đào múc hồ trên đất nhận khoán do người khác thực hiện hành vi',
+                'Đào múc hồ trên đất nhận khoán — không xác định đối tượng');
+
+            // ===== II. CÂY RỪNG =====
+            details += h2('II. VI PHẠM XÂM HẠI CÂY RỪNG');
+
+            details += h3('1. Tự ý khai thác cây gỗ lớn trên đất nhận khoán ('+ktChiGo.length+')');
+            details += subActor(ktGoS,
+                'Tự ý khai thác cây gỗ lớn trên đất nhận khoán do hộ nhận khoán trực tiếp thực hiện hành vi',
+                'Tự ý khai thác cây gỗ lớn trên đất nhận khoán do người khác thực hiện hành vi',
+                'Tự ý khai thác cây gỗ lớn trên đất nhận khoán — không xác định đối tượng');
+
+            details += h3('2. Tự ý khai thác cây phụ trợ, công nghiệp trên đất nhận khoán ('+ktChiTrong.length+')');
+            details += subActor(ktTrongS,
+                'Tự ý khai thác cây phụ trợ, công nghiệp trên đất nhận khoán do hộ nhận khoán trực tiếp thực hiện hành vi',
+                'Tự ý khai thác cây phụ trợ, công nghiệp trên đất nhận khoán do người khác thực hiện hành vi',
+                'Tự ý khai thác cây phụ trợ, công nghiệp trên đất nhận khoán — không xác định đối tượng');
+
+            details += h3('3. Tự ý khai thác cây gỗ lớn và cây phụ trợ/công nghiệp trên đất nhận khoán ('+ktCaHai.length+')');
+            details += subActor(ktCaHaiS,
+                'Tự ý khai thác gỗ lớn và cây phụ trợ/công nghiệp do hộ nhận khoán trực tiếp thực hiện hành vi',
+                'Tự ý khai thác gỗ lớn và cây phụ trợ/công nghiệp do người khác thực hiện hành vi',
+                'Tự ý khai thác gỗ lớn và cây phụ trợ/công nghiệp — không xác định đối tượng');
+
+            if(ktKhac.length){
+                details += h3('4. Khai thác khác / chưa tách số liệu ('+ktKhac.length+')');
+                details += detailTableBody(ktKhac);
+            }
+
+            details += h3((ktKhac.length? '5. ':'4. ')+'Phá hoại cây rừng trồng trên đất nhận khoán ('+treePH.length+')');
+            ;(function(){
+                const idArr = phS.other;
+                const unkArr = phS.self.concat(phS.unknown);
+                let html='';
+                const blocks=[];
+                if(idArr.length) blocks.push({t:'Phá hoại cây rừng trồng — xác định được đối tượng thực hiện hành vi', a:idArr});
+                if(unkArr.length) blocks.push({t:'Phá hoại cây rừng trồng — không xác định đối tượng', a:unkArr});
+                if(!blocks.length) html='<p style="font-size:12px;color:#64748b;margin:4px 0 10px">Không có hồ sơ.</p>';
+                blocks.forEach((b,i)=>{
+                    html+=h4(String.fromCharCode(65+i)+') '+b.t+' ('+b.a.length+')');
+                    html+=detailTableBody(b.a);
+                });
+                details += html;
+            })();
+
+            details += '</div>';
+
+            return { narrative:p, matrix:matrix, details:details, nSelf,nOther,nUnk };
+        }
+
+
+        function exportStatsReport() {
             const cases = getFilteredCases();
             const esc = (s) => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
             const fmt = (n, d) => {
@@ -4185,6 +4506,9 @@ function exportStatsReport() {
             if (fCQ) filterTags.push({g:'Cơ quan thụ lý', t:fCQ});
             if (fKQ) filterTags.push({g:'Kết quả xử lý', t:fKQ});
             if (fHV) filterTags.push({g:'Hành vi', t:fHV});
+            if (document.getElementById('statsFilterDoiTuong')?.value==='self') filterTags.push({g:'Đối tượng', t:'Hộ tự thực hiện'});
+            if (document.getElementById('statsFilterDoiTuong')?.value==='other') filterTags.push({g:'Đối tượng', t:'Người khác thực hiện'});
+            if (document.getElementById('statsFilterDoiTuong')?.value==='unknown') filterTags.push({g:'Đối tượng', t:'Không xác định đối tượng'});
             if (fNhom) {
                 const nh = (typeof NHOM_MAP!=='undefined' && NHOM_MAP[fNhom]) ? (NHOM_MAP[fNhom].short||NHOM_MAP[fNhom].ten) : ('Nhóm '+fNhom);
                 filterTags.push({g:'Nhóm HĐ khoán', t:nh});
@@ -4255,6 +4579,14 @@ function exportStatsReport() {
                 : '';
 
             const noteBits = [];
+            const detailBlocks = buildDetailedStatsBlocks(cases, esc, fmt);
+            const actorTag = (function(){
+                const v=document.getElementById('statsFilterDoiTuong')?.value||'';
+                if(v==='self') return ' · Chỉ hộ tự thực hiện';
+                if(v==='other') return ' · Chỉ người khác thực hiện';
+                if(v==='unknown') return ' · Chỉ không xác định đối tượng';
+                return '';
+            })();
 
             const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>BC QLBVR — ${esc(periodLabel)}</title>
 <style>
@@ -4310,6 +4642,12 @@ td{padding:7px 8px;border-top:1px solid #f1f5f9;vertical-align:top}
   <div class="kpi"><div class="l">XD / Đào hồ</div><div class="v" style="color:#d97706">${xayDungVu+daoMucVu} <span style="font-size:13px">vụ</span></div><div class="s">XD ${xayDungVu} vụ (${fmt(xayM2)} m²) · Đào hồ ${daoMucVu} vụ (${fmt(daoM2)} m²)</div></div>
 </div>
 
+<div class="card"><h2>Tổng hợp kết quả theo kỳ lọc</h2>
+  <div style="font-size:12.5px;line-height:1.65;color:#0f172a">${detailBlocks.narrative}</div>
+</div>
+
+${detailBlocks.matrix}
+
 <div class="grid2">
   <div class="card"><h2>Sơ đồ theo hành vi</h2>
     ${Object.entries(hvRows).sort((a,b)=>b[1].n-a[1].n).map(([k,v],i)=>barRow(k,v.n,maxHV,colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
@@ -4349,7 +4687,11 @@ td{padding:7px 8px;border-top:1px solid #f1f5f9;vertical-align:top}
   <tbody>${Object.entries(kqRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
 </div>
 
-<div class="card"><h2>Chi tiết hồ sơ trong kỳ lọc</h2>
+${detailBlocks.details}
+
+
+
+<div class="card"><h2>Danh sách tổng hợp theo kỳ lọc</h2>
 <table><thead><tr>
 <th class="center">STT</th><th>Hộ</th><th>Hành vi</th><th>Phân trường</th><th>TK</th>
 <th>Cơ quan thụ lý</th><th>KQ xử lý PL</th>
