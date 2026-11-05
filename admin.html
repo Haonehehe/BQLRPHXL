@@ -1,6 +1,56 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
+<script>
+/* BQLRPH Auth Guard (head) — Quản trị Admin */
+(function(){
+  try{ document.documentElement.classList.add('bqlrph-wait'); }catch(e){}
+  var SESS_KEY='bqlrph_session_v1';
+  var MOD='admin';
+  var LABEL='Quản trị Admin';
+  function getSession(){
+    try{
+      var s=sessionStorage.getItem(SESS_KEY);
+      if(s) return JSON.parse(s);
+      s=localStorage.getItem(SESS_KEY);
+      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
+    }catch(e){}
+    return null;
+  }
+  function canAccess(){
+    if(MOD==='pdf') return true;
+    var s=getSession();
+    if(!s) return false;
+    if(s.role==='admin') return true;
+    if(MOD==='admin') return false;
+    return Array.isArray(s.perms) && s.perms.indexOf(MOD)>=0;
+  }
+  var s=getSession();
+  if(!canAccess()){
+    try{ window.stop(); }catch(e){}
+    var msg, title;
+    if(!s){
+      title='Cần đăng nhập';
+      msg='Module <b>'+LABEL+'</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền <b>'+MOD+'</b>. Không thể bỏ qua bằng link trực tiếp.';
+    } else {
+      title='Chưa được cấp quyền';
+      msg='Bạn đã đăng nhập nhưng <b>chưa được cấp quyền</b> module <b>'+LABEL+'</b> (<code>'+MOD+'</code>). Liên hệ admin để cấp quyền, sau đó tải lại trang.';
+    }
+    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">'+title+'</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">'+msg+'</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu</a></div></body></html>';
+    document.open();
+    document.write(gate);
+    document.close();
+    return;
+  }
+  try{
+    document.documentElement.classList.remove('bqlrph-wait');
+    var cs=document.getElementById('bqlrph-lockcss');
+    if(cs) cs.remove();
+  }catch(e){}
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin · BQLRPH Xuân Lộc</title>
