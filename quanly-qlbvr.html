@@ -725,6 +725,9 @@ html.dark .qlbvr-sep{background:#334155!important}
                     <button type="button" onclick="exportWordND30()" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:none;cursor:pointer;font:600 12px Inter,system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 4px 14px rgba(59,130,246,.35)">
                         <i class="fa-solid fa-file-word"></i> Word NĐ 30
                     </button>
+                    <button type="button" onclick="printAllCaseDetails()" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:none;cursor:pointer;font:600 12px Inter,system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,#0f766e,#115e59);box-shadow:0 4px 14px rgba(15,118,110,.35)">
+                        <i class="fa-solid fa-layer-group"></i> Xuất tất cả phiếu
+                    </button>
                     </div>
                 </div>
             </div>
@@ -753,6 +756,16 @@ html.dark .qlbvr-sep{background:#334155!important}
                         <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-tree text-emerald-500 mr-1.5"></i>Thống kê theo Loài cây</h3>
                     </div>
                     <div class="overflow-x-auto"><table class="w-full text-xs" id="statsLoaiCayTable"><thead></thead><tbody></tbody></table></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
+                <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between gap-2">
+                    <h3 class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-user-group text-rose-500 mr-1.5"></i>Tổng hợp đối tượng vi phạm</h3>
+                    <span class="text-[10px] text-slate-400" id="statsDoiTuongMeta"></span>
+                </div>
+                <div class="overflow-x-auto max-h-80 custom-scrollbar">
+                    <table class="w-full text-xs" id="statsDoiTuongTable"><thead></thead><tbody></tbody></table>
                 </div>
             </div>
 
@@ -1677,71 +1690,179 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
             if (!qs || qs.classList.contains('hidden')) document.body.style.overflow = '';
             else document.body.style.overflow = 'hidden';
         }
+
+        function buildCasePhieuHtml(c, opts){
+            opts = opts || {};
+            const m = getReportMetrics(c);
+            const meta = NHOM_MAP[c.nhomId] || NHOM_MAP[1];
+            const today = opts.today || new Date().toLocaleDateString('vi-VN');
+            const ak = typeof actorKind === 'function' ? actorKind(c) : '';
+            const akLb = typeof actorKindLabel === 'function' ? actorKindLabel(ak) : '';
+            const esc = (v) => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const cell = (lb, v) => {
+                if (v == null || v === '' || v === '—') return '';
+                return `<tr><td class="lb">${esc(lb)}</td><td class="vl">${esc(v)}</td></tr>`;
+            };
+            const speciesRows = (c.species || []).filter(s => s && (s.loai || s.soLuong || s.khoiLuongM3 || s.dienTichHa || s.dienTichM2)).map((s, i) => {
+                return `<tr>
+                  <td class="c">${i+1}</td>
+                  <td>${esc(s.loai||'—')}</td>
+                  <td class="r">${s.soLuong!=null&&s.soLuong!==''?esc(fmt(s.soLuong,0)):'—'}</td>
+                  <td class="r">${s.khoiLuongM3?esc(fmt(s.khoiLuongM3,2)):'—'}</td>
+                  <td class="r">${s.dienTichHa?esc(fmt(s.dienTichHa,2)):'—'}</td>
+                  <td class="r">${s.dienTichM2?esc(fmt(s.dienTichM2,1)):'—'}</td>
+                </tr>`;
+            }).join('');
+            const hoSoUrl = buildHoSoUrl(c.linkHoSo || '', c.tuiHoSo);
+            const qrUrl = hoSoUrl ? ('https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=6&data=' + encodeURIComponent(hoSoUrl)) : '';
+            const loc = [c.tieuKhu && ('TK ' + c.tieuKhu), c.khoanh && ('Khoảnh ' + c.khoanh), c.lo && ('Lô ' + c.lo), c.phanTruong, c.xa].filter(Boolean).join(' · ');
+            return `<div class="sheet${opts.pageBreak ? ' break' : ''}">
+  <div class="hd">
+    <div class="hd-left">
+      <div class="cq">Ban Quản lý rừng phòng hộ Xuân Lộc</div>
+      <div class="tt">Phiếu thông tin hồ sơ vi phạm</div>
+      <div class="sub">In ngày ${esc(today)}${c.ngayViPham ? (' · Biên bản: ' + esc(c.ngayViPham)) : ''}</div>
+    </div>
+    <div class="qr">
+      ${qrUrl ? `<img src="${qrUrl}" alt="QR hồ sơ"/><div class="ql">Quét mở hồ sơ điện tử${c.tuiHoSo ? '<br>'+esc(c.tuiHoSo) : ''}</div>` : `<div class="ql muted">Chưa có link/túi hồ sơ</div>`}
+    </div>
+  </div>
+  <div class="sec">1. Hộ nhận khoán &amp; đối tượng</div>
+  <table class="info">
+    ${cell('Hộ nhận khoán', c.hoTen)}
+    ${cell('Đối tượng thực hiện', c.doiTuong || '—')}
+    ${cell('Phân loại đối tượng', akLb)}
+    ${cell('Địa chỉ', c.diaChi)}
+    ${cell('Vị trí', loc)}
+    ${cell('Nhóm xử lý', meta.ten || meta.short)}
+    ${cell('Hành vi', c.hanhVi)}
+  </table>
+  <div class="sec">2. Nguồn gốc đất &amp; hợp đồng</div>
+  <div class="block">${esc(c.nguonGocDat || '—')}</div>
+  <div class="two">
+    <div>
+      <div style="font-weight:700;font-size:10.5pt;margin:4px 0 2px">Hợp đồng giao khoán</div>
+      <table class="info">
+        ${cell('Số HĐ', c.soHDKhoan || '—')}
+        ${cell('Ngày ký', c.ngayKyHDKhoan || '')}
+        ${cell('Diện tích', c.dienTichHDKhoan ? (c.dienTichHDKhoan + ' ha') : '')}
+      </table>
+    </div>
+    <div>
+      <div style="font-weight:700;font-size:10.5pt;margin:4px 0 2px">Hợp đồng trồng rừng</div>
+      <table class="info">
+        ${cell('Số HĐ', c.soHDTrongRung || '—')}
+        ${cell('Ngày ký', c.ngayKyHDTrongRung || '')}
+        ${cell('Diện tích', c.dienTichHDTrongRung ? (c.dienTichHDTrongRung + ' ha') : '')}
+      </table>
+    </div>
+  </div>
+  <div class="sec">3. Thiệt hại</div>
+  <table class="grid">
+    <thead><tr><th>Chỉ tiêu</th><th>Cây gỗ lớn</th><th>Khối lượng (m³)</th><th>Diện tích (ha)</th><th>Diện tích (m²)</th></tr></thead>
+    <tbody><tr>
+      <td>Tổng hợp</td>
+      <td class="r">${esc(fmt(m.cayGoLon||0,0))}</td>
+      <td class="r">${esc(fmt(m.khoiLuongM3||0,2))}</td>
+      <td class="r">${esc(fmt(m.dienTichHa||0,2))}</td>
+      <td class="r">${esc(fmt(m.dienTichM2||0,1))}</td>
+    </tr></tbody>
+  </table>
+  ${speciesRows ? `<table class="grid"><thead><tr><th class="c">STT</th><th>Loài / loại cây</th><th class="r">Số cây</th><th class="r">m³</th><th class="r">ha</th><th class="r">m²</th></tr></thead><tbody>${speciesRows}</tbody></table>` : ''}
+  <div class="sec">4. Tình trạng &amp; xử lý</div>
+  <div class="block"><b>Tình trạng:</b> ${esc(c.tinhTrang || '—')}</div>
+  <table class="info">
+    ${cell('Cơ quan thụ lý', (typeof normalizeAgency==='function'?normalizeAgency(c.coQuanThuLy):c.coQuanThuLy) || '')}
+    ${cell('Kết quả xử lý PL', (typeof normalizeKetQuaPL==='function'?normalizeKetQuaPL(c.ketQuaXuLyPL):c.ketQuaXuLyPL) || '')}
+  </table>
+  <div class="foot">
+    <div class="box"><div class="role">Người tổng hợp</div><div class="pad"></div></div>
+    <div class="box"><div class="role">Phòng Lâm nghiệp</div><div class="pad"></div></div>
+  </div>
+</div>`;
+        }
+
+        function casePhieuStyles(){
+            return `@page{size:A4;margin:12mm 12mm 12mm 14mm}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"Times New Roman",Times,serif;font-size:11pt;color:#000;line-height:1.35;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:100%;max-width:180mm;margin:0 auto}
+.sheet.break{page-break-after:always;break-after:page}
+.sheet.break:last-child{page-break-after:auto;break-after:auto}
+.hd{display:grid;grid-template-columns:1fr 32mm;gap:8px;align-items:start;border-bottom:1.5pt solid #000;padding-bottom:6px;margin-bottom:8px}
+.hd-left{text-align:center}
+.cq{font-size:10.5pt;text-transform:uppercase;font-weight:700;letter-spacing:.02em}
+.tt{font-size:13.5pt;font-weight:700;text-transform:uppercase;margin:4px 0 2px}
+.sub{font-size:9.5pt;font-style:italic}
+.qr{text-align:center}
+.qr img{width:28mm;height:28mm;display:block;margin:0 auto;border:0.5pt solid #999}
+.qr .ql{font-size:8pt;margin-top:2px;line-height:1.2}
+.sec{margin:7px 0 5px;font-size:11pt;font-weight:700;text-transform:uppercase;border-bottom:0.6pt solid #333;padding-bottom:2px}
+table.info{width:100%;border-collapse:collapse;margin:2px 0 4px}
+table.info td{padding:2px 4px;vertical-align:top;font-size:10.5pt}
+table.info td.lb{width:38mm;color:#222;white-space:nowrap}
+table.info td.vl{font-weight:600}
+table.grid{width:100%;border-collapse:collapse;margin:3px 0 5px;font-size:10pt}
+table.grid th,table.grid td{border:0.6pt solid #444;padding:3px 4px}
+table.grid th{background:#eee;font-weight:700;text-align:center}
+table.grid .c{text-align:center;width:8mm}
+table.grid .r{text-align:right}
+.block{margin:3px 0;font-size:10.5pt;text-align:justify;white-space:pre-line}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.foot{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:10pt}
+.foot .box{text-align:center}
+.foot .role{font-weight:700;text-transform:uppercase}
+.foot .pad{height:14mm}
+.muted{color:#444;font-style:italic;font-weight:400}
+@media screen{
+  body{background:#e2e8f0;padding:12px}
+  .sheet{background:#fff;padding:12mm;box-shadow:0 4px 24px rgba(0,0,0,.12);margin-bottom:14px}
+  .no-print-bar{margin:0 auto 10px;max-width:180mm}
+  .no-print-bar button{height:34px;padding:0 14px;border:0;border-radius:8px;background:#059669;color:#fff;font-weight:700;cursor:pointer}
+}
+@media print{.no-print-bar{display:none!important}}`;
+        }
+
         function printCaseDetail(index){
             if (typeof index !== 'number') index = window._caseDetailIndex;
             const c = detailedCases[index];
             if (!c) { showToast('Không có hồ sơ để in', 'error'); return; }
-            const m = getReportMetrics(c);
-            const meta = NHOM_MAP[c.nhomId] || NHOM_MAP[1];
             const today = new Date().toLocaleDateString('vi-VN');
-            const line = (lb, v) => v ? `<tr><td style="padding:4px 8px;color:#64748b;width:180px;vertical-align:top">${lb}</td><td style="padding:4px 8px;font-weight:600">${String(v).replace(/</g,'&lt;')}</td></tr>` : '';
-            const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Hồ sơ ${c.hoTen||''}</title>
-<style>
-body{font-family:'Times New Roman',Times,serif;font-size:12pt;color:#000;margin:24px}
-h1{font-size:16pt;text-align:center;margin:0 0 4px}
-.sub{text-align:center;font-size:11pt;color:#333;margin-bottom:16px}
-table{width:100%;border-collapse:collapse;margin:8px 0}
-.box{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;margin:10px 0}
-.box h2{font-size:12pt;margin:0 0 8px;border-bottom:1px solid #e2e8f0;padding-bottom:4px}
-@media print{body{margin:12px}}
-</style></head><body>
-<h1>PHIẾU THÔNG TIN HỒ SƠ VI PHẠM</h1>
-<div class="sub">Ban Quản lý Rừng phòng hộ Xuân Lộc · Ngày in: ${today}</div>
-<div class="box"><h2>1. Thông tin hộ</h2>
-<table>
-${line('Hộ nhận khoán', c.hoTen)}
-${line('Đối tượng liên quan', c.doiTuong)}
-${line('Địa chỉ', c.diaChi)}
-${line('Tiểu khu / Phân trường / Xã', [c.tieuKhu, c.phanTruong, c.xa].filter(Boolean).join(' · '))}
-${line('Nhóm xử lý', meta.ten || meta.short)}
-${line('Hành vi', c.hanhVi)}
-${line('Ngày biên bản', c.ngayViPham)}
-</table></div>
-<div class="box"><h2>2. Nguồn gốc đất</h2>
-<p style="white-space:pre-line;margin:0">${(c.nguonGocDat || '—').replace(/</g,'&lt;')}</p></div>
-<div class="box"><h2>3. Hợp đồng giao khoán</h2>
-<table>
-${line('Số HĐ', c.soHDKhoan)}
-${line('Ngày ký', c.ngayKyHDKhoan)}
-${line('Diện tích', c.dienTichHDKhoan ? c.dienTichHDKhoan + ' ha' : '')}
-</table>
-${!(c.soHDKhoan||c.ngayKyHDKhoan||c.dienTichHDKhoan)?'<p><i>Chưa hợp tác lập hồ sơ quản lý.</i></p>':''}
-</div>
-<div class="box"><h2>4. Hợp đồng trồng rừng</h2>
-<table>
-${line('Số HĐ', c.soHDTrongRung)}
-${line('Ngày ký', c.ngayKyHDTrongRung)}
-${line('Diện tích', c.dienTichHDTrongRung ? c.dienTichHDTrongRung + ' ha' : '')}
-</table>
-${(c.soHDKhoan||c.ngayKyHDKhoan||c.dienTichHDKhoan) && !(c.soHDTrongRung||c.ngayKyHDTrongRung||c.dienTichHDTrongRung)?'<p><i>Hộ không có hợp đồng trồng rừng.</i></p>':''}
-</div>
-<div class="box"><h2>5. Thiệt hại / tình trạng</h2>
-<table>
-${line('Cây gỗ lớn', (m.cayGoLon||0) + ' cây')}
-${line('Khối lượng', (m.khoiLuongM3||0).toLocaleString('vi-VN',{maximumFractionDigits:2}) + ' m³')}
-${line('Diện tích ha', (m.dienTichHa||0).toLocaleString('vi-VN',{maximumFractionDigits:2}))}
-${line('Diện tích m²', (m.dienTichM2||0).toLocaleString('vi-VN',{maximumFractionDigits:1}))}
-</table>
-<p style="white-space:pre-line"><b>Tình trạng:</b> ${(c.tinhTrang||'—').replace(/</g,'&lt;')}</p>
-${(c.linkHoSo||c.tuiHoSo)?qrHoSoBlock(buildHoSoUrl(c.linkHoSo||'', c.tuiHoSo), c.tuiHoSo||'Hồ sơ điện tử'):''}
-</div>
-<script>setTimeout(function(){window.print()},400)<\/script>
+            const body = buildCasePhieuHtml(c, { today: today, pageBreak: false });
+            const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>HS ${String(c.hoTen||'').replace(/</g,'')}</title>
+<style>${casePhieuStyles()}</style></head><body>
+<div class="no-print-bar"><button onclick="window.print()">In / Lưu PDF</button></div>
+${body}
+<script>setTimeout(function(){ try{ window.print(); }catch(e){} }, 500);<\/script>
 </body></html>`;
             const w = window.open('', '_blank');
             if (!w) { showToast('Trình duyệt chặn cửa sổ in', 'error'); return; }
             w.document.write(html);
             w.document.close();
+            showToast('Đã mở phiếu hồ sơ (A4 · QR)');
         }
+
+        function printAllCaseDetails(){
+            const cases = (typeof getFilteredCases === 'function') ? getFilteredCases() : (detailedCases || []);
+            if (!cases.length) { showToast('Không có hồ sơ trong kỳ lọc', 'error'); return; }
+            if (cases.length > 80 && !confirm('Có ' + cases.length + ' phiếu. Tiếp tục xuất tất cả?')) return;
+            const today = new Date().toLocaleDateString('vi-VN');
+            const parts = cases.map((c, i) => buildCasePhieuHtml(c, { today: today, pageBreak: i < cases.length - 1 }));
+            const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Tất cả phiếu HS (${cases.length})</title>
+<style>${casePhieuStyles()}</style></head><body>
+<div class="no-print-bar"><button onclick="window.print()">In / Lưu PDF (${cases.length} phiếu)</button>
+<span style="margin-left:10px;font:12px system-ui;color:#334155">Mỗi phiếu 1 trang A4 · theo bộ lọc hiện tại</span></div>
+${parts.join('\n')}
+<script>setTimeout(function(){ try{ window.print(); }catch(e){} }, 800);<\/script>
+</body></html>`;
+            const w = window.open('', '_blank');
+            if (!w) { showToast('Trình duyệt chặn cửa sổ in', 'error'); return; }
+            w.document.write(html);
+            w.document.close();
+            showToast('Đã mở ' + cases.length + ' phiếu');
+        }
+
         function openQuickSearch(){
             const modal = document.getElementById('quickSearchModal');
             if (!modal) { showToast('Không tìm thấy cửa sổ tra cứu.', 'error'); return; }
@@ -3333,18 +3454,149 @@ function toggleAdvFilter() {
             try{ s=String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){ s=String(s||''); }
             return s.toLowerCase().replace(/\s+/g,' ').trim();
         }
+
+        /**
+         * Tách tên người + vai trò từ đoạn mô tả cột đối tượng.
+         * Chỉ trả về họ tên sạch (bỏ ông/bà, địa chỉ, sinh năm...).
+         */
+        function extractActorsFromText(raw){
+            const text0 = String(raw || '').replace(/\s+/g, ' ').trim();
+            if (!text0) return [];
+            const unknownRe = /^(khong xac dinh|chua (ro|xac dinh)|vo danh|an danh|-|—|n\/a)$/i;
+            const norm = (s) => {
+                try { s = String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''); } catch(e) { s = String(s||''); }
+                return s.toLowerCase().replace(/\s+/g,' ').trim();
+            };
+            if (unknownRe.test(norm(text0))) return [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
+
+            const stripTitle = (s) => String(s||'').replace(/^(ông|bà|anh|chị|cô|chú)\s+/i, '').replace(/\s+/g,' ').trim();
+            const cleanName = (s) => {
+                let t = stripTitle(s);
+                // cắt địa chỉ / năm sinh / mô tả thừa
+                t = t.split(/,|\(|—|–|\s+-\s+/)[0];
+                t = t.replace(/\s+(ấp|xa|xã|phường|thị\s*trấn|tp\.?|tỉnh|huyện|thường\s*trú|ngụ|trú\s*tại|sinh\s*năm|trực\s*tiếp|cùng\s*trú).*$/i, '');
+                t = t.replace(/\s+/g, ' ').trim();
+                // bỏ ký tự lạ cuối
+                t = t.replace(/[.,;:]+$/g, '').trim();
+                return t;
+            };
+            const isLikelyName = (s) => {
+                if (!s || s.length < 4 || s.length > 40) return false;
+                const parts = s.split(/\s+/);
+                if (parts.length < 2 || parts.length > 5) return false;
+                // mỗi phần bắt đầu chữ hoa (unicode)
+                if (!parts.every(p => /^[A-ZÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ]/.test(p))) return false;
+                const n = norm(s);
+                if (/^(ap|xa|phuong|thi|tp|tinh|huyen)\b/.test(n)) return false;
+                return true;
+            };
+
+            // Tên thuần
+            const plain = cleanName(text0);
+            if (isLikelyName(plain) && text0.length <= 50 && !/người|vận chuyển|cưa|chặt|mua|xây|đào|khai thác|phá hoại|sinh năm|thường trú|ngụ/i.test(text0)) {
+                return [{ ten: plain, vaiTro: '', key: norm(plain) }];
+            }
+            // Chỉ "ông/bà + tên (+ địa chỉ)"
+            const onlyTitle = text0.match(/^(?:ông|bà|anh|chị|cô|chú)\s+([A-ZÀ-ỴĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỴĐ][a-zà-ỹđ]+){1,3})(?:\s*[,—–\-].*)?$/i);
+            if (onlyTitle) {
+                const ten = cleanName(onlyTitle[1]);
+                if (isLikelyName(ten)) return [{ ten: ten, vaiTro: '', key: norm(ten) }];
+            }
+
+            const found = [];
+            const seen = new Set();
+            const push = (ten, vaiTro) => {
+                ten = cleanName(ten);
+                if (!isLikelyName(ten)) return;
+                const key = norm(ten);
+                if (!key || seen.has(key)) {
+                    if (seen.has(key) && vaiTro) {
+                        const prev = found.find(x => x.key === key);
+                        if (prev && !(prev.vaiTro||'').includes(vaiTro)) {
+                            prev.vaiTro = [prev.vaiTro, vaiTro].filter(Boolean).join('; ');
+                        }
+                    }
+                    return;
+                }
+                seen.add(key);
+                found.push({ ten: ten, vaiTro: (vaiTro||'').replace(/\s+/g,' ').trim(), key: key });
+            };
+
+            // Pattern: (vai trò) là (ông/bà)? Tên
+            const reRole = /(?:người\s+)?((?:cưa\s*hạ|vận\s*chuyển(?:\s*lâm\s*sản)?|chặt\s*phá|chặt\s*hạ|mua\s*lâm\s*sản|đi\s*dời(?:\s*lâm\s*sản)?|dùng\s*đấu\s*máy\s*cày\s*đi\s*dời\s*lâm\s*sản|thực\s*hiện|khai\s*thác|phá\s*hoại|đào\s*múc|xây\s*dựng|cướp|đốt)(?:\s*,\s*(?:cưa\s*hạ|vận\s*chuyển(?:\s*lâm\s*sản)?|chặt\s*phá|mua\s*lâm\s*sản|đi\s*dời))?|(?:\s+và\s+(?:cưa\s*hạ|vận\s*chuyển(?:\s*lâm\s*sản)?|chặt\s*phá|mua\s*lâm\s*sản|đi\s*dời|khai\s*thác))?)\s*(?:cây\s*[A-Za-zÀ-ỹđ]+\s*)?(?:trái\s*phép\s*)?(?:là\s*|:\s*)(?:ông|bà|anh|chị|cô|chú)?\s*([A-ZÀ-ỴĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỴĐ][a-zà-ỹđ]+){1,3})/gi;
+            let m1;
+            while ((m1 = reRole.exec(text0)) !== null) {
+                push(m1[2], m1[1]);
+            }
+
+            // Pattern: là Tên (không ông/bà) — "vận chuyển là Nguyễn Văn Tài"
+            const reLa = /(?:là|:)\s*([A-ZÀ-ỴĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỴĐ][a-zà-ỹđ]+){1,3})(?=\s*[,;.\(]|$)/g;
+            let mLa;
+            while ((mLa = reLa.exec(text0)) !== null) {
+                const from = Math.max(0, mLa.index - 50);
+                const window = text0.slice(from, mLa.index);
+                const rm = window.match(/((?:cưa\s*hạ|vận\s*chuyển(?:\s*lâm\s*sản)?|chặt\s*phá|chặt\s*hạ|mua\s*lâm\s*sản|đi\s*dời(?:\s*lâm\s*sản)?|thực\s*hiện|khai\s*thác|phá\s*hoại|đào\s*múc|xây\s*dựng)(?:\s*,\s*(?:cưa\s*hạ|vận\s*chuyển)|(?:\s+và\s+(?:cưa\s*hạ|vận\s*chuyển)))?)\s*$/i);
+                push(mLa[1], rm ? rm[1] : '');
+            }
+
+            // Pattern: ông/bà + Tên (mọi vị trí)
+            const reTitle = /(?:ông|bà|anh|chị|cô|chú)\s+([A-ZÀ-ỴĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỴĐ][a-zà-ỹđ]+){1,3})/gi;
+            let m2;
+            while ((m2 = reTitle.exec(text0)) !== null) {
+                const from = Math.max(0, m2.index - 55);
+                const window = text0.slice(from, m2.index);
+                const rm = window.match(/((?:cưa\s*hạ|vận\s*chuyển(?:\s*lâm\s*sản)?|chặt\s*phá|chặt\s*hạ|mua\s*lâm\s*sản|đi\s*dời(?:\s*lâm\s*sản)?|thực\s*hiện|khai\s*thác|phá\s*hoại|đào\s*múc|xây\s*dựng)(?:\s*,\s*(?:cưa\s*hạ|vận\s*chuyển)|(?:\s+và\s+(?:cưa\s*hạ|vận\s*chuyển)))?)\s*(?:trái\s*phép\s*)?(?:là\s*|:\s*)?$/i);
+                push(m2[1], rm ? rm[1] : '');
+            }
+
+            // Tên sau dấu phẩy (không có ông/bà)
+            const reComma = /,\s*([A-ZÀ-ỴĐ][a-zà-ỹđ]+(?:\s+[A-ZÀ-ỴĐ][a-zà-ỹđ]+){1,3})(?=\s*[,;.\(\)]|$)/g;
+            let m3;
+            while ((m3 = reComma.exec(text0)) !== null) {
+                push(m3[1], '');
+            }
+
+            if (found.length) return found;
+
+            // Fallback: lấy tên sạch nhất có thể
+            let short = cleanName(text0
+                .replace(/người\s+[^,]{0,40}?\s+là\s+/i, '')
+                .replace(/^(ông|bà|anh|chị|cô|chú)\s+/i, ''));
+            if (isLikelyName(short)) return [{ ten: short, vaiTro: '', key: norm(short) }];
+            if (short.length > 40) short = short.slice(0, 37) + '…';
+            if (!short) short = 'Không xác định';
+            return [{ ten: short, vaiTro: '', key: norm(short) || '__unknown__' }];
+        }
+
+
+
         /**
          * self = hộ nhận khoán tự thực hiện
          * other = người khác thực hiện trên diện tích hộ nhận khoán
          * unknown = không xác định đối tượng
          */
+        function isPhaHoaiCase(c){
+            const hv = normPersonName(c && c.hanhVi);
+            return /pha\s*hoai/.test(hv);
+        }
         function actorKind(c){
             const ho = normPersonName(c.hoTen);
             const dt = normPersonName(c.doiTuong);
+            const rawDt = String(c.doiTuong || '').trim();
+            // Phá hoại cây rừng trồng: đa số không phát hiện đối tượng
+            // — chỉ coi là xác định khi cột đối tượng mô tả rõ người thực hiện (ông/bà/người ...)
+            if (isPhaHoaiCase(c)) {
+                if (!dt || /khong xac dinh|chua (ro|xac dinh)|vo danh|an danh|^\-+$|^—$|^n\/a$/.test(dt)) return 'unknown';
+                // trùng hộ nhận khoán mà không có mô tả "người ... là ông/bà" → không gán cho hộ
+                const hasExplicitActor = /(?:người|ong|ông|bà|anh|chị)\s/.test(rawDt) || /\blà\s+(ong|ông|bà|anh|chị)\b/.test(rawDt);
+                if (!hasExplicitActor && ho && (dt === ho || (ho.length>=5 && dt.length>=5 && (ho.includes(dt) || dt.includes(ho))))) {
+                    return 'unknown';
+                }
+                if (!hasExplicitActor && dt === ho) return 'unknown';
+            }
             if(!dt || /khong xac dinh|chua (ro|xac dinh)|vo danh|an danh|^\-+$|^—$|^n\/a$/.test(dt)) return 'unknown';
             if(!ho) return 'other';
             if(dt === ho) return 'self';
-            // trùng họ tên gần như nhau
             if(ho.length>=5 && dt.length>=5 && (ho.includes(dt) || dt.includes(ho))) return 'self';
             return 'other';
         }
@@ -3600,6 +3852,162 @@ function getFilteredCases() {
             }
 
             // Detail table
+
+            // Tổng hợp đối tượng vi phạm (1 dòng / đối tượng, gộp hành vi)
+            (function renderDoiTuongAgg(){
+                const tb = document.getElementById('statsDoiTuongTable');
+                const meta = document.getElementById('statsDoiTuongMeta');
+                if (!tb) return;
+
+                function normalizeRoleToken(s){
+                    let t = String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                    try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch(e) {}
+                    t = t.replace(/trai phep/g, '').replace(/\s+/g, ' ').trim();
+                    return t;
+                }
+                function isPhaHoaiCase(c){
+                    const hv = normalizeRoleToken(c.hanhVi || '');
+                    if (/pha\s*hoai/.test(hv)) return true;
+                    // species / tình trạng đôi khi mang dấu hiệu phá hoại cây rừng trồng
+                    const blob = normalizeRoleToken([c.hanhVi, c.tinhTrang, c.doiTuong].filter(Boolean).join(' '));
+                    return /pha\s*hoai\s*cay|pha\s*hoai\s*rung/.test(blob) && !/cua\s*ha|khai\s*thac|xay\s*dung/.test(hv);
+                }
+                function mergeRoles(roleSet, hanhViSet){
+                    const raw = [];
+                    roleSet.forEach(r => { if (r) raw.push(String(r).trim()); });
+                    const roleBlob = normalizeRoleToken(Array.from(roleSet).join(' '));
+                    hanhViSet.forEach(h => {
+                        const hn = normalizeRoleToken(h);
+                        if (!hn) return;
+                        let mapped = h;
+                        if (/khai\s*thac/.test(hn)) mapped = 'khai thác';
+                        else if (/xay\s*dung/.test(hn)) mapped = 'xây dựng';
+                        else if (/dao|muc\s*ho/.test(hn)) mapped = 'đào múc hồ';
+                        else if (/pha\s*hoai/.test(hn)) mapped = 'phá hoại cây rừng trồng';
+                        const mn = normalizeRoleToken(mapped);
+                        if (/khai\s*thac/.test(mn) && /(cua\s*ha|van\s*chuyen|khai\s*thac)/.test(roleBlob)) return;
+                        if (/xay\s*dung/.test(mn) && /xay\s*dung/.test(roleBlob)) return;
+                        if (/pha\s*hoai/.test(mn) && /pha\s*hoai/.test(roleBlob)) return;
+                        raw.push(mapped);
+                    });
+                    const flags = {
+                        cuaHa: false, vanChuyen: false, muaLamSan: false, diDoi: false,
+                        chatPha: false, khaiThac: false, xayDung: false, daoMuc: false, phaHoai: false, other: []
+                    };
+                    raw.forEach(r => {
+                        const n = normalizeRoleToken(r);
+                        if (!n) return;
+                        if (/cua\s*ha/.test(n)) flags.cuaHa = true;
+                        if (/van\s*chuyen/.test(n)) flags.vanChuyen = true;
+                        if (/mua\s*(lam\s*san)?/.test(n) && /mua/.test(n)) flags.muaLamSan = true;
+                        if (/di\s*doi|dung\s*dau\s*may/.test(n)) flags.diDoi = true;
+                        if (/chat\s*pha|chat\s*ha|cua\s*bo/.test(n)) flags.chatPha = true;
+                        if (/khai\s*thac/.test(n)) flags.khaiThac = true;
+                        if (/xay\s*dung/.test(n)) flags.xayDung = true;
+                        if (/dao|muc\s*ho/.test(n)) flags.daoMuc = true;
+                        if (/pha\s*hoai/.test(n)) flags.phaHoai = true;
+                        if (!/(cua\s*ha|van\s*chuyen|mua\s*lam|di\s*doi|dung\s*dau|chat\s*pha|chat\s*ha|cua\s*bo|khai\s*thac|xay\s*dung|dao|muc\s*ho|pha\s*hoai|thuc\s*hien)/.test(n)) {
+                            if (r && flags.other.indexOf(r) < 0) flags.other.push(r);
+                        }
+                    });
+                    const out = [];
+                    if (flags.cuaHa && flags.vanChuyen) out.push('cưa hạ và vận chuyển lâm sản');
+                    else if (flags.cuaHa) out.push('cưa hạ');
+                    else if (flags.vanChuyen) out.push('vận chuyển lâm sản');
+                    if (flags.diDoi) out.push('đi dời lâm sản');
+                    if (flags.muaLamSan) out.push('mua lâm sản');
+                    if (flags.chatPha && !flags.cuaHa) out.push('chặt phá');
+                    if (flags.xayDung) out.push('xây dựng');
+                    if (flags.daoMuc) out.push('đào múc hồ');
+                    if (flags.phaHoai) out.push('phá hoại cây rừng trồng');
+                    if (flags.khaiThac && !flags.cuaHa && !flags.vanChuyen) out.push('khai thác');
+                    flags.other.forEach(o => out.push(o));
+                    return out;
+                }
+
+                const map = new Map();
+                cases.forEach(c => {
+                    const phaHoai = (typeof isPhaHoaiCase === 'function' && isPhaHoaiCase(c))
+                        || /pha\s*hoai/i.test(String(c.hanhVi||'').normalize('NFD').replace(/[\u0300-\u036f]/g,''));
+                    let actors = extractActorsFromText(c.doiTuong);
+                    // Phá hoại cây rừng trồng: đa số không phát hiện đối tượng
+                    if (phaHoai) {
+                        const hoKey = (typeof normPersonName === 'function' ? normPersonName(c.hoTen) : String(c.hoTen||'').toLowerCase());
+                        const dtRaw = String(c.doiTuong || '').trim();
+                        // Chỉ coi là xác định khi có câu chữ chỉ người thực hiện VÀ tên khác hộ nhận khoán
+                        const hasExplicitActorPhrase = /(?:người\s+[^,]{0,40}?\s+là\s+)?(?:ông|bà|anh|chị)\s+[A-ZÀ-ỴĐ]/i.test(dtRaw)
+                            || /người\s+thực\s+hiện/i.test(dtRaw);
+                        if (!hasExplicitActorPhrase) {
+                            actors = [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
+                        } else {
+                            actors = (actors || []).filter(a => {
+                                if (!a || a.key === '__unknown__') return false;
+                                if (hoKey && a.key === hoKey) return false;
+                                if (hoKey && a.key.length >= 4 && hoKey.length >= 4 && (hoKey.includes(a.key) || a.key.includes(hoKey))) return false;
+                                return true;
+                            });
+                            if (!actors.length) {
+                                actors = [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
+                            }
+                        }
+                    } else if (!actors.length) {
+                        actors = [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
+                    }
+
+                    const seenInCase = new Set();
+                    actors.forEach(a => {
+                        const key = a.key || '__unknown__';
+                        if (seenInCase.has(key)) return;
+                        seenInCase.add(key);
+                        let row = map.get(key);
+                        if (!row) {
+                            row = {
+                                ten: key === '__unknown__' ? 'Không xác định' : a.ten,
+                                soVu: 0,
+                                vaiTro: new Set(),
+                                hanhVi: new Set(),
+                                ho: new Set()
+                            };
+                            map.set(key, row);
+                        }
+                        row.soVu++;
+                        if (a.vaiTro) String(a.vaiTro).split(';').map(s => s.trim()).filter(Boolean).forEach(v => row.vaiTro.add(v));
+                        if (c.hanhVi) row.hanhVi.add(String(c.hanhVi).trim());
+                        if (c.hoTen) row.ho.add(String(c.hoTen).trim());
+                    });
+                });
+                const rows = Array.from(map.values()).sort((a, b) => {
+                    if (a.ten === 'Không xác định') return 1;
+                    if (b.ten === 'Không xác định') return -1;
+                    return b.soVu - a.soVu || a.ten.localeCompare(b.ten, 'vi');
+                });
+                tb.querySelector('thead').innerHTML = `<tr class="bg-slate-50 text-slate-600">
+                    <th class="py-2 px-3 text-left w-10">STT</th>
+                    <th class="py-2 px-3 text-left">Họ tên đối tượng</th>
+                    <th class="py-2 px-3 text-right">Số vụ</th>
+                    <th class="py-2 px-3 text-left">Hành vi</th>
+                    <th class="py-2 px-3 text-left">Hộ nhận khoán liên quan</th>
+                </tr>`;
+                if (!rows.length) {
+                    tb.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="py-6 text-center text-slate-400">Không có dữ liệu trong kỳ lọc</td></tr>';
+                    if (meta) meta.textContent = '';
+                    return;
+                }
+                const unkVu = rows.filter(r => r.ten === 'Không xác định').reduce((s, r) => s + r.soVu, 0);
+                if (meta) meta.textContent = `${rows.length} đối tượng · từ ${cases.length} hồ sơ` + (unkVu ? ` · không XĐ: ${unkVu}` : '');
+                tb.querySelector('tbody').innerHTML = rows.map((r, i) => {
+                    const hv = mergeRoles(r.vaiTro, r.hanhVi).join('; ') || '—';
+                    const ho = Array.from(r.ho).filter(Boolean).join('; ') || '—';
+                    return `<tr class="border-t border-slate-100 hover:bg-slate-50">
+                        <td class="py-2 px-3 text-slate-500">${i + 1}</td>
+                        <td class="py-2 px-3 font-semibold text-slate-800">${escapeHtml(r.ten)}</td>
+                        <td class="py-2 px-3 text-right font-semibold">${r.soVu}</td>
+                        <td class="py-2 px-3 text-rose-700">${escapeHtml(hv)}</td>
+                        <td class="py-2 px-3">${escapeHtml(ho)}</td>
+                    </tr>`;
+                }).join('');
+            })();
+
             const det = document.getElementById('statsDetailTable');
             if (det) {
                 det.querySelector('thead').innerHTML = `<tr class="bg-slate-50 text-slate-600 sticky top-0">
