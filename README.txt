@@ -1,35 +1,30 @@
-BQLRPH XUAN LOC - He thong quan ly lam nghiep (ban dong goi)
-============================================================
+BQLRPH Xuân Lộc — Hệ thống quản lý lâm nghiệp trực tuyến
+Tác giả: Huỳnh Nhựt Hào | 0878 884 088 | hnhao.213@gmail.com
+Domain: https://www.bqlrphxuanloc.site
 
-CACH DUNG
-1. Giai nen toan bo file vao 1 thu muc.
-2. Day len GitHub Pages (hoac mo menu.html bang Chrome/Edge).
-3. Dia chi dang chay: https://haonehehe.github.io/BQLRPHXL/menu
+CẤU TRÚC
+  index.html                 → chuyển vào menu.html
+  menu.html                  → menu chính
+  admin.html                 → quản trị + đăng tin
+  quanly-qlbvr.html          → vi phạm QLBVR
+  quanly-datdai-lamba.html   → lâm bạ
+  quanly-nhao-lampart.html   → nhà ở
+  quanly-mocgioi.html        → mốc giới
+  quanly-trongrung.html      → trồng / chăm sóc
+  quanly-nhiemvu-gantt.html  → nhiệm vụ Gantt
+  quanly-tonghop-duongdan.html
+  quanly-pdf.html            → PDF (công khai)
+  tienich-thongbao.html      → xem thông báo / niêm yết
+  tienich-congcu.html / tienich-phapluat.html / tienich-bando.html
+  maps/                      → geojson lâm bạ (nếu có)
+  BQLRPH-Auth-AppsScript.gs  → dán vào Apps Script, Deploy Web App
 
-FILE CHINH
-- menu.html              : Cong vao he thong (dang nhap, phan quyen)
-- admin.html             : Duyet tai khoan, cap quyen
-- index.html             : Vi pham QLBVR
-- quanly-datdai-lamba.html : Lam ba / dat dai
-- quanly-nhao-lampart.html : Nha o tren lam phan
-- quanly-mocgioi.html    : Moc gioi
-- quanly-trongrung.html  : Tien do trong & cham soc rung 2026
-- quanly-pdf.html        : Cong cu PDF (khach dung duoc)
+DEPLOY SCRIPT
+  1. Mở Google Sheet Users → Extensions → Apps Script
+  2. Dán toàn bộ BQLRPH-Auth-AppsScript.gs → Save
+  3. Deploy → New deployment → Web app → Anyone → Deploy
+  4. Dán URL /exec vào CONFIG.SCRIPT_URL trong menu.html & admin.html
+  5. Cho phép quyền Drive (đăng tin + upload file)
 
-AUTH (dong bo nhieu may)
-- BQLRPH-Auth-AppsScript.gs  : dan vao Google Apps Script, Deploy Web App
-- HUONG-DAN-AUTH-SHEET.md    : huong dan cau hinh
-- Script URL mac dinh da gan trong menu/admin
-
-BAO MAT
-- Module nghiep vu bi khoa neu chua dang nhap / khong du quyen
-  (ke ca khi mo link truc tiep, khong qua menu).
-- PDF khong khoa.
-- Session luu sessionStorage + localStorage (ghi nho dang nhap).
-
-HO TRO KY THUAT
-- Huynh Nhut Hao
-- SDT: 0878 884 088
-- Email: hnhao.213@gmail.com
-
-Sang kien: Sang-kien-he-thong-quan-ly-lam-nghiep-BQLRPH-Xuan-Loc.docx
+UPLOAD GITHUB PAGES
+  Upload toàn bộ file HTML + maps + không bắt buộc .gs/.md lên repo
