@@ -1,0 +1,44 @@
+/* BQLRPH Xuân Lộc — lớp giao diện dùng chung. Nạp SAU css riêng của từng trang.
+   Giữ màu nhận diện của từng module (icon .logo-i); thống nhất khung, nút, thẻ, focus. */
+:root{--bq-green:#047857;--bq-green-d:#065f46;--bq-bg:#f4f7f5;--bq-line:#dce5df;--bq-r:10px;--bq-r-lg:14px;--bq-shadow:0 1px 2px rgba(15,23,42,.06)}
+html{-webkit-text-size-adjust:100%}
+body{-webkit-font-smoothing:antialiased;line-height:1.5}
+body:not(.bq-dark){background:var(--bq-bg)}
+::selection{background:#bbf7d0;color:#052e16}
+*{scrollbar-width:thin;scrollbar-color:#9fb1a6 transparent}
+:focus-visible{outline:2px solid #0f766e;outline-offset:2px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0}
+button:disabled,.btn[disabled]{opacity:.5;cursor:not-allowed}
+img{max-width:100%}
+body:not(.bq-dark) .top{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:1px solid var(--bq-line);border-top:3px solid var(--bq-green);box-shadow:none}
+body:not(.bq-dark) .logo-i{border-radius:10px;box-shadow:none}
+body:not(.bq-dark) .logo h1{font-weight:700;letter-spacing:-.01em}
+body:not(.bq-dark) .btn{border-radius:var(--bq-r);box-shadow:none;transition:background-color .15s,border-color .15s}
+body:not(.bq-dark) .btn:hover{transform:none;filter:none}
+body:not(.bq-dark) .btn-g{background:var(--bq-green);color:#fff}
+body:not(.bq-dark) .btn-g:hover{background:var(--bq-green-d)}
+body:not(.bq-dark) .btn-b{background:#0369a1;color:#fff}
+body:not(.bq-dark) .btn-b:hover{background:#075985}
+body:not(.bq-dark) .btn-v{background:#6d28d9;color:#fff}
+body:not(.bq-dark) .btn-v:hover{background:#5b21b6}
+body:not(.bq-dark) .btn-a{background:#b45309;color:#fff}
+body:not(.bq-dark) .btn-r{background:#be123c;color:#fff}
+body:not(.bq-dark) .btn-o{background:#fff;border:1px solid var(--bq-line);color:#1e293b}
+body:not(.bq-dark) .btn-o:hover{background:#f1f5f2;border-color:#c3d0c8}
+body:not(.bq-dark) .card,body:not(.bq-dark) .panel{border-radius:var(--bq-r-lg);box-shadow:var(--bq-shadow);border-color:var(--bq-line)}
+/* Trang nền tối: menu, thông báo */
+.bq-dark .brand-icon{display:none}
+.bq-dark .brand-logo{display:block;width:76px;height:76px;margin:0 auto 12px;border-radius:50%;box-shadow:0 0 0 3px rgba(255,255,255,.14)}
+.bq-dark .brand h1{background:none;-webkit-text-fill-color:currentColor;color:#f1f5f9;font-weight:700}
+.bq-dark .btn-g{background:#059669;box-shadow:none}
+.bq-dark .btn-b{background:#0369a1;box-shadow:none}
+.bq-dark .btn-v{background:#6d28d9;box-shadow:none}
+.bq-dark .card:hover{transform:none;box-shadow:0 0 0 1px rgba(148,163,184,.4)}
+@media(max-width:640px){
+  .wrap{padding-left:12px;padding-right:12px}
+  .acts,.top-actions{width:100%}
+  .acts .btn,.top-actions .btn{flex:1 1 auto;justify-content:center}
+  .btn{min-height:40px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{.top,.acts,.top-actions{display:none!important}*{box-shadow:none!important}}

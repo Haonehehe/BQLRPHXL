@@ -67,6 +67,9 @@ table.mini th{background:#f8fafc;font-size:10.5px;text-transform:uppercase;color
 .drop.drag{background:#ccfbf1;border-color:#14b8a6}
 .chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:11px;font-weight:700;margin:2px}
 </style>
+<link rel="icon" type="image/png" href="favicon-bqlrph.png">
+<meta name="theme-color" content="#047857">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div class="top">
@@ -177,8 +180,8 @@ table.mini th{background:#f8fafc;font-size:10.5px;text-transform:uppercase;color
       </select>
     </div>
     <div class="grid2" id="inVN">
-      <div class="field"><label>X (Đông, m)</label><input type="number" id="x" step="any"></div>
-      <div class="field"><label>Y (Bắc, m)</label><input type="number" id="y" step="any"></div>
+      <div class="field"><label>X (Bắc, m)</label><input type="number" id="x" step="any"></div>
+      <div class="field"><label>Y (Đông, m)</label><input type="number" id="y" step="any"></div>
     </div>
     <div class="grid2" id="inWGS" style="display:none">
       <div class="field"><label>Lat</label><input type="number" id="lat" step="any"></div>
@@ -420,23 +423,32 @@ function fileProj(){
   return ensureVnProj(map[v]||'107.75');
 }
 function syncZoneUI(){ /* zone change — rebuild proj next convert */ }
+var dir='vn';
+function setDir(d){
+  dir=d;
+  document.getElementById('tabVN').classList.toggle('on',d==='vn');
+  document.getElementById('tabWGS').classList.toggle('on',d==='wgs');
+  document.getElementById('inVN').style.display=d==='vn'?'grid':'none';
+  document.getElementById('inWGS').style.display=d==='wgs'?'grid':'none';
+}
 function convert(){
   try{
     var code=currentProj();
     if(dir==='vn'){
       var x=+document.getElementById('x').value,y=+document.getElementById('y').value;
       if(!isFinite(x)||!isFinite(y)) throw new Error('Nhập X,Y');
-      var ll=proj4(code,'EPSG:4326',[x,y]);
+      var e=x,n=y;if(x>y){e=y;n=x;}
+      var ll=proj4(code,'EPSG:4326',[e,n]);
       document.getElementById('lat').value=ll[1].toFixed(8);document.getElementById('lng').value=ll[0].toFixed(8);
       document.getElementById('convOut').innerHTML='<b>WGS84</b><br>Lat <b>'+ll[1].toFixed(8)+'</b><br>Lng <b>'+ll[0].toFixed(8)+'</b>';
-      return {lat:ll[1],lng:ll[0],x:x,y:y};
+      return {lat:ll[1],lng:ll[0],x:n,y:e};
     } else {
       var lat=+document.getElementById('lat').value,lng=+document.getElementById('lng').value;
       if(!isFinite(lat)||!isFinite(lng)) throw new Error('Nhập lat,lng');
       var xy=proj4('EPSG:4326',code,[lng,lat]);
-      document.getElementById('x').value=xy[0].toFixed(3);document.getElementById('y').value=xy[1].toFixed(3);
-      document.getElementById('convOut').innerHTML='<b>VN-2000</b><br>X <b>'+xy[0].toFixed(3)+'</b><br>Y <b>'+xy[1].toFixed(3)+'</b>';
-      return {lat:lat,lng:lng,x:xy[0],y:xy[1]};
+      document.getElementById('x').value=xy[1].toFixed(3);document.getElementById('y').value=xy[0].toFixed(3);
+      document.getElementById('convOut').innerHTML='<b>VN-2000</b><br>X (Bắc) <b>'+xy[1].toFixed(3)+'</b><br>Y (Đông) <b>'+xy[0].toFixed(3)+'</b>';
+      return {lat:lat,lng:lng,x:xy[1],y:xy[0]};
     }
   }catch(e){document.getElementById('convOut').innerHTML='<span style="color:#b91c1c">'+e.message+'</span>';return null;}
 }
