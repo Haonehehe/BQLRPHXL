@@ -4669,123 +4669,173 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
             return m;
         }
 
-
-
-        /** Bảng tổng hợp đối tượng thực hiện hành vi — gom theo người (1 người nhiều vụ = 1 dòng) */
+        /** Bảng tổng hợp đối tượng — cùng logic với bảng trên giao diện (tách từng người) */
         function buildDoiTuongTongHopHtml(cases, esc, fmt){
-            const map = new Map(); // key -> aggregate
-            function shortHanhVi(hv){
-                let s = String(hv||'').replace(/\s+/g,' ').trim();
-                if(!s) return '—';
-                // Gộp khái niệm trùng: cưa hạ / vận chuyển
-                const low = s.toLowerCase();
-                const hasCH = /cưa\s*hạ|chặt\s*hạ|chặt\s*phá/.test(low);
-                const hasVC = /vận\s*chuyển/.test(low);
-                if(hasCH && hasVC) return 'Cưa hạ và vận chuyển lâm sản';
-                if(hasCH) return 'Cưa hạ lâm sản';
-                if(hasVC) return 'Vận chuyển lâm sản';
-                if(/phá\s*hoại/.test(low)) return 'Phá hoại cây rừng trồng';
-                if(/xây\s*dựng/.test(low)) return 'Xây dựng công trình';
-                if(/đào|múc\s*hồ/.test(low)) return 'Đào múc hồ';
-                if(/khai\s*thác/.test(low) && /(điều|keo|cao\s*su)/.test(low)) return 'Khai thác cây phụ trợ/công nghiệp';
-                if(/khai\s*thác/.test(low)) return 'Khai thác cây gỗ lớn';
-                // cắt dài
-                if(s.length>60) s = s.slice(0,57)+'…';
-                return s;
+            function normalizeRoleToken(s){
+                let t = String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch(e) {}
+                t = t.replace(/trai phep/g, '').replace(/\s+/g, ' ').trim();
+                return t;
             }
-            function displayName(c, ak){
-                if(ak==='unknown') return 'Không xác định';
-                // Ưu tiên extractActorsFromText để lấy tên sạch
-                if(typeof extractActorsFromText==='function'){
-                    const acts = extractActorsFromText(c.doiTuong||'');
-                    if(acts && acts.length){
-                        const names = acts.map(a=>a.ten).filter(Boolean);
-                        if(names.length) return names.join('; ');
+            function isPhaHoaiLocal(c){
+                if (typeof isPhaHoaiCase === 'function') {
+                    try { if (isPhaHoaiCase(c)) return true; } catch(e) {}
+                }
+                const hv = normalizeRoleToken(c.hanhVi || '');
+                if (/pha\s*hoai/.test(hv)) return true;
+                const blob = normalizeRoleToken([c.hanhVi, c.tinhTrang, c.doiTuong].filter(Boolean).join(' '));
+                return /pha\s*hoai\s*cay|pha\s*hoai\s*rung/.test(blob) && !/cua\s*ha|khai\s*thac|xay\s*dung/.test(hv);
+            }
+            function mergeRoles(roleSet, hanhViSet){
+                const raw = [];
+                roleSet.forEach(r => { if (r) raw.push(String(r).trim()); });
+                const roleBlob = normalizeRoleToken(Array.from(roleSet).join(' '));
+                hanhViSet.forEach(h => {
+                    const hn = normalizeRoleToken(h);
+                    if (!hn) return;
+                    let mapped = h;
+                    if (/khai\s*thac/.test(hn)) mapped = 'khai thác';
+                    else if (/xay\s*dung/.test(hn)) mapped = 'xây dựng';
+                    else if (/dao|muc\s*ho/.test(hn)) mapped = 'đào múc hồ';
+                    else if (/pha\s*hoai/.test(hn)) mapped = 'phá hoại cây rừng trồng';
+                    const mn = normalizeRoleToken(mapped);
+                    if (/khai\s*thac/.test(mn) && /(cua\s*ha|van\s*chuyen|khai\s*thac)/.test(roleBlob)) return;
+                    if (/xay\s*dung/.test(mn) && /xay\s*dung/.test(roleBlob)) return;
+                    if (/pha\s*hoai/.test(mn) && /pha\s*hoai/.test(roleBlob)) return;
+                    raw.push(mapped);
+                });
+                const flags = {
+                    cuaHa: false, vanChuyen: false, muaLamSan: false, diDoi: false,
+                    chatPha: false, khaiThac: false, xayDung: false, daoMuc: false, phaHoai: false, other: []
+                };
+                raw.forEach(r => {
+                    const n = normalizeRoleToken(r);
+                    if (!n) return;
+                    if (/cua\s*ha/.test(n)) flags.cuaHa = true;
+                    if (/van\s*chuyen/.test(n)) flags.vanChuyen = true;
+                    if (/mua\s*(lam\s*san)?/.test(n) && /mua/.test(n)) flags.muaLamSan = true;
+                    if (/di\s*doi|dung\s*dau\s*may/.test(n)) flags.diDoi = true;
+                    if (/chat\s*pha|chat\s*ha|cua\s*bo/.test(n)) flags.chatPha = true;
+                    if (/khai\s*thac/.test(n)) flags.khaiThac = true;
+                    if (/xay\s*dung/.test(n)) flags.xayDung = true;
+                    if (/dao|muc\s*ho/.test(n)) flags.daoMuc = true;
+                    if (/pha\s*hoai/.test(n)) flags.phaHoai = true;
+                    if (!/(cua\s*ha|van\s*chuyen|mua\s*lam|di\s*doi|dung\s*dau|chat\s*pha|chat\s*ha|cua\s*bo|khai\s*thac|xay\s*dung|dao|muc\s*ho|pha\s*hoai|thuc\s*hien)/.test(n)) {
+                        if (r && flags.other.indexOf(r) < 0) flags.other.push(r);
+                    }
+                });
+                const out = [];
+                if (flags.cuaHa && flags.vanChuyen) out.push('cưa hạ và vận chuyển lâm sản');
+                else if (flags.cuaHa) out.push('cưa hạ');
+                else if (flags.vanChuyen) out.push('vận chuyển lâm sản');
+                if (flags.diDoi) out.push('đi dời lâm sản');
+                if (flags.muaLamSan) out.push('mua lâm sản');
+                if (flags.chatPha && !flags.cuaHa) out.push('chặt phá');
+                if (flags.xayDung) out.push('xây dựng');
+                if (flags.daoMuc) out.push('đào múc hồ');
+                if (flags.phaHoai) out.push('phá hoại cây rừng trồng');
+                if (flags.khaiThac && !flags.cuaHa && !flags.vanChuyen) out.push('khai thác');
+                flags.other.forEach(o => out.push(o));
+                return out;
+            }
+
+            const map = new Map();
+            (cases || []).forEach(c => {
+                const phaHoai = isPhaHoaiLocal(c);
+                let actors = (typeof extractActorsFromText === 'function')
+                    ? extractActorsFromText(c.doiTuong)
+                    : [];
+                if (phaHoai) {
+                    const hoKey = (typeof normPersonName === 'function' ? normPersonName(c.hoTen) : String(c.hoTen||'').toLowerCase());
+                    const dtRaw = String(c.doiTuong || '').trim();
+                    const hasExplicitActorPhrase = /(?:người\s+[^,]{0,40}?\s+là\s+)?(?:ông|bà|anh|chị)\s+[A-ZÀ-ỴĐ]/i.test(dtRaw)
+                        || /người\s+thực\s+hiện/i.test(dtRaw);
+                    if (!hasExplicitActorPhrase) {
+                        actors = [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
+                    } else {
+                        actors = (actors || []).filter(a => {
+                            if (!a || a.key === '__unknown__') return false;
+                            if (hoKey && a.key === hoKey) return false;
+                            if (hoKey && a.key.length >= 4 && hoKey.length >= 4 && (hoKey.includes(a.key) || a.key.includes(hoKey))) return false;
+                            return true;
+                        });
+                        if (!actors.length) {
+                            actors = [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
+                        }
+                    }
+                } else if (!actors || !actors.length) {
+                    // Không tách được tên: nếu hộ tự thực hiện thì dùng tên hộ; không thì không xác định
+                    let ak = (typeof actorKind === 'function') ? actorKind(c) : 'unknown';
+                    if (ak === 'self' && c.hoTen) {
+                        const ten = String(c.hoTen).trim();
+                        const key = (typeof normPersonName === 'function' ? normPersonName(ten) : ten.toLowerCase());
+                        actors = [{ ten: ten, vaiTro: '', key: key || '__unknown__' }];
+                    } else {
+                        actors = [{ ten: 'Không xác định', vaiTro: '', key: '__unknown__' }];
                     }
                 }
-                if(ak==='self') return String(c.hoTen||'').trim() || '—';
-                let t = String(c.doiTuong||'').replace(/\s+/g,' ').trim();
-                if(!t) return String(c.hoTen||'').trim() || '—';
-                // chỉ lấy tên, bỏ mô tả dài
-                t = t.replace(/^(ông|bà|anh|chị|cô|chú)\s+/i,'').split(/,|\(|—|–/)[0].trim();
-                if(t.length>40) t = t.slice(0,37)+'…';
-                return t || '—';
-            }
-            function roleLabel(ak){
-                if(ak==='self') return 'Hộ tự thực hiện';
-                if(ak==='other') return 'Người khác';
-                return 'Không xác định';
-            }
-            cases.forEach(c=>{
-                let ak = (typeof actorKind==='function') ? actorKind(c) : 'unknown';
-                const m = (typeof getReportMetrics==='function') ? getReportMetrics(c) : {};
-                // Phá hoại: self → unknown (đồng bộ logic thống kê)
-                if(m.isPhaHoai && ak==='self') ak='unknown';
-                const name = displayName(c, ak);
-                const key = (typeof normPersonName==='function' ? normPersonName(name) : name.toLowerCase()) + '|' + ak;
-                if(!map.has(key)){
-                    map.set(key, {
-                        name, ak,
-                        role: roleLabel(ak),
-                        n: 0,
-                        hanhVi: new Set(),
-                        ho: new Set(),
-                        pt: new Set(),
-                        cay: 0, m3: 0, m2: 0
-                    });
-                }
-                const o = map.get(key);
-                o.n++;
-                o.hanhVi.add(shortHanhVi(c.hanhVi));
-                if(c.hoTen) o.ho.add(String(c.hoTen).trim());
-                if(c.phanTruong) o.pt.add(String(c.phanTruong).trim());
-                o.cay += m.cayGoLon||0;
-                o.m3 += m.khoiLuongM3||0;
-                o.m2 += m.dienTichM2||0;
+
+                const seenInCase = new Set();
+                actors.forEach(a => {
+                    const key = a.key || '__unknown__';
+                    if (seenInCase.has(key)) return;
+                    seenInCase.add(key);
+                    let row = map.get(key);
+                    if (!row) {
+                        row = {
+                            ten: key === '__unknown__' ? 'Không xác định' : a.ten,
+                            soVu: 0,
+                            vaiTro: new Set(),
+                            hanhVi: new Set(),
+                            ho: new Set()
+                        };
+                        map.set(key, row);
+                    }
+                    row.soVu++;
+                    if (a.vaiTro) String(a.vaiTro).split(';').map(s => s.trim()).filter(Boolean).forEach(v => row.vaiTro.add(v));
+                    if (c.hanhVi) row.hanhVi.add(String(c.hanhVi).trim());
+                    if (c.hoTen) row.ho.add(String(c.hoTen).trim());
+                });
             });
-            const rows = Array.from(map.values()).sort((a,b)=>{
-                // Ưu tiên số vụ giảm dần, rồi tên
-                if(b.n!==a.n) return b.n-a.n;
-                return String(a.name).localeCompare(String(b.name),'vi');
+
+            const rows = Array.from(map.values()).sort((a, b) => {
+                if (a.ten === 'Không xác định') return 1;
+                if (b.ten === 'Không xác định') return -1;
+                return b.soVu - a.soVu || String(a.ten).localeCompare(String(b.ten), 'vi');
             });
-            let html = '<div class="card"><h2>Bảng tổng hợp đối tượng thực hiện hành vi</h2>';
-            html += '<p style="font-size:11.5px;color:#64748b;margin:0 0 10px">Mỗi đối tượng 1 dòng — nếu cùng người thực hiện nhiều vụ sẽ gộp số vụ và danh sách hành vi.</p>';
+
+            const unkVu = rows.filter(r => r.ten === 'Không xác định').reduce((s, r) => s + r.soVu, 0);
+            const meta = rows.length + ' đối tượng · từ ' + (cases||[]).length + ' hồ sơ'
+                + (unkVu ? ' · không XĐ: ' + unkVu : '');
+
+            let html = '<div class="card"><h2>Tổng hợp đối tượng vi phạm</h2>';
+            html += '<p style="font-size:11.5px;color:#64748b;margin:0 0 10px">' + esc(meta) + '</p>';
             html += '<table><thead><tr>'
               + '<th class="center">STT</th>'
-              + '<th>Đối tượng thực hiện</th>'
-              + '<th>Vai trò</th>'
+              + '<th>Họ tên đối tượng</th>'
               + '<th class="right">Số vụ</th>'
               + '<th>Hành vi</th>'
               + '<th>Hộ nhận khoán liên quan</th>'
-              + '<th>Phân trường</th>'
-              + '<th class="right">Cây</th>'
-              + '<th class="right">m³</th>'
-              + '<th class="right">m²</th>'
               + '</tr></thead><tbody>';
-            if(!rows.length){
-                html += '<tr><td colspan="10" class="center" style="color:#94a3b8">Không có dữ liệu</td></tr>';
+            if (!rows.length) {
+                html += '<tr><td colspan="5" class="center" style="color:#94a3b8">Không có dữ liệu trong kỳ lọc</td></tr>';
             } else {
-                rows.forEach((r,i)=>{
-                    const hv = Array.from(r.hanhVi).filter(Boolean).join('; ') || '—';
+                rows.forEach((r, i) => {
+                    const hv = mergeRoles(r.vaiTro, r.hanhVi).join('; ') || '—';
                     const ho = Array.from(r.ho).filter(Boolean).join('; ') || '—';
-                    const pt = Array.from(r.pt).filter(Boolean).join('; ') || '—';
                     html += '<tr>'
-                      + '<td class="center">'+(i+1)+'</td>'
-                      + '<td><b>'+esc(r.name)+'</b></td>'
-                      + '<td style="font-size:10.5px">'+esc(r.role)+'</td>'
-                      + '<td class="right"><b>'+r.n+'</b></td>'
-                      + '<td style="font-size:10.5px">'+esc(hv)+'</td>'
-                      + '<td style="font-size:10.5px">'+esc(ho)+'</td>'
-                      + '<td style="font-size:10.5px">'+esc(pt)+'</td>'
-                      + '<td class="right">'+fmt(r.cay,0)+'</td>'
-                      + '<td class="right">'+fmt(r.m3)+'</td>'
-                      + '<td class="right">'+fmt(r.m2)+'</td>'
+                      + '<td class="center">' + (i + 1) + '</td>'
+                      + '<td><b>' + esc(r.ten) + '</b></td>'
+                      + '<td class="right"><b>' + r.soVu + '</b></td>'
+                      + '<td style="font-size:10.5px">' + esc(hv) + '</td>'
+                      + '<td style="font-size:10.5px">' + esc(ho) + '</td>'
                       + '</tr>';
                 });
             }
             html += '</tbody></table></div>';
             return html;
         }
+
 
         function buildDetailedStatsBlocks(cases, esc, fmt){
             const land=[], treeKT=[], treePH=[], other=[];
