@@ -4588,6 +4588,55 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
 
         function exportStatsExcel() {
             const cases = getFilteredCases();
+            const agg = (typeof collectDoiTuongAggRows === 'function')
+                ? collectDoiTuongAggRows(cases)
+                : { rows: [], meta: '' };
+
+            // —— Sheet 1: Tổng hợp đối tượng (định dạng đẹp như biểu Word)
+            let periodLabel = 'Toàn bộ thời gian';
+            try { if (typeof getPeriodLabelStats === 'function') periodLabel = getPeriodLabelStats(); } catch(e) {}
+            const mode = document.getElementById('statsTimeMode')?.value || 'all';
+            if (!periodLabel || periodLabel.indexOf('Toàn bộ') >= 0) {
+                if (mode === 'year') periodLabel = 'Năm ' + (document.getElementById('statsYearTop')?.value || '');
+                if (mode === 'month') periodLabel = 'Tháng ' + (document.getElementById('statsMonth')?.value || '');
+                if (mode === 'quarter') periodLabel = 'Quý ' + (document.getElementById('statsQuarter')?.value || '') + '/' + (document.getElementById('statsYearTop')?.value || '');
+                if (mode === 'custom') periodLabel = (document.getElementById('statsFrom')?.value || '…') + ' → ' + (document.getElementById('statsTo')?.value || '…');
+            }
+
+            const aoa = [];
+            aoa.push(['BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC']);
+            aoa.push(['BIỂU TỔNG HỢP ĐỐI TƯỢNG THỰC HIỆN HÀNH VI VI PHẠM']);
+            aoa.push(['Kỳ thống kê: ' + periodLabel]);
+            aoa.push([agg.meta || ('')]);
+            aoa.push([]); // blank
+            aoa.push(['STT', 'Họ tên đối tượng', 'Số vụ', 'Hành vi', 'Hộ nhận khoán liên quan']);
+            (agg.rows || []).forEach((r, i) => {
+                aoa.push([i + 1, r.ten, r.soVu, r.hanhVi, r.ho]);
+            });
+            if (!(agg.rows || []).length) {
+                aoa.push(['', 'Không có dữ liệu trong kỳ lọc', '', '', '']);
+            }
+
+            const wsDT = XLSX.utils.aoa_to_sheet(aoa);
+            // Merge title rows
+            wsDT['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 4 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 4 } }
+            ];
+            // Column widths (approx characters) — căn đẹp như biểu Word
+            wsDT['!cols'] = [
+                { wch: 6 },   // STT
+                { wch: 22 },  // Họ tên đối tượng
+                { wch: 8 },   // Số vụ
+                { wch: 32 },  // Hành vi
+                { wch: 48 }   // Hộ nhận khoán
+            ];
+            // Row heights lightly
+            wsDT['!rows'] = [{ hpt: 20 }, { hpt: 22 }, { hpt: 16 }, { hpt: 16 }, { hpt: 8 }, { hpt: 18 }];
+
+            // —— Sheet danh sách hồ sơ
             const rows = cases.map((c, i) => {
                 const m = getReportMetrics(c);
                 return {
@@ -4613,18 +4662,31 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                     'Hồ sơ': c.linkHoSo || c.tuiHoSo || ''
                 };
             });
-            const list = (typeof getFilteredCases==='function' ? getFilteredCases() : detailedCases)||[];
+            const list = cases || [];
             function sheetCount(fn){
                 const m={};
                 list.forEach(c=>{ const k=fn(c)||'—'; m[k]=(m[k]||0)+1; });
                 return Object.keys(m).sort((a,b)=>m[b]-m[a]).map(k=>({Nhom:k,'So vu':m[k]}));
             }
+            const wsList = XLSX.utils.json_to_sheet(rows);
+            wsList['!cols'] = [
+                {wch:5},{wch:20},{wch:22},{wch:28},{wch:24},
+                {wch:12},{wch:12},{wch:12},{wch:12},{wch:12},
+                {wch:18},{wch:18},{wch:18},{wch:28},{wch:10},
+                {wch:12},{wch:14},{wch:14},{wch:14},{wch:20}
+            ];
+            const wsPH = XLSX.utils.json_to_sheet(sheetCount(detectLoaiRung));
+            wsPH['!cols'] = [{wch:22},{wch:10}];
+            const wsVon = XLSX.utils.json_to_sheet(sheetCount(detectNguonVon));
+            wsVon['!cols'] = [{wch:24},{wch:10}];
+
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sheetCount(detectLoaiRung)), 'TH loai rung PH-SX');
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sheetCount(detectNguonVon)), 'TH nguon von VNN-TDT');
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Danh sach');
-            XLSX.writeFile(wb, 'ThongKe_ViPham_LamNghiep_'+new Date().toISOString().slice(0,10)+'.xlsx');
-            showToast('Đã xuất Excel · có sheet PH-SX, VNN, TĐT');
+            XLSX.utils.book_append_sheet(wb, wsDT, 'TH doi tuong VP');
+            XLSX.utils.book_append_sheet(wb, wsList, 'Danh sach');
+            XLSX.utils.book_append_sheet(wb, wsPH, 'TH loai rung PH-SX');
+            XLSX.utils.book_append_sheet(wb, wsVon, 'TH nguon von VNN-TDT');
+            XLSX.writeFile(wb, 'Bieu_TongHop_DoiTuong_ViPham_'+new Date().toISOString().slice(0,10)+'.xlsx');
+            showToast('Đã xuất Excel · sheet Tổng hợp đối tượng + danh sách');
         }
 
 
@@ -4669,8 +4731,8 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
             return m;
         }
 
-        /** Bảng tổng hợp đối tượng — cùng logic với bảng trên giao diện (tách từng người) */
-        function buildDoiTuongTongHopHtml(cases, esc, fmt){
+        /** Gom đối tượng vi phạm — 1 người / 1 dòng (dùng chung UI · Excel · PDF · Word) */
+        function collectDoiTuongAggRows(cases){
             function normalizeRoleToken(s){
                 let t = String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
                 try { t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); } catch(e) {}
@@ -4764,7 +4826,6 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                         }
                     }
                 } else if (!actors || !actors.length) {
-                    // Không tách được tên: nếu hộ tự thực hiện thì dùng tên hộ; không thì không xác định
                     let ak = (typeof actorKind === 'function') ? actorKind(c) : 'unknown';
                     if (ak === 'self' && c.hoTen) {
                         const ten = String(c.hoTen).trim();
@@ -4802,14 +4863,26 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                 if (a.ten === 'Không xác định') return 1;
                 if (b.ten === 'Không xác định') return -1;
                 return b.soVu - a.soVu || String(a.ten).localeCompare(String(b.ten), 'vi');
-            });
-
+            }).map(r => ({
+                ten: r.ten,
+                soVu: r.soVu,
+                hanhVi: mergeRoles(r.vaiTro, r.hanhVi).join('; ') || '—',
+                ho: Array.from(r.ho).filter(Boolean).join('; ') || '—'
+            }));
             const unkVu = rows.filter(r => r.ten === 'Không xác định').reduce((s, r) => s + r.soVu, 0);
-            const meta = rows.length + ' đối tượng · từ ' + (cases||[]).length + ' hồ sơ'
-                + (unkVu ? ' · không XĐ: ' + unkVu : '');
+            return {
+                rows,
+                meta: rows.length + ' đối tượng · từ ' + (cases||[]).length + ' hồ sơ'
+                    + (unkVu ? ' · không XĐ: ' + unkVu : '')
+            };
+        }
 
+        /** HTML bảng tổng hợp đối tượng — PDF / Word */
+        function buildDoiTuongTongHopHtml(cases, esc, fmt){
+            const agg = collectDoiTuongAggRows(cases);
+            const rows = agg.rows;
             let html = '<div class="card"><h2>Tổng hợp đối tượng vi phạm</h2>';
-            html += '<p style="font-size:11.5px;color:#64748b;margin:0 0 10px">' + esc(meta) + '</p>';
+            html += '<p style="font-size:11.5px;color:#64748b;margin:0 0 10px">' + esc(agg.meta) + '</p>';
             html += '<table><thead><tr>'
               + '<th class="center">STT</th>'
               + '<th>Họ tên đối tượng</th>'
@@ -4821,20 +4894,19 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                 html += '<tr><td colspan="5" class="center" style="color:#94a3b8">Không có dữ liệu trong kỳ lọc</td></tr>';
             } else {
                 rows.forEach((r, i) => {
-                    const hv = mergeRoles(r.vaiTro, r.hanhVi).join('; ') || '—';
-                    const ho = Array.from(r.ho).filter(Boolean).join('; ') || '—';
                     html += '<tr>'
                       + '<td class="center">' + (i + 1) + '</td>'
                       + '<td><b>' + esc(r.ten) + '</b></td>'
                       + '<td class="right"><b>' + r.soVu + '</b></td>'
-                      + '<td style="font-size:10.5px">' + esc(hv) + '</td>'
-                      + '<td style="font-size:10.5px">' + esc(ho) + '</td>'
+                      + '<td style="font-size:10.5px">' + esc(r.hanhVi) + '</td>'
+                      + '<td style="font-size:10.5px">' + esc(r.ho) + '</td>'
                       + '</tr>';
                 });
             }
             html += '</tbody></table></div>';
             return html;
         }
+
 
 
         function buildDetailedStatsBlocks(cases, esc, fmt){
