@@ -519,6 +519,23 @@ footer{
   display:none;line-height:1.45;text-align:center;
 }
 .toast-perm.on{display:block;animation:fadeIn .2s ease}
+/* ===== Module Công cụ lâm nghiệp + hiệu ứng ===== */
+.card.lamnghiep{--accent:#4ade80}
+.card.lamnghiep .card-icon{background:linear-gradient(135deg,#4ade80,#047857);animation:lnGlow 2.8s ease-in-out infinite}
+.card.lamnghiep .card-icon i{display:inline-block;transform-origin:50% 100%;animation:lnSway 3.2s ease-in-out infinite}
+.card.lamnghiep .code{color:#bbf7d0;background:rgba(74,222,128,.14);animation:lnPulse 2.4s ease-in-out infinite}
+.grid-inner .card{animation:cardIn .55s cubic-bezier(.2,.7,.2,1) both}
+.grid-inner .card:nth-child(2){animation-delay:.05s}.grid-inner .card:nth-child(3){animation-delay:.1s}.grid-inner .card:nth-child(4){animation-delay:.15s}
+.grid-inner .card:nth-child(5){animation-delay:.2s}.grid-inner .card:nth-child(6){animation-delay:.25s}.grid-inner .card:nth-child(7){animation-delay:.3s}.grid-inner .card:nth-child(8){animation-delay:.35s}
+.card:hover .card-icon{transform:translateY(-2px) rotate(-6deg) scale(1.06)}
+.card-icon{transition:transform .25s}
+.ln-leaf{position:fixed;top:-24px;width:16px;height:16px;pointer-events:none;z-index:0;opacity:.55;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2334d399' d='M20 2C9 2 3 8 3 15c0 2 .6 3.4 1.4 4.6C6 14 10 10.5 15 9c-4.200 2.500-7.300 6-9.300 11.200C7.200 21.300 8.800 22 11 22c7 0 10-8 9-20z'/%3E%3C/svg%3E") center/contain no-repeat;animation:lnFall linear infinite}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes lnSway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@keyframes lnGlow{0%,100%{box-shadow:0 8px 18px rgba(0,0,0,.28),0 0 0 0 rgba(74,222,128,.45)}50%{box-shadow:0 8px 18px rgba(0,0,0,.28),0 0 0 9px rgba(74,222,128,0)}}
+@keyframes lnPulse{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes lnFall{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(40px,55vh,0) rotate(180deg)}100%{transform:translate3d(-20px,112vh,0) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.grid-inner .card,.card.lamnghiep .card-icon,.card.lamnghiep .card-icon i,.card.lamnghiep .code,.ln-leaf{animation:none!important}}
 </style>
 <link rel="icon" type="image/png" href="favicon-bqlrph.png">
 <meta name="theme-color" content="#047857">
@@ -755,9 +772,9 @@ var CONFIG = {
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', pdf: 'Công cụ PDF' };
-var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','tonghop','pdf'];
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pdf: 'Công cụ PDF' };
+var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','tonghop','lamnghiep','pdf'];
 function sanitizePerms(p){
   var arr = Array.isArray(p) ? p : String(p==null?'':p).split(/[,;|\/]/);
   var out = [];
@@ -768,6 +785,7 @@ function sanitizePerms(p){
     'mocgioi':'mocgioi','mốc giới':'mocgioi','moc gioi':'mocgioi',
     'trongrung':'trongrung','trồng & chăm sóc':'trongrung','trồng rừng':'trongrung','trong rung':'trongrung',
     'tasks':'tasks','gantt':'tasks','nhiệm vụ':'tasks','nhiem vu':'tasks','nhiệm vụ / gantt':'tasks',
+    'lamnghiep':'lamnghiep','công cụ lâm nghiệp':'lamnghiep','cong cu lam nghiep':'lamnghiep','lâm nghiệp':'lamnghiep',
     'pdf':'pdf','công cụ pdf':'pdf','cong cu pdf':'pdf'
   };
   arr.forEach(function(x){
@@ -781,7 +799,7 @@ function sanitizePerms(p){
 }
 function looksLikePermList(v){
   var s = String(v==null?'':v).toLowerCase();
-  return /(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|pdf)/.test(s);
+  return /(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pdf)/.test(s);
 }
 /** API cũ từng map nhầm: perms = tên đơn vị, created = chuỗi quyền module */
 function extractPermsFromUser(u){
@@ -1148,6 +1166,7 @@ var MODULES={
     {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Tọa độ VN-2000 · tải lớp · mẫu VB.'}
   ],
   chuyenmon:[
+    {id:'lamnghiep',href:'tienich-lamnghiep.html',cls:'lamnghiep',icon:'fa-tree',code:'LÂM NGHIỆP',title:'Công cụ lâm nghiệp',desc:'Tính m³ · bảng kê · phương án · tọa độ · đo diện tích.'},
     {id:'qlbvr',href:'quanly-qlbvr.html',cls:'qlbvr',icon:'fa-shield-halved',code:'QLBVR',title:'Vi phạm QLBVR',desc:'Hồ sơ · thống kê · báo cáo.'},
     {id:'nhao',href:'quanly-nhao-lampart.html',cls:'nhao',icon:'fa-house-chimney',code:'NHÀ Ở',title:'Nhà ở lâm phận',desc:'6 phân trường · phép xây.'},
     {id:'mocgioi',href:'quanly-mocgioi.html',cls:'mocgioi',icon:'fa-location-dot',code:'MỐC GIỚI',title:'Mốc giới',desc:'Tọa độ · lọc · Excel · in.'},
@@ -1407,6 +1426,9 @@ window.doRefreshPerms=doRefreshPerms;
 window.addEventListener('focus', function(){ setTimeout(pulsePresence, 200); });
 
 
+</script>
+<script>
+(function(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;for(var i=0;i<10;i++){var l=document.createElement('i');l.className='ln-leaf';l.style.left=(Math.random()*96)+'%';l.style.animationDuration=(14+Math.random()*12)+'s';l.style.animationDelay=(-Math.random()*20)+'s';l.style.transform='scale('+(.6+Math.random()*.8)+')';document.body.appendChild(l)}})();
 </script>
 </body>
 </html>

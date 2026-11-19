@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Công cụ lâm nghiệp · BQLRPH Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--g:#059669;--g2:#047857;--gs:#ecfdf5;--gl:#a7f3d0;--bg:#f1f5f4;--card:#fff;--bd:#e2e8f0;--tx:#0f172a;--mu:#64748b;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;color:var(--tx);min-height:100vh;background:radial-gradient(900px 420px at 0% 0%,rgba(16,185,129,.08),transparent 55%),var(--bg)}
+button,input,select,textarea{font:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 56px}
+.top{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:16px;background:linear-gradient(145deg,#34d399,#047857)}
+.logo h1{font-size:14.5px;font-weight:800}.logo p{font-size:11px;color:var(--mu);margin-top:1px}
+.btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 12px;border-radius:11px;font-size:12.5px;font-weight:600;border:1px solid var(--bd);background:#fff;color:#334155;cursor:pointer;text-decoration:none}
+.btn:hover{background:#f8fafc}
+.btn-g{background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none}
+.btn-b{background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;border:none}
+.btn-d{background:linear-gradient(135deg,#0f766e,#115e59);color:#fff;border:none}
+.btn-sm{height:32px;padding:0 10px;font-size:12px;border-radius:9px}
+.tabs{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 12px}
+.tab{height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--bd);background:#fff;font-size:12px;font-weight:700;color:#475569;cursor:pointer}
+.tab.on{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-color:transparent}
+.tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.tab{flex:none;white-space:nowrap}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;box-shadow:var(--sh);margin-bottom:12px}
+.card h2{font-size:15px;font-weight:800;margin:0 0 4px}
+.card h3{font-size:13.5px;font-weight:800;margin:14px 0 8px;color:#065f46}
+.card .sub{font-size:12px;color:var(--mu);margin-bottom:12px;line-height:1.55}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--mu);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:#fff;color:var(--tx)}
+.field input,.field select{height:38px}
+.field textarea{padding:8px 10px;min-height:80px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.12)}
+.table-wrap{overflow:auto;border:1px solid var(--bd);border-radius:12px}
+table.data{width:100%;border-collapse:collapse;font-size:12.5px;min-width:700px}
+table.data th,table.data td{border-bottom:1px solid #f1f5f9;padding:8px 10px;text-align:left;vertical-align:middle}
+table.data th{background:#f8fafc;font-size:11px;text-transform:uppercase;color:#64748b;font-weight:700}
+table.data td input,table.data td select{width:100%;height:32px;border:1px solid var(--bd);border-radius:8px;padding:0 8px;font-size:12.5px}
+table.data .right{text-align:right}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.result{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--gs);border:1px solid var(--gl);font-size:13px;line-height:1.55}
+.result b{color:var(--g2)}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+@media(max-width:720px){.kpi-row{grid-template-columns:1fr 1fr}}
+.kpi{background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:10px 12px}
+.kpi .l{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase}
+.kpi .v{font-size:18px;font-weight:800;margin-top:2px}
+#mapArea,#mapPA{height:360px;border-radius:14px;border:1px solid var(--bd);z-index:1}
+.hint{font-size:11.5px;color:var(--mu);margin-top:8px;line-height:1.45}
+.toast{position:fixed;right:16px;bottom:16px;z-index:9999;background:#0f172a;color:#fff;padding:10px 14px;border-radius:12px;font-size:12.5px;font-weight:600;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.foot{margin-top:18px;text-align:center;font-size:11.5px;color:var(--mu)}
+.photo-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.photo-box{width:96px;height:64px;border:1px dashed var(--bd);border-radius:10px;overflow:hidden;background:#f8fafc;display:grid;place-items:center;font-size:11px;color:var(--mu);position:relative}
+.photo-box img{width:100%;height:100%;object-fit:cover}
+#qrBox{display:inline-block;padding:8px;background:#fff;border:1px solid var(--bd);border-radius:12px;margin-top:8px}
+.sec-note{font-size:11.5px;color:var(--mu);background:#f8fafc;border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin:8px 0 12px;line-height:1.45}
+
+/* ===== Hiệu ứng ===== */
+.hero{position:relative;margin:14px 0 0;border-radius:18px;overflow:hidden;border:1px solid var(--bd);box-shadow:var(--sh);height:150px;animation:fadeUp .6s both}
+.hero svg{position:absolute;inset:0;width:100%;height:100%}
+.hero-t{position:absolute;left:18px;top:50%;transform:translateY(-50%);max-width:62%}
+.hero-t b{display:block;font-size:20px;font-weight:800;color:#064e3b;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.hero-t span{display:block;margin-top:4px;font-size:12px;color:#065f46;font-weight:600}
+.hero .sun{transform-box:fill-box;transform-origin:center;animation:sunPulse 4s ease-in-out infinite}
+.hero .cloud{animation:drift 38s linear infinite}.hero .cloud.c2{animation-duration:55s;animation-delay:-20s}
+.hero .tree{transform-box:fill-box;transform-origin:50% 100%;animation:sway 3.6s ease-in-out infinite}
+.ln-leaf{position:fixed;top:-24px;width:16px;height:16px;pointer-events:none;z-index:0;opacity:.5;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2334d399' d='M20 2C9 2 3 8 3 15c0 2 .6 3.4 1.4 4.6C6 14 10 10.5 15 9c-4.2 2.5-7.3 6-9.3 11.2C7.2 21.3 8.8 22 11 22c7 0 10-8 9-20z'/%3E%3C/svg%3E") center/contain no-repeat;animation:fall linear infinite}
+.wrap,.top{position:relative;z-index:1}.top{position:sticky}
+.logo-i i{display:inline-block;transform-origin:50% 100%;animation:sway 3.2s ease-in-out infinite}
+.panel.on{animation:panelIn .38s cubic-bezier(.2,.7,.2,1)}
+.tab{transition:transform .15s,box-shadow .2s,background .2s}.tab:hover{transform:translateY(-2px)}.tab.on{box-shadow:0 6px 14px rgba(13,148,136,.3)}
+.btn{transition:transform .15s,box-shadow .2s,background .2s;position:relative;overflow:hidden}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(15,23,42,.12)}.btn:active{transform:scale(.95)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:rip .55s ease-out;pointer-events:none}
+.card{transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-2px)}
+.kpi{transition:transform .2s,border-color .2s}.kpi:hover{transform:translateY(-3px);border-color:#34d399}
+.kpi .v.bump{animation:bump .35s}
+table.data tbody tr{animation:rowIn .3s both}table.data tbody tr:hover td{background:#f0fdf4}
+.result{animation:fadeUp .35s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes panelIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes drift{from{transform:translateX(-220px)}to{transform:translateX(900px)}}
+@keyframes fall{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(40px,55vh,0) rotate(180deg)}100%{transform:translate3d(-20px,112vh,0) rotate(360deg)}}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+@keyframes bump{50%{transform:scale(1.18);color:#059669}}
+@media(max-width:720px){.hero{height:120px}.hero-t b{font-size:16px}.hero-t{max-width:70%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.ln-leaf{display:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap top-in">
+  <div class="logo">
+    <div class="logo-i"><i class="fa-solid fa-tree"></i></div>
+    <div><h1>Công cụ lâm nghiệp</h1><p>BQLRPH Xuân Lộc · bộ công cụ nội bộ</p></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a class="btn" href="menu.html"><i class="fa-solid fa-arrow-left"></i> Menu</a>
+    <a class="btn" href="tienich-congcu.html"><i class="fa-solid fa-screwdriver-wrench"></i> Tiện ích</a>
+    <a class="btn" href="tienich-bando.html"><i class="fa-solid fa-map"></i> Bản đồ</a>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="hero" aria-hidden="true"><svg viewBox="0 0 800 150" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset="1" stop-color="#f0fdf4"/></linearGradient></defs><rect width="800" height="150" fill="url(#hsky)"/><circle class="sun" cx="690" cy="40" r="22" fill="#fde68a"/><g class="cloud"><ellipse cx="120" cy="34" rx="38" ry="10" fill="#fff" opacity=".85"/><ellipse cx="146" cy="28" rx="24" ry="9" fill="#fff" opacity=".85"/></g><g class="cloud c2"><ellipse cx="320" cy="56" rx="30" ry="8" fill="#fff" opacity=".7"/></g><path d="M0 100 Q130 62 280 92 T540 84 T800 96 V150 H0Z" fill="#86efac"/><path d="M0 122 Q170 88 340 116 T800 108 V150 H0Z" fill="#34d399"/><g id="heroTrees"></g></svg><div class="hero-t"><b>Hồ sơ lâm sản · khai thác · tọa độ</b><span>Tính m³ theo TT 26/2025 · xuất Word / PDF / Excel / KML</span></div></div>
+  <div class="tabs">
+    <button type="button" class="tab on" data-tab="m3" onclick="showTab(this)">m³ gỗ tròn</button>
+    <button type="button" class="tab" data-tab="bangke" onclick="showTab(this)">Bảng kê lâm sản</button>
+    <button type="button" class="tab" data-tab="phuongan" onclick="showTab(this)">Phương án khai thác</button>
+    <button type="button" class="tab" data-tab="bienban" onclick="showTab(this)">Biên bản kiểm tra</button>
+    <button type="button" class="tab" data-tab="toado" onclick="showTab(this)">Chuyển tọa độ</button>
+    <button type="button" class="tab" data-tab="dientich" onclick="showTab(this)">Đo diện tích</button>
+  </div>
+
+  <!-- m3 -->
+  <div class="panel on" id="tab-m3"><div class="card">
+    <h2>Tính khối lượng gỗ tròn</h2>
+    <p class="sub">Công thức theo Phụ lục I Thông tư 26/2025/TT-BNNMT: V = π/4 × D² × L, π = 3,14; D đường kính trung bình (m); L chiều dài ngắn nhất giữa hai mặt cắt (m). Gỗ đo vanh thì D = vanh ÷ 3,14. Đường kính làm tròn 1 số thập phân (cm), chiều dài 2 số thập phân (m), thể tích 3 số thập phân (m³).</p>
+    <div class="toolbar">
+      <button type="button" class="btn btn-g btn-sm" onclick="m3AddRow()"><i class="fa-solid fa-plus"></i> Thêm dòng</button>
+      <button type="button" class="btn btn-sm" onclick="m3AddRow();m3AddRow();m3AddRow();m3AddRow();m3AddRow()"><i class="fa-solid fa-plus"></i> +5 dòng</button>
+      <button type="button" class="btn btn-sm" onclick="m3Dup()"><i class="fa-solid fa-copy"></i> Sao chép dòng cuối</button>
+      <button type="button" class="btn btn-sm" onclick="m3Clear()"><i class="fa-solid fa-eraser"></i> Xóa hết</button>
+      <button type="button" class="btn btn-b btn-sm" onclick="m3ExportExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      <button type="button" class="btn btn-sm" onclick="m3ExportCSV()"><i class="fa-solid fa-file-csv"></i> CSV</button>
+      <button type="button" class="btn btn-sm" onclick="m3ExportWord()"><i class="fa-solid fa-file-word"></i> Word</button>
+      <button type="button" class="btn btn-sm" onclick="asPDF(m3ExportWord)"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      <button type="button" class="btn btn-d btn-sm" onclick="m3ToBangKe()"><i class="fa-solid fa-share"></i> Sang bảng kê</button>
+      <button type="button" class="btn btn-d btn-sm" onclick="m3ToPhuongAn()"><i class="fa-solid fa-share"></i> Sang phương án</button>
+    </div>
+    <div class="table-wrap"><table class="data"><thead><tr>
+      <th style="width:44px">TT</th><th>Loài gỗ</th><th style="width:120px">Đo bằng</th><th style="width:100px">Số đo (cm)</th><th style="width:90px">Dài (m)</th><th style="width:80px">SL</th><th class="right" style="width:100px">m³</th><th style="width:48px"></th>
+    </tr></thead><tbody id="m3Body"></tbody></table></div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="l">Số dòng</div><div class="v" id="m3KpiRows">0</div></div>
+      <div class="kpi"><div class="l">Tổng khúc</div><div class="v" id="m3KpiQty">0</div></div>
+      <div class="kpi"><div class="l">Tổng m³</div><div class="v" id="m3KpiVol">0</div></div>
+      <div class="kpi"><div class="l">TB / khúc</div><div class="v" id="m3KpiAvg">0</div></div>
+    </div>
+    <div class="result" id="m3Result">Chưa có số liệu. Nhập số đo và chiều dài.</div>
+  </div></div>
+
+  <!-- Bảng kê -->
+  <div class="panel" id="tab-bangke"><div class="card">
+    <h2>Bảng kê lâm sản</h2>
+    <p class="sub">Lập bảng kê (tham chiếu Mẫu số 01) — có mã QR tóm tắt, xuất Word/Excel.</p>
+    <h3>1. Thông tin chủ lâm sản</h3>
+    <div class="grid2">
+      <div class="field"><label>Họ và tên / tên tổ chức</label><input id="bkChu"></div>
+      <div class="field"><label>Số CCCD / MST</label><input id="bkCccd"></div>
+      <div class="field"><label>Địa chỉ / phân trường</label><input id="bkDiaChi"></div>
+      <div class="field"><label>Số điện thoại</label><input id="bkSdt"></div>
+      <div class="field"><label>Vị trí (tiểu khu · khoảnh · lô)</label><input id="bkVitri"></div>
+      <div class="field"><label>Ngày lập</label><input type="date" id="bkNgay"></div>
+    </div>
+    <div class="photo-row">
+      <label class="btn btn-sm"><i class="fa-solid fa-image"></i> Ảnh mặt trước<input type="file" accept="image/*" hidden onchange="previewImg(this,'bkImg1')"></label>
+      <label class="btn btn-sm"><i class="fa-solid fa-image"></i> Ảnh mặt sau<input type="file" accept="image/*" hidden onchange="previewImg(this,'bkImg2')"></label>
+      <div class="photo-box" id="bkImg1">MT</div>
+      <div class="photo-box" id="bkImg2">MS</div>
+    </div>
+    <h3>2. Chi tiết lâm sản</h3>
+    <div class="toolbar">
+      <button type="button" class="btn btn-g btn-sm" onclick="bkAddFromM3()"><i class="fa-solid fa-file-import"></i> Lấy từ bảng m³</button>
+      <button type="button" class="btn btn-sm" onclick="bkAddRow()"><i class="fa-solid fa-plus"></i> Thêm dòng</button>
+      <button type="button" class="btn btn-b btn-sm" onclick="bkExportExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
+      <button type="button" class="btn btn-sm" onclick="bkExportWord()"><i class="fa-solid fa-file-word"></i> Word + QR</button>
+      <button type="button" class="btn btn-sm" onclick="asPDF(bkExportWord)"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      <button type="button" class="btn btn-sm" onclick="bkMakeQR()"><i class="fa-solid fa-qrcode"></i> Tạo QR</button>
+      <button type="button" class="btn btn-sm" onclick="saveDraft('bangke')"><i class="fa-solid fa-floppy-disk"></i> Lưu hồ sơ</button>
+      <button type="button" class="btn btn-sm" onclick="loadDraft('bangke')"><i class="fa-solid fa-folder-open"></i> Mở hồ sơ</button>
+    </div>
+    <div class="table-wrap"><table class="data"><thead><tr>
+      <th style="width:44px">TT</th><th>Tên lâm sản / loài</th><th style="width:120px">Quy cách</th><th style="width:70px">ĐVT</th><th style="width:90px">Số lượng</th><th style="width:90px">m³</th><th>Ghi chú</th><th style="width:48px"></th>
+    </tr></thead><tbody id="bkBody"></tbody></table></div>
+    <div class="result" id="bkSum">Tổng m³: <b>0</b></div>
+    <div id="qrBox" style="display:none"></div>
+  </div></div>
+
+  <!-- Phương án -->
+  <div class="panel" id="tab-phuongan"><div class="card">
+    <h2>Phương án khai thác gỗ rừng trồng</h2>
+    <p class="sub">Dự thảo nội bộ theo hướng Mẫu 07/08/09 (TT 26/2025). Xuất Word để hoàn thiện trình ký.</p>
+    <h3>1. Chủ rừng</h3>
+    <div class="grid2">
+      <div class="field"><label>Chủ rừng là</label>
+        <select id="paLoai">
+          <option value="canhan">Hộ gia đình, cá nhân, cộng đồng (Mẫu số 08)</option>
+          <option value="tochuc">Tổ chức (Mẫu số 07)</option>
+        </select>
+      </div>
+      <div class="field"><label>Họ và tên / tên tổ chức</label><input id="paChu"></div>
+      <div class="field"><label>Số CCCD / MST</label><input id="paId"></div>
+      <div class="field"><label>Ngày cấp</label><input id="paNgayCap" placeholder="dd/mm/yyyy"></div>
+      <div class="field"><label>Nơi cấp</label><input id="paNoiCap" value="Cục cảnh sát QLHC về TTXH"></div>
+      <div class="field"><label>Nơi thường trú / trụ sở</label><input id="paThuongTru"></div>
+      <div class="field"><label>Số điện thoại</label><input id="paSdt"></div>
+      <div class="field"><label>Email</label><input id="paEmail"></div>
+    </div>
+    <div class="photo-row">
+      <label class="btn btn-sm"><i class="fa-solid fa-image"></i> Ảnh mặt trước<input type="file" accept="image/*" hidden onchange="previewImg(this,'paImg1')"></label>
+      <label class="btn btn-sm"><i class="fa-solid fa-image"></i> Ảnh mặt sau<input type="file" accept="image/*" hidden onchange="previewImg(this,'paImg2')"></label>
+      <div class="photo-box" id="paImg1">MT</div>
+      <div class="photo-box" id="paImg2">MS</div>
+    </div>
+    <h3>2. Hiện trạng khu rừng</h3>
+    <div class="grid2">
+      <div class="field"><label>Đối tượng khai thác</label><input id="paDoiTuong" value="Rừng trồng"></div>
+      <div class="field"><label>Loài cây</label><input id="paLoaiCay"></div>
+      <div class="field"><label>Năm trồng</label><input id="paNamTrong"></div>
+      <div class="field"><label>Nguồn vốn</label><input id="paNguonVon" value="Do hộ gia đình tự bỏ vốn"></div>
+      <div class="field"><label>Thôn / ấp</label><input id="paThon"></div>
+      <div class="field"><label>Xã / phường</label><input id="paXa"></div>
+      <div class="field"><label>Tỉnh / thành phố</label><input id="paTinh" value="Đồng Nai"></div>
+      <div class="field"><label>Tiểu khu</label><input id="paTieuKhu"></div>
+      <div class="field"><label>Khoảnh</label><input id="paKhoanh"></div>
+      <div class="field"><label>Lô</label><input id="paLo"></div>
+      <div class="field"><label>Diện tích khai thác (ha)</label><input type="number" step="any" id="paDienTich" value="0"></div>
+      <div class="field"><label>Sản lượng dự kiến (m³)</label><input type="number" step="any" id="paSanLuong" value="0"></div>
+      <div class="field"><label>Thời gian khai thác</label><input id="paThoiGian" placeholder="Từ ... đến ..."></div>
+      <div class="field"><label>Phương thức khai thác</label>
+        <select id="paPhuongThuc"><option>Khai thác trắng</option><option>Khai thác chọn</option><option>Khai thác nuôi dưỡng</option><option>Khác</option></select>
+      </div>
+    </div>
+    <h3>3. Vị trí khu rừng (WGS84 / VN-2000)</h3>
+    <div class="grid2">
+      <div class="field"><label>Vĩ độ (WGS84)</label><input id="paLat" type="number" step="any"></div>
+      <div class="field"><label>Kinh độ (WGS84)</label><input id="paLng" type="number" step="any"></div>
+      <div class="field"><label>Kinh tuyến trục VN-2000 (°)</label>
+        <select id="paLon0"><option value="105">105°00′</option><option value="105.5">105°30′</option><option value="105.75">105°45′</option><option value="106">106°00′</option><option value="106.25">106°15′ (Bình Phước cũ)</option><option value="106.5">106°30′</option><option value="107">107°00′</option><option value="107.25">107°15′</option><option value="107.5">107°30′</option><option value="107.75" selected>107°45′ (Đồng Nai)</option><option value="108">108°00′</option><option value="108.25">108°15′</option><option value="108.5">108°30′</option></select>
+      </div>
+      <div class="field"><label>&nbsp;</label><button type="button" class="btn btn-g" style="width:100%" onclick="paGPS()"><i class="fa-solid fa-location-crosshairs"></i> Lấy vị trí hiện tại</button></div>
+    </div>
+    <div id="mapPA"></div><p class="hint">Chạm lên bản đồ vệ tinh để chọn vị trí khu rừng — vĩ độ/kinh độ và VN-2000 tự cập nhật.</p>
+    <div class="result" id="paCoordOut">Chưa có tọa độ VN-2000.</div>
+    <div class="field" style="margin-top:10px"><label>Biện pháp thực hiện, BVMT, PCCCR</label><textarea id="paNoiDung"></textarea></div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-g btn-sm" onclick="paFillFromBk()"><i class="fa-solid fa-file-import"></i> Lấy từ bảng kê / m³</button>
+      <button type="button" class="btn btn-sm" onclick="paExportWord()"><i class="fa-solid fa-file-word"></i> Xuất Word</button>
+      <button type="button" class="btn btn-sm" onclick="asPDF(paExportWord)"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      <button type="button" class="btn btn-sm" onclick="saveDraft('phuongan')"><i class="fa-solid fa-floppy-disk"></i> Lưu hồ sơ</button>
+      <button type="button" class="btn btn-sm" onclick="loadDraft('phuongan')"><i class="fa-solid fa-folder-open"></i> Mở hồ sơ</button>
+    </div>
+  </div></div>
+
+  <!-- Biên bản -->
+  <div class="panel" id="tab-bienban"><div class="card">
+    <h2>Biên bản kiểm tra lâm sản</h2>
+    <p class="sub">Tham chiếu Mẫu số 15 — ghi nhận hiện trường, xuất Word.</p>
+    <div class="grid2">
+      <div class="field"><label>Số biên bản</label><input id="bbSo" placeholder="…/BB-KTLS"></div>
+      <div class="field"><label>Ngày kiểm tra</label><input type="date" id="bbNgay"></div>
+      <div class="field"><label>Địa điểm</label><input id="bbDiaDiem"></div>
+      <div class="field"><label>Chủ lâm sản</label><input id="bbChu"></div>
+      <div class="field"><label>Đại diện Tổ kiểm tra</label><input id="bbToTruong" placeholder="Họ tên · chức vụ"></div>
+      <div class="field"><label>Thành viên</label><input id="bbThanhVien"></div>
+    </div>
+    <div class="field" style="margin-top:10px"><label>Hồ sơ liên quan</label><textarea id="bbHoSo" placeholder="Số HĐ, quyết định, bảng kê…"></textarea></div>
+    <div class="field" style="margin-top:10px"><label>Lâm sản thực tế kiểm tra</label><textarea id="bbThucTe" placeholder="Khối lượng, chủng loại, quy cách…"></textarea></div>
+    <div class="field" style="margin-top:10px"><label>Kết luận</label><textarea id="bbKetLuan" placeholder="Phù hợp / chênh lệch / kiến nghị…"></textarea></div>
+    <div class="photo-row">
+      <label class="btn btn-sm"><i class="fa-solid fa-camera"></i> Ảnh hiện trường<input type="file" accept="image/*" multiple hidden onchange="previewMulti(this,'bbPhotos')"></label>
+      <div id="bbPhotos" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-sm" onclick="bbExportWord()"><i class="fa-solid fa-file-word"></i> Xuất Word</button>
+      <button type="button" class="btn btn-sm" onclick="asPDF(bbExportWord)"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      <button type="button" class="btn btn-sm" onclick="saveDraft('bienban')"><i class="fa-solid fa-floppy-disk"></i> Lưu hồ sơ</button>
+      <button type="button" class="btn btn-sm" onclick="loadDraft('bienban')"><i class="fa-solid fa-folder-open"></i> Mở hồ sơ</button>
+    </div>
+  </div></div>
+
+  <!-- Tọa độ -->
+  <div class="panel" id="tab-toado"><div class="card">
+    <h2>Chuyển đổi tọa độ WGS84 ⇄ VN-2000</h2>
+    <p class="sub">Múi chiếu TM VN-2000 (k = 0,9999). Mặc định kinh tuyến trục Đồng Nai 107°45′.</p>
+    <div class="grid3">
+      <div class="field"><label>Kinh tuyến trục (°)</label>
+        <select id="tdLon0"><option value="105">105°00′</option><option value="105.5">105°30′</option><option value="105.75">105°45′</option><option value="106">106°00′</option><option value="106.25">106°15′ (Bình Phước cũ)</option><option value="106.5">106°30′</option><option value="107">107°00′</option><option value="107.25">107°15′</option><option value="107.5">107°30′</option><option value="107.75" selected>107°45′ (Đồng Nai)</option><option value="108">108°00′</option><option value="108.25">108°15′</option><option value="108.5">108°30′</option></select>
+      </div>
+      <div class="field"><label>Chiều chuyển</label>
+        <select id="tdDir" onchange="tdRenderLabels()">
+          <option value="w2v">WGS84 → VN-2000</option>
+          <option value="v2w">VN-2000 → WGS84</option>
+        </select>
+      </div>
+      <div class="field"><label>&nbsp;</label><button type="button" class="btn btn-g" style="width:100%" onclick="tdConvert()"><i class="fa-solid fa-right-left"></i> Đổi</button></div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="field"><label id="tdL1">Kinh độ WGS84 (°)</label><input id="tdA" type="number" step="any"></div>
+      <div class="field"><label id="tdL2">Vĩ độ WGS84 (°)</label><input id="tdB" type="number" step="any"></div>
+    </div>
+    <div class="result" id="tdOut">Nhập tọa độ rồi bấm Đổi.</div>
+    <div class="toolbar">
+      <button type="button" class="btn btn-sm" onclick="tdUseGPS()"><i class="fa-solid fa-location-crosshairs"></i> GPS hiện tại</button>
+      <button type="button" class="btn btn-sm" onclick="tdAddList()"><i class="fa-solid fa-plus"></i> Thêm vào danh sách</button>
+      <button type="button" class="btn btn-b btn-sm" onclick="tdExportCSV()"><i class="fa-solid fa-file-csv"></i> CSV</button>
+      <button type="button" class="btn btn-sm" onclick="tdExportGeoJSON()"><i class="fa-solid fa-download"></i> GeoJSON</button>
+      <button type="button" class="btn btn-sm" onclick="tdExportKML()"><i class="fa-solid fa-earth-asia"></i> KML</button>
+    </div>
+    <div class="table-wrap" style="margin-top:10px"><table class="data"><thead><tr><th>TT</th><th>WGS84 lng</th><th>WGS84 lat</th><th>VN X</th><th>VN Y</th><th></th></tr></thead><tbody id="tdBody"></tbody></table></div>
+  </div></div>
+
+  <!-- Diện tích -->
+  <div class="panel" id="tab-dientich"><div class="card">
+    <h2>Đo diện tích trên bản đồ</h2>
+    <p class="sub">Vẽ đa giác trên ảnh vệ tinh — tính m², ha, sào (Nam Bộ ≈ 1.000 m²).</p>
+    <div class="toolbar">
+      <button type="button" class="btn btn-g btn-sm" onclick="areaLocate()"><i class="fa-solid fa-location-crosshairs"></i> Vị trí của tôi</button>
+      <button type="button" class="btn btn-sm" onclick="areaClear()"><i class="fa-solid fa-eraser"></i> Xóa hình</button>
+      <button type="button" class="btn btn-b btn-sm" onclick="areaExport()"><i class="fa-solid fa-download"></i> GeoJSON</button>
+      <button type="button" class="btn btn-sm" onclick="areaExportKML()"><i class="fa-solid fa-earth-asia"></i> KML</button>
+      <button type="button" class="btn btn-d btn-sm" onclick="areaToPA()"><i class="fa-solid fa-share"></i> Sang phương án</button>
+    </div>
+    <div id="mapArea"></div>
+    <div class="result" id="areaOut">Dùng công cụ đa giác trên bản đồ để vẽ thửa / lô.</div>
+  </div></div>
+
+  <div class="foot">Công cụ nội bộ Ban Quản lý rừng phòng hộ Xuân Lộc · Không phụ thuộc hệ thống bên ngoài</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){try{var j=sessionStorage.getItem('bqlrph_session_v1')||localStorage.getItem('bqlrph_session_v1');var u=j&&JSON.parse(j);var ok=u&&(u.role==='admin'||String(u.perms||'').indexOf('lamnghiep')>=0);if(!ok&&location.protocol!=='file:')location.replace('menu.html')}catch(e){}})();
+const PI=3.14;
+function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('on')},2200)}
+function showTab(btn){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on')});document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('on')});btn.classList.add('on');document.getElementById('tab-'+btn.getAttribute('data-tab')).classList.add('on');var t=btn.getAttribute('data-tab');if(t==='dientich')setTimeout(areaEnsureMap,80);if(t==='phuongan')setTimeout(paEnsureMap,80)}
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+var _pdf=false;
+function downloadText(fn,text,mime){if(_pdf&&/\.doc$/.test(fn)){var w=window.open('','_blank');if(!w){toast('Trình duyệt chặn cửa sổ in');return}w.document.write(text);w.document.close();w.focus();setTimeout(function(){w.print()},500);return}var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff',text],{type:mime||'text/plain'}));a.download=fn;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},800)}
+function wordHtml(title,body){return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+'</title></head><body style="font-family:\'Times New Roman\',serif;font-size:13pt">'+body+'</body></html>'}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function previewImg(input,boxId){var box=document.getElementById(boxId);if(!input.files||!input.files[0])return;var r=new FileReader();r.onload=function(){box.innerHTML='<img src="'+r.result+'" alt="">';box.dataset.src=r.result};r.readAsDataURL(input.files[0])}
+function previewMulti(input,wrapId){var w=document.getElementById(wrapId);w.innerHTML='';if(!input.files)return;[...input.files].forEach(function(f){var r=new FileReader();r.onload=function(){var d=document.createElement('div');d.className='photo-box';d.innerHTML='<img src="'+r.result+'" alt="">';w.appendChild(d)};r.readAsDataURL(f)})}
+
+/* ===== m³ TT26: π=3.14 ===== */
+function m3Vol(mode,sizeCm,lenM,qty){
+  var dCm=mode==='c'?(sizeCm/PI):sizeCm;
+  dCm=Math.round(dCm*10)/10;
+  var L=Math.round(lenM*100)/100;
+  var dM=dCm/100;
+  var v1=Math.round((PI/4)*dM*dM*L*1000)/1000;
+  return {dCm:dCm,len:L,v1:v1,total:Math.round(v1*qty*1000)/1000};
+}
+function m3AddRow(data){
+  data=data||{};
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td class="stt"></td><td><input class="m3-name" value="'+esc(data.name||'')+'" placeholder="Keo lai, Dầu…"></td><td><select class="m3-mode" onchange="m3Recalc()"><option value="d">Đường kính</option><option value="c">Vanh</option></select></td><td><input class="m3-size" type="number" step="any" min="0" value="'+(data.size!=null?data.size:'')+'" oninput="m3Recalc()" placeholder="cm"></td><td><input class="m3-len" type="number" step="any" min="0" value="'+(data.len!=null?data.len:'')+'" oninput="m3Recalc()" placeholder="m"></td><td><input class="m3-qty" type="number" step="1" min="1" value="'+(data.qty!=null?data.qty:1)+'" oninput="m3Recalc()"></td><td class="right m3-out">0</td><td><button type="button" class="btn btn-sm" onclick="this.closest(\'tr\').remove();m3Recalc()"><i class="fa-solid fa-xmark"></i></button></td>';
+  document.getElementById('m3Body').appendChild(tr);
+  if(data.mode==='c') tr.querySelector('.m3-mode').value='c';
+  m3Recalc();
+}
+function m3Dup(){var rows=m3Rows();if(!rows.length){m3AddRow();return}var last=rows[rows.length-1];m3AddRow({name:last.name,mode:last.mode,size:last.size,len:last.len,qty:last.qty})}
+function m3Rows(){return[...document.querySelectorAll('#m3Body tr')].map(function(tr,i){var mode=tr.querySelector('.m3-mode').value,size=parseFloat(tr.querySelector('.m3-size').value)||0,len=parseFloat(tr.querySelector('.m3-len').value)||0,qty=parseFloat(tr.querySelector('.m3-qty').value)||0,name=tr.querySelector('.m3-name').value.trim(),r=m3Vol(mode,size,len,qty);return{i:i+1,name:name,mode:mode,size:size,len:len,qty:qty,dCm:r.dCm,v1:r.v1,total:r.total,tr:tr}})}
+function m3Recalc(){var rows=m3Rows(),sumV=0,sumQ=0;rows.forEach(function(r){r.tr.querySelector('.stt').textContent=r.i;r.tr.querySelector('.m3-out').textContent=r.total?r.total.toFixed(3):'0';sumV+=r.total;sumQ+=r.qty});sumV=Math.round(sumV*1000)/1000;document.getElementById('m3KpiRows').textContent=rows.length;document.getElementById('m3KpiQty').textContent=sumQ;document.getElementById('m3KpiVol').textContent=sumV.toFixed(3);document.getElementById('m3KpiAvg').textContent=sumQ?(sumV/sumQ).toFixed(3):'0';document.getElementById('m3Result').innerHTML=rows.length?('Tổng thể tích: <b>'+sumV.toFixed(3)+' m³</b> · '+sumQ+' khúc · '+rows.length+' dòng.'):'Chưa có số liệu. Nhập số đo và chiều dài.'}
+function m3Clear(){document.getElementById('m3Body').innerHTML='';m3Recalc()}
+function m3ExportExcel(){var rows=m3Rows().map(function(r){return{'TT':r.i,'Loài gỗ':r.name,'Đo bằng':r.mode==='c'?'Vanh':'Đường kính','Số đo (cm)':r.size,'ĐK quy đổi (cm)':r.dCm,'Dài (m)':r.len,'Số lượng':r.qty,'m³':r.total}});rows.push({'TT':'','Loài gỗ':'TỔNG','Đo bằng':'','Số đo (cm)':'','ĐK quy đổi (cm)':'','Dài (m)':'','Số lượng':rows.reduce(function(s,r){return s+r['Số lượng']},0),'m³':Math.round(rows.reduce(function(s,r){return s+r['m³']},0)*1000)/1000});var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Khoi luong go');XLSX.writeFile(wb,'Khoi_luong_go_tron_'+todayStr()+'.xlsx');toast('Đã xuất Excel')}
+function m3ExportCSV(){var lines=['TT,Loai go,Do bang,So do cm,DK cm,Dai m,SL,m3'];m3Rows().forEach(function(r){lines.push([r.i,r.name,r.mode==='c'?'Vanh':'DK',r.size,r.dCm,r.len,r.qty,r.total].join(','))});downloadText('Khoi_luong_go_'+todayStr()+'.csv',lines.join('\n'),'text/csv');toast('Đã xuất CSV')}
+function m3ExportWord(){var rows=m3Rows(),sum=rows.reduce(function(s,r){return s+r.total},0);sum=Math.round(sum*1000)/1000;var trs=rows.map(function(r){return '<tr><td style="border:1px solid #000;padding:4px;text-align:center">'+r.i+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.name)+'</td><td style="border:1px solid #000;padding:4px">'+(r.mode==='c'?'Vanh':'ĐK')+' '+r.size+' cm</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.len+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.qty+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.total.toFixed(3)+'</td></tr>'}).join('');downloadText('Bang_tinh_m3_go_'+todayStr()+'.doc',wordHtml('m3','<p style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>BẢNG TÍNH KHỐI LƯỢNG GỖ TRÒN</b></p><p>Công thức TT 26/2025: V = π/4 × D² × L (π = 3,14) · Ngày '+todayStr()+'</p><table style="border-collapse:collapse;width:100%"><tr><th style="border:1px solid #000;padding:4px">TT</th><th style="border:1px solid #000;padding:4px">Loài</th><th style="border:1px solid #000;padding:4px">Quy cách</th><th style="border:1px solid #000;padding:4px">Dài (m)</th><th style="border:1px solid #000;padding:4px">SL</th><th style="border:1px solid #000;padding:4px">m³</th></tr>'+trs+'</table><p><b>Tổng khối lượng: '+sum.toFixed(3)+' m³</b></p>'),'application/msword');toast('Đã xuất Word')}
+function m3ToBangKe(){bkAddFromM3();document.querySelector('.tab[data-tab="bangke"]').click();toast('Đã chuyển sang bảng kê')}
+function m3ToPhuongAn(){var sum=m3Rows().reduce(function(s,r){return s+r.total},0);document.getElementById('paSanLuong').value=(Math.round(sum*1000)/1000).toFixed(3);var names=[...new Set(m3Rows().map(function(r){return r.name}).filter(Boolean))];if(names.length&&!document.getElementById('paLoaiCay').value)document.getElementById('paLoaiCay').value=names.join(', ');document.querySelector('.tab[data-tab="phuongan"]').click();toast('Đã chuyển sản lượng sang phương án')}
+
+/* ===== Bảng kê ===== */
+function bkAddRow(data){data=data||{};var tr=document.createElement('tr');tr.innerHTML='<td class="stt"></td><td><input class="bk-ten" value="'+esc(data.ten||'')+'"></td><td><input class="bk-qc" value="'+esc(data.qc||'')+'"></td><td><input class="bk-dvt" value="'+esc(data.dvt||'m³')+'"></td><td><input class="bk-sl" type="number" step="any" value="'+(data.sl!=null?data.sl:1)+'" oninput="bkSum()"></td><td><input class="bk-m3" type="number" step="any" value="'+(data.m3!=null?data.m3:0)+'" oninput="bkSum()"></td><td><input class="bk-gc" value="'+esc(data.gc||'')+'"></td><td><button type="button" class="btn btn-sm" onclick="this.closest(\'tr\').remove();bkSum()"><i class="fa-solid fa-xmark"></i></button></td>';document.getElementById('bkBody').appendChild(tr);bkSum()}
+function bkSum(){var rows=[...document.querySelectorAll('#bkBody tr')],sum=0;rows.forEach(function(tr,i){tr.querySelector('.stt').textContent=i+1;sum+=parseFloat(tr.querySelector('.bk-m3').value)||0});sum=Math.round(sum*1000)/1000;document.getElementById('bkSum').innerHTML='Tổng m³: <b>'+sum.toFixed(3)+'</b> · '+rows.length+' dòng';return sum}
+function bkAddFromM3(){var rows=m3Rows();if(!rows.length){toast('Chưa có dòng ở bảng m³');return}rows.forEach(function(r){bkAddRow({ten:r.name||'Gỗ tròn',qc:(r.mode==='c'?'Vanh ':'ĐK ')+r.size+' cm × '+r.len+' m',dvt:'m³',sl:r.qty,m3:r.total})});toast('Đã nhập '+rows.length+' dòng từ m³')}
+function bkData(){return[...document.querySelectorAll('#bkBody tr')].map(function(tr,i){return{stt:i+1,ten:tr.querySelector('.bk-ten').value.trim(),qc:tr.querySelector('.bk-qc').value.trim(),dvt:tr.querySelector('.bk-dvt').value.trim(),sl:parseFloat(tr.querySelector('.bk-sl').value)||0,m3:parseFloat(tr.querySelector('.bk-m3').value)||0,gc:tr.querySelector('.bk-gc').value.trim()}})}
+function bkMakeQR(){var sum=bkSum();var payload={chu:document.getElementById('bkChu').value,cccd:document.getElementById('bkCccd').value,vitri:document.getElementById('bkVitri').value,ngay:document.getElementById('bkNgay').value||todayStr(),tong_m3:sum,so_dong:bkData().length};var box=document.getElementById('qrBox');box.style.display='inline-block';box.innerHTML='';new QRCode(box,{text:JSON.stringify(payload),width:140,height:140,correctLevel:QRCode.CorrectLevel.L});toast('Đã tạo mã QR')}
+function bkExportExcel(){var meta=[['BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC'],['BẢNG KÊ LÂM SẢN'],['Chủ lâm sản',document.getElementById('bkChu').value],['CCCD/MST',document.getElementById('bkCccd').value],['Địa chỉ',document.getElementById('bkDiaChi').value],['Vị trí',document.getElementById('bkVitri').value],['Ngày',document.getElementById('bkNgay').value||todayStr()],[]];var rows=bkData().map(function(r){return[r.stt,r.ten,r.qc,r.dvt,r.sl,r.m3,r.gc]});var aoa=meta.concat([['TT','Tên lâm sản','Quy cách','ĐVT','SL','m³','Ghi chú']],rows);aoa.push([]);aoa.push(['Tổng m³','','','','',bkSum(),'']);var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:6},{wch:22},{wch:18},{wch:8},{wch:10},{wch:10},{wch:18}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:6}},{s:{r:1,c:0},e:{r:1,c:6}}];var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Bảng kê');XLSX.writeFile(wb,'Bang_ke_lam_san_'+todayStr()+'.xlsx');toast('Đã xuất Excel bảng kê')}
+function bkExportWord(){bkMakeQR();var rows=bkData(),sum=bkSum();var trs=rows.map(function(r){return '<tr><td style="border:1px solid #000;padding:4px;text-align:center">'+r.stt+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.ten)+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.qc)+'</td><td style="border:1px solid #000;padding:4px;text-align:center">'+esc(r.dvt)+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.sl+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.m3+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.gc)+'</td></tr>'}).join('');downloadText('Bang_ke_lam_san_'+todayStr()+'.doc',wordHtml('bk','<div style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>BẢNG KÊ LÂM SẢN</b></div><p>Chủ lâm sản: <b>'+esc(document.getElementById('bkChu').value)+'</b> · CCCD/MST: '+esc(document.getElementById('bkCccd').value)+'<br>Địa chỉ: '+esc(document.getElementById('bkDiaChi').value)+'<br>Vị trí: '+esc(document.getElementById('bkVitri').value)+'<br>Ngày lập: '+esc(document.getElementById('bkNgay').value||todayStr())+'</p><table style="border-collapse:collapse;width:100%"><tr><th style="border:1px solid #000;padding:4px">TT</th><th style="border:1px solid #000;padding:4px">Tên lâm sản</th><th style="border:1px solid #000;padding:4px">Quy cách</th><th style="border:1px solid #000;padding:4px">ĐVT</th><th style="border:1px solid #000;padding:4px">SL</th><th style="border:1px solid #000;padding:4px">m³</th><th style="border:1px solid #000;padding:4px">Ghi chú</th></tr>'+trs+'</table><p><b>Tổng khối lượng: '+sum.toFixed(3)+' m³</b></p>'+qrImgHtml()),'application/msword');toast('Đã xuất Word bảng kê')}
+
+/* ===== Phương án ===== */
+function paGPS(){if(!navigator.geolocation){toast('Không hỗ trợ GPS');return}navigator.geolocation.getCurrentPosition(function(pos){document.getElementById('paLat').value=pos.coords.latitude;document.getElementById('paLng').value=pos.coords.longitude;paUpdateCoord();toast('Đã lấy vị trí')},function(){toast('Không lấy được GPS')},{enableHighAccuracy:true,timeout:12000})}
+function paUpdateCoord(){paMarkerSync();var lat=parseFloat(document.getElementById('paLat').value),lng=parseFloat(document.getElementById('paLng').value),lon0=parseFloat(document.getElementById('paLon0').value)||107.75;if(isNaN(lat)||isNaN(lng)){document.getElementById('paCoordOut').textContent='Chưa có tọa độ VN-2000.';return}try{var code='VN2000_'+lon0;if(!proj4.defs[code])proj4.defs(code,'+proj=tmerc +lat_0=0 +lon_0='+lon0+' +k=0.9999 +x_0=500000 +y_0=0 +ellps=WGS84 +units=m +no_defs');var xy=proj4('EPSG:4326',code,[lng,lat]);document.getElementById('paCoordOut').innerHTML='VN-2000 (KT '+lon0+'°): <b>X = '+xy[1].toFixed(3)+'</b> · <b>Y = '+xy[0].toFixed(3)+'</b>'}catch(e){document.getElementById('paCoordOut').textContent='Lỗi chuyển tọa độ'}}
+document.getElementById('paLat').addEventListener('input',paUpdateCoord);
+document.getElementById('paLng').addEventListener('input',paUpdateCoord);
+document.getElementById('paLon0').addEventListener('change',paUpdateCoord);
+function paFillFromBk(){var sum=bkSum();if(sum>0)document.getElementById('paSanLuong').value=sum.toFixed(3);else{var s=m3Rows().reduce(function(a,r){return a+r.total},0);if(s)document.getElementById('paSanLuong').value=(Math.round(s*1000)/1000).toFixed(3)}if(!document.getElementById('paChu').value)document.getElementById('paChu').value=document.getElementById('bkChu').value;if(!document.getElementById('paId').value)document.getElementById('paId').value=document.getElementById('bkCccd').value;if(!document.getElementById('paThuongTru').value)document.getElementById('paThuongTru').value=document.getElementById('bkDiaChi').value;toast('Đã điền từ bảng kê / m³')}
+function paExportWord(){var loai=document.getElementById('paLoai').selectedOptions[0].text;var html=wordHtml('pa','<div style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>PHƯƠNG ÁN KHAI THÁC GỖ RỪNG TRỒNG</b><br><i>(Dự thảo nội bộ — tham chiếu Mẫu 07/08 TT 26/2025)</i></div><p><b>I. Chủ rừng</b> ('+esc(loai)+')<br>Họ tên / tổ chức: '+esc(document.getElementById('paChu').value)+'<br>CCCD/MST: '+esc(document.getElementById('paId').value)+' · Ngày cấp: '+esc(document.getElementById('paNgayCap').value)+'<br>Nơi cấp: '+esc(document.getElementById('paNoiCap').value)+'<br>Thường trú / trụ sở: '+esc(document.getElementById('paThuongTru').value)+'<br>Điện thoại: '+esc(document.getElementById('paSdt').value)+' · Email: '+esc(document.getElementById('paEmail').value)+'</p><p><b>II. Hiện trạng khu rừng</b><br>Đối tượng: '+esc(document.getElementById('paDoiTuong').value)+' · Loài: '+esc(document.getElementById('paLoaiCay').value)+' · Năm trồng: '+esc(document.getElementById('paNamTrong').value)+'<br>Nguồn vốn: '+esc(document.getElementById('paNguonVon').value)+'<br>Địa danh: '+esc(document.getElementById('paThon').value)+', '+esc(document.getElementById('paXa').value)+', '+esc(document.getElementById('paTinh').value)+'<br>Tiểu khu: '+esc(document.getElementById('paTieuKhu').value)+' · Khoảnh: '+esc(document.getElementById('paKhoanh').value)+' · Lô: '+esc(document.getElementById('paLo').value)+'<br>Diện tích: '+esc(document.getElementById('paDienTich').value)+' ha · Sản lượng dự kiến: '+esc(document.getElementById('paSanLuong').value)+' m³<br>Thời gian: '+esc(document.getElementById('paThoiGian').value)+' · Phương thức: '+esc(document.getElementById('paPhuongThuc').value)+'</p><p><b>III. Tọa độ</b><br>WGS84: lat '+esc(document.getElementById('paLat').value)+', lng '+esc(document.getElementById('paLng').value)+'<br>'+document.getElementById('paCoordOut').innerText+'</p><p><b>IV. Biện pháp thực hiện</b><br>'+esc(document.getElementById('paNoiDung').value).replace(/\n/g,'<br>')+'</p><br><table style="width:100%"><tr><td style="width:50%;text-align:center">Người lập<br><br><br></td><td style="width:50%;text-align:center">Lãnh đạo đơn vị<br><br><br></td></tr></table>');downloadText('Phuong_an_khai_thac_'+todayStr()+'.doc',html,'application/msword');toast('Đã xuất Word phương án')}
+
+/* ===== Biên bản ===== */
+function bbExportWord(){downloadText('Bien_ban_kiem_tra_'+todayStr()+'.doc',wordHtml('bb','<div style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>BIÊN BẢN KIỂM TRA LÂM SẢN</b><br>Số: '+esc(document.getElementById('bbSo').value)+'</div><p>Ngày kiểm tra: '+esc(document.getElementById('bbNgay').value||todayStr())+'<br>Địa điểm: '+esc(document.getElementById('bbDiaDiem').value)+'<br>Chủ lâm sản: '+esc(document.getElementById('bbChu').value)+'</p><p><b>I. Thành phần Tổ kiểm tra</b><br>Đại diện: '+esc(document.getElementById('bbToTruong').value)+'<br>Thành viên: '+esc(document.getElementById('bbThanhVien').value)+'</p><p><b>II. Hồ sơ liên quan</b><br>'+esc(document.getElementById('bbHoSo').value).replace(/\n/g,'<br>')+'</p><p><b>III. Lâm sản thực tế</b><br>'+esc(document.getElementById('bbThucTe').value).replace(/\n/g,'<br>')+'</p><p><b>IV. Kết luận</b><br>'+esc(document.getElementById('bbKetLuan').value).replace(/\n/g,'<br>')+'</p><br><table style="width:100%"><tr><td style="width:33%;text-align:center">Đại diện Tổ KT<br><br><br></td><td style="width:33%;text-align:center">Thành viên<br><br><br></td><td style="width:33%;text-align:center">Chủ lâm sản<br><br><br></td></tr></table>'),'application/msword');toast('Đã xuất Word biên bản')}
+
+/* ===== Drafts ===== */
+function collectIds(ids){var o={};ids.forEach(function(id){var el=document.getElementById(id);if(el)o[id]=el.value});return o}
+function applyIds(o){Object.keys(o||{}).forEach(function(id){var el=document.getElementById(id);if(el)el.value=o[id]})}
+function saveDraft(kind){
+  var data={};
+  if(kind==='bangke'){data.meta=collectIds(['bkChu','bkCccd','bkDiaChi','bkSdt','bkVitri','bkNgay']);data.rows=bkData()}
+  else if(kind==='phuongan'){data.meta=collectIds(['paLoai','paChu','paId','paNgayCap','paNoiCap','paThuongTru','paSdt','paEmail','paDoiTuong','paLoaiCay','paNamTrong','paNguonVon','paThon','paXa','paTinh','paTieuKhu','paKhoanh','paLo','paDienTich','paSanLuong','paThoiGian','paPhuongThuc','paLat','paLng','paLon0','paNoiDung'])}
+  else if(kind==='bienban'){data.meta=collectIds(['bbSo','bbNgay','bbDiaDiem','bbChu','bbToTruong','bbThanhVien','bbHoSo','bbThucTe','bbKetLuan'])}
+  try{localStorage.setItem('bqlrph_ln_'+kind,JSON.stringify(data));toast('Đã lưu hồ sơ trên máy')}catch(e){toast('Không lưu được')}
+}
+function loadDraft(kind){
+  try{
+    var raw=localStorage.getItem('bqlrph_ln_'+kind);if(!raw){toast('Chưa có hồ sơ đã lưu');return}
+    var data=JSON.parse(raw);
+    if(kind==='bangke'){applyIds(data.meta);document.getElementById('bkBody').innerHTML='';(data.rows||[]).forEach(function(r){bkAddRow(r)});bkSum()}
+    else applyIds(data.meta);
+    if(kind==='phuongan')paUpdateCoord();
+    toast('Đã mở hồ sơ');
+  }catch(e){toast('Lỗi mở hồ sơ')}
+}
+
+/* ===== Tọa độ ===== */
+var tdPoints=[];
+function vnDef(lon0){return '+proj=tmerc +lat_0=0 +lon_0='+lon0+' +k=0.9999 +x_0=500000 +y_0=0 +ellps=WGS84 +units=m +no_defs'}
+function tdCode(){var lon0=parseFloat(document.getElementById('tdLon0').value)||107.75;var code='VN2000_'+lon0;if(!proj4.defs[code])proj4.defs(code,vnDef(lon0));return code}
+function tdRenderLabels(){var dir=document.getElementById('tdDir').value;if(dir==='w2v'){document.getElementById('tdL1').textContent='Kinh độ WGS84 (°)';document.getElementById('tdL2').textContent='Vĩ độ WGS84 (°)'}else{document.getElementById('tdL1').textContent='X VN-2000 (m)';document.getElementById('tdL2').textContent='Y VN-2000 (m)'}}
+function tdConvert(){var dir=document.getElementById('tdDir').value,a=parseFloat(document.getElementById('tdA').value),b=parseFloat(document.getElementById('tdB').value),out=document.getElementById('tdOut');if(isNaN(a)||isNaN(b)){out.textContent='Nhập đủ hai giá trị tọa độ.';return null}try{var code=tdCode();if(dir==='w2v'){var xy=proj4('EPSG:4326',code,[a,b]);out.innerHTML='VN-2000: <b>X = '+xy[1].toFixed(3)+'</b> · <b>Y = '+xy[0].toFixed(3)+'</b>';return{lng:a,lat:b,x:xy[1],y:xy[0]}}else{var ll=proj4(code,'EPSG:4326',[b,a]);out.innerHTML='WGS84: <b>lng = '+ll[0].toFixed(8)+'</b> · <b>lat = '+ll[1].toFixed(8)+'</b>';return{lng:ll[0],lat:ll[1],x:a,y:b}}}catch(e){out.textContent='Lỗi: '+(e.message||e);return null}}
+function tdUseGPS(){if(!navigator.geolocation){toast('Không hỗ trợ GPS');return}navigator.geolocation.getCurrentPosition(function(pos){document.getElementById('tdDir').value='w2v';tdRenderLabels();document.getElementById('tdA').value=pos.coords.longitude;document.getElementById('tdB').value=pos.coords.latitude;tdConvert();toast('Đã lấy GPS')},function(){toast('Không lấy được GPS')},{enableHighAccuracy:true,timeout:12000})}
+function tdAddList(){var r=tdConvert();if(!r)return;tdPoints.push(r);tdRenderList();toast('Đã thêm điểm')}
+function tdRenderList(){document.getElementById('tdBody').innerHTML=tdPoints.map(function(p,i){return '<tr><td>'+(i+1)+'</td><td>'+p.lng.toFixed(8)+'</td><td>'+p.lat.toFixed(8)+'</td><td>'+p.x.toFixed(3)+'</td><td>'+p.y.toFixed(3)+'</td><td><button type="button" class="btn btn-sm" onclick="tdPoints.splice('+i+',1);tdRenderList()"><i class="fa-solid fa-xmark"></i></button></td></tr>'}).join('')}
+function tdExportCSV(){if(!tdPoints.length){toast('Chưa có điểm');return}var lines=['tt,lng_wgs84,lat_wgs84,x_vn2000,y_vn2000'];tdPoints.forEach(function(p,i){lines.push([i+1,p.lng,p.lat,p.x,p.y].join(','))});downloadText('Toa_do_VN2000_'+todayStr()+'.csv',lines.join('\n'),'text/csv');toast('Đã xuất CSV')}
+function tdExportGeoJSON(){if(!tdPoints.length){toast('Chưa có điểm');return}var fc={type:'FeatureCollection',features:tdPoints.map(function(p,i){return{type:'Feature',properties:{stt:i+1,x:p.x,y:p.y},geometry:{type:'Point',coordinates:[p.lng,p.lat]}}})};downloadText('Toa_do_'+todayStr()+'.geojson',JSON.stringify(fc,null,2),'application/geo+json');toast('Đã xuất GeoJSON')}
+proj4.defs('EPSG:4326','+proj=longlat +datum=WGS84 +no_defs');
+
+/* ===== Diện tích ===== */
+var areaMap=null,drawnItems=null,areaLast=null;
+function areaEnsureMap(){if(areaMap){areaMap.invalidateSize();return}areaMap=L.map('mapArea').setView([10.93,107.25],12);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'Esri',maxZoom:19}).addTo(areaMap);drawnItems=new L.FeatureGroup();areaMap.addLayer(drawnItems);areaMap.addControl(new L.Control.Draw({draw:{polygon:true,polyline:false,rectangle:true,circle:false,marker:false,circlemarker:false},edit:{featureGroup:drawnItems}}));areaMap.on(L.Draw.Event.CREATED,function(e){drawnItems.clearLayers();drawnItems.addLayer(e.layer);areaUpdate(e.layer)});areaMap.on('draw:edited',function(e){e.layers.eachLayer(function(l){areaUpdate(l)})});areaMap.on('draw:deleted',function(){document.getElementById('areaOut').textContent='Đã xóa hình vẽ.'})}
+function polygonArea(latlngs){if(!latlngs||latlngs.length<3)return 0;var R=6378137,area=0;for(var i=0;i<latlngs.length;i++){var j=(i+1)%latlngs.length;var lat1=latlngs[i].lat*Math.PI/180,lon1=latlngs[i].lng*Math.PI/180,lat2=latlngs[j].lat*Math.PI/180,lon2=latlngs[j].lng*Math.PI/180;area+=(lon2-lon1)*(2+Math.sin(lat1)+Math.sin(lat2))}return Math.abs(area*R*R/2)}
+function areaUpdate(layer){var latlngs=layer.getLatLngs();if(Array.isArray(latlngs[0]))latlngs=latlngs[0];var m2=polygonArea(latlngs);areaLast={ll:latlngs,m2:m2};document.getElementById('areaOut').innerHTML='Diện tích: <b>'+m2.toLocaleString('vi-VN',{maximumFractionDigits:1})+' m²</b> · <b>'+(m2/10000).toLocaleString('vi-VN',{maximumFractionDigits:4})+' ha</b> · <b>'+(m2/1000).toLocaleString('vi-VN',{maximumFractionDigits:2})+' sào (NB)</b>'+areaVerts(latlngs)}
+function areaLocate(){areaEnsureMap();if(!navigator.geolocation){toast('Không hỗ trợ GPS');return}navigator.geolocation.getCurrentPosition(function(pos){areaMap.setView([pos.coords.latitude,pos.coords.longitude],17);L.marker([pos.coords.latitude,pos.coords.longitude]).addTo(areaMap);toast('Đã định vị')},function(){toast('Không lấy được GPS')})}
+function areaClear(){areaLast=null;if(drawnItems)drawnItems.clearLayers();document.getElementById('areaOut').textContent='Đã xóa hình vẽ.'}
+function areaExport(){if(!drawnItems||!drawnItems.getLayers().length){toast('Chưa có hình');return}downloadText('Dien_tich_'+todayStr()+'.geojson',JSON.stringify(drawnItems.getLayers()[0].toGeoJSON(),null,2),'application/geo+json');toast('Đã xuất GeoJSON')}
+
+
+/* ===== Bổ sung ===== */
+function asPDF(fn){_pdf=true;try{fn()}finally{_pdf=false}toast('Hộp thoại in đã mở — chọn "Lưu thành PDF"')}
+function qrImgHtml(){var im=document.querySelector('#qrBox img');return(im&&im.src)?'<p><img src="'+im.src+'" width="110" height="110"><br><i>Mã QR tóm tắt hồ sơ</i></p>':''}
+function kmlDoc(name,body){return '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>'+esc(name)+'</name>'+body+'</Document></kml>'}
+function tdExportKML(){if(!tdPoints.length){toast('Chưa có điểm');return}downloadText('Toa_do_'+todayStr()+'.kml',kmlDoc('Toạ độ',tdPoints.map(function(p,i){return '<Placemark><name>Điểm '+(i+1)+'</name><description>X='+p.x.toFixed(3)+' Y='+p.y.toFixed(3)+'</description><Point><coordinates>'+p.lng+','+p.lat+',0</coordinates></Point></Placemark>'}).join('')),'application/vnd.google-earth.kml+xml');toast('Đã xuất KML')}
+function areaExportKML(){if(!areaLast){toast('Chưa có hình');return}var c=areaLast.ll.map(function(p){return p.lng+','+p.lat+',0'});c.push(c[0]);downloadText('Dien_tich_'+todayStr()+'.kml',kmlDoc('Lô rừng','<Placemark><name>Lô rừng</name><description>'+(areaLast.m2/10000).toFixed(4)+' ha</description><Polygon><outerBoundaryIs><LinearRing><coordinates>'+c.join(' ')+'</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>'),'application/vnd.google-earth.kml+xml');toast('Đã xuất KML')}
+function areaVerts(ll){try{var code=tdCode();return '<div class="table-wrap" style="margin-top:8px"><table class="data" style="min-width:0"><thead><tr><th>Đỉnh</th><th>X VN-2000</th><th>Y VN-2000</th></tr></thead><tbody>'+ll.map(function(p,i){var xy=proj4('EPSG:4326',code,[p.lng,p.lat]);return '<tr><td>'+(i+1)+'</td><td>'+xy[1].toFixed(3)+'</td><td>'+xy[0].toFixed(3)+'</td></tr>'}).join('')+'</tbody></table></div><p class="hint">Kinh tuyến trục lấy theo tab “Chuyển tọa độ”.</p>'}catch(e){return ''}}
+function areaToPA(){if(!areaLast){toast('Chưa có hình');return}var la=0,ln=0,ll=areaLast.ll;ll.forEach(function(p){la+=p.lat;ln+=p.lng});document.getElementById('paDienTich').value=(areaLast.m2/10000).toFixed(4);document.getElementById('paLat').value=(la/ll.length).toFixed(6);document.getElementById('paLng').value=(ln/ll.length).toFixed(6);paUpdateCoord();document.querySelector('.tab[data-tab="phuongan"]').click();toast('Đã chuyển diện tích + tọa độ tâm lô')}
+var paMap=null,paMarker=null;
+function paEnsureMap(){if(paMap){paMap.invalidateSize();return}paMap=L.map('mapPA').setView([10.93,107.25],12);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'Esri',maxZoom:19}).addTo(paMap);paMap.on('click',function(e){document.getElementById('paLat').value=e.latlng.lat.toFixed(6);document.getElementById('paLng').value=e.latlng.lng.toFixed(6);paUpdateCoord()});paMarkerSync(true)}
+function paMarkerSync(){var la=parseFloat(document.getElementById('paLat').value),ln=parseFloat(document.getElementById('paLng').value);if(!paMap||isNaN(la)||isNaN(ln))return;if(paMarker)paMarker.setLatLng([la,ln]);else paMarker=L.marker([la,ln]).addTo(paMap);if(!paMap.getBounds().contains([la,ln]))paMap.setView([la,ln],16)}
+
+
+/* ===== Hiệu ứng JS ===== */
+(function(){
+  var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var g=document.getElementById('heroTrees'),X=[40,95,150,205,610,665,720,770,330,420,505],h='';
+  X.forEach(function(x,i){var sc=.7+(i%4)*.18,y=118+(i%3)*6;h+='<g transform="translate('+x+','+y+') scale('+sc+')"><g class="tree" style="animation-delay:'+(-i*.4)+'s"><rect x="-2" y="26" width="4" height="9" fill="#78350f"/><path d="M0 -14 L-15 28 H15Z" fill="#047857"/><path d="M0 -28 L-11 6 H11Z" fill="#059669"/></g></g>'});
+  g.innerHTML=h;
+  if(rm)return;
+  for(var i=0;i<10;i++){var l=document.createElement('i');l.className='ln-leaf';l.style.left=(Math.random()*96)+'%';l.style.animationDuration=(14+Math.random()*12)+'s';l.style.animationDelay=(-Math.random()*20)+'s';l.style.width=l.style.height=(11+Math.random()*10)+'px';document.body.appendChild(l)}
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.btn,.tab');if(!b)return;var r=b.getBoundingClientRect(),d=Math.max(r.width,r.height),sp=document.createElement('span');sp.className='ripple';sp.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';if(!b.classList.contains('tab'))b.appendChild(sp);else return;setTimeout(function(){sp.remove()},600)});
+  /* số liệu chạy đếm */
+  function count(el,dec){var to=parseFloat(el.textContent);if(isNaN(to))return;var from=parseFloat(el.dataset.v||0);el.dataset.v=to;cancelAnimationFrame(el._r);if(from===to)return;var t0=performance.now();(function step(t){var k=Math.min(1,(t-t0)/450),e=1-Math.pow(1-k,3);el.textContent=(from+(to-from)*e).toFixed(dec);if(k<1)el._r=requestAnimationFrame(step)})(t0)}
+  var _m3=m3Recalc;m3Recalc=function(){_m3();count(document.getElementById('m3KpiVol'),3);count(document.getElementById('m3KpiQty'),0);count(document.getElementById('m3KpiAvg'),3);count(document.getElementById('m3KpiRows'),0)};
+  m3Recalc();
+})();
+
+/* init */
+document.getElementById('bkNgay').value=todayStr();
+document.getElementById('bbNgay').value=todayStr();
+tdRenderLabels();
+m3AddRow();
+bkAddRow();
+</script>
+</body>
+</html>
