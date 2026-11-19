@@ -582,8 +582,7 @@ function paExportWord(){
     'Thời gian: '+esc(document.getElementById('paThoiGian').value)+' · Phương thức: '+esc(document.getElementById('paPhuongThuc').value)+'</p>'+
     '<p><b>III. Tọa độ</b><br>WGS84: lat '+esc(document.getElementById('paLat').value)+', lng '+esc(document.getElementById('paLng').value)+'<br>'+
     document.getElementById('paCoordOut').innerText+'</p>'+
-    '<p><b>IV. Biện pháp thực hiện</b><br>'+esc(document.getElementById('paNoiDung').value).replace(/
-/g,'<br>')+'</p>'+
+    '<p><b>IV. Biện pháp thực hiện</b><br>'+esc(document.getElementById('paNoiDung').value).split('\n').join('<br>')+'</p>'+
     nd30Ky({leftLabel:'NGƯỜI LẬP'});
   downloadText('Phuong_an_khai_thac_'+todayStr()+'.doc', wordHtml('Phương án khai thác', body), 'application/msword');
   toast('Đã xuất Word phương án');
@@ -596,12 +595,9 @@ function bbExportWord(){
     '<p>Địa điểm: '+esc(document.getElementById('bbDiaDiem').value)+'<br>Chủ lâm sản: '+esc(document.getElementById('bbChu').value)+'</p>'+
     '<p><b>I. Thành phần Tổ kiểm tra</b><br>Đại diện: '+esc(document.getElementById('bbToTruong').value)+
     '<br>Thành viên: '+esc(document.getElementById('bbThanhVien').value)+'</p>'+
-    '<p><b>II. Hồ sơ liên quan</b><br>'+esc(document.getElementById('bbHoSo').value).replace(/
-/g,'<br>')+'</p>'+
-    '<p><b>III. Lâm sản thực tế</b><br>'+esc(document.getElementById('bbThucTe').value).replace(/
-/g,'<br>')+'</p>'+
-    '<p><b>IV. Kết luận</b><br>'+esc(document.getElementById('bbKetLuan').value).replace(/
-/g,'<br>')+'</p>'+
+    '<p><b>II. Hồ sơ liên quan</b><br>'+esc(document.getElementById('bbHoSo').value).split('\n').join('<br>')+'</p>'+
+    '<p><b>III. Lâm sản thực tế</b><br>'+esc(document.getElementById('bbThucTe').value).split('\n').join('<br>')+'</p>'+
+    '<p><b>IV. Kết luận</b><br>'+esc(document.getElementById('bbKetLuan').value).split('\n').join('<br>')+'</p>'+
     '<br><table style="width:100%;border-collapse:collapse"><tr>'+
     '<td style="width:33%;text-align:center;vertical-align:top"><b>ĐẠI DIỆN TỔ KIỂM TRA</b><div style="height:48pt"></div></td>'+
     '<td style="width:33%;text-align:center;vertical-align:top"><b>THÀNH VIÊN</b><div style="height:48pt"></div></td>'+
