@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Công cụ lâm nghiệp · BQLRPH Xuân Lộc</title>
+<title>Công cụ lâm nghiệp</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -111,7 +111,7 @@ table.data tbody tr{animation:rowIn .3s both}table.data tbody tr:hover td{backgr
 <div class="top"><div class="wrap top-in">
   <div class="logo">
     <div class="logo-i"><i class="fa-solid fa-tree"></i></div>
-    <div><h1>Công cụ lâm nghiệp</h1><p>BQLRPH Xuân Lộc · bộ công cụ nội bộ</p></div>
+    <div><h1>Công cụ lâm nghiệp</h1><p>Tiện ích hồ sơ · khai thác · tọa độ</p></div>
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <a class="btn" href="menu.html"><i class="fa-solid fa-arrow-left"></i> Menu</a>
@@ -132,6 +132,38 @@ table.data tbody tr{animation:rowIn .3s both}table.data tbody tr:hover td{backgr
   </div>
 
   <!-- m3 -->
+  
+  <!-- Cấu hình cơ quan (dùng khi xuất VB) -->
+  <div class="card" id="cfgAgency" style="margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <div>
+        <h2 style="margin:0;font-size:14px">Cơ quan ban hành (xuất Word / PDF)</h2>
+        <p class="sub" style="margin:4px 0 0">Theo thể thức văn bản hành chính Nghị định 30/2020/NĐ-CP — áp dụng mọi đơn vị.</p>
+      </div>
+      <button type="button" class="btn btn-sm" onclick="saveAgencyCfg()"><i class="fa-solid fa-floppy-disk"></i> Lưu cấu hình</button>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Cơ quan chủ quản (dòng trên, không in đậm)</label><input id="cfgCQ" placeholder="Ví dụ: UBND tỉnh … / Sở … (để trống nếu không có)"></div>
+      <div class="field"><label>Tên cơ quan ban hành (in đậm)</label><input id="cfgCQBH" placeholder="Tên đơn vị của bạn"></div>
+      <div class="field"><label>Địa danh (phần ngày tháng)</label><input id="cfgDiaDanh" placeholder="Ví dụ: Đồng Nai"></div>
+      <div class="field"><label>Quốc hiệu / Tiêu ngữ</label><input id="cfgQH" value="CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"></div>
+    </div>
+    <div class="grid2" style="margin-top:8px">
+      <div class="field"><label>Tiêu ngữ</label><input id="cfgTN" value="Độc lập - Tự do - Hạnh phúc"></div>
+      <div class="field"><label>Chức vụ ký mặc định</label>
+        <select id="cfgChucVu">
+          <option>GIÁM ĐỐC</option>
+          <option>KT. GIÁM ĐỐC</option>
+          <option>PHÓ GIÁM ĐỐC</option>
+          <option>TRƯỞNG PHÒNG</option>
+          <option>KT. TRƯỞNG PHÒNG</option>
+          <option>PHÓ TRƯỞNG PHÒNG</option>
+          <option>TL. GIÁM ĐỐC</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <div class="panel on" id="tab-m3"><div class="card">
     <h2>Tính khối lượng gỗ tròn</h2>
     <p class="sub">Công thức theo Phụ lục I Thông tư 26/2025/TT-BNNMT: V = π/4 × D² × L, π = 3,14; D đường kính trung bình (m); L chiều dài ngắn nhất giữa hai mặt cắt (m). Gỗ đo vanh thì D = vanh ÷ 3,14. Đường kính làm tròn 1 số thập phân (cm), chiều dài 2 số thập phân (m), thể tích 3 số thập phân (m³).</p>
@@ -335,7 +367,7 @@ table.data tbody tr{animation:rowIn .3s both}table.data tbody tr:hover td{backgr
     <div class="result" id="areaOut">Dùng công cụ đa giác trên bản đồ để vẽ thửa / lô.</div>
   </div></div>
 
-  <div class="foot">Công cụ nội bộ Ban Quản lý rừng phòng hộ Xuân Lộc · Không phụ thuộc hệ thống bên ngoài</div>
+  <div class="foot">Công cụ tiện ích · Xuất văn bản theo thể thức hành chính (NĐ 30/2020/NĐ-CP)</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -347,10 +379,103 @@ function showTab(btn){document.querySelectorAll('.tab').forEach(function(t){t.cl
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 var _pdf=false;
 function downloadText(fn,text,mime){if(_pdf&&/\.doc$/.test(fn)){var w=window.open('','_blank');if(!w){toast('Trình duyệt chặn cửa sổ in');return}w.document.write(text);w.document.close();w.focus();setTimeout(function(){w.print()},500);return}var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff',text],{type:mime||'text/plain'}));a.download=fn;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},800)}
-function wordHtml(title,body){return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+title+'</title></head><body style="font-family:\'Times New Roman\',serif;font-size:13pt">'+body+'</body></html>'}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
 function previewImg(input,boxId){var box=document.getElementById(boxId);if(!input.files||!input.files[0])return;var r=new FileReader();r.onload=function(){box.innerHTML='<img src="'+r.result+'" alt="">';box.dataset.src=r.result};r.readAsDataURL(input.files[0])}
 function previewMulti(input,wrapId){var w=document.getElementById(wrapId);w.innerHTML='';if(!input.files)return;[...input.files].forEach(function(f){var r=new FileReader();r.onload=function(){var d=document.createElement('div');d.className='photo-box';d.innerHTML='<img src="'+r.result+'" alt="">';w.appendChild(d)};r.readAsDataURL(f)})}
+
+
+/* ===== Cấu hình cơ quan + thể thức NĐ 30 ===== */
+var AGENCY_KEY='bqlrph_vb_agency_v1';
+function loadAgencyCfg(){
+  try{
+    var o=JSON.parse(localStorage.getItem(AGENCY_KEY)||'{}');
+    if(o.cq!=null) document.getElementById('cfgCQ').value=o.cq;
+    if(o.cqbh) document.getElementById('cfgCQBH').value=o.cqbh;
+    if(o.diadanh) document.getElementById('cfgDiaDanh').value=o.diadanh;
+    if(o.qh) document.getElementById('cfgQH').value=o.qh;
+    if(o.tn) document.getElementById('cfgTN').value=o.tn;
+    if(o.chucvu) document.getElementById('cfgChucVu').value=o.chucvu;
+  }catch(e){}
+}
+function saveAgencyCfg(){
+  var o={
+    cq:(document.getElementById('cfgCQ').value||'').trim(),
+    cqbh:(document.getElementById('cfgCQBH').value||'').trim(),
+    diadanh:(document.getElementById('cfgDiaDanh').value||'').trim(),
+    qh:(document.getElementById('cfgQH').value||'').trim()||'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM',
+    tn:(document.getElementById('cfgTN').value||'').trim()||'Độc lập - Tự do - Hạnh phúc',
+    chucvu:(document.getElementById('cfgChucVu').value||'').trim()||'GIÁM ĐỐC'
+  };
+  try{localStorage.setItem(AGENCY_KEY,JSON.stringify(o));toast('Đã lưu cấu hình cơ quan')}catch(e){toast('Không lưu được')}
+}
+function getAgency(){
+  return {
+    cq:(document.getElementById('cfgCQ')&&document.getElementById('cfgCQ').value||'').trim(),
+    cqbh:(document.getElementById('cfgCQBH')&&document.getElementById('cfgCQBH').value||'').trim()||'................................',
+    diadanh:(document.getElementById('cfgDiaDanh')&&document.getElementById('cfgDiaDanh').value||'').trim()||'......',
+    qh:(document.getElementById('cfgQH')&&document.getElementById('cfgQH').value||'').trim()||'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM',
+    tn:(document.getElementById('cfgTN')&&document.getElementById('cfgTN').value||'').trim()||'Độc lập - Tự do - Hạnh phúc',
+    chucvu:(document.getElementById('cfgChucVu')&&document.getElementById('cfgChucVu').value||'').trim()||'GIÁM ĐỐC'
+  };
+}
+function fmtNgayVB(iso){
+  var d;
+  if(iso && /^\d{4}-\d{2}-\d{2}/.test(iso)){ var p=iso.split('-'); d=new Date(+p[0],+p[1]-1,+p[2]); }
+  else d=new Date();
+  return 'ngày '+d.getDate()+' tháng '+(d.getMonth()+1)+' năm '+d.getFullYear();
+}
+/** Quốc hiệu + tiêu ngữ (căn giữa, tiêu ngữ gạch dưới) */
+function nd30QuocHieu(){
+  var a=getAgency();
+  return '<table style="width:100%;border-collapse:collapse;margin-bottom:8pt"><tr>'+
+    '<td style="width:48%;text-align:center;vertical-align:top;font-size:12pt">'+
+      (a.cq?('<div style="font-weight:normal;text-transform:uppercase">'+esc(a.cq)+'</div>'):'')+
+      '<div style="font-weight:bold;text-transform:uppercase">'+esc(a.cqbh)+'</div>'+
+      '<div style="border-top:1px solid #000;width:40%;margin:4pt auto 0"></div>'+
+    '</td>'+
+    '<td style="width:52%;text-align:center;vertical-align:top;font-size:12pt">'+
+      '<div style="font-weight:bold">'+esc(a.qh)+'</div>'+
+      '<div style="font-weight:bold"><span style="border-bottom:1px solid #000">'+esc(a.tn)+'</span></div>'+
+    '</td></tr></table>';
+}
+/** Số / ký hiệu · địa danh, ngày */
+function nd30SoNgay(so, ngayIso){
+  var a=getAgency();
+  return '<table style="width:100%;border-collapse:collapse;margin-bottom:10pt"><tr>'+
+    '<td style="width:48%;vertical-align:top;font-size:12pt">Số: '+(so?esc(so):'................')+'</td>'+
+    '<td style="width:52%;text-align:center;vertical-align:top;font-size:12pt"><i>'+esc(a.diadanh)+', '+fmtNgayVB(ngayIso)+'</i></td>'+
+    '</tr></table>';
+}
+function nd30Title(title){
+  return '<p style="text-align:center;font-weight:bold;font-size:13pt;margin:10pt 0 6pt;text-transform:uppercase">'+esc(title)+'</p>';
+}
+/** Ô ký: bên phải — chức vụ / khoảng trống / tên */
+function nd30Ky(opts){
+  opts=opts||{};
+  var a=getAgency();
+  var chuc=opts.chucvu||a.chucvu||'GIÁM ĐỐC';
+  var left=opts.leftLabel||'NGƯỜI LẬP';
+  var leftName=opts.leftName||'';
+  var rightName=opts.rightName||'';
+  return '<br><table style="width:100%;border-collapse:collapse;margin-top:12pt"><tr>'+
+    '<td style="width:48%;text-align:center;vertical-align:top;font-size:12pt">'+
+      '<div style="font-weight:bold">'+esc(left)+'</div>'+
+      '<div style="height:48pt"></div>'+
+      (leftName?('<div style="font-weight:bold">'+esc(leftName)+'</div>'):'<div>........................</div>')+
+    '</td>'+
+    '<td style="width:52%;text-align:center;vertical-align:top;font-size:12pt">'+
+      '<div style="font-weight:bold">'+esc(chuc)+'</div>'+
+      '<div style="height:48pt"></div>'+
+      (rightName?('<div style="font-weight:bold">'+esc(rightName)+'</div>'):'<div>........................</div>')+
+    '</td></tr></table>';
+}
+function wordHtml(title, body){
+  var print = (typeof _pdf!=='undefined' && _pdf);
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+
+    '<style>@page{size:A4;margin:20mm 20mm 20mm 25mm}body{font-family:"Times New Roman",Times,serif;font-size:13pt;line-height:1.3;color:#000}'+
+    'table{border-collapse:collapse}p{margin:4pt 0}</style></head><body'+(print?' onload="window.print()"':'')+'>'+body+'</body></html>';
+}
+
 
 /* ===== m³ TT26: π=3.14 ===== */
 function m3Vol(mode,sizeCm,lenM,qty){
@@ -375,7 +500,24 @@ function m3Recalc(){var rows=m3Rows(),sumV=0,sumQ=0;rows.forEach(function(r){r.t
 function m3Clear(){document.getElementById('m3Body').innerHTML='';m3Recalc()}
 function m3ExportExcel(){var rows=m3Rows().map(function(r){return{'TT':r.i,'Loài gỗ':r.name,'Đo bằng':r.mode==='c'?'Vanh':'Đường kính','Số đo (cm)':r.size,'ĐK quy đổi (cm)':r.dCm,'Dài (m)':r.len,'Số lượng':r.qty,'m³':r.total}});rows.push({'TT':'','Loài gỗ':'TỔNG','Đo bằng':'','Số đo (cm)':'','ĐK quy đổi (cm)':'','Dài (m)':'','Số lượng':rows.reduce(function(s,r){return s+r['Số lượng']},0),'m³':Math.round(rows.reduce(function(s,r){return s+r['m³']},0)*1000)/1000});var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Khoi luong go');XLSX.writeFile(wb,'Khoi_luong_go_tron_'+todayStr()+'.xlsx');toast('Đã xuất Excel')}
 function m3ExportCSV(){var lines=['TT,Loai go,Do bang,So do cm,DK cm,Dai m,SL,m3'];m3Rows().forEach(function(r){lines.push([r.i,r.name,r.mode==='c'?'Vanh':'DK',r.size,r.dCm,r.len,r.qty,r.total].join(','))});downloadText('Khoi_luong_go_'+todayStr()+'.csv',lines.join('\n'),'text/csv');toast('Đã xuất CSV')}
-function m3ExportWord(){var rows=m3Rows(),sum=rows.reduce(function(s,r){return s+r.total},0);sum=Math.round(sum*1000)/1000;var trs=rows.map(function(r){return '<tr><td style="border:1px solid #000;padding:4px;text-align:center">'+r.i+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.name)+'</td><td style="border:1px solid #000;padding:4px">'+(r.mode==='c'?'Vanh':'ĐK')+' '+r.size+' cm</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.len+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.qty+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.total.toFixed(3)+'</td></tr>'}).join('');downloadText('Bang_tinh_m3_go_'+todayStr()+'.doc',wordHtml('m3','<p style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>BẢNG TÍNH KHỐI LƯỢNG GỖ TRÒN</b></p><p>Công thức TT 26/2025: V = π/4 × D² × L (π = 3,14) · Ngày '+todayStr()+'</p><table style="border-collapse:collapse;width:100%"><tr><th style="border:1px solid #000;padding:4px">TT</th><th style="border:1px solid #000;padding:4px">Loài</th><th style="border:1px solid #000;padding:4px">Quy cách</th><th style="border:1px solid #000;padding:4px">Dài (m)</th><th style="border:1px solid #000;padding:4px">SL</th><th style="border:1px solid #000;padding:4px">m³</th></tr>'+trs+'</table><p><b>Tổng khối lượng: '+sum.toFixed(3)+' m³</b></p>'),'application/msword');toast('Đã xuất Word')}
+function m3ExportWord(){
+  var rows=m3Rows(),sum=rows.reduce(function(s,r){return s+r.total},0);sum=Math.round(sum*1000)/1000;
+  var trs=rows.map(function(r){
+    return '<tr><td style="border:1px solid #000;padding:4px;text-align:center">'+r.i+'</td>'+
+      '<td style="border:1px solid #000;padding:4px">'+esc(r.name)+'</td>'+
+      '<td style="border:1px solid #000;padding:4px">'+(r.mode==='c'?'Vanh':'ĐK')+' '+r.size+' cm</td>'+
+      '<td style="border:1px solid #000;padding:4px;text-align:right">'+r.len+'</td>'+
+      '<td style="border:1px solid #000;padding:4px;text-align:right">'+r.qty+'</td>'+
+      '<td style="border:1px solid #000;padding:4px;text-align:right">'+r.total.toFixed(3)+'</td></tr>';
+  }).join('');
+  var body=nd30QuocHieu()+nd30SoNgay('', todayStr())+nd30Title('BẢNG TÍNH KHỐI LƯỢNG GỖ TRÒN')+
+    '<p style="text-align:center;font-size:11pt"><i>(Công thức theo Phụ lục I Thông tư 26/2025/TT-BNNMT: V = π/4 × D² × L; π = 3,14)</i></p>'+
+    '<table style="width:100%;border-collapse:collapse;margin-top:8pt">'+
+    '<tr><th style="border:1px solid #000;padding:4px">TT</th><th style="border:1px solid #000;padding:4px">Loài gỗ</th><th style="border:1px solid #000;padding:4px">Quy cách</th><th style="border:1px solid #000;padding:4px">Dài (m)</th><th style="border:1px solid #000;padding:4px">SL</th><th style="border:1px solid #000;padding:4px">m³</th></tr>'+
+    trs+'</table><p><b>Tổng khối lượng: '+sum.toFixed(3)+' m³</b></p>'+nd30Ky({leftLabel:'NGƯỜI LẬP BIỂU'});
+  downloadText('Bang_tinh_m3_go_'+todayStr()+'.doc', wordHtml('Bảng tính m³ gỗ tròn', body), 'application/msword');
+  toast('Đã xuất Word');
+}
 function m3ToBangKe(){bkAddFromM3();document.querySelector('.tab[data-tab="bangke"]').click();toast('Đã chuyển sang bảng kê')}
 function m3ToPhuongAn(){var sum=m3Rows().reduce(function(s,r){return s+r.total},0);document.getElementById('paSanLuong').value=(Math.round(sum*1000)/1000).toFixed(3);var names=[...new Set(m3Rows().map(function(r){return r.name}).filter(Boolean))];if(names.length&&!document.getElementById('paLoaiCay').value)document.getElementById('paLoaiCay').value=names.join(', ');document.querySelector('.tab[data-tab="phuongan"]').click();toast('Đã chuyển sản lượng sang phương án')}
 
@@ -385,8 +527,32 @@ function bkSum(){var rows=[...document.querySelectorAll('#bkBody tr')],sum=0;row
 function bkAddFromM3(){var rows=m3Rows();if(!rows.length){toast('Chưa có dòng ở bảng m³');return}rows.forEach(function(r){bkAddRow({ten:r.name||'Gỗ tròn',qc:(r.mode==='c'?'Vanh ':'ĐK ')+r.size+' cm × '+r.len+' m',dvt:'m³',sl:r.qty,m3:r.total})});toast('Đã nhập '+rows.length+' dòng từ m³')}
 function bkData(){return[...document.querySelectorAll('#bkBody tr')].map(function(tr,i){return{stt:i+1,ten:tr.querySelector('.bk-ten').value.trim(),qc:tr.querySelector('.bk-qc').value.trim(),dvt:tr.querySelector('.bk-dvt').value.trim(),sl:parseFloat(tr.querySelector('.bk-sl').value)||0,m3:parseFloat(tr.querySelector('.bk-m3').value)||0,gc:tr.querySelector('.bk-gc').value.trim()}})}
 function bkMakeQR(){var sum=bkSum();var payload={chu:document.getElementById('bkChu').value,cccd:document.getElementById('bkCccd').value,vitri:document.getElementById('bkVitri').value,ngay:document.getElementById('bkNgay').value||todayStr(),tong_m3:sum,so_dong:bkData().length};var box=document.getElementById('qrBox');box.style.display='inline-block';box.innerHTML='';new QRCode(box,{text:JSON.stringify(payload),width:140,height:140,correctLevel:QRCode.CorrectLevel.L});toast('Đã tạo mã QR')}
-function bkExportExcel(){var meta=[['BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC'],['BẢNG KÊ LÂM SẢN'],['Chủ lâm sản',document.getElementById('bkChu').value],['CCCD/MST',document.getElementById('bkCccd').value],['Địa chỉ',document.getElementById('bkDiaChi').value],['Vị trí',document.getElementById('bkVitri').value],['Ngày',document.getElementById('bkNgay').value||todayStr()],[]];var rows=bkData().map(function(r){return[r.stt,r.ten,r.qc,r.dvt,r.sl,r.m3,r.gc]});var aoa=meta.concat([['TT','Tên lâm sản','Quy cách','ĐVT','SL','m³','Ghi chú']],rows);aoa.push([]);aoa.push(['Tổng m³','','','','',bkSum(),'']);var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:6},{wch:22},{wch:18},{wch:8},{wch:10},{wch:10},{wch:18}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:6}},{s:{r:1,c:0},e:{r:1,c:6}}];var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Bảng kê');XLSX.writeFile(wb,'Bang_ke_lam_san_'+todayStr()+'.xlsx');toast('Đã xuất Excel bảng kê')}
-function bkExportWord(){bkMakeQR();var rows=bkData(),sum=bkSum();var trs=rows.map(function(r){return '<tr><td style="border:1px solid #000;padding:4px;text-align:center">'+r.stt+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.ten)+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.qc)+'</td><td style="border:1px solid #000;padding:4px;text-align:center">'+esc(r.dvt)+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.sl+'</td><td style="border:1px solid #000;padding:4px;text-align:right">'+r.m3+'</td><td style="border:1px solid #000;padding:4px">'+esc(r.gc)+'</td></tr>'}).join('');downloadText('Bang_ke_lam_san_'+todayStr()+'.doc',wordHtml('bk','<div style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>BẢNG KÊ LÂM SẢN</b></div><p>Chủ lâm sản: <b>'+esc(document.getElementById('bkChu').value)+'</b> · CCCD/MST: '+esc(document.getElementById('bkCccd').value)+'<br>Địa chỉ: '+esc(document.getElementById('bkDiaChi').value)+'<br>Vị trí: '+esc(document.getElementById('bkVitri').value)+'<br>Ngày lập: '+esc(document.getElementById('bkNgay').value||todayStr())+'</p><table style="border-collapse:collapse;width:100%"><tr><th style="border:1px solid #000;padding:4px">TT</th><th style="border:1px solid #000;padding:4px">Tên lâm sản</th><th style="border:1px solid #000;padding:4px">Quy cách</th><th style="border:1px solid #000;padding:4px">ĐVT</th><th style="border:1px solid #000;padding:4px">SL</th><th style="border:1px solid #000;padding:4px">m³</th><th style="border:1px solid #000;padding:4px">Ghi chú</th></tr>'+trs+'</table><p><b>Tổng khối lượng: '+sum.toFixed(3)+' m³</b></p>'+qrImgHtml()),'application/msword');toast('Đã xuất Word bảng kê')}
+function bkExportExcel(){var meta=[[(getAgency().cqbh||'CƠ QUAN BAN HÀNH')],['BẢNG KÊ LÂM SẢN'],['Chủ lâm sản',document.getElementById('bkChu').value],['CCCD/MST',document.getElementById('bkCccd').value],['Địa chỉ',document.getElementById('bkDiaChi').value],['Vị trí',document.getElementById('bkVitri').value],['Ngày',document.getElementById('bkNgay').value||todayStr()],[]];var rows=bkData().map(function(r){return[r.stt,r.ten,r.qc,r.dvt,r.sl,r.m3,r.gc]});var aoa=meta.concat([['TT','Tên lâm sản','Quy cách','ĐVT','SL','m³','Ghi chú']],rows);aoa.push([]);aoa.push(['Tổng m³','','','','',bkSum(),'']);var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=[{wch:6},{wch:22},{wch:18},{wch:8},{wch:10},{wch:10},{wch:18}];ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:6}},{s:{r:1,c:0},e:{r:1,c:6}}];var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Bảng kê');XLSX.writeFile(wb,'Bang_ke_lam_san_'+todayStr()+'.xlsx');toast('Đã xuất Excel bảng kê')}
+function bkExportWord(){
+  try{bkMakeQR()}catch(e){}
+  var rows=bkData(),sum=bkSum();
+  var trs=rows.map(function(r){
+    return '<tr><td style="border:1px solid #000;padding:4px;text-align:center">'+r.stt+'</td>'+
+      '<td style="border:1px solid #000;padding:4px">'+esc(r.ten)+'</td>'+
+      '<td style="border:1px solid #000;padding:4px">'+esc(r.qc)+'</td>'+
+      '<td style="border:1px solid #000;padding:4px;text-align:center">'+esc(r.dvt)+'</td>'+
+      '<td style="border:1px solid #000;padding:4px;text-align:right">'+r.sl+'</td>'+
+      '<td style="border:1px solid #000;padding:4px;text-align:right">'+r.m3+'</td>'+
+      '<td style="border:1px solid #000;padding:4px">'+esc(r.gc)+'</td></tr>';
+  }).join('');
+  var ngay=document.getElementById('bkNgay').value||todayStr();
+  var body=nd30QuocHieu()+nd30SoNgay('', ngay)+nd30Title('BẢNG KÊ LÂM SẢN')+
+    '<p>Chủ lâm sản: <b>'+esc(document.getElementById('bkChu').value)+'</b> · CCCD/MST: '+esc(document.getElementById('bkCccd').value)+'<br>'+
+    'Địa chỉ: '+esc(document.getElementById('bkDiaChi').value)+'<br>'+
+    'Vị trí: '+esc(document.getElementById('bkVitri').value)+'</p>'+
+    '<table style="width:100%;border-collapse:collapse">'+
+    '<tr><th style="border:1px solid #000;padding:4px">TT</th><th style="border:1px solid #000;padding:4px">Tên lâm sản</th><th style="border:1px solid #000;padding:4px">Quy cách</th><th style="border:1px solid #000;padding:4px">ĐVT</th><th style="border:1px solid #000;padding:4px">SL</th><th style="border:1px solid #000;padding:4px">m³</th><th style="border:1px solid #000;padding:4px">Ghi chú</th></tr>'+
+    trs+'</table><p><b>Tổng khối lượng: '+sum.toFixed(3)+' m³</b></p>'+
+    (typeof qrImgHtml==='function'?qrImgHtml():'')+
+    nd30Ky({leftLabel:'NGƯỜI LẬP BIỂU'});
+  downloadText('Bang_ke_lam_san_'+todayStr()+'.doc', wordHtml('Bảng kê lâm sản', body), 'application/msword');
+  toast('Đã xuất Word bảng kê');
+}
 
 /* ===== Phương án ===== */
 function paGPS(){if(!navigator.geolocation){toast('Không hỗ trợ GPS');return}navigator.geolocation.getCurrentPosition(function(pos){document.getElementById('paLat').value=pos.coords.latitude;document.getElementById('paLng').value=pos.coords.longitude;paUpdateCoord();toast('Đã lấy vị trí')},function(){toast('Không lấy được GPS')},{enableHighAccuracy:true,timeout:12000})}
@@ -395,10 +561,55 @@ document.getElementById('paLat').addEventListener('input',paUpdateCoord);
 document.getElementById('paLng').addEventListener('input',paUpdateCoord);
 document.getElementById('paLon0').addEventListener('change',paUpdateCoord);
 function paFillFromBk(){var sum=bkSum();if(sum>0)document.getElementById('paSanLuong').value=sum.toFixed(3);else{var s=m3Rows().reduce(function(a,r){return a+r.total},0);if(s)document.getElementById('paSanLuong').value=(Math.round(s*1000)/1000).toFixed(3)}if(!document.getElementById('paChu').value)document.getElementById('paChu').value=document.getElementById('bkChu').value;if(!document.getElementById('paId').value)document.getElementById('paId').value=document.getElementById('bkCccd').value;if(!document.getElementById('paThuongTru').value)document.getElementById('paThuongTru').value=document.getElementById('bkDiaChi').value;toast('Đã điền từ bảng kê / m³')}
-function paExportWord(){var loai=document.getElementById('paLoai').selectedOptions[0].text;var html=wordHtml('pa','<div style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>PHƯƠNG ÁN KHAI THÁC GỖ RỪNG TRỒNG</b><br><i>(Dự thảo nội bộ — tham chiếu Mẫu 07/08 TT 26/2025)</i></div><p><b>I. Chủ rừng</b> ('+esc(loai)+')<br>Họ tên / tổ chức: '+esc(document.getElementById('paChu').value)+'<br>CCCD/MST: '+esc(document.getElementById('paId').value)+' · Ngày cấp: '+esc(document.getElementById('paNgayCap').value)+'<br>Nơi cấp: '+esc(document.getElementById('paNoiCap').value)+'<br>Thường trú / trụ sở: '+esc(document.getElementById('paThuongTru').value)+'<br>Điện thoại: '+esc(document.getElementById('paSdt').value)+' · Email: '+esc(document.getElementById('paEmail').value)+'</p><p><b>II. Hiện trạng khu rừng</b><br>Đối tượng: '+esc(document.getElementById('paDoiTuong').value)+' · Loài: '+esc(document.getElementById('paLoaiCay').value)+' · Năm trồng: '+esc(document.getElementById('paNamTrong').value)+'<br>Nguồn vốn: '+esc(document.getElementById('paNguonVon').value)+'<br>Địa danh: '+esc(document.getElementById('paThon').value)+', '+esc(document.getElementById('paXa').value)+', '+esc(document.getElementById('paTinh').value)+'<br>Tiểu khu: '+esc(document.getElementById('paTieuKhu').value)+' · Khoảnh: '+esc(document.getElementById('paKhoanh').value)+' · Lô: '+esc(document.getElementById('paLo').value)+'<br>Diện tích: '+esc(document.getElementById('paDienTich').value)+' ha · Sản lượng dự kiến: '+esc(document.getElementById('paSanLuong').value)+' m³<br>Thời gian: '+esc(document.getElementById('paThoiGian').value)+' · Phương thức: '+esc(document.getElementById('paPhuongThuc').value)+'</p><p><b>III. Tọa độ</b><br>WGS84: lat '+esc(document.getElementById('paLat').value)+', lng '+esc(document.getElementById('paLng').value)+'<br>'+document.getElementById('paCoordOut').innerText+'</p><p><b>IV. Biện pháp thực hiện</b><br>'+esc(document.getElementById('paNoiDung').value).replace(/\n/g,'<br>')+'</p><br><table style="width:100%"><tr><td style="width:50%;text-align:center">Người lập<br><br><br></td><td style="width:50%;text-align:center">Lãnh đạo đơn vị<br><br><br></td></tr></table>');downloadText('Phuong_an_khai_thac_'+todayStr()+'.doc',html,'application/msword');toast('Đã xuất Word phương án')}
+function paExportWord(){
+  var loai=document.getElementById('paLoai').selectedOptions[0].text;
+  var body=nd30QuocHieu()+nd30SoNgay('', todayStr())+nd30Title('PHƯƠNG ÁN KHAI THÁC GỖ RỪNG TRỒNG')+
+    '<p style="text-align:center;font-size:11pt"><i>(Dự thảo — tham chiếu Mẫu 07/08 Thông tư 26/2025/TT-BNNMT)</i></p>'+
+    '<p><b>I. Chủ rừng</b> ('+esc(loai)+')<br>'+
+    'Họ tên / tổ chức: '+esc(document.getElementById('paChu').value)+'<br>'+
+    'CCCD/MST: '+esc(document.getElementById('paId').value)+' · Ngày cấp: '+esc(document.getElementById('paNgayCap').value)+'<br>'+
+    'Nơi cấp: '+esc(document.getElementById('paNoiCap').value)+'<br>'+
+    'Thường trú / trụ sở: '+esc(document.getElementById('paThuongTru').value)+'<br>'+
+    'Điện thoại: '+esc(document.getElementById('paSdt').value)+' · Email: '+esc(document.getElementById('paEmail').value)+'</p>'+
+    '<p><b>II. Hiện trạng khu rừng</b><br>'+
+    'Đối tượng: '+esc(document.getElementById('paDoiTuong').value)+' · Loài: '+esc(document.getElementById('paLoaiCay').value)+
+    ' · Năm trồng: '+esc(document.getElementById('paNamTrong').value)+'<br>'+
+    'Nguồn vốn: '+esc(document.getElementById('paNguonVon').value)+'<br>'+
+    'Địa danh: '+esc(document.getElementById('paThon').value)+', '+esc(document.getElementById('paXa').value)+', '+esc(document.getElementById('paTinh').value)+'<br>'+
+    'Tiểu khu: '+esc(document.getElementById('paTieuKhu').value)+' · Khoảnh: '+esc(document.getElementById('paKhoanh').value)+
+    ' · Lô: '+esc(document.getElementById('paLo').value)+'<br>'+
+    'Diện tích: '+esc(document.getElementById('paDienTich').value)+' ha · Sản lượng dự kiến: '+esc(document.getElementById('paSanLuong').value)+' m³<br>'+
+    'Thời gian: '+esc(document.getElementById('paThoiGian').value)+' · Phương thức: '+esc(document.getElementById('paPhuongThuc').value)+'</p>'+
+    '<p><b>III. Tọa độ</b><br>WGS84: lat '+esc(document.getElementById('paLat').value)+', lng '+esc(document.getElementById('paLng').value)+'<br>'+
+    document.getElementById('paCoordOut').innerText+'</p>'+
+    '<p><b>IV. Biện pháp thực hiện</b><br>'+esc(document.getElementById('paNoiDung').value).replace(/
+/g,'<br>')+'</p>'+
+    nd30Ky({leftLabel:'NGƯỜI LẬP'});
+  downloadText('Phuong_an_khai_thac_'+todayStr()+'.doc', wordHtml('Phương án khai thác', body), 'application/msword');
+  toast('Đã xuất Word phương án');
+}
 
 /* ===== Biên bản ===== */
-function bbExportWord(){downloadText('Bien_ban_kiem_tra_'+todayStr()+'.doc',wordHtml('bb','<div style="text-align:center"><b>BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>BIÊN BẢN KIỂM TRA LÂM SẢN</b><br>Số: '+esc(document.getElementById('bbSo').value)+'</div><p>Ngày kiểm tra: '+esc(document.getElementById('bbNgay').value||todayStr())+'<br>Địa điểm: '+esc(document.getElementById('bbDiaDiem').value)+'<br>Chủ lâm sản: '+esc(document.getElementById('bbChu').value)+'</p><p><b>I. Thành phần Tổ kiểm tra</b><br>Đại diện: '+esc(document.getElementById('bbToTruong').value)+'<br>Thành viên: '+esc(document.getElementById('bbThanhVien').value)+'</p><p><b>II. Hồ sơ liên quan</b><br>'+esc(document.getElementById('bbHoSo').value).replace(/\n/g,'<br>')+'</p><p><b>III. Lâm sản thực tế</b><br>'+esc(document.getElementById('bbThucTe').value).replace(/\n/g,'<br>')+'</p><p><b>IV. Kết luận</b><br>'+esc(document.getElementById('bbKetLuan').value).replace(/\n/g,'<br>')+'</p><br><table style="width:100%"><tr><td style="width:33%;text-align:center">Đại diện Tổ KT<br><br><br></td><td style="width:33%;text-align:center">Thành viên<br><br><br></td><td style="width:33%;text-align:center">Chủ lâm sản<br><br><br></td></tr></table>'),'application/msword');toast('Đã xuất Word biên bản')}
+function bbExportWord(){
+  var ngay=document.getElementById('bbNgay').value||todayStr();
+  var body=nd30QuocHieu()+nd30SoNgay(document.getElementById('bbSo').value, ngay)+nd30Title('BIÊN BẢN KIỂM TRA LÂM SẢN')+
+    '<p>Địa điểm: '+esc(document.getElementById('bbDiaDiem').value)+'<br>Chủ lâm sản: '+esc(document.getElementById('bbChu').value)+'</p>'+
+    '<p><b>I. Thành phần Tổ kiểm tra</b><br>Đại diện: '+esc(document.getElementById('bbToTruong').value)+
+    '<br>Thành viên: '+esc(document.getElementById('bbThanhVien').value)+'</p>'+
+    '<p><b>II. Hồ sơ liên quan</b><br>'+esc(document.getElementById('bbHoSo').value).replace(/
+/g,'<br>')+'</p>'+
+    '<p><b>III. Lâm sản thực tế</b><br>'+esc(document.getElementById('bbThucTe').value).replace(/
+/g,'<br>')+'</p>'+
+    '<p><b>IV. Kết luận</b><br>'+esc(document.getElementById('bbKetLuan').value).replace(/
+/g,'<br>')+'</p>'+
+    '<br><table style="width:100%;border-collapse:collapse"><tr>'+
+    '<td style="width:33%;text-align:center;vertical-align:top"><b>ĐẠI DIỆN TỔ KIỂM TRA</b><div style="height:48pt"></div></td>'+
+    '<td style="width:33%;text-align:center;vertical-align:top"><b>THÀNH VIÊN</b><div style="height:48pt"></div></td>'+
+    '<td style="width:33%;text-align:center;vertical-align:top"><b>CHỦ LÂM SẢN</b><div style="height:48pt"></div></td>'+
+    '</tr></table>';
+  downloadText('Bien_ban_kiem_tra_'+todayStr()+'.doc', wordHtml('Biên bản kiểm tra lâm sản', body), 'application/msword');
+  toast('Đã xuất Word biên bản');
+}
 
 /* ===== Drafts ===== */
 function collectIds(ids){var o={};ids.forEach(function(id){var el=document.getElementById(id);if(el)o[id]=el.value});return o}
@@ -473,6 +684,7 @@ function paMarkerSync(){var la=parseFloat(document.getElementById('paLat').value
 })();
 
 /* init */
+try{loadAgencyCfg()}catch(e){}
 document.getElementById('bkNgay').value=todayStr();
 document.getElementById('bbNgay').value=todayStr();
 tdRenderLabels();
