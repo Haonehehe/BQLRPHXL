@@ -107,7 +107,7 @@ table.data tbody tr{animation:rowIn .3s both}table.data tbody tr:hover td{backgr
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.ln-leaf{display:none}}
 </style>
 </head>
-<body>
+<body data-bqlrph-module="lamnghiep">
 <div class="top"><div class="wrap top-in">
   <div class="logo">
     <div class="logo-i"><i class="fa-solid fa-tree"></i></div>
@@ -686,6 +686,11 @@ document.getElementById('bbNgay').value=todayStr();
 tdRenderLabels();
 m3AddRow();
 bkAddRow();
+</script>
+
+<script src="js/activity-log.js"></script>
+<script>
+try { if (window.BQLRPHLog) BQLRPHLog.page('lamnghiep'); } catch (e) {}
 </script>
 </body>
 </html>

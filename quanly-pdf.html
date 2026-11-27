@@ -336,7 +336,7 @@ input:focus,select:focus,textarea:focus{
 <meta name="theme-color" content="#047857">
 <link rel="stylesheet" href="theme.css">
 </head>
-<body>
+<body data-bqlrph-module="pdf">
 <div class="top">
   <div class="wrap top-in">
     <div class="logo">
@@ -956,6 +956,11 @@ window.ocrTrongModal=ocrTrongModal;window.copyOcr=copyOcr;window.taiOcrTxt=taiOc
 window.xoaHet=xoaHet;window.openPv=openPv;window.pvNav=pvNav;window.pvZoom=pvZoom;window.dongPv=dongPv;
 document.addEventListener('keydown',function(e){if(e.key==='Escape')dongPv();});
 updateKpi();
+</script>
+
+<script src="js/activity-log.js"></script>
+<script>
+try { if (window.BQLRPHLog) BQLRPHLog.page('pdf'); } catch (e) {}
 </script>
 </body>
 </html>

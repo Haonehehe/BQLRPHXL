@@ -819,7 +819,9 @@ function toggleAcc(id){
 }
 function adminCred(){
   var s=getSession();
-  return { adminEmail:(s&&s.email)||'', adminPass:(s&&s._pass)||'' };
+  var out={ adminEmail:(s&&s.email)||'', adminPass:(s&&s._pass)||'' };
+  if(s&&s.token) out.token=s.token;
+  return out;
 }
 function loadThongbaoPosts(){
   var box=document.getElementById('tbPostsBox');

@@ -63,6 +63,8 @@ function doPost(e) {
     if (action === 'getsheets') return jsonOut(getSheets_(data));
     if (action === 'setsheets') return jsonOut(setSheets_(data));
     if (action === 'addthongbao') return jsonOut(addThongBao_(data));
+    if (action === 'listthongbao') return jsonOut(listThongBao_(data));
+    if (action === 'hidethongbao') return jsonOut(hideThongBao_(data));
     // v4
     if (action === 'log') return jsonOut(logActivity_(data));
     if (action === 'listlog') return jsonOut(listLog_(data));
@@ -735,6 +737,56 @@ function addThongBao_(data) {
     (data.show === false || data.show === '0') ? '' : '1'
   ]);
   return { ok: true, link: link, image: image };
+}
+
+/**
+ * Danh sách tin đăng (admin).
+ * Cột sheet: Loại|Tiêu đề|Nội dung|Ngày đăng|Hết hạn|Link file|Ảnh|Người đăng|Ghim|Hiện
+ * Client admin.html cần: items[{ row, type, title, date, author, link, show, pin, body, exp, image }]
+ */
+function listThongBao_(data) {
+  requireAdmin_(data);
+  var sh = ensureThongBaoSheet_();
+  var values = sh.getDataRange().getValues();
+  var items = [];
+  if (values.length < 2) return { ok: true, items: items };
+
+  // Đọc từ cuối (tin mới trước)
+  for (var r = values.length - 1; r >= 1; r--) {
+    var row = values[r];
+    var title = String(row[1] || '').trim();
+    if (!title) continue;
+    items.push({
+      row: r + 1,
+      type: String(row[0] || ''),
+      title: title,
+      body: String(row[2] || ''),
+      date: String(row[3] || ''),
+      exp: String(row[4] || ''),
+      link: String(row[5] || ''),
+      image: String(row[6] || ''),
+      author: String(row[7] || ''),
+      pin: String(row[8] || ''),
+      show: String(row[9] || '')
+    });
+  }
+  return { ok: true, items: items };
+}
+
+/**
+ * Ẩn / hiện tin: cập nhật cột "Hiện" (cột 10).
+ * data.row = số dòng sheet (1-based), data.show = 1|0
+ */
+function hideThongBao_(data) {
+  requireAdmin_(data);
+  var rowNum = parseInt(data.row, 10);
+  if (!rowNum || rowNum < 2) throw new Error('Dòng tin không hợp lệ');
+  var sh = ensureThongBaoSheet_();
+  if (rowNum > sh.getLastRow()) throw new Error('Không tìm thấy tin');
+  var showVal = (data.show === 1 || data.show === '1' || data.show === true) ? '1' : '';
+  // Cột 10 = Hiện
+  sh.getRange(rowNum, 10).setValue(showVal);
+  return { ok: true, row: rowNum, show: showVal };
 }
 
 /* ===================== Activity Log ===================== */

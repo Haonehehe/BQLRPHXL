@@ -291,7 +291,7 @@ tbody tr:hover td{background:#f8fafc}
 <meta name="theme-color" content="#047857">
 <link rel="stylesheet" href="theme.css">
 </head>
-<body>
+<body data-bqlrph-module="tasks">
 <div class="top">
   <div class="wrap top-in">
     <div class="logo">
@@ -1418,6 +1418,11 @@ window.addEventListener('beforeprint', function(){
   else window.addEventListener('load', go);
   setTimeout(go, 4000);
 })();
+</script>
+
+<script src="js/activity-log.js"></script>
+<script>
+try { if (window.BQLRPHLog) BQLRPHLog.page('tasks'); } catch (e) {}
 </script>
 </body>
 </html>
