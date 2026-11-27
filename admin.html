@@ -367,8 +367,9 @@ function logoutUser() { setSession(null); }
 function adminCred() {
   var s = getSession();
   if (!s || s.role !== 'admin') throw new Error('Cần đăng nhập admin');
-  // Lưu pass tạm trong session khi login (chỉ để gọi API admin)
-  return { adminEmail: s.email, adminPass: s._pass || '' };
+  var out = { adminEmail: s.email, adminPass: s._pass || '' };
+  if (s.token) out.token = s.token;
+  return out;
 }
 
 /* ---- Register / Login ---- */
@@ -408,9 +409,11 @@ function loginUser(email, pass) {
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
         perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
-        _pass: pass // dùng cho thao tác admin trên API
+        token: res.token || '',
+        _pass: pass
       };
       setSession(sess);
+      try { if (window.BQLRPHLog) BQLRPHLog.action('auth', 'login', u.email); } catch (e) {}
       return sess;
     });
   }
@@ -1107,7 +1110,71 @@ function doDisable(email){if(!confirm('Khóa '+email+'?'))return;disableUser(ema
 function doSavePerms(email,id){updatePerms(email,readPerms(id)).then(function(){toast('Đã lưu quyền');loadUsers();}).catch(function(e){toast(e.message||e);});}
 function doResetPass(email){var np=prompt('Mật khẩu mới cho '+email+' (tối thiểu 6 ký tự):','');if(np==null)return;resetPassword(email,np).then(function(){toast('Đã đặt lại mật khẩu');}).catch(function(e){toast(e.message||e);});}
 
+/* ===== Nhật ký hoạt động (v4) ===== */
+function loadActivityLog(){
+  if(!useCloud()){ toast('Chỉ có khi dùng Apps Script'); return; }
+  var c;
+  try{ c=adminCred(); }catch(e){ toast(e.message||e); return; }
+  var box=document.getElementById('activityLogBox');
+  if(box) box.innerHTML='<p style="padding:12px;color:#64748b">Đang tải nhật ký…</p>';
+  apiCall(Object.assign({ action:'listlog', limit:150 }, c)).then(function(res){
+    if(!res.ok) throw new Error(res.error||'Không tải được nhật ký');
+    var logs=res.logs||[];
+    if(!box){
+      // tạo panel nếu chưa có
+      var host=document.querySelector('.wrap')||document.body;
+      box=document.createElement('div');
+      box.id='activityLogBox';
+      box.className='card';
+      box.style.cssText='margin:16px 0;padding:0;overflow:hidden';
+      host.appendChild(box);
+    }
+    var html='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e2e8f0;flex-wrap:wrap">'+
+      '<div><b style="font-size:14px">Nhật ký hoạt động</b><div style="font-size:11px;color:#64748b;margin-top:2px">'+logs.length+' bản ghi gần nhất</div></div>'+
+      '<button type="button" class="btn btn-o btn-sm" onclick="loadActivityLog()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button></div>';
+    if(!logs.length){
+      html+='<p style="padding:16px;color:#64748b;font-size:13px">Chưa có dữ liệu. Sau khi deploy Auth v4, mọi đăng nhập / mở trang sẽ ghi vào đây.</p>';
+    } else {
+      html+='<div style="max-height:420px;overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
+        '<thead><tr style="background:#f8fafc;text-align:left">'+
+        '<th style="padding:8px 10px">Thời gian</th><th style="padding:8px 10px">Người dùng</th>'+
+        '<th style="padding:8px 10px">Hành động</th><th style="padding:8px 10px">Module</th><th style="padding:8px 10px">Chi tiết</th></tr></thead><tbody>';
+      logs.forEach(function(L){
+        var t=String(L.time||'').replace('T',' ').replace(/\.\d+Z?$/,'');
+        html+='<tr style="border-top:1px solid #f1f5f9">'+
+          '<td style="padding:7px 10px;white-space:nowrap;color:#64748b">'+esc(t)+'</td>'+
+          '<td style="padding:7px 10px"><b>'+esc(L.name||'')+'</b><div style="font-size:11px;color:#94a3b8">'+esc(L.email||'')+'</div></td>'+
+          '<td style="padding:7px 10px">'+esc(L.action||'')+'</td>'+
+          '<td style="padding:7px 10px">'+esc(L.module||'')+'</td>'+
+          '<td style="padding:7px 10px;color:#475569">'+esc(L.detail||'')+'</td></tr>';
+      });
+      html+='</tbody></table></div>';
+    }
+    box.innerHTML=html;
+    box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }).catch(function(e){ toast(e.message||e); if(box) box.innerHTML='<p style="padding:12px;color:#be123c">'+(e.message||e)+'</p>'; });
+}
+
 loadUsers();
+// Nút nhật ký trên thanh công cụ (nếu có vùng nút)
+setTimeout(function(){
+  try{
+    var bar=document.querySelector('.authbar')||document.querySelector('.top-in');
+    if(bar && !document.getElementById('btnActivityLog')){
+      var b=document.createElement('button');
+      b.id='btnActivityLog';
+      b.type='button';
+      b.className='btn btn-o';
+      b.innerHTML='<i class="fa-solid fa-clock-rotate-left"></i> Nhật ký';
+      b.onclick=loadActivityLog;
+      bar.appendChild(b);
+    }
+  }catch(e){}
+}, 400);
+</script>
+<script src="js/activity-log.js"></script>
+<script>
+try { if (window.BQLRPHLog) BQLRPHLog.page('admin'); } catch (e) {}
 </script>
 </body>
 </html>

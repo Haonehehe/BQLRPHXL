@@ -958,8 +958,19 @@ function logoutUser() { setSession(null); }
 function adminCred() {
   var s = getSession();
   if (!s || s.role !== 'admin') throw new Error('Cần đăng nhập admin');
-  // Lưu pass tạm trong session khi login (chỉ để gọi API admin)
-  return { adminEmail: s.email, adminPass: s._pass || '' };
+  // v4: ưu tiên token; vẫn gửi pass để tương thích server cũ
+  var out = { adminEmail: s.email, adminPass: s._pass || '' };
+  if (s.token) out.token = s.token;
+  return out;
+}
+
+/** Payload auth dùng chung (token hoặc email+_pass) */
+function authPayload() {
+  var s = getSession() || {};
+  var o = { email: s.email || '', name: s.name || '' };
+  if (s.token) o.token = s.token;
+  if (s._pass) o.pass = s._pass;
+  return o;
 }
 
 /* ---- Register / Login ---- */
@@ -999,9 +1010,11 @@ function loginUser(email, pass) {
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
         perms: extractPermsFromUser(u), loginAt: new Date().toISOString(),
+        token: res.token || '',
         _pass: pass
       };
       setSession(sess);
+      try { if (window.BQLRPHLog) BQLRPHLog.action('auth', 'login', u.email); } catch (e) {}
       return sess;
     });
   }
@@ -1405,7 +1418,9 @@ function pulsePresence(){
     // gửi server nếu có Apps Script
     try{
       if(typeof apiCall==='function' && typeof CONFIG!=='undefined' && CONFIG.SCRIPT_URL){
-        apiCall({action:'heartbeat', email:s.email, name:row.name, unit:row.unit, page:row.page}).catch(function(){});
+        var hb={action:'heartbeat', email:s.email, name:row.name, unit:row.unit, page:row.page};
+        if(s.token) hb.token=s.token;
+        apiCall(hb).catch(function(){});
       }
     }catch(e){}
   }catch(e){}
@@ -1429,6 +1444,12 @@ window.addEventListener('focus', function(){ setTimeout(pulsePresence, 200); });
 </script>
 <script>
 (function(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;for(var i=0;i<10;i++){var l=document.createElement('i');l.className='ln-leaf';l.style.left=(Math.random()*96)+'%';l.style.animationDuration=(14+Math.random()*12)+'s';l.style.animationDelay=(-Math.random()*20)+'s';l.style.transform='scale('+(.6+Math.random()*.8)+')';document.body.appendChild(l)}})();
+</script>
+<script src="js/activity-log.js"></script>
+<script>
+try {
+  if (window.BQLRPHLog) BQLRPHLog.page('menu');
+} catch (e) {}
 </script>
 </body>
 </html>

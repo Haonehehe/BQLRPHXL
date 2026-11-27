@@ -1,56 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
-<script>
-/* BQLRPH Auth Guard (head) — Nhiệm vụ / Gantt */
-(function(){
-  try{ document.documentElement.classList.add('bqlrph-wait'); }catch(e){}
-  var SESS_KEY='bqlrph_session_v1';
-  var MOD='tasks';
-  var LABEL='Nhiệm vụ / Gantt';
-  function getSession(){
-    try{
-      var s=sessionStorage.getItem(SESS_KEY);
-      if(s) return JSON.parse(s);
-      s=localStorage.getItem(SESS_KEY);
-      if(s){ sessionStorage.setItem(SESS_KEY,s); return JSON.parse(s); }
-    }catch(e){}
-    return null;
-  }
-  function canAccess(){
-    var s=getSession();
-    if(!s) return false;
-    if(s.role==='admin') return true;
-    if(MOD==='admin') return false;
-    return Array.isArray(s.perms) && s.perms.indexOf(MOD)>=0;
-  }
-  var s=getSession();
-  if(!canAccess()){
-    try{ window.stop(); }catch(e){}
-    var title, msg;
-    if(!s){
-      title='Cần đăng nhập';
-      msg='Module <b>'+LABEL+'</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>'+MOD+'</b>.';
-    } else {
-      title='Chưa được cấp quyền';
-      msg='Bạn đã đăng nhập nhưng <b>chưa được cấp quyền</b> module <b>'+LABEL+'</b>.<br><br>Vào Menu kiểm tra quyền, hoặc nhờ admin cấp quyền <b>'+MOD+'</b>, sau đó tải lại trang.';
-    }
-    var lockIcon='<div style="width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#fbbf24,#f59e0b);box-shadow:0 10px 28px rgba(245,158,11,.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="10" width="14" height="11" rx="3" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="15.5" r="1.6" fill="#fff"/></svg></div>';
-    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(160deg,#07111f 0%,#064e3b 100%);color:#f8fafc"><div style="max-width:440px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:32px 28px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35)">'+lockIcon+'<h1 style="font-size:20px;font-weight:700;margin:0 0 10px;letter-spacing:-.02em">'+title+'</h1><p style="font-size:13.5px;color:#94a3b8;line-height:1.6;margin:0 0 22px">'+msg+'</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 22px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13.5px;text-decoration:none;box-shadow:0 8px 22px rgba(5,150,105,.35)">Về Menu đăng nhập</a></div></body></html>';
-    document.open();
-    document.write(gate);
-    document.close();
-    return;
-  }
-  try{
-    document.documentElement.classList.remove('bqlrph-wait');
-    var cs=document.getElementById('bqlrph-lockcss');
-    if(cs) cs.remove();
-  }catch(e){}
-})();
-</script>
-
 <meta charset="UTF-8">
 <script>
 (function(){

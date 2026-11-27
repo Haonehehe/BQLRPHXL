@@ -1,14 +1,61 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}</style>
+<meta charset="UTF-8">
+<style id="bqlrph-lockcss">html.bqlrph-wait body{visibility:hidden!important}
+/* === UI modern polish === */
+:root{--shadow:0 4px 20px rgba(15,23,42,.06);--shadow-lg:0 12px 40px rgba(15,23,42,.1)}
+body{background:
+  radial-gradient(ellipse 80% 40% at 0% 0%, rgba(16,185,129,.07), transparent 50%),
+  radial-gradient(ellipse 60% 30% at 100% 0%, rgba(14,165,233,.05), transparent 45%),
+  var(--bg,#f0fdf4) !important;}
+.btn,.btn-g,.btn-b,.btn-o,.btn-dark{
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, filter .15s !important;
+}
+.btn:active,.btn-g:active,.btn-b:active{transform:scale(.97)}
+.btn-g{
+  background:linear-gradient(135deg,#10b981,#047857)!important;
+  box-shadow:0 4px 14px rgba(16,185,129,.28)!important;
+}
+.btn-g:hover{filter:brightness(1.06);box-shadow:0 6px 22px rgba(16,185,129,.4)!important}
+.btn-b{
+  background:linear-gradient(135deg,#0ea5e9,#0369a1)!important;
+  box-shadow:0 4px 14px rgba(14,165,233,.25)!important;
+}
+.btn-b:hover{filter:brightness(1.05)}
+.btn-o:hover{background:#f8fafc!important;border-color:#cbd5e1!important}
+.card,.kpi,.bar,.mbox{
+  box-shadow:var(--shadow)!important;
+  transition:box-shadow .2s ease, transform .15s ease;
+}
+.card:hover,.kpi:hover{box-shadow:var(--shadow-lg)!important}
+.top{
+  backdrop-filter:blur(12px);
+  background:rgba(255,255,255,.92)!important;
+  box-shadow:0 1px 0 rgba(15,23,42,.04);
+}
+.nav button{transition:background .15s, color .15s, transform .1s}
+.nav button:hover{color:var(--g2,#047857)}
+.nav button.on{box-shadow:0 -1px 0 #fff}
+input,select,textarea{
+  transition:border-color .15s, box-shadow .15s;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#34d399!important;
+  box-shadow:0 0 0 3px rgba(52,211,153,.12)!important;
+  outline:none;
+}
+.toast{border-radius:14px!important;box-shadow:0 12px 40px rgba(15,23,42,.2)!important}
+.modal{backdrop-filter:blur(6px)}
+.mbox{border-radius:18px!important;box-shadow:0 24px 60px rgba(15,23,42,.18)!important}
+
+</style>
 <script>
-/* BQLRPH Auth Guard (head) — Nhà ở trên lâm phận */
+/* BQLRPH Auth Guard (head) — chặn trước khi vẽ trang */
 (function(){
   try{ document.documentElement.classList.add('bqlrph-wait'); }catch(e){}
   var SESS_KEY='bqlrph_session_v1';
   var MOD='nhao';
-  var LABEL='Nhà ở trên lâm phận';
   function getSession(){
     try{
       var s=sessionStorage.getItem(SESS_KEY);
@@ -19,30 +66,29 @@
     return null;
   }
   function canAccess(){
+    if(MOD==='pdf') return true;
     var s=getSession();
     if(!s) return false;
     if(s.role==='admin') return true;
-    if(MOD==='admin') return false;
     return Array.isArray(s.perms) && s.perms.indexOf(MOD)>=0;
   }
-  var s=getSession();
   if(!canAccess()){
     try{ window.stop(); }catch(e){}
-    var title, msg;
-    if(!s){
-      title='Cần đăng nhập';
-      msg='Module <b>'+LABEL+'</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>'+MOD+'</b>.';
-    } else {
-      title='Chưa được cấp quyền';
-      msg='Bạn đã đăng nhập nhưng <b>chưa được cấp quyền</b> module <b>'+LABEL+'</b>.<br><br>Vào Menu kiểm tra quyền, hoặc nhờ admin cấp quyền <b>'+MOD+'</b>, sau đó tải lại trang.';
-    }
-    var lockIcon='<div style="width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#fbbf24,#f59e0b);box-shadow:0 10px 28px rgba(245,158,11,.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="5" y="10" width="14" height="11" rx="3" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-width="2"/><circle cx="12" cy="15.5" r="1.6" fill="#fff"/></svg></div>';
-    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+'</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(160deg,#07111f 0%,#064e3b 100%);color:#f8fafc"><div style="max-width:440px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:32px 28px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35)">'+lockIcon+'<h1 style="font-size:20px;font-weight:700;margin:0 0 10px;letter-spacing:-.02em">'+title+'</h1><p style="font-size:13.5px;color:#94a3b8;line-height:1.6;margin:0 0 22px">'+msg+'</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 22px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13.5px;text-decoration:none;box-shadow:0 8px 22px rgba(5,150,105,.35)">Về Menu đăng nhập</a></div></body></html>';
+    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Nhà ở trên lâm phận</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>nhao</b>.</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div></body></html>';
     document.open();
     document.write(gate);
     document.close();
+    // đảm bảo không còn nội dung cũ
+    setTimeout(function(){
+      try{
+        if(!document.body || document.body.innerText.indexOf('Cần đăng nhập')<0){
+          document.documentElement.innerHTML=gate.replace(/^<!DOCTYPE html>/,'');
+        }
+      }catch(e){}
+    },0);
     return;
   }
+  // Được phép: bỏ ẩn body
   try{
     document.documentElement.classList.remove('bqlrph-wait');
     var cs=document.getElementById('bqlrph-lockcss');
@@ -51,7 +97,7 @@
 })();
 </script>
 
-<meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nhà ở trên lâm phận · BQLRPH Xuân Lộc</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -163,6 +209,9 @@ body{padding-bottom:30px!important}
 @media print{.print-only{display:block}}
 
 </style>
+<link rel="icon" type="image/png" href="favicon-bqlrph.png">
+<meta name="theme-color" content="#047857">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 

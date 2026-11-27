@@ -42,3 +42,59 @@ body:not(.bq-dark) .card,body:not(.bq-dark) .panel{border-radius:var(--bq-r-lg);
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{.top,.acts,.top-actions{display:none!important}*{box-shadow:none!important}}
+
+/* ===== Lớp “sống động” dùng chung (lấy cảm hứng từ tienich-lamnghiep) =====
+   Thêm class bq-lively trên <body> để bật. Không đụng layout module hiện có. */
+body.bq-lively{
+  --lv-g:#059669;--lv-g2:#047857;--lv-gs:#ecfdf5;--lv-gl:#a7f3d0;
+  --lv-sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06);
+}
+body.bq-lively .card,
+body.bq-lively .panel,
+body.bq-lively .grp-card{
+  transition:box-shadow .25s, transform .2s, border-color .2s;
+}
+body.bq-lively .card:hover,
+body.bq-lively .panel:hover,
+body.bq-lively .grp-card:hover{
+  box-shadow:0 10px 28px rgba(15,23,42,.1);
+  border-color:#bbf7d0;
+}
+body.bq-lively .btn-g{
+  background:linear-gradient(135deg,#10b981,#047857);
+  box-shadow:0 4px 14px rgba(16,185,129,.28);
+}
+body.bq-lively .btn-g:hover{filter:brightness(1.05);box-shadow:0 6px 20px rgba(16,185,129,.4)}
+body.bq-lively .tile,
+body.bq-lively .mod-card,
+body.bq-lively a.card-link{
+  transition:transform .2s, box-shadow .25s;
+}
+body.bq-lively .tile:hover,
+body.bq-lively .mod-card:hover,
+body.bq-lively a.card-link:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 28px rgba(15,23,42,.12);
+}
+@keyframes bq-fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes bq-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+body.bq-lively .bq-hero{
+  position:relative;margin:12px 0 16px;border-radius:18px;overflow:hidden;
+  border:1px solid #d1fae5;height:120px;
+  background:linear-gradient(180deg,#a7f3d0 0%,#ecfdf5 100%);
+  box-shadow:var(--lv-sh);animation:bq-fadeUp .55s both;
+}
+body.bq-lively .bq-hero-t{position:absolute;left:16px;top:50%;transform:translateY(-50%);max-width:70%}
+body.bq-lively .bq-hero-t b{display:block;font-size:18px;font-weight:800;color:#064e3b}
+body.bq-lively .bq-hero-t span{display:block;margin-top:3px;font-size:12px;color:#065f46;font-weight:600}
+body.bq-lively .tabs{
+  display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;padding:4px;
+  background:#f0fdf4;border-radius:12px;border:1px solid #d1fae5;
+}
+body.bq-lively .tab{
+  border:none;background:transparent;padding:8px 14px;border-radius:9px;
+  font-size:12.5px;font-weight:600;color:#047857;cursor:pointer;
+  transition:background .15s, color .15s, box-shadow .15s;
+}
+body.bq-lively .tab:hover{background:#d1fae5}
+body.bq-lively .tab.on{background:#fff;color:#064e3b;box-shadow:0 1px 4px rgba(15,23,42,.08)}
