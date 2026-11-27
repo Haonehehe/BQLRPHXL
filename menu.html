@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,551 +9,277 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --tx:#e8eef7;--mu:#9aa8bc;--dim:#7b8ba3;
-  --line:rgba(148,163,184,.14);
-  --card:rgba(36,48,68,.72);
+  --bg:#0c1322;--bg-a:rgba(52,211,153,.18);--bg-b:rgba(56,189,248,.12);--bg-c:rgba(167,139,250,.10);
+  --panel:rgba(24,34,54,.78);--card:rgba(30,42,64,.72);--card-h:rgba(38,52,78,.9);--field:rgba(10,16,30,.6);
+  --line:rgba(148,163,184,.16);--line2:rgba(148,163,184,.3);
+  --tx:#eaf0f8;--tx2:#c4d0e0;--mu:#93a3ba;--dim:#6f8099;
+  --good:#6ee7b7;--bad:#fda4af;--accent:#34d399;
+  --shadow:0 10px 34px rgba(0,0,0,.28);--chip:rgba(255,255,255,.06);
 }
-html{scroll-behavior:smooth}
+:root[data-theme="light"]{
+  --bg:#f2f6fa;--bg-a:rgba(16,185,129,.14);--bg-b:rgba(14,165,233,.10);--bg-c:rgba(139,92,246,.07);
+  --panel:rgba(255,255,255,.86);--card:#ffffff;--card-h:#ffffff;--field:#ffffff;
+  --line:rgba(15,23,42,.10);--line2:rgba(15,23,42,.22);
+  --tx:#0f172a;--tx2:#334155;--mu:#64748b;--dim:#94a3b8;
+  --good:#047857;--bad:#be123c;--accent:#059669;
+  --shadow:0 8px 26px rgba(15,23,42,.08);--chip:rgba(15,23,42,.05);
+}
+html{scroll-behavior:smooth;color-scheme:dark}
+html[data-theme="light"]{color-scheme:light}
 body{
-  font-family:"Be Vietnam Pro",system-ui,sans-serif;
-  min-height:100vh;color:#e8eef7;
-  background-color:#121a28;
-  background-attachment:fixed;
+  font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;color:var(--tx);
+  background:radial-gradient(ellipse 85% 55% at 10% -15%,var(--bg-a),transparent 55%),
+    radial-gradient(ellipse 65% 45% at 95% 0%,var(--bg-b),transparent 50%),
+    radial-gradient(ellipse 50% 35% at 50% 105%,var(--bg-c),transparent 50%),var(--bg);
+  background-attachment:fixed;transition:background-color .25s,color .25s;
 }
-.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:28px 16px 56px}
-.brand{text-align:center;margin-bottom:22px}
-.brand-icon{
-  width:64px;height:64px;margin:0 auto 14px;border-radius:20px;
-  display:grid;place-items:center;font-size:28px;color:#fff;
-  background:linear-gradient(135deg,#34d399,#059669 55%,#0d9488);
-  box-shadow:0 14px 40px rgba(16,185,129,.38), inset 0 0 0 1px rgba(255,255,255,.15);
-  animation:floatY 4.5s ease-in-out infinite;
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:18px 18px 96px}
+
+/* Thanh tài khoản */
+.authbar{
+  position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 12px 10px 16px;margin-bottom:26px;border-radius:18px;
+  background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(18px) saturate(1.2);box-shadow:var(--shadow);
 }
+.authbar .who{margin-right:auto;font-size:13.5px;color:var(--tx2);display:flex;align-items:center;gap:10px;min-width:0}
+.authbar .who::before{
+  content:"\f007";font:900 13px "Font Awesome 6 Free";width:34px;height:34px;border-radius:50%;flex:none;
+  display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#34d399,#0d9488);
+}
+.authbar .who b{color:var(--good);font-weight:700}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;padding:0 15px;border-radius:12px;
+  font:600 12.5px "Be Vietnam Pro",system-ui,sans-serif;border:1px solid transparent;cursor:pointer;text-decoration:none;
+  color:inherit;transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .2s,background .2s,filter .15s;
+}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:scale(.97)}.btn:disabled{opacity:.6;pointer-events:none}
+.btn-g{background:linear-gradient(135deg,#34d399,#059669);color:#fff;box-shadow:0 6px 18px rgba(16,185,129,.3)}
+.btn-b{background:linear-gradient(135deg,#38bdf8,#0284c7);color:#fff;box-shadow:0 6px 18px rgba(14,165,233,.28)}
+.btn-v{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;box-shadow:0 6px 18px rgba(124,58,237,.28)}
+.btn-o{background:var(--chip);color:var(--tx);border-color:var(--line)}
+.btn-o:hover{border-color:var(--line2);background:var(--card-h)}
+.btn-ic{width:38px;padding:0}
+
+/* Hero */
+.brand{text-align:center;margin-bottom:26px}
+.brand-logo{width:84px;height:84px;object-fit:contain;display:block;margin:0 auto 14px;filter:drop-shadow(0 10px 24px rgba(16,185,129,.35));animation:floatY 5s ease-in-out infinite}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .brand h1{
-  font-size:clamp(1.1rem,2.6vw,1.4rem);font-weight:800;letter-spacing:-.02em;
-  background:linear-gradient(135deg,#fff 25%,#a7f3d0);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  font-size:clamp(1.35rem,3.4vw,2rem);font-weight:800;letter-spacing:-.03em;line-height:1.2;
+  background:linear-gradient(120deg,var(--tx) 30%,var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
-.brand p{margin-top:6px;font-size:13px;color:var(--mu)}
-.pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-.pill{
-  font-size:11px;font-weight:600;padding:5px 12px;border-radius:999px;
-  background:rgba(255,255,255,.06);border:1px solid var(--line);color:#cbd5e1;
+.brand p{margin-top:8px;font-size:14px;color:var(--mu)}
+.pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.pill{font-size:11.5px;font-weight:600;padding:6px 13px;border-radius:999px;background:var(--chip);border:1px solid var(--line);color:var(--tx2)}
+.pill:empty{display:none}
+.search{position:relative;max-width:520px;margin:20px auto 0}
+.search i{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:14px;pointer-events:none}
+.search input{
+  width:100%;height:48px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--tx);
+  padding:0 16px 0 44px;font:500 14px "Be Vietnam Pro",system-ui;outline:none;box-shadow:var(--shadow);backdrop-filter:blur(12px);
+  transition:border-color .15s,box-shadow .15s;
 }
-.authbar{
-  display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;
-  padding:12px 14px;margin-bottom:20px;border-radius:16px;
-  background:var(--card);border:1px solid var(--line);
-  backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.22);
-}
-.authbar .who{margin-right:auto;font-size:13px;color:#cbd5e1}
-.authbar .who b{color:#6ee7b7;font-weight:700}
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  height:36px;padding:0 14px;border-radius:11px;font-size:12.5px;font-weight:600;
-  border:1px solid transparent;cursor:pointer;font-family:inherit;text-decoration:none;color:inherit;
-  transition:transform .15s, box-shadow .2s, background .2s, filter .15s;
-}
-.btn:active{transform:scale(.97)}
-.btn-g{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 4px 16px rgba(16,185,129,.32)}
-.btn-g:hover{filter:brightness(1.06);box-shadow:0 6px 24px rgba(16,185,129,.45)}
-.btn-b{background:linear-gradient(135deg,#38bdf8,#0284c7);color:#fff;box-shadow:0 4px 14px rgba(14,165,233,.28)}
-.btn-b:hover{filter:brightness(1.05)}
-.btn-v{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.3)}
-.btn-v:hover{filter:brightness(1.05)}
-.btn-o{background:rgba(255,255,255,.06);color:#e2e8f0;border-color:var(--line)}
-.btn-o:hover{background:rgba(255,255,255,.11);border-color:rgba(148,163,184,.35)}
-.sec-label{
-  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-  font-size:13px;font-weight:700;color:#e2e8f0;margin:4px 0 10px;padding:0 2px;
-}
-.sec-label i{
-  width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:12px;
-  background:rgba(16,185,129,.15);color:#34d399;
-}
-.sec-label span{font-weight:500;font-size:11px;color:var(--dim)}
-.grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
-.grp-card{
-  margin-bottom:14px;border-radius:18px;padding:14px;
-  border:1px solid var(--line);background:rgba(15,23,42,.4);backdrop-filter:blur(10px);
-}
-.grp-card.qlbvr{border-color:rgba(16,185,129,.2)}
-.grp-card.datdai{border-color:rgba(20,184,166,.2)}
-.grp-card.lamsinh{border-color:rgba(251,191,36,.2)}
-.grp-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.grp-ico{
-  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:15px;
-  background:linear-gradient(135deg,#10b981,#047857);box-shadow:0 6px 16px rgba(16,185,129,.25);
-}
-.grp-card.datdai .grp-ico{background:linear-gradient(135deg,#14b8a6,#0f766e)}
-.grp-card.lamsinh .grp-ico{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 6px 16px rgba(245,158,11,.25)}
-.grp-head b{display:block;font-size:13.5px;font-weight:700}
-.grp-head span{font-size:11px;color:var(--mu)}
-.grp-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.search input::placeholder{color:var(--mu)}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+
+/* Nhóm & thẻ module */
+.sec-label{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 14px;font-size:12.5px;font-weight:800;color:var(--tx);letter-spacing:.06em;text-transform:uppercase}
+.sec-label i{width:30px;height:30px;border-radius:10px;display:inline-grid;place-items:center;font-size:12px;color:var(--good);background:color-mix(in srgb,var(--accent) 16%,transparent);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent)}
+.sec-label span{font-size:11.5px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--mu);padding:4px 11px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--line);min-width:30px}
+.grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:16px}
 .card{
-  position:relative;display:block;text-decoration:none;color:inherit;
-  border-radius:16px;padding:15px 14px 14px;
-  background:linear-gradient(165deg,rgba(30,41,59,.95),rgba(15,23,42,.9));
-  border:1px solid var(--line);
-  transition:transform .2s, box-shadow .25s, border-color .2s;
-  overflow:hidden;
+  --accent:#34d399;position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+  border-radius:20px;padding:18px 18px 16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+  overflow:hidden;cursor:pointer;animation:cardIn .5s cubic-bezier(.2,.7,.2,1) both;
+  transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,border-color .2s,background .2s;
 }
-.card::after{
-  content:"";position:absolute;inset:0;opacity:0;pointer-events:none;
-  background:radial-gradient(circle at 20% 0%, rgba(255,255,255,.1), transparent 55%);
-  transition:opacity .25s;
-}
-.card:hover{transform:translateY(-4px);border-color:rgba(148,163,184,.3);box-shadow:0 18px 44px rgba(0,0,0,.4)}
-.card:hover::after{opacity:1}
-.card.locked{opacity:.58;filter:grayscale(.25);cursor:pointer}
-.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;position:relative;z-index:1}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--accent),transparent 80%);opacity:.9}
+.card::after{content:"";position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 26%,transparent),transparent 70%);opacity:.7;transition:opacity .3s,transform .3s;pointer-events:none}
+.card:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line));background:var(--card-h);box-shadow:0 18px 46px color-mix(in srgb,var(--accent) 22%,rgba(0,0,0,.18))}
+.card:hover::after{opacity:1;transform:scale(1.25)}
+.grid-inner .card:nth-child(2){animation-delay:.05s}.grid-inner .card:nth-child(3){animation-delay:.1s}.grid-inner .card:nth-child(4){animation-delay:.15s}.grid-inner .card:nth-child(5){animation-delay:.2s}.grid-inner .card:nth-child(6){animation-delay:.25s}.grid-inner .card:nth-child(7){animation-delay:.3s}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.card.pdf{--accent:#f43f5e}.card.thongbao{--accent:#0ea5e9}.card.phapluat{--accent:#6366f1}.card.congcu{--accent:#14b8a6}
+.card.lamnghiep{--accent:#22c55e}.card.qlbvr{--accent:#10b981}.card.nhao{--accent:#38bdf8}.card.mocgioi{--accent:#8b5cf6}
+.card.lamba{--accent:#0d9488}.card.trongrung{--accent:#f59e0b}.card.tasks{--accent:#6366f1}.card.tonghop{--accent:#ec4899}.card.admin{--accent:#64748b}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;position:relative;z-index:1}
 .card-icon{
-  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
-  font-size:17px;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.28);
+  width:50px;height:50px;border-radius:16px;display:grid;place-items:center;font-size:20px;color:#fff;
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 55%,#000));
+  box-shadow:0 10px 22px color-mix(in srgb,var(--accent) 38%,transparent),inset 0 1px 0 rgba(255,255,255,.28);transition:transform .3s;
 }
-.card.pdf .card-icon{background:linear-gradient(135deg,#fb7185,#e11d48)}
-.card.qlbvr .card-icon{background:linear-gradient(135deg,#34d399,#059669)}
-.card.nhao .card-icon{background:linear-gradient(135deg,#38bdf8,#0284c7)}
-.card.mocgioi .card-icon{background:linear-gradient(135deg,#a78bfa,#7c3aed)}
-.card.lamba .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
-.card.trongrung .card-icon{background:linear-gradient(135deg,#fbbf24,#d97706)}
-.card.tasks .card-icon{background:linear-gradient(135deg,#818cf8,#4f46e5)}
-.card.phapluat .card-icon{background:linear-gradient(135deg,#818cf8,#4338ca)}
-.card.congcu .card-icon{background:linear-gradient(135deg,#2dd4bf,#0f766e)}
-.card.bando .card-icon{background:linear-gradient(135deg,#14b8a6,#115e59)}
-.card.admin .card-icon{background:linear-gradient(135deg,#94a3b8,#334155)}
-.tonghop .card-icon{background:linear-gradient(135deg,#818cf8,#4f46e5)}
-.card .code{
-  font-size:10px;font-weight:700;letter-spacing:.04em;
-  color:var(--dim);padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05);
-}
-.card h2{font-size:14px;font-weight:700;margin-bottom:4px;position:relative;z-index:1}
-.card p{font-size:11.5px;color:var(--mu);line-height:1.45;min-height:2.5em;position:relative;z-index:1}
+.card:hover .card-icon{transform:rotate(-6deg) scale(1.08)}
+.card .code{font-size:10px;font-weight:800;letter-spacing:.06em;padding:4px 9px;border-radius:8px;background:var(--chip);color:var(--mu);border:1px solid var(--line)}
+.card h2{font-size:15.5px;font-weight:750;color:var(--tx);margin-bottom:6px;letter-spacing:-.015em;line-height:1.3;position:relative;z-index:1}
+.card p{font-size:12.5px;color:var(--mu);line-height:1.5;margin-bottom:14px;position:relative;z-index:1;flex:1}
 .card .go{
-  margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;
-  height:34px;border-radius:10px;font-size:12px;font-weight:600;color:#fff;
-  background:linear-gradient(135deg,#10b981,#047857);
-  box-shadow:0 4px 14px rgba(16,185,129,.28);
-  position:relative;z-index:1;transition:filter .15s, box-shadow .2s;
+  display:inline-flex;align-items:center;gap:7px;align-self:flex-start;font-size:12.5px;font-weight:700;color:var(--accent);position:relative;z-index:1;
+  padding:6px 12px;border-radius:999px;background:color-mix(in srgb,var(--accent) 12%,transparent);transition:gap .2s,background .2s;
 }
-.card:hover .go{filter:brightness(1.08);box-shadow:0 6px 20px rgba(16,185,129,.4)}
-.card.pdf .go{background:linear-gradient(135deg,#f43f5e,#be123c);box-shadow:0 4px 14px rgba(244,63,94,.28)}
-.card.nhao .go{background:linear-gradient(135deg,#0ea5e9,#0369a1);box-shadow:0 4px 14px rgba(14,165,233,.28)}
-.card.mocgioi .go{background:linear-gradient(135deg,#8b5cf6,#6d28d9);box-shadow:0 4px 14px rgba(139,92,246,.28)}
-.card.lamba .go{background:linear-gradient(135deg,#14b8a6,#0f766e)}
-.card.trongrung .go{background:linear-gradient(135deg,#f59e0b,#b45309);box-shadow:0 4px 14px rgba(245,158,11,.28)}
-.card.admin .go{background:linear-gradient(135deg,#64748b,#1e293b)}
-.tonghop .go{background:linear-gradient(135deg,#6366f1,#4338ca);box-shadow:0 4px 14px rgba(99,102,241,.28)}
-.lock-badge{
-  position:absolute;top:10px;right:10px;z-index:2;
-  font-size:10px;font-weight:600;color:#fbbf24;
-  background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.28);
-  padding:3px 8px;border-radius:999px;
-}
-.hint{text-align:center;font-size:12px;color:var(--dim);margin-top:10px;line-height:1.5}
-.hint b{color:#a7f3d0}
-footer{text-align:center;margin-top:28px;font-size:11px;color:#475569}
-.modal{
-  position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
-  padding:16px;background:rgba(2,6,23,.75);backdrop-filter:blur(10px);
-}
+:root[data-theme="light"] .card .go{color:color-mix(in srgb,var(--accent) 80%,#000)}
+.card:hover .go{gap:11px;background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.card.locked{filter:saturate(.6)}
+.card.locked:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.card.locked .go{color:var(--mu);background:var(--chip)}
+.lock-badge{position:absolute;top:12px;right:12px;z-index:2;font-size:10px;font-weight:700;padding:4px 9px;border-radius:999px;background:rgba(251,191,36,.14);color:#d97706;border:1px solid rgba(251,191,36,.35)}
+.lock-badge.perm{background:rgba(217,70,239,.12);color:#c026d3;border-color:rgba(217,70,239,.35)}
+.card.locked .code{opacity:0}
+.empty{text-align:center;padding:40px 16px;color:var(--mu);border:1px dashed var(--line2);border-radius:18px;font-size:14px}
+.hint{text-align:center;font-size:12.5px;color:var(--mu);margin-top:26px;line-height:1.6}
+.hint b{color:var(--good)}
+footer{text-align:center;margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+
+/* Huy hiệu chờ duyệt */
+.btn-badge{position:relative}
+.badge-dot{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px var(--bg),0 4px 10px rgba(239,68,68,.5);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.1)}}
+.notif-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:999px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#ef4444;font-size:11.5px;font-weight:700;text-decoration:none}
+
+/* Hộp thoại */
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(8,12,22,.55);backdrop-filter:blur(10px)}
 .modal.open,.modal.on{display:flex;animation:fadeIn .2s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.mbox{
-  width:100%;max-width:400px;border-radius:20px;padding:22px 20px;
-  background:linear-gradient(165deg,#1e293b,#0f172a);
-  border:1px solid rgba(148,163,184,.22);
-  box-shadow:0 28px 70px rgba(0,0,0,.55);
-  animation:pop .22s ease;
-}
+.mbox{width:100%;max-width:440px;max-height:92vh;overflow:auto;border-radius:22px;padding:24px;color:var(--tx);background:var(--card);border:1px solid var(--line2);box-shadow:0 28px 70px rgba(0,0,0,.4);animation:pop .22s ease}
+:root[data-theme="dark"] .mbox{background:linear-gradient(165deg,#243248,#18212f)}
 @keyframes pop{from{transform:scale(.96) translateY(10px);opacity:0}to{transform:none;opacity:1}}
-.mbox h3{font-size:17px;font-weight:700;margin-bottom:4px}
-.mbox .sub{font-size:12px;color:var(--mu);margin-bottom:16px}
-.field{margin-bottom:12px}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--mu);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
-.field input{
-  width:100%;height:40px;border-radius:11px;padding:0 12px;font-size:13px;font-family:inherit;
-  background:rgba(15,23,42,.85);border:1px solid rgba(148,163,184,.22);color:#f1f5f9;outline:none;
-  transition:border-color .15s, box-shadow .15s;
-}
-.field input:focus{border-color:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.18)}
-.field input::placeholder{color:#64748b}
-.err{font-size:12px;color:#fb7185;min-height:18px;margin-bottom:6px}
-.macts{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-.switch{text-align:center;margin-top:14px;font-size:12px;color:var(--mu)}
-.switch a{color:#6ee7b7;cursor:pointer;font-weight:600}
-.switch a:hover{text-decoration:underline}
-.toast{
-  position:fixed;bottom:20px;right:20px;z-index:60;padding:12px 16px;border-radius:14px;
-  font-size:13px;font-weight:500;background:#1e293b;color:#fff;
-  border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(0,0,0,.4);
-  transform:translateY(16px);opacity:0;transition:.28s;pointer-events:none;
-}
-.toast.show{transform:none;opacity:1}
-.motto-ticker{position:fixed;bottom:0;left:0;right:0;z-index:40;height:32px;overflow:hidden;
-  background:rgba(15,23,42,.9);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
-.motto-track{display:flex;gap:48px;white-space:nowrap;animation:marquee 42s linear infinite;padding:7px 0}
-.motto-item{font-size:12px;color:#94a3b8}
-.motto-item i{color:#34d399;margin-right:6px}
-@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(max-width:560px){
-  .grid-inner,.grp-items{grid-template-columns:1fr 1fr;gap:8px}
-  .card p{display:none}
-  .card{padding:12px}
-  .brand-icon{width:56px;height:56px;font-size:24px}
-}
-
-/* nút (i) hướng dẫn */
-.btn-info{
-  position:fixed;right:16px;bottom:44px;z-index:45;
-  width:36px;height:36px;border-radius:999px;
-  background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;
-  font-size:15px;font-weight:800;font-style:italic;font-family:Georgia,serif;
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 8px 24px rgba(0,0,0,.35);
-  display:grid;place-items:center;cursor:pointer;
-  transition:transform .15s, box-shadow .2s, filter .15s;
-}
-.btn-info:hover{transform:scale(1.08);filter:brightness(1.1);box-shadow:0 10px 28px rgba(0,0,0,.45)}
-.btn-info:active{transform:scale(.96)}
-.mbox.guide-box{max-width:520px;max-height:85vh;overflow:auto}
-.mbox.guide-box h3{display:flex;align-items:center;gap:8px}
-.guide-body{font-size:13px;line-height:1.55;color:#cbd5e1}
-.guide-body ol,.guide-body ul{margin:8px 0 8px 18px}
-.guide-body li{margin:4px 0}
-.guide-body b{color:#e2e8f0}
-.guide-support{
-  margin-top:14px;padding:12px;border-radius:12px;
-  background:rgba(16,185,129,.1);border:1px solid rgba(52,211,153,.25);
-  font-size:12.5px;color:#a7f3d0;
-}
-.guide-support a{color:#6ee7b7;font-weight:600}
-/* gọn hơn */
-.wrap{padding:22px 16px 56px}
-.grp-card{display:none}
-.card p{min-height:0}
-
-
-.mbox.guide-box{max-width:560px;max-height:82vh;overflow:auto;padding:20px 18px 16px}
-.mbox.guide-box h3{margin-bottom:2px;color:#f8fafc}
-.mbox.guide-box .sub{color:#94a3b8;margin-bottom:14px;font-size:12px}
-.mbox.guide-box h4{
-  font-size:13px;font-weight:700;color:#6ee7b7;margin:14px 0 6px;
-  padding-bottom:4px;border-bottom:1px solid rgba(148,163,184,.15);
-}
-.mbox.guide-box p,.mbox.guide-box li{font-size:12.5px;line-height:1.55;color:#cbd5e1;margin:4px 0}
-.mbox.guide-box ul,.mbox.guide-box ol{margin:6px 0 8px 18px;color:#cbd5e1}
-.mbox.guide-box b{color:#e2e8f0}
-.mbox.guide-box a{color:#6ee7b7;text-decoration:none;font-weight:600}
-.mbox.guide-box a:hover{text-decoration:underline}
-.mbox.guide-box code{background:rgba(15,23,42,.6);padding:1px 5px;border-radius:4px;font-size:11.5px;color:#a7f3d0}
-.mbox.guide-box table{width:100%;border-collapse:collapse;margin:8px 0 10px;font-size:12px}
-.mbox.guide-box th,.mbox.guide-box td{
-  border:1px solid rgba(148,163,184,.2);padding:6px 8px;text-align:left;color:#cbd5e1;
-}
-.mbox.guide-box th{background:rgba(15,23,42,.7);color:#94a3b8;font-size:11px;text-transform:uppercase}
-.mbox.guide-box .support{
-  margin-top:14px;padding:12px 14px;border-radius:12px;
-  background:rgba(16,185,129,.1);border:1px solid rgba(52,211,153,.28);
-  font-size:12.5px;color:#a7f3d0;line-height:1.55;
-}
-.mbox.guide-box .support b{color:#6ee7b7}
-.mbox.guide-box .support a{color:#6ee7b7}
-
-
-.btn-badge{position:relative}
-.badge-dot{
-  position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;
-  border-radius:999px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 2px #0f172a,0 4px 10px rgba(239,68,68,.5);
-  line-height:1;animation:badgePulse 1.6s ease-in-out infinite;
-}
-@keyframes badgePulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.08)}
-}
-.notif-chip{
-  display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;
-  background:rgba(239,68,68,.15);border:1px solid rgba(248,113,113,.45);color:#fecaca;
-  font-size:11.5px;font-weight:700;text-decoration:none;
-}
-.notif-chip:hover{background:rgba(239,68,68,.25)}
-
-
-
-
-/* ===== Balanced dusk theme ===== */
-:root{
-  --tx:#e8eef7;
-  --mu:#9aa8bc;
-  --dim:#7b8ba3;
-  --line:rgba(148,163,184,.15);
-  --card:rgba(40,54,76,.78);
-  --green:#34d399;
-  --bg:#141c2c;
-}
-body{
-  color:var(--tx) !important;
-  background-color:#141c2c !important;
-  background-image:
-    radial-gradient(ellipse 85% 55% at 12% -15%, rgba(52,211,153,.22), transparent 52%),
-    radial-gradient(ellipse 65% 45% at 95% 5%, rgba(56,189,248,.12), transparent 48%),
-    radial-gradient(ellipse 50% 35% at 50% 105%, rgba(167,139,250,.1), transparent 50%),
-    linear-gradient(175deg, #1a2438 0%, #141c2c 45%, #101826 100%) !important;
-  background-attachment:fixed !important;
-}
-.wrap{max-width:1040px;padding:28px 18px 88px}
-
-.brand{text-align:center;margin-bottom:24px}
-.brand-icon{
-  width:68px;height:68px;margin:0 auto 14px;border-radius:20px;
-  display:grid;place-items:center;font-size:28px;color:#fff;
-  background:linear-gradient(145deg,#6ee7b7,#10b981 48%,#0d9488) !important;
-  box-shadow:0 14px 36px rgba(16,185,129,.32), 0 0 0 5px rgba(52,211,153,.12) !important;
-  animation:floatY 5s ease-in-out infinite;
-}
-.brand h1{
-  font-size:clamp(1.15rem,2.7vw,1.5rem)!important;font-weight:800;letter-spacing:-.025em;
-  background:linear-gradient(120deg,#ffffff 15%,#d1fae5 55%,#6ee7b7) !important;
-  -webkit-background-clip:text !important;background-clip:text !important;
-  -webkit-text-fill-color:transparent !important;
-  color:transparent !important;
-}
-.brand p{margin-top:6px;font-size:13.5px;color:var(--mu)!important}
-.pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-.pill{
-  font-size:11.5px;font-weight:600;padding:6px 13px;border-radius:999px;
-  background:rgba(255,255,255,.06)!important;
-  border:1px solid var(--line)!important;color:#c5d0de!important;
-  backdrop-filter:blur(8px);
-}
-
-.authbar{
-  display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;
-  padding:13px 16px;margin-bottom:22px;border-radius:16px;
-  background:linear-gradient(135deg,rgba(48,64,90,.7),rgba(30,42,60,.65))!important;
-  border:1px solid var(--line)!important;
-  backdrop-filter:blur(18px) saturate(1.15)!important;
-  box-shadow:0 10px 36px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06)!important;
-}
-.authbar .who{margin-right:auto;font-size:13.5px;color:#d5dee9!important}
-.authbar .who b{color:#6ee7b7!important}
-
-.btn{
-  height:38px;padding:0 15px;border-radius:11px!important;
-  font:600 12.5px "Be Vietnam Pro",system-ui!important;
-  transition:transform .18s cubic-bezier(.22,1,.36,1),box-shadow .2s!important;
-}
-.btn:hover{transform:translateY(-2px)!important}
-.btn-g{
-  background:linear-gradient(135deg,#34d399,#059669)!important;color:#fff!important;
-  box-shadow:0 6px 18px rgba(16,185,129,.32)!important;border:0!important;
-}
-.btn-b{
-  background:linear-gradient(135deg,#38bdf8,#0284c7)!important;color:#fff!important;
-  box-shadow:0 6px 18px rgba(14,165,233,.28)!important;border:0!important;
-}
-.btn-o{
-  background:rgba(255,255,255,.07)!important;color:#e2e8f0!important;
-  border:1px solid var(--line)!important;
-}
-.btn-o:hover{background:rgba(255,255,255,.11)!important}
-
-.sec-label{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  margin:6px 0 14px;font-size:12.5px;font-weight:800;color:#eef3f9;
-  letter-spacing:.04em;text-transform:uppercase;
-}
-.sec-label i{
-  width:28px;height:28px;border-radius:9px;display:inline-grid;place-items:center;font-size:12px;
-  background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.22);
-}
-.sec-label span{
-  font-size:11.5px;font-weight:600;text-transform:none;letter-spacing:0;
-  color:var(--dim);padding:4px 10px;border-radius:999px;
-  background:rgba(255,255,255,.05);border:1px solid var(--line);
-}
-
-.grid-inner{
-  display:grid!important;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
-  gap:14px!important;
-}
-
-.card{
-  position:relative;display:block;text-decoration:none;color:inherit;
-  border-radius:18px!important;padding:17px 15px 15px!important;
-  background:linear-gradient(165deg, rgba(52,68,96,.55), rgba(28,40,58,.75))!important;
-  border:1px solid var(--line)!important;
-  box-shadow:0 8px 28px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.07)!important;
-  backdrop-filter:blur(14px)!important;
-  transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,border-color .2s!important;
-  overflow:hidden;
-}
-.card::before{
-  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:linear-gradient(180deg,var(--accent,#34d399),transparent 85%);
-  border-radius:18px 0 0 18px;opacity:.9;
-}
-.card.pdf{--accent:#fb7185}
-.card.qlbvr,.card.congcu{--accent:#34d399}
-.card.nhao{--accent:#38bdf8}
-.card.mocgioi,.card.tasks,.card.phapluat{--accent:#a78bfa}
-.card.lamba{--accent:#2dd4bf}
-.card.trongrung{--accent:#fbbf24}
-.card.tonghop{--accent:#818cf8}
-.card.admin{--accent:#94a3b8}
-
-.card:hover{
-  transform:translateY(-5px)!important;
-  border-color:rgba(148,163,184,.28)!important;
-  box-shadow:0 16px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.1)!important;
-}
-.card-icon{
-  width:46px!important;height:46px!important;border-radius:14px!important;
-  font-size:18px!important;color:#fff;
-  box-shadow:0 10px 22px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.2)!important;
-}
-.card .code{
-  font-size:10px;font-weight:800;letter-spacing:.05em;padding:4px 8px;border-radius:8px;
-  background:rgba(255,255,255,.06);color:#9aa8bc;border:1px solid var(--line);
-}
-.card h2{
-  font-size:15px!important;font-weight:750!important;color:#f1f5f9!important;
-  margin:2px 0 6px;letter-spacing:-.015em;line-height:1.3;
-}
-.card p{font-size:12.5px!important;color:var(--mu)!important;line-height:1.45!important;margin-bottom:12px}
-.card .go{
-  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:10px;
-  font-size:11.5px;font-weight:700;color:#fff;
-  transition:transform .2s,filter .15s;
-}
-.card:hover .go{filter:brightness(1.06);transform:translateX(2px)}
-
-.locked{opacity:.58!important;filter:grayscale(.2)!important}
-.locked:hover{transform:none!important}
-.lock-badge{
-  position:absolute;top:12px;right:12px;z-index:2;
-  font-size:10px;font-weight:700;padding:4px 8px;border-radius:8px;
-  background:rgba(20,28,42,.9);color:#fbbf24;
-  border:1px solid rgba(251,191,36,.28);
-}
-
-.modal{background:rgba(10,14,24,.55)!important;backdrop-filter:blur(10px)!important}
-.mbox{
-  border-radius:20px!important;
-  background:linear-gradient(165deg,#243248,#1a2436)!important;
-  border:1px solid var(--line)!important;
-  box-shadow:0 24px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06)!important;
-  padding:24px!important;color:var(--tx);max-width:440px;width:100%;
-}
-.mbox h3{font-size:17px;font-weight:800;color:#f1f5f9;letter-spacing:-.02em}
+.mbox h3{font-size:18px;font-weight:800;letter-spacing:-.02em}
 .mbox .sub{color:var(--mu);font-size:13px;margin:4px 0 16px}
-.field label{
-  font-size:11px;font-weight:700;color:#9aa8bc;text-transform:uppercase;
-  letter-spacing:.04em;margin-bottom:6px;display:block;
-}
-.field input,.field textarea,.field select{
-  width:100%;border-radius:11px;border:1px solid rgba(148,163,184,.18);
-  background:rgba(15,23,42,.55);color:#e8eef7;padding:0 14px;
-  font:500 14px "Be Vietnam Pro",system-ui;
-}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;border-radius:12px;border:1px solid var(--line2);background:var(--field);color:var(--tx);padding:0 14px;font:500 14px "Be Vietnam Pro",system-ui;transition:border-color .15s,box-shadow .15s}
 .field input,.field select{height:42px}
 .field textarea{padding:12px 14px;min-height:96px;resize:vertical;line-height:1.45}
-.field input:focus,.field textarea:focus,.field select:focus{
-  outline:none;border-color:#34d399!important;
-  box-shadow:0 0 0 3px rgba(52,211,153,.16)!important;
-}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.field input::placeholder,.field textarea::placeholder{color:var(--dim)}
+.err{font-size:12.5px;color:var(--bad);min-height:18px;margin-top:6px;font-weight:600}
 .macts{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
-.err{color:#f87171;font-size:12.5px;margin-top:8px;font-weight:600}
-.switch{text-align:center;margin-top:14px;font-size:13px;color:var(--mu)}
-.switch a{color:#6ee7b7;font-weight:700;cursor:pointer}
-
-footer{
-  text-align:center;margin-top:32px;padding-top:18px;
-  border-top:1px solid rgba(148,163,184,.1);
-  font-size:12px;color:#6b7c94;
-}
-.hint{text-align:center;font-size:12.5px;color:var(--dim);margin-top:12px;line-height:1.5}
-.hint b{color:#6ee7b7}
-
-.fb-fab{
-  position:fixed;left:20px;bottom:22px;z-index:40;
-  height:50px;padding:0 18px 0 15px;border-radius:999px;border:0;cursor:pointer;
-  display:inline-flex;align-items:center;gap:9px;
-  font:700 13px "Be Vietnam Pro",system-ui;color:#fff;
-  background:linear-gradient(135deg,#34d399,#059669 60%,#0f766e);
-  box-shadow:0 10px 28px rgba(16,185,129,.38), 0 0 0 3px rgba(52,211,153,.12);
-  transition:transform .2s,box-shadow .2s;
-}
-.fb-fab:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(16,185,129,.42)}
-.fb-fab i{font-size:17px}
-@media(max-width:520px){
-  .fb-fab span{display:none}
-  .fb-fab{width:50px;padding:0;justify-content:center;left:14px;bottom:16px}
-  .grid-inner{grid-template-columns:1fr!important}
-}
-.btn-info{
-  position:fixed!important;right:16px!important;bottom:22px!important;z-index:45!important;
-}
-.fb-ok{
-  display:none;margin-top:12px;padding:11px 13px;border-radius:11px;
-  background:rgba(16,185,129,.12);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;font-size:13px;font-weight:600;
-}
+.switch{text-align:center;margin-top:14px;font-size:12.5px;color:var(--mu);line-height:1.6}
+.switch a{color:var(--good);cursor:pointer;font-weight:700}.switch a:hover{text-decoration:underline}
+.fb-ok{display:none;margin-top:12px;padding:11px 13px;border-radius:12px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);color:var(--good);font-size:13px;font-weight:600}
 .fb-ok.on{display:block}
-
-
-.lock-badge.perm{
-  background:rgba(30,20,40,.92)!important;color:#f0abfc!important;
-  border:1px solid rgba(232,121,249,.35)!important;
-}
-.go-perm{background:linear-gradient(135deg,#a78bfa,#7c3aed)!important;opacity:.9}
-.locked-perm{opacity:.72!important;filter:none!important}
-.toast-perm{
-  position:fixed;left:50%;bottom:88px;transform:translateX(-50%);
-  z-index:60;max-width:92vw;padding:12px 16px;border-radius:14px;
-  background:rgba(15,23,42,.95);color:#f8fafc;font-size:13px;font-weight:600;
-  border:1px solid rgba(167,139,250,.35);box-shadow:0 12px 40px rgba(0,0,0,.35);
-  display:none;line-height:1.45;text-align:center;
-}
+.mbox.guide-box{max-width:580px}
+.guide-box h3{display:flex;align-items:center;gap:8px}
+.guide-box h4{font-size:13px;font-weight:700;color:var(--good);margin:16px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.guide-box p,.guide-box li{font-size:12.8px;line-height:1.6;color:var(--tx2);margin:4px 0}
+.guide-box ul,.guide-box ol{margin:6px 0 8px 18px}
+.guide-box b{color:var(--tx)}.guide-box a{color:var(--good);font-weight:600;text-decoration:none}
+.guide-box code{background:var(--chip);padding:1px 6px;border-radius:5px;font-size:11.5px;color:var(--good)}
+.guide-box table{width:100%;border-collapse:collapse;margin:8px 0 10px;font-size:12px}
+.guide-box th,.guide-box td{border:1px solid var(--line);padding:7px 9px;text-align:left;color:var(--tx2)}
+.guide-box th{background:var(--chip);color:var(--mu);font-size:11px;text-transform:uppercase}
+.guide-box .support{margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);font-size:12.5px;color:var(--tx2);line-height:1.6}
+.toast-perm{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);z-index:60;max-width:92vw;padding:12px 16px;border-radius:14px;background:var(--card);color:var(--tx);font-size:13px;font-weight:600;border:1px solid rgba(167,139,250,.5);box-shadow:0 12px 40px rgba(0,0,0,.3);display:none;line-height:1.5;text-align:center}
 .toast-perm.on{display:block;animation:fadeIn .2s ease}
-/* ===== Module Công cụ lâm nghiệp + hiệu ứng ===== */
-.card.lamnghiep{--accent:#4ade80}
-.card.lamnghiep .card-icon{background:linear-gradient(135deg,#4ade80,#047857);animation:lnGlow 2.8s ease-in-out infinite}
-.card.lamnghiep .card-icon i{display:inline-block;transform-origin:50% 100%;animation:lnSway 3.2s ease-in-out infinite}
-.card.lamnghiep .code{color:#bbf7d0;background:rgba(74,222,128,.14);animation:lnPulse 2.4s ease-in-out infinite}
-.grid-inner .card{animation:cardIn .55s cubic-bezier(.2,.7,.2,1) both}
-.grid-inner .card:nth-child(2){animation-delay:.05s}.grid-inner .card:nth-child(3){animation-delay:.1s}.grid-inner .card:nth-child(4){animation-delay:.15s}
-.grid-inner .card:nth-child(5){animation-delay:.2s}.grid-inner .card:nth-child(6){animation-delay:.25s}.grid-inner .card:nth-child(7){animation-delay:.3s}.grid-inner .card:nth-child(8){animation-delay:.35s}
-.card:hover .card-icon{transform:translateY(-2px) rotate(-6deg) scale(1.06)}
-.card-icon{transition:transform .25s}
-.ln-leaf{position:fixed;top:-24px;width:16px;height:16px;pointer-events:none;z-index:0;opacity:.55;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2334d399' d='M20 2C9 2 3 8 3 15c0 2 .6 3.4 1.4 4.6C6 14 10 10.5 15 9c-4.200 2.500-7.300 6-9.300 11.200C7.200 21.300 8.800 22 11 22c7 0 10-8 9-20z'/%3E%3C/svg%3E") center/contain no-repeat;animation:lnFall linear infinite}
-@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes lnSway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
-@keyframes lnGlow{0%,100%{box-shadow:0 8px 18px rgba(0,0,0,.28),0 0 0 0 rgba(74,222,128,.45)}50%{box-shadow:0 8px 18px rgba(0,0,0,.28),0 0 0 9px rgba(74,222,128,0)}}
-@keyframes lnPulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* Nút nổi & băng chữ */
+.fb-fab{position:fixed;left:18px;bottom:48px;z-index:40;height:48px;padding:0 18px 0 15px;border-radius:999px;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:9px;font:700 13px "Be Vietnam Pro",system-ui;color:#fff;background:linear-gradient(135deg,#34d399,#059669 60%,#0f766e);box-shadow:0 10px 28px rgba(16,185,129,.38);transition:transform .2s}
+.fb-fab:hover{transform:translateY(-3px)}
+.btn-info{position:fixed;right:18px;bottom:48px;z-index:45;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer;font:italic 800 17px Georgia,serif;color:var(--tx);background:var(--panel);border:1px solid var(--line2);backdrop-filter:blur(12px);box-shadow:var(--shadow);transition:transform .15s}
+.btn-info:hover{transform:scale(1.1)}
+.motto-ticker{position:fixed;bottom:0;left:0;right:0;z-index:40;height:32px;overflow:hidden;background:var(--panel);border-top:1px solid var(--line);backdrop-filter:blur(12px)}
+.motto-track{display:flex;gap:48px;white-space:nowrap;animation:marquee 60s linear infinite;padding:7px 0}
+.motto-item{font-size:12px;color:var(--mu)}.motto-item i{color:var(--accent);margin-right:6px}.motto-sep{color:var(--dim)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.ln-leaf{position:fixed;top:-24px;width:16px;height:16px;pointer-events:none;z-index:0;opacity:.4;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2334d399' d='M20 2C9 2 3 8 3 15c0 2 .6 3.4 1.4 4.6C6 14 10 10.5 15 9c-4.2 2.5-7.3 6-9.3 11.2C7.2 21.3 8.8 22 11 22c7 0 10-8 9-20z'/%3E%3C/svg%3E") center/contain no-repeat;animation:lnFall linear infinite}
 @keyframes lnFall{0%{transform:translate3d(0,0,0) rotate(0)}50%{transform:translate3d(40px,55vh,0) rotate(180deg)}100%{transform:translate3d(-20px,112vh,0) rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.grid-inner .card,.card.lamnghiep .card-icon,.card.lamnghiep .card-icon i,.card.lamnghiep .code,.ln-leaf{animation:none!important}}
+@media(max-width:600px){
+  .wrap{padding:12px 12px 96px}.grid-inner{grid-template-columns:1fr;gap:12px}
+  .authbar .btn span{display:none}.fb-fab span{display:none}.fb-fab{width:48px;padding:0;justify-content:center}
+  .card{flex-direction:column}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.authbar,.fb-fab,.btn-info,.motto-ticker,.ln-leaf,.search{display:none!important}}
+
+/* ===== v3: thẻ gọn, thanh tài khoản thu gọn, hướng dẫn mới ===== */
+.barslot{margin-bottom:20px}
+.authbar{position:relative;margin-bottom:0;z-index:30}
+.lbl{display:none}
+.authbar.drop{
+  position:fixed;top:70px;right:14px;z-index:70;width:min(300px,calc(100vw - 28px));
+  flex-direction:column;align-items:stretch;gap:6px;padding:12px;animation:pop .18s ease;
+  background:var(--card);box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+.authbar.drop .who{margin:0 0 6px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.authbar.drop .btn,.authbar.drop .btn-ic{width:100%;justify-content:flex-start;padding:0 14px}
+.authbar.drop .lbl{display:inline}
+.menu-fab{
+  position:fixed;top:14px;right:14px;z-index:71;width:46px;height:46px;border-radius:50%;display:none;
+  place-items:center;cursor:pointer;font-size:17px;color:var(--tx);background:var(--panel);
+  border:1px solid var(--line2);backdrop-filter:blur(14px);box-shadow:var(--shadow);transition:transform .15s,background .2s;
+}
+.menu-fab.show{display:grid;animation:pop .2s ease}
+.menu-fab:hover{transform:scale(1.08);background:var(--card-h)}
+
+.brand{margin-bottom:18px}
+.brand-logo{width:70px;height:70px;margin-bottom:10px}
+.brand h1{font-size:clamp(1.2rem,3vw,1.7rem)}
+.search{margin-top:14px}.search input{height:44px}
+.sec-label{margin:20px 0 10px}
+.grid-inner{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.card{
+  display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;
+  padding:13px 14px;border-radius:16px;min-height:76px;box-shadow:none;
+}
+.card::after{display:none}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 30px color-mix(in srgb,var(--accent) 20%,rgba(0,0,0,.14))}
+.card-top{display:contents}
+.card-icon{width:44px;height:44px;border-radius:13px;font-size:17px;grid-row:1/span 2}
+.card .code{display:none}
+.card h2{font-size:14px;margin:0 0 2px;padding-right:26px;grid-column:2}
+.card p{font-size:11.8px;line-height:1.4;margin:0;flex:none;grid-column:2;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .go{
+  position:absolute;top:11px;right:11px;width:24px;height:24px;padding:0;justify-content:center;
+  font-size:0;gap:0;border-radius:50%;
+}
+.card .go i{font-size:11px}
+.card:hover .go{gap:0;transform:translateX(2px)}
+.card.locked .go{display:none}
+.lock-badge{top:11px;right:11px;width:24px;height:24px;padding:0;border-radius:50%;display:grid;place-items:center;font-size:0}
+.lock-badge i{font-size:11px}
+
+/* Hướng dẫn */
+.mbox.guide-box{max-width:640px;padding:22px 20px 18px}
+.g-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.g-steps div{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:12px;background:var(--chip);border:1px solid var(--line);font-size:12px;line-height:1.35;color:var(--tx2)}
+.g-steps b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#fff;background:linear-gradient(135deg,#34d399,#059669)}
+.guide-box details{border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--chip);overflow:hidden}
+.guide-box summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13.5px;font-weight:700;color:var(--tx);user-select:none}
+.guide-box summary::-webkit-details-marker{display:none}
+.guide-box summary i{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--good);background:color-mix(in srgb,var(--accent) 16%,transparent);flex:none}
+.guide-box summary::after{content:"\f078";font:900 11px "Font Awesome 6 Free";margin-left:auto;color:var(--mu);transition:transform .2s}
+.guide-box details[open] summary::after{transform:rotate(180deg)}
+.guide-box details[open] summary{border-bottom:1px solid var(--line)}
+.guide-box details>:not(summary){margin-left:14px;margin-right:14px}
+.guide-box details>:nth-child(2){margin-top:10px}.guide-box details>:last-child{margin-bottom:12px}
+.guide-box .macts{margin-top:14px}
+@media(max-width:600px){.g-steps{grid-template-columns:1fr}.grid-inner{grid-template-columns:1fr;gap:10px}}
+@media print{.menu-fab{display:none!important}}
 </style>
 <link rel="icon" type="image/png" href="favicon-bqlrph.png">
-<meta name="theme-color" content="#047857">
-<link rel="stylesheet" href="theme.css">
+<meta name="theme-color" content="#0c1322" id="metaTheme">
+<script>
+(function(){var t='';try{t=localStorage.getItem('bqlrph_theme')||'';}catch(e){}
+if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';
+document.documentElement.setAttribute('data-theme',t);})();
+</script>
 </head>
-<body class="bq-dark">
+<body>
 <div class="wrap">
+  <div class="barslot" id="barSlot"><div class="authbar" id="authBar"></div></div>
+  <button type="button" class="menu-fab" id="menuFab" aria-label="Tài khoản và công cụ" onclick="toggleBarDrop()"><i class="fa-solid fa-bars"></i></button>
   <div class="brand">
-    <img class="brand-logo" src="logo-bqlrph.png" alt="Logo Ban Quản lý rừng phòng hộ Xuân Lộc" width="76" height="76">
+    <img class="brand-logo" src="logo-bqlrph.png" alt="Logo BQLRPH Xuân Lộc" width="84" height="84" onerror="this.style.display='none'">
     <h1>Ban Quản lý Rừng phòng hộ Xuân Lộc</h1>
     <p>Hệ thống quản lý lâm nghiệp trực tuyến</p>
     <div class="pills">
-      <span class="pill" id="modeBadge">Auth</span>
-      <span class="pill">Tiện ích · Chuyên môn</span>
+      <span class="pill" id="modeBadge"></span>
+      <span class="pill"><i class="fa-solid fa-layer-group"></i> Tiện ích · Chuyên môn</span>
     </div>
+    <div class="search"><i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" id="modSearch" placeholder="Tìm chức năng… (nhấn / để tìm nhanh)" autocomplete="off" oninput="renderGrid()"></div>
   </div>
-
-  <div class="authbar" id="authBar"></div>
   <div class="grid" id="grid"></div>
   <p class="hint" id="hintBox"></p>
   <footer><i class="fa-solid fa-leaf" style="color:#34d399;margin-right:6px;opacity:.7"></i>BQLRPH Xuân Lộc</footer>
@@ -586,7 +312,7 @@ footer{
       <button type="button" class="btn btn-o" onclick="closeModal()">Đóng</button>
       <button type="button" class="btn btn-g" id="btnFb" onclick="sendFeedback()"><i class="fa-solid fa-paper-plane"></i> Gửi góp ý</button>
     </div>
-    <div class="switch" style="margin-top:12px">Admin nhận góp ý qua <b style="color:#6ee7b7">email hnhao.213@gmail.com</b> (sau khi bạn bấm Gửi trong app email).<br>Hỗ trợ: 0878 884 088</div>
+    <div class="switch" style="margin-top:12px">Admin nhận góp ý qua <b style="color:var(--good)">email hnhao.213@gmail.com</b> (sau khi bạn bấm Gửi trong app email).<br>Hỗ trợ: 0878 884 088</div>
   </div>
 </div>
 
@@ -626,7 +352,7 @@ footer{
     <h3>Cấu hình đồng bộ</h3>
     <div class="sub">Web App URL từ Google Apps Script (Deploy → Web app)</div>
     <div class="field"><label>Script URL</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
-    <div class="err" id="cfgErr" style="color:#94a3b8">Để trống = lưu tài khoản trên máy này</div>
+    <div class="err" id="cfgErr" style="color:var(--mu)">Để trống = lưu tài khoản trên máy này</div>
     <div class="macts">
       <button type="button" class="btn btn-o" onclick="closeModal()">Đóng</button>
       <button type="button" class="btn btn-g" onclick="saveCfg()">Lưu</button>
@@ -654,7 +380,7 @@ footer{
     <h3>Quên mật khẩu</h3>
     <div class="sub">Liên hệ admin để được đặt lại mật khẩu trên hệ thống.</div>
     <div class="field"><label>Email đăng ký</label><input type="email" id="forgotEmail" placeholder="email@donvi.vn"></div>
-    <div class="err" id="forgotErr" style="color:#94a3b8">Admin → Khu vực Admin → <b>Đặt lại MK</b></div>
+    <div class="err" id="forgotErr" style="color:var(--mu)">Admin → Khu vực Admin → <b>Đặt lại MK</b></div>
     <div class="macts">
       <button type="button" class="btn btn-o" onclick="closeModal()">Đóng</button>
       <button type="button" class="btn btn-b" onclick="doForgotHint()"><i class="fa-solid fa-circle-info"></i> Đã hiểu</button>
@@ -667,90 +393,115 @@ footer{
 
 <div class="modal" id="modalGuide" onclick="if(event.target===this)closeModal()">
   <div class="mbox guide-box">
-    <h3><i class="fa-solid fa-circle-info" style="color:#6ee7b7;margin-right:6px"></i>Hướng dẫn sử dụng nhanh</h3>
-    <div class="sub">Hệ thống quản lý lâm nghiệp · BQLRPH Xuân Lộc (dành cho người mới)</div>
+    <h3><i class="fa-solid fa-circle-info" style="color:var(--good)"></i> Hướng dẫn sử dụng</h3>
+    <div class="sub">Hệ thống quản lý lâm nghiệp · BQLRPH Xuân Lộc — bấm vào từng mục để mở</div>
 
-    <h4>1. Mở hệ thống</h4>
-    <p>Truy cập: <a href="https://haonehehe.github.io/BQLRPHXL/menu" target="_blank" rel="noopener">https://haonehehe.github.io/BQLRPHXL/menu</a><br>
-    Nên dùng trình duyệt <b>Chrome</b> hoặc <b>Edge</b>.</p>
+    <div class="g-steps">
+      <div><b>1</b><span>Chọn chức năng trên menu</span></div>
+      <div><b>2</b><span>Cần quyền thì <u>Đăng nhập</u></span></div>
+      <div><b>3</b><span>Làm việc, xuất Excel / In / PDF</span></div>
+    </div>
 
-    <h4>2. Lần đầu: Khách chỉ dùng được PDF</h4>
-    <p>Khi <b>chưa đăng nhập</b>:</p>
-    <ul>
-      <li>Chỉ mở được <b>Công cụ PDF</b> (tách, nối, xoay, OCR…).</li>
-      <li>Các module QLBVR, Đất đai, Nhà ở, Mốc giới bị <b>khóa</b> (có ổ khóa).</li>
-    </ul>
-    <p>→ Muốn dùng đủ chức năng: <b>Đăng ký</b> rồi chờ admin duyệt.</p>
+    <details open><summary><i class="fa-solid fa-rocket"></i> Bắt đầu nhanh</summary>
+      <ul>
+        <li>Địa chỉ: <a href="https://haonehehe.github.io/BQLRPHXL/menu" target="_blank" rel="noopener">haonehehe.github.io/BQLRPHXL/menu</a> — dùng <b>Chrome</b> hoặc <b>Edge</b>, có mạng để tải dữ liệu Google Sheet.</li>
+        <li><b>Không cần đăng nhập</b> vẫn dùng được nhóm <b>Tiện ích</b> (PDF, Thông báo, Pháp luật, Bộ tiện ích, Công cụ lâm nghiệp).</li>
+        <li>Nhóm <b>Chuyên môn</b> cần tài khoản đã được admin duyệt và cấp quyền từng module.</li>
+        <li>Thẻ có biểu tượng <i class="fa-solid fa-lock"></i> là cần đăng nhập; <i class="fa-solid fa-user-lock"></i> là đã đăng nhập nhưng <b>chưa được cấp quyền</b>.</li>
+      </ul>
+    </details>
 
-    <h4>3. Đăng ký tài khoản</h4>
-    <ol>
-      <li>Trên menu bấm <b>Đăng ký</b>.</li>
-      <li>Nhập: Họ tên · Email · Mật khẩu (tối thiểu 6 ký tự).</li>
-      <li>Bấm <b>Gửi đăng ký</b>.</li>
-      <li>Trạng thái: <i>chờ admin duyệt</i>.</li>
-      <li>Khi được duyệt → <b>Đăng nhập</b> bằng đúng email và mật khẩu đã đăng ký.</li>
-    </ol>
-    <p>Không vào được ngay sau đăng ký là bình thường — phải chờ admin cấp quyền.</p>
+    <details><summary><i class="fa-solid fa-user-plus"></i> Đăng ký · Đăng nhập · Mật khẩu</summary>
+      <ol>
+        <li>Bấm <b>Đăng ký</b> → nhập Họ tên, Email, Mật khẩu (từ 6 ký tự) → <b>Gửi đăng ký</b>.</li>
+        <li>Chờ admin duyệt. Chưa vào được ngay sau khi đăng ký là bình thường.</li>
+        <li>Khi đã duyệt: <b>Đăng nhập</b> bằng đúng email + mật khẩu. Thấy lời chào «Xin chào, [Họ tên]» là thành công.</li>
+      </ol>
+      <table>
+        <tr><th>Nút</th><th>Tác dụng</th></tr>
+        <tr><td>Làm mới quyền</td><td>Lấy quyền mới nhất từ máy chủ khi admin vừa cấp thêm</td></tr>
+        <tr><td>Đổi MK</td><td>Đổi mật khẩu (nhập mật khẩu hiện tại + mật khẩu mới)</td></tr>
+        <tr><td><i class="fa-solid fa-gear"></i> Cấu hình</td><td>Địa chỉ đồng bộ — thường không cần đụng</td></tr>
+        <tr><td><i class="fa-solid fa-circle-half-stroke"></i> Sáng / tối</td><td>Đổi giao diện, được ghi nhớ cho các trang</td></tr>
+        <tr><td>Thoát</td><td>Đăng xuất</td></tr>
+      </table>
+      <p><b>Quên mật khẩu:</b> ở form đăng nhập bấm «Quên mật khẩu?» → liên hệ admin để đặt lại.</p>
+    </details>
 
-    <h4>4. Đăng nhập</h4>
-    <ol>
-      <li>Menu → <b>Đăng nhập</b>.</li>
-      <li>Nhập email + mật khẩu.</li>
-      <li>Thành công sẽ thấy: <b>Xin chào, [Họ tên]</b>.</li>
-      <li>Chỉ hiện các module được cấp quyền.</li>
-    </ol>
-    <table>
-      <tr><th>Nút</th><th>Việc</th></tr>
-      <tr><td>Đổi MK</td><td>Đổi mật khẩu</td></tr>
-      <tr><td>⚙</td><td>Cấu hình đồng bộ (thường không cần đụng)</td></tr>
-      <tr><td>Thoát</td><td>Đăng xuất</td></tr>
-    </table>
-    <p><b>Quên mật khẩu:</b> trên form đăng nhập chọn <b>Quên mật khẩu?</b> → liên hệ admin để đặt lại MK.</p>
+    <details><summary><i class="fa-solid fa-bars"></i> Thanh tài khoản &amp; tìm nhanh</summary>
+      <ul>
+        <li>Thanh tài khoản nằm ở đầu trang. Khi <b>cuộn xuống</b>, nó thu lại thành nút <b>3 gạch <i class="fa-solid fa-bars"></i></b> ở góc phải trên — bấm để mở lại các nút (Admin, Đổi MK, Thoát…).</li>
+        <li>Ô <b>Tìm chức năng</b>: gõ tên hoặc từ khóa (không cần gõ dấu). Nhấn phím <code>/</code> để nhảy vào ô tìm.</li>
+        <li>Phím <code>Esc</code> đóng mọi hộp thoại.</li>
+        <li>Nút <b>Góp ý</b> (góc trái dưới) để báo lỗi / đề xuất tới admin.</li>
+      </ul>
+    </details>
 
-    <h4>5. Các module nghiệp vụ</h4>
-    <p>Sau khi đăng nhập và được cấp quyền, bấm <b>Mở module</b> trên từng thẻ:</p>
-    <table>
-      <tr><th>Module</th><th>Dùng để làm gì</th></tr>
-      <tr><td>Vi phạm QLBVR</td><td>Hồ sơ vi phạm, thống kê, xuất báo cáo</td></tr>
-      <tr><td>Quản lý đất đai</td><td>Lâm bạ, hộ nhận khoán, diện tích, hiện trạng</td></tr>
-      <tr><td>Nhà ở trên lâm phận</td><td>Công trình / nhà tạm theo phân trường</td></tr>
-      <tr><td>Quản lý mốc giới</td><td>Danh sách mốc, tọa độ, lọc, Excel, in</td></tr>
-      <tr><td>Công cụ PDF</td><td>Tách, nối, xoay, OCR hồ sơ scan</td></tr>
-      <tr><td>Trồng &amp; chăm sóc rừng</td><td>Tiến độ trồng, chăm sóc, xuất báo cáo</td></tr>
-      <tr><td>Nhiệm vụ / Gantt</td><td>Chỉ đạo, tiến độ, timeline, Excel/Word</td></tr>
-      <tr><td>Admin</td><td>Chỉ tài khoản quản trị — duyệt TK, cấp quyền, nguồn Sheet</td></tr>
-    </table>
-    <ul>
-      <li>Dùng ô tìm / bộ lọc (phân trường, loại mốc, từ khóa…) nếu có.</li>
-      <li>Xem bảng → <b>Xuất Excel</b> hoặc <b>In / PDF</b> khi cần báo cáo.</li>
-      <li>Bấm <b>Làm mới</b> nếu dữ liệu chưa lên (cần mạng để tải Google Sheet).</li>
-    </ul>
+    <details><summary><i class="fa-solid fa-wrench"></i> Nhóm Tiện ích (ai cũng dùng được)</summary>
+      <table>
+        <tr><th>Module</th><th>Dùng để làm gì</th></tr>
+        <tr><td>Công cụ PDF</td><td>Nối, tách, chỉnh sửa, xoay, OCR hồ sơ scan</td></tr>
+        <tr><td>Thông báo · Niêm yết</td><td>Xem thông báo, niêm yết văn bản, tin quan trọng, hoạt động đơn vị; lọc theo loại, tìm theo từ khóa, xem trực tiếp / tải văn bản đính kèm</td></tr>
+        <tr><td>Tra cứu pháp luật</td><td>Nghị định, thông tư, luật lâm nghiệp</td></tr>
+        <tr><td>Bộ tiện ích nhanh</td><td>Tọa độ VN-2000, tải lớp bản đồ, mẫu văn bản</td></tr>
+        <tr><td>Công cụ lâm nghiệp</td><td>Tính m³, bảng kê, phương án, tọa độ, đo diện tích</td></tr>
+      </table>
+    </details>
 
-    <h4>6. Công cụ PDF (ai cũng dùng được)</h4>
-    <ol>
-      <li>Chọn tab: <b>Nối</b> · <b>Tách</b> · <b>Chỉnh sửa</b> · <b>Xoay</b> · <b>OCR</b>.</li>
-      <li>Chọn / kéo thả file PDF.</li>
-      <li><b>Xem trước</b> trang (kéo thả đổi thứ tự nếu được).</li>
-      <li>Xử lý xong → <b>Tải về</b>.</li>
-    </ol>
-    <ul>
-      <li><b>Nối:</b> thứ tự trang xem trước = thứ tự sau nối; tên file thường theo file đầu + <code>_DANOI</code>.</li>
-      <li><b>Xoay:</b> dùng nút dưới từng trang để xoay đúng hướng trước khi tải.</li>
-      <li><b>OCR:</b> chọn tiếng Việt với văn bản tiếng Việt; có thể xuất Word.</li>
-    </ul>
+    <details><summary><i class="fa-solid fa-briefcase"></i> Nhóm Chuyên môn (cần cấp quyền)</summary>
+      <table>
+        <tr><th>Module</th><th>Dùng để làm gì</th></tr>
+        <tr><td>Vi phạm QLBVR</td><td>Hồ sơ vi phạm, thống kê, báo cáo</td></tr>
+        <tr><td>Nhà ở lâm phận</td><td>Công trình / nhà tạm theo 6 phân trường, phép xây</td></tr>
+        <tr><td>Mốc giới</td><td>Danh sách mốc, tọa độ, lọc, xuất Excel, in</td></tr>
+        <tr><td>Lâm bạ / Đất đai</td><td>Hợp đồng khoán, bản đồ, diện tích, in sơ đồ</td></tr>
+        <tr><td>Trồng &amp; chăm sóc rừng</td><td>Tiến độ trồng, chăm sóc, xuất Excel / Word</td></tr>
+        <tr><td>Nhiệm vụ / Gantt</td><td>Chỉ đạo, tiến độ, timeline, đồng bộ Sheet</td></tr>
+        <tr><td>Tổng hợp đường dẫn</td><td>Báo cáo, theo dõi, mở nhanh Sheet / Drive</td></tr>
+      </table>
+      <ul>
+        <li>Dùng ô tìm / bộ lọc trong từng module (phân trường, loại, từ khóa…).</li>
+        <li>Xem bảng xong có thể <b>Xuất Excel</b> hoặc <b>In / PDF</b>.</li>
+        <li>Dữ liệu chưa lên: bấm <b>Làm mới</b> và kiểm tra mạng.</li>
+      </ul>
+    </details>
+
+    <details><summary><i class="fa-solid fa-file-pdf"></i> Công cụ PDF</summary>
+      <ol>
+        <li>Chọn tab: <b>Nối</b> · <b>Tách</b> · <b>Chỉnh sửa</b> · <b>Xoay</b> · <b>OCR</b>.</li>
+        <li>Chọn hoặc kéo thả file PDF, xem trước các trang (kéo thả để đổi thứ tự nếu có).</li>
+        <li>Xử lý xong bấm <b>Tải về</b>.</li>
+      </ol>
+      <ul>
+        <li><b>Nối:</b> thứ tự trang xem trước chính là thứ tự sau khi nối.</li>
+        <li><b>Xoay:</b> xoay từng trang bằng nút dưới trang trước khi tải.</li>
+        <li><b>OCR:</b> chọn tiếng Việt cho văn bản tiếng Việt; có thể xuất Word.</li>
+      </ul>
+    </details>
+
+    <details><summary><i class="fa-solid fa-user-shield"></i> Dành cho Admin</summary>
+      <ul>
+        <li>Nút <b>Admin</b> (có chấm đỏ nếu có tài khoản chờ duyệt) mở khu vực quản trị.</li>
+        <li>Tại đó: duyệt / từ chối / khóa tài khoản, cấp quyền module, đặt lại mật khẩu, đăng tin Thông báo · Niêm yết, cấu hình nguồn Google Sheet, xem người đang online và <b>Nhật ký hoạt động</b>.</li>
+      </ul>
+    </details>
+
+    <details><summary><i class="fa-solid fa-triangle-exclamation"></i> Gặp sự cố?</summary>
+      <table>
+        <tr><th>Hiện tượng</th><th>Cách xử lý</th></tr>
+        <tr><td>Không đăng nhập được</td><td>Kiểm tra email / mật khẩu; tài khoản có thể đang chờ duyệt hoặc bị khóa. Sai nhiều lần sẽ bị tạm khóa ít phút.</td></tr>
+        <tr><td>«Chưa được cấp quyền»</td><td>Nhờ admin cấp quyền, rồi bấm <b>Làm mới quyền</b> hoặc tải lại trang.</td></tr>
+        <tr><td>Dữ liệu không tải</td><td>Kiểm tra mạng, bấm <b>Làm mới</b>; nếu vẫn lỗi báo admin kiểm tra chia sẻ Google Sheet.</td></tr>
+        <tr><td>Giao diện sai màu</td><td>Bấm nút sáng / tối, hoặc nhấn Ctrl+F5 để tải lại.</td></tr>
+      </table>
+    </details>
 
     <div class="support">
-      <b>Hỗ trợ kỹ thuật</b><br>
-      Huỳnh Nhựt Hào<br>
-      Phát triển &amp; vận hành hệ thống BQLRPH Xuân Lộc<br>
-      SĐT: <a href="tel:0878884088">0878 884 088</a><br>
-      Email: <a href="mailto:hnhao.213@gmail.com">hnhao.213@gmail.com</a><br>
-      Liên hệ khi: không đăng nhập được, thiếu quyền module, dữ liệu không tải, hoặc lỗi xử lý PDF.
+      <b>Hỗ trợ kỹ thuật</b> — Huỳnh Nhựt Hào, phát triển &amp; vận hành hệ thống BQLRPH Xuân Lộc<br>
+      <i class="fa-solid fa-phone"></i> <a href="tel:0878884088">0878 884 088</a> &nbsp;·&nbsp;
+      <i class="fa-solid fa-envelope"></i> <a href="mailto:hnhao.213@gmail.com">hnhao.213@gmail.com</a>
     </div>
-
-    <div class="macts" style="margin-top:14px">
-      <button type="button" class="btn btn-g" onclick="closeModal()" style="flex:1">Đã hiểu</button>
-    </div>
+    <div class="macts"><button type="button" class="btn btn-g" onclick="closeModal()" style="flex:1">Đã hiểu</button></div>
   </div>
 </div>
 
@@ -1174,7 +925,7 @@ function authModeLabel() {
 var MODULES={
   tienich:[
     {id:'pdf',href:'quanly-pdf.html',cls:'pdf',icon:'fa-file-pdf',code:'PDF',title:'Công cụ PDF',desc:'Tách · nối · xoay · OCR.'},
-    {id:'thongbao',href:'tienich-thongbao.html',cls:'congcu',icon:'fa-bullhorn',code:'TB',title:'Thông báo · Niêm yết',desc:'Xem thông báo · niêm yết · hoạt động đơn vị.'},
+    {id:'thongbao',href:'tienich-thongbao.html',cls:'thongbao',icon:'fa-bullhorn',code:'TB',title:'Thông báo · Niêm yết',desc:'Xem thông báo · niêm yết · hoạt động đơn vị.'},
     {id:'phapluat',href:'tienich-phapluat.html',cls:'phapluat',icon:'fa-scale-balanced',code:'PHÁP LUẬT',title:'Tra cứu pháp luật',desc:'NĐ · TT · Luật lâm nghiệp.'},
     {id:'congcu',href:'tienich-congcu.html',cls:'congcu',icon:'fa-screwdriver-wrench',code:'TIỆN ÍCH',title:'Bộ tiện ích nhanh',desc:'Tọa độ VN-2000 · tải lớp · mẫu VB.'},
     {id:'lamnghiep',href:'tienich-lamnghiep.html',cls:'lamnghiep',icon:'fa-tree',code:'LÂM NGHIỆP',title:'Công cụ lâm nghiệp',desc:'Tính m³ · bảng kê · phương án · tọa độ · đo diện tích.'}
@@ -1197,14 +948,14 @@ function openLogin(){closeModal();document.getElementById('loginErr').textConten
 function openRegister(){closeModal();document.getElementById('regErr').textContent='';document.getElementById('modalReg').classList.add('on');}
 function openCfg(){closeModal();document.getElementById('cfgUrl').value=CONFIG.SCRIPT_URL||'';document.getElementById('modalCfg').classList.add('on');}
 function openChangePass(){closeModal();document.getElementById('passErr').textContent='';['passOld','passNew','passNew2'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('modalPass').classList.add('on');}
-function openForgot(){closeModal();document.getElementById('forgotErr').style.color='#94a3b8';document.getElementById('forgotErr').innerHTML='Admin → Khu vực Admin → <b>Đặt lại MK</b>';document.getElementById('forgotEmail').value=document.getElementById('loginEmail').value||'';document.getElementById('modalForgot').classList.add('on');}
+function openForgot(){closeModal();document.getElementById('forgotErr').style.color='var(--mu)';document.getElementById('forgotErr').innerHTML='Admin → Khu vực Admin → <b>Đặt lại MK</b>';document.getElementById('forgotEmail').value=document.getElementById('loginEmail').value||'';document.getElementById('modalForgot').classList.add('on');}
 function saveCfg(){var u=document.getElementById('cfgUrl').value.trim();CONFIG.SCRIPT_URL=u;try{localStorage.setItem('bqlrph_script_url',u);}catch(e){}closeModal();render();
 if(typeof isAdmin==='function' && isAdmin()) setInterval(refreshPendingBadge, 60000);}
 function doLogin(){var err=document.getElementById('loginErr'),btn=document.getElementById('btnLogin');err.textContent='';btn.disabled=true;loginUser(document.getElementById('loginEmail').value,document.getElementById('loginPass').value).then(function(){closeModal();render();}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
-function doRegister(){var err=document.getElementById('regErr'),btn=document.getElementById('btnReg');err.style.color='#fda4af';err.textContent='';btn.disabled=true;registerUser(document.getElementById('regName').value,document.getElementById('regEmail').value,document.getElementById('regPass').value).then(function(){err.style.color='#6ee7b7';err.textContent='Đã gửi đăng ký. Chờ admin duyệt rồi đăng nhập.';setTimeout(function(){closeModal();openLogin();},1400);}).catch(function(e){err.style.color='#fda4af';err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
+function doRegister(){var err=document.getElementById('regErr'),btn=document.getElementById('btnReg');err.style.color='var(--bad)';err.textContent='';btn.disabled=true;registerUser(document.getElementById('regName').value,document.getElementById('regEmail').value,document.getElementById('regPass').value).then(function(){err.style.color='var(--good)';err.textContent='Đã gửi đăng ký. Chờ admin duyệt rồi đăng nhập.';setTimeout(function(){closeModal();openLogin();},1400);}).catch(function(e){err.style.color='var(--bad)';err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 function doLogout(){logoutUser();render();}
-function doForgotHint(){var em=document.getElementById('forgotEmail').value.trim(),err=document.getElementById('forgotErr');if(em){err.style.color='#6ee7b7';err.textContent='Đã ghi nhận '+em+'. Liên hệ admin để đặt lại mật khẩu.';}else{err.style.color='#fda4af';err.textContent='Nhập email đã đăng ký.';}}
-function doChangePass(){var s=currentUser();if(!s){openLogin();return;}var err=document.getElementById('passErr'),btn=document.getElementById('btnPass');var n1=document.getElementById('passNew').value,n2=document.getElementById('passNew2').value;err.style.color='#fda4af';if(n1!==n2){err.textContent='Mật khẩu mới nhập lại không khớp';return;}btn.disabled=true;err.textContent='';changePassword(s.email,document.getElementById('passOld').value,n1).then(function(){err.style.color='#6ee7b7';err.textContent='Đã đổi mật khẩu';setTimeout(closeModal,800);}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
+function doForgotHint(){var em=document.getElementById('forgotEmail').value.trim(),err=document.getElementById('forgotErr');if(em){err.style.color='var(--good)';err.textContent='Đã ghi nhận '+em+'. Liên hệ admin để đặt lại mật khẩu.';}else{err.style.color='var(--bad)';err.textContent='Nhập email đã đăng ký.';}}
+function doChangePass(){var s=currentUser();if(!s){openLogin();return;}var err=document.getElementById('passErr'),btn=document.getElementById('btnPass');var n1=document.getElementById('passNew').value,n2=document.getElementById('passNew2').value;err.style.color='var(--bad)';if(n1!==n2){err.textContent='Mật khẩu mới nhập lại không khớp';return;}btn.disabled=true;err.textContent='';changePassword(s.email,document.getElementById('passOld').value,n1).then(function(){err.style.color='var(--good)';err.textContent='Đã đổi mật khẩu';setTimeout(closeModal,800);}).catch(function(e){err.textContent=e.message||String(e);}).then(function(){btn.disabled=false;});}
 
 
 function toastPerm(title){
@@ -1215,7 +966,7 @@ function toastPerm(title){
     el.className='toast-perm';
     document.body.appendChild(el);
   }
-  el.innerHTML='Bạn <b>đã đăng nhập</b> nhưng <b>chưa được cấp quyền</b> module <b>'+esc(title||'')+'</b>.<br><span style="font-weight:500;color:#cbd5e1;font-size:12px">Liên hệ admin để cấp quyền, rồi bấm «Làm mới quyền» hoặc tải lại trang.</span>';
+  el.innerHTML='Bạn <b>đã đăng nhập</b> nhưng <b>chưa được cấp quyền</b> module <b>'+esc(title||'')+'</b>.<br><span style="font-weight:500;color:var(--mu);font-size:12px">Liên hệ admin để cấp quyền, rồi bấm «Làm mới quyền» hoặc tải lại trang.</span>';
   el.classList.add('on');
   clearTimeout(window._toastPermT);
   window._toastPermT=setTimeout(function(){ el.classList.remove('on'); }, 4200);
@@ -1284,14 +1035,16 @@ function renderAuthBar(){
     el.innerHTML='<span class="who">Bạn đang dùng với tư cách <b>Khách</b></span>'+
       '<button type="button" class="btn btn-g" onclick="openLogin()"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</button>'+
       '<button type="button" class="btn btn-o" onclick="openRegister()"><i class="fa-solid fa-user-plus"></i> Đăng ký</button>'+
-      '<button type="button" class="btn btn-o" onclick="openCfg()"><i class="fa-solid fa-gear"></i></button>';
+      '<button type="button" class="btn btn-o btn-ic" title="Cấu hình" onclick="openCfg()"><i class="fa-solid fa-gear"></i><span class="lbl">Cấu hình</span></button>'+
+      '<button type="button" class="btn btn-o btn-ic" title="Sáng / tối" aria-label="Đổi giao diện" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i><span class="lbl">Sáng / tối</span></button>';
     return;
   }
   el.innerHTML='<span class="who">Xin chào, <b>'+esc(s.name)+'</b></span>'+
     (s.role==='admin'?'<a class="btn btn-v" href="admin.html"><i class="fa-solid fa-gauge-high"></i> Admin</a>':'')+
     '<button type="button" class="btn btn-o" title="Đồng bộ quyền mới từ server" onclick="doRefreshPerms()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới quyền</button>'+
     '<button type="button" class="btn btn-o" onclick="openChangePass()"><i class="fa-solid fa-key"></i> Đổi MK</button>'+
-    '<button type="button" class="btn btn-o" onclick="openCfg()"><i class="fa-solid fa-gear"></i></button>'+
+    '<button type="button" class="btn btn-o btn-ic" title="Cấu hình" onclick="openCfg()"><i class="fa-solid fa-gear"></i><span class="lbl">Cấu hình</span></button>'+
+    '<button type="button" class="btn btn-o btn-ic" title="Sáng / tối" aria-label="Đổi giao diện" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i><span class="lbl">Sáng / tối</span></button>'+
     '<button type="button" class="btn btn-o" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>';
 }
 function moduleCard(m, ok){
@@ -1302,27 +1055,63 @@ function moduleCard(m, ok){
   }
   return '<div class="card '+m.cls+' locked locked-guest" onclick="openLogin()"><span class="lock-badge"><i class="fa-solid fa-lock"></i> Cần đăng nhập</span><div class="card-top"><div class="card-icon"><i class="fa-solid '+m.icon+'"></i></div><span class="code">'+m.code+'</span></div><h2>'+m.title+'</h2><p>'+m.desc+'</p><span class="go">Cần đăng nhập <i class="fa-solid fa-lock"></i></span></div>';
 }
+function toggleBarDrop(force){
+  var bar=document.getElementById('authBar'),slot=document.getElementById('barSlot'),fab=document.getElementById('menuFab');
+  var open=(force===undefined)?!bar.classList.contains('drop'):!!force;
+  if(open){slot.style.minHeight=bar.offsetHeight+'px';bar.classList.add('drop');}
+  else{bar.classList.remove('drop');slot.style.minHeight='';}
+  fab.innerHTML='<i class="fa-solid '+(open?'fa-xmark':'fa-bars')+'"></i>';
+}
+(function(){
+  function onScroll(){
+    var slot=document.getElementById('barSlot'),fab=document.getElementById('menuFab'),bar=document.getElementById('authBar');
+    if(!slot||!fab) return;
+    var past=slot.getBoundingClientRect().bottom<0;
+    fab.classList.toggle('show',past);
+    if(!past&&bar.classList.contains('drop')) toggleBarDrop(false);
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  document.addEventListener('click',function(e){
+    var bar=document.getElementById('authBar');
+    if(!bar||!bar.classList.contains('drop')) return;
+    var b=e.target.closest&&e.target.closest('.btn');
+    if(e.target.closest('#menuFab')) return;
+    if(!bar.contains(e.target)||(b&&!/toggleTheme/.test(b.getAttribute('onclick')||''))) setTimeout(function(){toggleBarDrop(false);},0);
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape') toggleBarDrop(false);});
+})();
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('bqlrph_theme',t);}catch(e){}
+  var m=document.getElementById('metaTheme'); if(m) m.setAttribute('content',t==='light'?'#f2f6fa':'#0c1322');
+}
+function normQ(x){return String(x||'').toLowerCase().replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
 function renderGrid(){
-  var html='';
-  html+='<div class="sec-label"><i class="fa-solid fa-wrench"></i> Tiện ích <span>Không cần đăng nhập</span></div>';
-  html+='<div class="grid-inner">';
-  (MODULES.tienich||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
-  html+='</div>';
-  html+='<div class="sec-label" style="margin-top:18px"><i class="fa-solid fa-briefcase"></i> Chuyên môn <span>Cần đăng nhập &amp; cấp quyền</span></div>';
-  html+='<div class="grid-inner">';
-  (MODULES.chuyenmon||[]).forEach(function(m){ html+=moduleCard(m, canAccess(m.id)); });
-  html+='</div>';
-  if(isAdmin()){
-    html+='<div class="sec-label" style="margin-top:18px"><i class="fa-solid fa-user-shield"></i> Quản trị</div>';
+  var qi=document.getElementById('modSearch'), q=normQ(qi?qi.value:'').trim();
+  function pick(list){return (list||[]).filter(function(m){return !q||normQ(m.title+' '+m.desc+' '+m.code).indexOf(q)>=0;});}
+  function sec(icon,title,note,list){
+    if(!list.length) return '';
+    var h='<div class="sec-label"><i class="fa-solid '+icon+'"></i> '+title+(note?' <span>'+note+'</span>':'')+'</div><div class="grid-inner">';
+    list.forEach(function(m){ h+=moduleCard(m, canAccess(m.id)); });
+    return h+'</div>';
+  }
+  var html=sec('fa-wrench','Tiện ích','Không cần đăng nhập',pick(MODULES.tienich))+
+           sec('fa-briefcase','Chuyên môn','Cần đăng nhập &amp; cấp quyền',pick(MODULES.chuyenmon));
+  if(isAdmin()&&(!q||'quan tri admin'.indexOf(q)>=0)){
+    html+='<div class="sec-label"><i class="fa-solid fa-user-shield"></i> Quản trị</div>';
     html+='<div class="grid-inner"><a class="card admin" href="admin.html"><div class="card-top"><div class="card-icon"><i class="fa-solid fa-user-shield"></i></div><span class="code">ADMIN</span></div><h2>Khu vực quản trị</h2><p>Duyệt TK · cấp quyền · nguồn Sheet.</p><span class="go">Vào Admin <i class="fa-solid fa-arrow-right"></i></span></a></div>';
   }
+  if(!html) html='<div class="empty"><i class="fa-regular fa-face-frown" style="font-size:26px;display:block;margin-bottom:10px;opacity:.5"></i>Không tìm thấy chức năng phù hợp</div>';
   document.getElementById('grid').innerHTML=html;
+  refreshPendingBadge();
 }
 function render(){
   (function(){var s=getSession();if(s){s.perms=sanitizePerms(s.perms);setSession(s);}})();
   document.getElementById('modeBadge').textContent=useCloud()?'':'Local';
   renderAuthBar();
-  refreshPendingBadge();renderGrid();
+  renderGrid();
   var s=currentUser();
   document.getElementById('hintBox').innerHTML=s
     ?(s.role==='admin'?'Bạn là <b>Admin</b> — duyệt tài khoản tại Khu vực quản trị.':'Quyền module: <b>'+(sanitizePerms(s.perms).map(function(p){return PERM_LABEL[p]||p;}).filter(function(x){return x!=='Công cụ PDF';}).join(', ')||'PDF')+'</b>.')
@@ -1330,6 +1119,7 @@ function render(){
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape')closeModal();
+  if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')){e.preventDefault();var qi=document.getElementById('modSearch');if(qi)qi.focus();}
   if(e.key==='Enter'&&document.getElementById('modalLogin').classList.contains('on'))doLogin();
   if(e.key==='Enter'&&document.getElementById('modalReg').classList.contains('on'))doRegister();
 });
