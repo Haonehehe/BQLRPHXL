@@ -256,6 +256,11 @@ footer{text-align:center;margin-top:30px;padding-top:18px;border-top:1px solid v
 .guide-box .macts{margin-top:14px}
 @media(max-width:600px){.g-steps{grid-template-columns:1fr}.grid-inner{grid-template-columns:1fr;gap:10px}}
 @media print{.menu-fab{display:none!important}}
+
+/* ===== v4: lưới cân đối, logo ===== */
+.grid-inner{display:flex;flex-wrap:wrap;gap:12px}
+.grid-inner .card{flex:var(--grow,1) 1 calc((100% - (var(--pr,4) - 1)*12px)/var(--pr,4) - .5px);min-width:0;align-content:center}
+.brand-logo{width:76px;height:76px;object-fit:contain;border-radius:50%}
 </style>
 <link rel="icon" type="image/png" href="favicon-bqlrph.png">
 <meta name="theme-color" content="#0c1322" id="metaTheme">
@@ -270,7 +275,7 @@ document.documentElement.setAttribute('data-theme',t);})();
   <div class="barslot" id="barSlot"><div class="authbar" id="authBar"></div></div>
   <button type="button" class="menu-fab" id="menuFab" aria-label="Tài khoản và công cụ" onclick="toggleBarDrop()"><i class="fa-solid fa-bars"></i></button>
   <div class="brand">
-    <img class="brand-logo" src="logo-bqlrph.png" alt="Logo BQLRPH Xuân Lộc" width="84" height="84" onerror="this.style.display='none'">
+    <img class="brand-logo" src="logo-bqlrph.png" alt="Logo BQLRPH Xuân Lộc" width="84" height="84" onload="trimLogo(this)" onerror="this.style.display='none'">
     <h1>Ban Quản lý Rừng phòng hộ Xuân Lộc</h1>
     <p>Hệ thống quản lý lâm nghiệp trực tuyến</p>
     <div class="pills">
@@ -1081,6 +1086,37 @@ function toggleBarDrop(force){
   });
   document.addEventListener('keydown',function(e){if(e.key==='Escape') toggleBarDrop(false);});
 })();
+function trimLogo(img){
+  if(img.dataset.trimmed) return;
+  try{
+    var w=img.naturalWidth,h=img.naturalHeight; if(!w||!h) return;
+    var c=document.createElement('canvas'); c.width=w; c.height=h;
+    var g=c.getContext('2d'); g.drawImage(img,0,0);
+    var d=g.getImageData(0,0,w,h).data,x0=w,y0=h,x1=-1,y1=-1,x,y,i;
+    for(y=0;y<h;y++)for(x=0;x<w;x++){
+      i=(y*w+x)*4;
+      if(d[i+3]>24&&!(d[i]>236&&d[i+1]>236&&d[i+2]>236)){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; }
+    }
+    if(x1<0) return;
+    var sz=Math.max(x1-x0+1,y1-y0+1), cx=(x0+x1)/2, cy=(y0+y1)/2, out=256, k=out/sz;
+    var o=document.createElement('canvas'); o.width=o.height=out;
+    o.getContext('2d').drawImage(img,-(cx-sz/2)*k,-(cy-sz/2)*k,w*k,h*k);
+    img.dataset.trimmed='1';
+    img.src=o.toDataURL('image/png');
+  }catch(e){ /* mở bằng file:// thì canvas bị chặn — giữ nguyên logo */ }
+}
+function gridLayout(n){
+  var W=(document.getElementById('grid')||{}).clientWidth||1000;
+  var cap=Math.max(1,Math.min(4,Math.floor((W+12)/232))), pr, grow=1;
+  if(n<=1){pr=cap;grow=0;}
+  else if(n<=cap){pr=n;}
+  else{var rows=Math.ceil(n/cap);pr=Math.ceil(n/rows);}
+  window._gridCap=cap;
+  return ' style="--pr:'+pr+';--grow:'+grow+'"';
+}
+(function(){var t;window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(function(){
+  var W=(document.getElementById('grid')||{}).clientWidth||1000, cap=Math.max(1,Math.min(4,Math.floor((W+12)/232)));
+  if(cap!==window._gridCap&&typeof renderGrid==='function') renderGrid();},150);});})();
 function toggleTheme(){
   var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
   document.documentElement.setAttribute('data-theme',t);
@@ -1093,7 +1129,7 @@ function renderGrid(){
   function pick(list){return (list||[]).filter(function(m){return !q||normQ(m.title+' '+m.desc+' '+m.code).indexOf(q)>=0;});}
   function sec(icon,title,note,list){
     if(!list.length) return '';
-    var h='<div class="sec-label"><i class="fa-solid '+icon+'"></i> '+title+(note?' <span>'+note+'</span>':'')+'</div><div class="grid-inner">';
+    var h='<div class="sec-label"><i class="fa-solid '+icon+'"></i> '+title+(note?' <span>'+note+'</span>':'')+'</div><div class="grid-inner"'+gridLayout(list.length)+'>';
     list.forEach(function(m){ h+=moduleCard(m, canAccess(m.id)); });
     return h+'</div>';
   }
@@ -1101,7 +1137,7 @@ function renderGrid(){
            sec('fa-briefcase','Chuyên môn','Cần đăng nhập &amp; cấp quyền',pick(MODULES.chuyenmon));
   if(isAdmin()&&(!q||'quan tri admin'.indexOf(q)>=0)){
     html+='<div class="sec-label"><i class="fa-solid fa-user-shield"></i> Quản trị</div>';
-    html+='<div class="grid-inner"><a class="card admin" href="admin.html"><div class="card-top"><div class="card-icon"><i class="fa-solid fa-user-shield"></i></div><span class="code">ADMIN</span></div><h2>Khu vực quản trị</h2><p>Duyệt TK · cấp quyền · nguồn Sheet.</p><span class="go">Vào Admin <i class="fa-solid fa-arrow-right"></i></span></a></div>';
+    html+='<div class="grid-inner"'+gridLayout(1)+'><a class="card admin" href="admin.html"><div class="card-top"><div class="card-icon"><i class="fa-solid fa-user-shield"></i></div><span class="code">ADMIN</span></div><h2>Khu vực quản trị</h2><p>Duyệt TK · cấp quyền · nguồn Sheet.</p><span class="go">Vào Admin <i class="fa-solid fa-arrow-right"></i></span></a></div>';
   }
   if(!html) html='<div class="empty"><i class="fa-regular fa-face-frown" style="font-size:26px;display:block;margin-bottom:10px;opacity:.5"></i>Không tìm thấy chức năng phù hợp</div>';
   document.getElementById('grid').innerHTML=html;
