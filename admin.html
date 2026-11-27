@@ -675,6 +675,7 @@ function shell(inner){
     '<div><h1>Quản trị hệ thống</h1><p>BQLRPH Xuân Lộc · '+esc(mode)+'</p></div></div>'+
     '<div class="top-actions">'+
     '<a class="btn btn-o" href="menu.html"><i class="fa-solid fa-house"></i> Menu</a>'+
+    '<button type="button" class="btn btn-o" onclick="openActivityLog()"><i class="fa-solid fa-clock-rotate-left"></i> Nhật ký</button>'+
     '<button type="button" class="btn btn-o" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button>'+
     '<button type="button" class="btn btn-dark" onclick="logoutUser();location.href=\'menu.html\'"><i class="fa-solid fa-right-from-bracket"></i> Thoát</button>'+
     '</div></div></div><div class="wrap main">'+inner+'</div>';
@@ -1062,6 +1063,9 @@ function loadUsers(){
     html+='<div class="panel" id="acc-sheets">';
     html+='<button type="button" class="panel-h" onclick="toggleAcc(\'acc-sheets\')"><span class="panel-left"><i class="fa-solid fa-link c-violet"></i> Nguồn Google Sheet</span><i class="fa-solid fa-chevron-down chev"></i></button>';
     html+='<div class="panel-b">'+sheetSourcesCardInner()+'</div></div>';
+    html+='<div class="panel" id="acc-log">';
+    html+='<button type="button" class="panel-h" onclick="openActivityLog()"><span class="panel-left"><i class="fa-solid fa-clock-rotate-left c-amber"></i> Nhật ký hoạt động</span><i class="fa-solid fa-chevron-down chev"></i></button>';
+    html+='<div class="panel-b"><div id="activityLogBox"><p style="padding:12px;color:#64748b;font-size:13px">Bấm “Nhật ký” để tải.</p></div></div></div>';
     html+='</div>';
 
     shell(html);
@@ -1122,15 +1126,7 @@ function loadActivityLog(){
   apiCall(Object.assign({ action:'listlog', limit:150 }, c)).then(function(res){
     if(!res.ok) throw new Error(res.error||'Không tải được nhật ký');
     var logs=res.logs||[];
-    if(!box){
-      // tạo panel nếu chưa có
-      var host=document.querySelector('.wrap')||document.body;
-      box=document.createElement('div');
-      box.id='activityLogBox';
-      box.className='card';
-      box.style.cssText='margin:16px 0;padding:0;overflow:hidden';
-      host.appendChild(box);
-    }
+    box=document.getElementById('activityLogBox'); if(!box) return;
     var html='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e2e8f0;flex-wrap:wrap">'+
       '<div><b style="font-size:14px">Nhật ký hoạt động</b><div style="font-size:11px;color:#64748b;margin-top:2px">'+logs.length+' bản ghi gần nhất</div></div>'+
       '<button type="button" class="btn btn-o btn-sm" onclick="loadActivityLog()"><i class="fa-solid fa-arrows-rotate"></i> Làm mới</button></div>';
@@ -1153,26 +1149,17 @@ function loadActivityLog(){
       html+='</tbody></table></div>';
     }
     box.innerHTML=html;
-    box.scrollIntoView({behavior:'smooth',block:'nearest'});
   }).catch(function(e){ toast(e.message||e); if(box) box.innerHTML='<p style="padding:12px;color:#be123c">'+(e.message||e)+'</p>'; });
 }
 
 loadUsers();
-// Nút nhật ký trên thanh công cụ (nếu có vùng nút)
-setTimeout(function(){
-  try{
-    var bar=document.querySelector('.authbar')||document.querySelector('.top-in');
-    if(bar && !document.getElementById('btnActivityLog')){
-      var b=document.createElement('button');
-      b.id='btnActivityLog';
-      b.type='button';
-      b.className='btn btn-o';
-      b.innerHTML='<i class="fa-solid fa-clock-rotate-left"></i> Nhật ký';
-      b.onclick=loadActivityLog;
-      bar.appendChild(b);
-    }
-  }catch(e){}
-}, 400);
+function openActivityLog(){
+  var p=document.getElementById('acc-log');
+  if(!p){ toast('Đang tải trang, thử lại sau giây lát'); return; }
+  p.classList.add('open');
+  loadActivityLog();
+  p.scrollIntoView({behavior:'smooth',block:'start'});
+}
 </script>
 <script src="js/activity-log.js"></script>
 <script>
