@@ -316,8 +316,8 @@ function pushSheetSourcesCloud(cfg){
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pcccr', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pcccr: 'Phòng cháy chữa cháy rừng', pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -806,6 +806,7 @@ function sheetSourcesCardInner(){
     {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'tasks', title:'Nhiệm vụ / Gantt', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'tonghop', title:'Tổng hợp đường dẫn', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
+    {k:'pcccr', title:'PCCCR — dữ liệu riêng (để trống dùng Sheet hệ thống)', fields:[{f:'sid',l:'Spreadsheet ID (không bắt buộc)'}]},
     {k:'thongbao', title:'Thông báo / Niêm yết (công khai)', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
   ];
   var h='';
