@@ -2592,6 +2592,30 @@ ${parts.join('\n')}
             return { spreadsheetId: idMatch[1], gid };
         }
 
+        let archiveCases = [], archiveLoaded = false;
+        const ARCHIVE_GID = '563303191';
+        function statsSourceCases() { return archiveCases.length ? archiveCases.concat(detailedCases) : detailedCases; }
+        async function fetchArchiveSheet(spreadsheetId, silent) {
+            try {
+                let table = null;
+                try { table = await executeJSONPQuery(spreadsheetId, ARCHIVE_GID); } catch (e) {}
+                if (!table || !table.rows || !table.rows.length) {
+                    for (const nm of ['VI PHAM 2019-2025', 'VI PHAM 2019 - 2025']) {
+                        try { table = await executeJSONPQuery(spreadsheetId, null, nm); if (table && table.rows && table.rows.length) break; } catch (e) {}
+                    }
+                }
+                if (!table || !table.rows || !table.rows.length) throw new Error('Không đọc được sheet 2019–2025');
+                archiveCases = parseGVizDataToRows(table, { archive: true });
+                archiveLoaded = true;
+                if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
+                if (typeof updateSyncBadge === 'function') updateSyncBadge();
+                if (!silent) showToast('Đã tích hợp ' + archiveCases.length + ' hồ sơ lưu trữ 2019–2025');
+            } catch (err) {
+                console.warn('[Lưu trữ 2019–2025]', err.message);
+                if (!silent) showToast('Không tải được dữ liệu 2019–2025: ' + (err.message || ''), 'error');
+            }
+        }
+
         async function fetchViaJSONP(silent = false) {
             const rawUrl = document.getElementById('sheetCsvUrl').value.trim();
             if (!rawUrl) {
@@ -2606,6 +2630,7 @@ ${parts.join('\n')}
                 parseGVizDataToRows(table);
                 // Đồng bộ tab Thu hồi HĐ (sheet riêng)
                 await fetchThuHoiSheet(spreadsheetId, silent);
+                if (!archiveLoaded || !silent) await fetchArchiveSheet(spreadsheetId, silent);
                 lastSyncTime = new Date();
                 updateSyncBadge();
                 if (typeof renderThuHoiPanel === 'function') renderThuHoiPanel();
@@ -2822,11 +2847,12 @@ function sanitizeDoiTuong(v){
 }
 function parseNamTrong(){
     const yMax = new Date().getFullYear();
+    const seen = [];
     for (const v of arguments){
-        const m = String(v||'').match(/(?:19[7-9]\d|20\d{2})/);
-        if (m && +m[0] <= yMax) return m[0];
+        (String(v||'').match(/(?:19[7-9]\d|20\d{2})/g) || []).forEach(y=>{ if(+y<=yMax && !seen.includes(y)) seen.push(y); });
+        if (seen.length) break;
     }
-    return '';
+    return seen.sort().join(', ');
 }
 function speciesLabel(s){
     if(!s || !s.loai) return '';
@@ -2844,6 +2870,7 @@ function postProcessCases(cases){
         if(!clean) clean = sanitizeDoiTuong(c.hoHopDong || '');
         if(raw && clean !== raw) c.doiTuongGoc = raw;
         c.doiTuong = clean;
+        { const d = (typeof parseVNDate === 'function') ? parseVNDate(c.ngayViPham) : null; c.namViPham = d ? d.getFullYear() : ''; }
         const txt = [c.nguonGocDat, c.quaTrinhCanhTac, c.tinhTrang].join(' ');
         const mm = txt.match(/trồng[^.;\n]{0,40}?((?:19[7-9]\d|20\d{2}))/i);
         const fb = mm ? parseNamTrong(mm[1]) : '';
@@ -2930,19 +2957,68 @@ function parseNum(s) {
             return c?.hoTen || c?.doiTuong || "Không xác định";
         }
 
-        function parseGVizDataToRows(table) {
+        function parseGVizDataToRows(table, opts) {
             if (!table?.rows?.length) throw new Error("Không tìm thấy dữ liệu!");
             const newCases = [];
             let current = null;
             const hasWideCols = (table.cols && table.cols.length > 38);
+            // Sheet lưu trữ 2019–2025: dò vị trí cột theo chữ tiêu đề (ngay cả khi lệch so với sheet 2026)
+            let colShift = 0, colMap = null;
+            if (opts && opts.archive) {
+                const nz = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/\s+/g,' ').trim();
+                const hdrRows = table.rows.slice(0, 6);
+                const heads = {};
+                const addHead = (j, v) => { const s = nz(v); if (s && !/^\d+([.,]\d+)?$/.test(s)) (heads[j] = heads[j] || []).push(s); };
+                (table.cols || []).forEach((c, j) => addHead(j, c.label));
+                hdrRows.forEach(rw => { (rw.c || []).forEach((cell, j) => { if (cell) addHead(j, cell.f || cell.v); }); });
+                const find = (...keys) => {
+                    for (const exact of [true, false]) for (const k of keys) {
+                        for (const j of Object.keys(heads).map(Number).sort((x, y) => x - y)) {
+                            if (heads[j].some(h => exact ? h === k : h.startsWith(k))) return j;
+                        }
+                    }
+                    return undefined;
+                };
+                const m = {};
+                const set = (idx, j) => { if (j !== undefined) m[idx] = j; };
+                set(16, find('phan truong'));
+                set(18, find('dia ban hanh chinh moi'));
+                set(19, find('loai rung'));
+                set(20, find('doi tuong rung'));
+                set(21, find('ngay lap bien ban', 'ngay lap bb'));
+                set(24, find('hanh vi'));
+                set(25, find('hanh vi chi tiet'));
+                set(27, find('dien tich m2'));
+                set(28, find('dien tich ha'));
+                set(29, find('loai cay'));
+                set(30, find('nam trong'));
+                set(31, find('so luong'));
+                set(32, find('khoi luong m3', 'khoi luong'));
+                set(35, find('co quan thu ly'));
+                set(36, find('ket qua xu ly'));
+                set(37, find('moi lam viec'));
+                set(38, find('ket qua'));
+                { const jDT = Object.keys(heads).map(Number).sort((x, y) => x - y).find(j => heads[j].some(h => h === 'doi tuong')); set(40, jDT); }
+                colMap = m;
+                console.info('[Lưu trữ] Ánh xạ cột theo tiêu đề:', JSON.stringify(m));
+                if (m[21] === undefined) {
+                    const cnt = {};
+                    table.rows.slice(0, 80).forEach(rw => { if (!rw.c) return; for (let j = 14; j <= 30; j++) { const cell = rw.c[j]; const s = cell ? String(cell.f || cell.v || '').trim() : ''; if (/^\d{1,2}\/\d{1,2}\/(19|20)\d{2}$/.test(s)) cnt[j] = (cnt[j] || 0) + 1; } });
+                    const best = Object.keys(cnt).sort((x, y) => cnt[y] - cnt[x])[0];
+                    if (best !== undefined && Math.abs(+best - 21) <= 3) colShift = +best - 21;
+                }
+            }
 
             table.rows.forEach((r, idx) => {
                 if (!r.c) return;
-                const getVal = (i) => (r.c[i] ? (r.c[i].f || r.c[i].v || "") : "").toString().trim();
+                const getVal = (i0) => { const i = (colMap && colMap[i0] !== undefined) ? colMap[i0] : (i0 >= 14 ? i0 + colShift : i0); return (r.c[i] ? (r.c[i].f || r.c[i].v || "") : "").toString().trim(); };
 
                 const colSTT = getVal(0);
                 const colHo1 = getVal(1);
                 const colHo2 = getVal(2);
+                // Bỏ hàng tiêu đề / hàng đánh số cột lẫn trong sheet
+                if (/^\d+$/.test(colHo1) && /^\d+$/.test(colHo2)) return;
+                if (/^stt$/i.test(colSTT) || /^hộ canh tác/i.test(colHo1)) return;
                 // F=nguồn gốc đất; G,H,I = HĐ giao khoán (số, ngày ký, DT); J,K,L = HĐ trồng rừng
                 const colHoHopDong = getVal(3);
                 const colDiaChi = getVal(4);
@@ -2964,6 +3040,7 @@ function parseNum(s) {
                 const colM2 = getVal(27);
                 const colHa = getVal(28);
                 const colLoai = getVal(29);
+                if (/^loài cây$/i.test(colLoai) || /^diện tích m2$/i.test(getVal(27))) return;
                 const colSL = getVal(31);
                 const colM3 = getVal(32);
                 const colAL = hasWideCols ? getVal(37) : (getVal(3) || getVal(4));
@@ -3068,6 +3145,10 @@ namTrong: parseNamTrong(colNamTrong, colLoai),
             const uiState = (typeof snapshotUiState === 'function') ? snapshotUiState() : null;
             const keepMode = currentViewMode || (uiState && uiState.viewMode) || 'dashboard';
             postProcessCases(newCases);
+            if (opts && opts.archive) {
+                newCases.forEach(c => { c.luuTru = true; c.id = 100000 + c.id; });
+                return newCases;
+            }
             detailedCases = newCases;
             if (typeof populateFilterOptions === 'function') populateFilterOptions();
             if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
@@ -3251,12 +3332,12 @@ function toggleAdvFilter() {
                 nhom.innerHTML = `<option value="">Tất cả nhóm xử lý</option>` + [1,2,3,4,5].map(id => `<option value="${id}">${escapeHtml(NHOM_MAP[id].short)}</option>`).join('');
                 if (nhomCur) nhom.value = nhomCur;
             }
-            setSelectOptions('statsFilterHanhVi', detailedCases.map(c => c.hanhVi), 'Tất cả hành vi');
-            setSelectOptions('statsFilterTieuKhu', detailedCases.map(c => c.tieuKhu), 'Tất cả tiểu khu');
-            setSelectOptions('statsFilterPhanTruong', detailedCases.map(c => c.phanTruong), 'Tất cả phân trường');
-            setSelectOptions('statsFilterXa', detailedCases.map(c => c.xa), 'Tất cả xã');
-            setSelectOptions('statsFilterCoQuan', detailedCases.map(c => normalizeAgency(c.coQuanThuLy||'')).filter(Boolean), 'Tất cả cơ quan thụ lý');
-            setSelectOptions('statsFilterKetQuaPL', detailedCases.map(c => normalizeKetQuaPL(c.ketQuaXuLyPL||'')).filter(Boolean), 'Tất cả KQ xử lý PL');
+            setSelectOptions('statsFilterHanhVi', statsSourceCases().map(c => c.hanhVi), 'Tất cả hành vi');
+            setSelectOptions('statsFilterTieuKhu', statsSourceCases().map(c => c.tieuKhu), 'Tất cả tiểu khu');
+            setSelectOptions('statsFilterPhanTruong', statsSourceCases().map(c => c.phanTruong), 'Tất cả phân trường');
+            setSelectOptions('statsFilterXa', statsSourceCases().map(c => c.xa), 'Tất cả xã');
+            setSelectOptions('statsFilterCoQuan', statsSourceCases().map(c => normalizeAgency(c.coQuanThuLy||'')).filter(Boolean), 'Tất cả cơ quan thụ lý');
+            setSelectOptions('statsFilterKetQuaPL', statsSourceCases().map(c => normalizeKetQuaPL(c.ketQuaXuLyPL||'')).filter(Boolean), 'Tất cả KQ xử lý PL');
         }
 
         function clearStatsFilters() {
@@ -3748,6 +3829,7 @@ function toggleAdvFilter() {
         }
 
 function getFilteredCases() {
+            const _src = statsSourceCases();
             const mode = document.getElementById('statsTimeMode')?.value || 'all';
             const year = +((document.getElementById('statsYearTop')?.value || document.getElementById('statsYear')?.value) || document.getElementById('statsYearTop')?.value || new Date().getFullYear());
             const nhom = document.getElementById('statsFilterNhom')?.value || '';
@@ -3759,7 +3841,7 @@ function getFilteredCases() {
             const from = document.getElementById('statsFrom')?.value || '';
             const to = document.getElementById('statsTo')?.value || '';
 
-            return detailedCases.filter(c => {
+            return _src.filter(c => {
                 const d = parseVNDate(c.ngayViPham);
                 if (mode !== 'all') {
                     if (!d) return false;
@@ -4437,7 +4519,7 @@ function getFilteredCases() {
         }
 
         function casesInRange(from, to) {
-            return detailedCases.filter(c => {
+            return statsSourceCases().filter(c => {
                 const d = parseVNDate(c.ngayViPham);
                 if (!d) return false;
                 return d >= from && d <= to;
@@ -5534,7 +5616,7 @@ ${detailBlocks.details}
             const timeStr = lastSyncTime
                 ? lastSyncTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 : '—';
-            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 badge-pulse"></span> ${detailedCases.length} hồ sơ · Đồng bộ ${timeStr}`;
+            badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 badge-pulse"></span> ${detailedCases.length} hồ sơ${archiveCases.length ? ' (+' + archiveCases.length + ' lưu trữ)' : ''} · Đồng bộ ${timeStr}`;
         }
 
         function startAutoRefresh() {
