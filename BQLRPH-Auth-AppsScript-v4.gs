@@ -662,6 +662,8 @@ function getSheets_(data) {
   } catch (e) {
     sheets = {};
   }
+  // Nguồn PCCCR thống nhất trong tệp BQLRPH-Auth.
+  sheets.pcccr = {sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'581631532',label:'BQLRPH-Auth — Tiến độ PCCCR'};
   return { ok: true, sheets: sheets };
 }
 
@@ -671,6 +673,8 @@ function setSheets_(data) {
   if (!sheets || typeof sheets !== 'object') {
     throw new Error('Thiếu sheets');
   }
+  // Không cho cấu hình cũ ghi đè nguồn PCCCR đã thống nhất.
+  sheets.pcccr = {sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'581631532',label:'BQLRPH-Auth — Tiến độ PCCCR'};
   PropertiesService.getScriptProperties()
     .setProperty('SHEET_SOURCES', JSON.stringify(sheets));
   return { ok: true };
@@ -893,8 +897,9 @@ function pcccrUser_(data) {
 function pcccrSheet_(name, headers) {
   var cfg = {};
   try { cfg = JSON.parse(PropertiesService.getScriptProperties().getProperty('SHEET_SOURCES') || '{}') || {}; } catch(e) {}
-  var sid = cfg.pcccr && String(cfg.pcccr.sid || '').trim();
-  if (!sid) throw new Error('Chưa cấu hình Spreadsheet ID nguồn PCCCR trong trang Admin.');
+  // Cấp cháy được lưu trong cùng tệp BQLRPH-Auth, tại tab PCCCR_CapChay.
+  // Bảng tiến độ nằm ở tab GID 581631532 trong chính tệp này.
+  var sid = '1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI';
   var ss = SpreadsheetApp.openById(sid);
   var sh = ss.getSheetByName(name);
   if (!sh) {
