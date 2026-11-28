@@ -61,6 +61,66 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
  #view-tiendo .table-wrap{max-height:65vh}
 }
 
+
+/* ===== BIEN BAO CAP CHAY RUNG - giao dien moi ===== */
+#view-cap{padding:clamp(14px,2.4vw,26px);background:linear-gradient(145deg,#f7fbf8,#ffffff 55%,#f1f7f3)}
+#view-cap>h2{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#123d2d;margin:0 0 4px}
+#view-cap>.sub{font-size:12px;color:#718477;margin-bottom:16px}
+.fire-sign{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr);
+  grid-template-areas:"head head" "sub sub" "dial name" "dial desc" "dial foot" "legend legend";
+  align-items:center;column-gap:clamp(12px,2.5vw,28px);
+  max-width:900px;margin:14px auto 18px;padding:clamp(16px,2.6vw,28px);
+  border:1px solid #b7d3c2;border-radius:22px;
+  background:linear-gradient(135deg,#ffffff 0%,#f7fbf8 58%,#edf6ef 100%);
+  box-shadow:0 18px 42px rgba(15,55,35,.12),inset 0 0 0 5px rgba(255,255,255,.8);
+  text-align:center;
+}
+.fire-sign:before{content:"";position:absolute;z-index:-1;left:0;right:0;top:0;height:9px;background:linear-gradient(90deg,#14532d,#16a34a,#d4a72c,#dc2626,#7f1d1d)}
+.fire-sign-head{grid-area:head;color:#123d2d;font-size:clamp(17px,2.5vw,24px);font-weight:900;letter-spacing:.015em;line-height:1.3;margin:5px 0 3px}
+.fire-sign-sub{grid-area:sub;color:#64786b;font-size:10px;font-weight:800;letter-spacing:.16em;margin-bottom:6px}
+.fire-dial{grid-area:dial;width:100%;max-width:560px;margin:0 auto;filter:drop-shadow(0 5px 5px rgba(15,23,42,.08))}
+.fire-level-name{
+ grid-area:name;align-self:end;display:inline-flex;justify-content:center;align-items:center;
+ width:100%;min-height:72px;padding:13px 12px;margin:0;
+ border-radius:15px;background:#123d2d;color:#fff!important;
+ font-size:clamp(21px,3vw,31px);font-weight:900;line-height:1.15;letter-spacing:.01em;
+ box-shadow:0 8px 18px rgba(18,61,45,.16)
+}
+.fire-level-desc{
+ grid-area:desc;align-self:start;margin:0;padding:12px 10px;width:100%;
+ border:1px solid #dbe8de;border-radius:12px;background:#fff;
+ color:#284d38;font-size:clamp(12px,1.5vw,15px);font-weight:800;line-height:1.5
+}
+.fire-sign-foot{grid-area:foot;display:block;margin:0;padding:10px 8px;border:0;border-top:1px solid #d5e4d9;color:#496b56;font-size:11px;font-weight:900;letter-spacing:.12em}
+.fire-legend{grid-area:legend;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0 0;padding-top:13px;border-top:1px solid #e0ebe3;font-size:11px;font-weight:700;color:#486052}
+.fire-legend span{padding:5px 9px;border:1px solid #e1eae3;border-radius:99px;background:#fff}
+.fire-dot{width:9px;height:9px;border-radius:50%}
+#recommend{max-width:900px;margin:12px auto 8px;padding:13px 16px;border:1px solid #cde5d6;border-left:5px solid #16834a;border-radius:12px;background:#effaf2;color:#194b31;font-size:13px;font-weight:600;line-height:1.65}
+#cap-meta{max-width:900px;margin:9px auto 0;padding:11px 14px;border:1px solid #e1e9e3;border-radius:11px;background:#fff;color:#617267;font-size:11px;line-height:1.7}
+.level-table-title{max-width:900px;margin:22px auto 9px;color:#214b34;font-size:14px;font-weight:900;letter-spacing:.025em}
+#cap-reference-table{max-width:900px;margin:auto;border:1px solid #dce8df;border-radius:13px;overflow:auto;background:#fff;box-shadow:0 5px 16px rgba(20,60,35,.04)}
+#cap-reference-table table{width:100%;min-width:0;font-size:12px}
+#cap-reference-table th{background:#eaf4ed;color:#1e5133;font-weight:800}
+#cap-reference-table td,#cap-reference-table th{padding:11px 13px;text-align:left}
+#cap-reference-table tr:nth-child(even) td{background:#f8fbf9}
+#cap-reference-status{display:none}
+#view-cap>.notice:not(#recommend){display:none}
+@media(max-width:640px){
+ #view-cap{padding:12px 9px}
+ .fire-sign{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "sub" "dial" "name" "desc" "foot" "legend";gap:8px;padding:17px 12px;border-radius:17px}
+ .fire-sign-head{font-size:16px}
+ .fire-sign-sub{font-size:9px;letter-spacing:.1em}
+ .fire-dial{max-width:420px}
+ .fire-level-name{min-height:58px;font-size:22px}
+ .fire-level-desc{font-size:12px}
+ .fire-sign-foot{font-size:10px}
+ .fire-legend{gap:5px}
+ .fire-legend span{font-size:10px;padding:4px 7px}
+ #cap-meta{font-size:10px}
+}
+
 </style>
 <script>
 (function(){
