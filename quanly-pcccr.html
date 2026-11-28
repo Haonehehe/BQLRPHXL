@@ -76,7 +76,7 @@ function parseProgress(table){
  const totalKH=find(['tongkh','tongkehoach']),totalTH=find(['tongth','tongthuchien']);
  const aliases={GH:['giahuynh','gh'],NL:['nuile','nl'],TT:['trantao','tt'],LC:['lancat','lc'],GP:['giaphu','gp'],DV:['damvoi','dv']},map={};
  codes.forEach(k=>{const a=aliases[k];map[k]={kh:find(a.map(x=>x+'kh').concat(a.map(x=>'kh'+x))),th:find(a.map(x=>x+'th').concat(a.map(x=>'th'+x)))}});
- return (table.rows||[]).map((r,i)=>{const name=cell(r,ix.name);if(name==null||String(name).trim()==='')return null;let pt={},sumK=0,sumT=0;codes.forEach(k=>{let kh=num(cell(r,map[k].kh)),th=num(cell(r,map[k].th));sumK+=kh;sumT+=th;pt[k]={kh,th,tyLe:percent(th,kh)}});let kh=cell(r,totalKH),th=cell(r,totalTH);kh=kh==null?sumK:num(kh);th=th==null?sumT:num(th);return{stt:cell(r,ix.stt)||i+1,hangMuc:String(name),dvt:String(cell(r,ix.unit)||''),tong:{kh,th,tyLe:percent(th,kh)},phanTruong:pt}}).filter(Boolean)
+ return (table.rows||[]).map((r,i)=>{const name=cell(r,ix.name);if(name==null||String(name).trim()==='')return null;let pt={},sumK=0,sumT=0;codes.forEach(k=>{let kh=num(cell(r,map[k].kh)),th=num(cell(r,map[k].th));sumK+=kh;sumT+=th;pt[k]={kh,th,tyLe:percent(th,kh)}});let kh=cell(r,totalKH),th=cell(r,totalTH);kh=kh==null||kh===''?sumK:num(kh);th=th==null||th===''?sumT:num(th);return{stt:cell(r,ix.stt)||i+1,hangMuc:String(name),dvt:String(cell(r,ix.unit)||''),tong:{kh,th,tyLe:percent(th,kh)},phanTruong:pt}}).filter(Boolean)
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(n){return Number(n||0).toLocaleString('vi-VN',{maximumFractionDigits:2})}
