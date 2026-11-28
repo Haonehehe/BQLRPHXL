@@ -331,6 +331,19 @@ input:focus,select:focus,textarea:focus{
 .modal{backdrop-filter:blur(6px)}
 .mbox{border-radius:18px!important;box-shadow:0 24px 60px rgba(15,23,42,.18)!important}
 
+
+/* Tiện ích PDF */
+.utility-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.utility-card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:15px;box-shadow:var(--shadow)}
+.utility-card h3{font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.utility-card h3 i{color:var(--vio);font-size:16px}
+.utility-card p{font-size:11px;color:var(--mu);line-height:1.5;margin-bottom:10px}
+.utility-card .row{margin-bottom:9px}
+.utility-card input[type=password],.utility-card input[type=number],.utility-card input[type=file],.utility-card input[type=text],.utility-card select{width:100%;height:38px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;background:#fff;font-size:12px}
+.utility-card input[type=file]{height:auto;padding:8px}
+.utility-note{font-size:11px;line-height:1.55;color:#475569;background:#f8fafc;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:10px}
+.utility-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+
 </style>
 <link rel="icon" type="image/png" href="favicon-bqlrph.png">
 <meta name="theme-color" content="#047857">
@@ -343,7 +356,7 @@ input:focus,select:focus,textarea:focus{
       <div class="logo-i"><i class="fa-solid fa-file-pdf"></i></div>
       <div>
         <h1>Công cụ PDF</h1>
-        <p>Xem trước · Kéo thả · Tách nối · Xoay · OCR</p>
+        <p>Tách · Nối · Xoay · OCR · Bảo mật · Chèn ảnh · Đóng dấu</p>
       </div>
     </div>
     <div class="acts">
@@ -358,6 +371,7 @@ input:focus,select:focus,textarea:focus{
       <button type="button" data-t="sua" onclick="doiTab('sua')"><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa</button>
       <button type="button" data-t="xoay" onclick="doiTab('xoay')"><i class="fa-solid fa-rotate"></i> Xoay</button>
       <button type="button" data-t="ocr" onclick="doiTab('ocr')"><i class="fa-solid fa-eye"></i> OCR</button>
+      <button type="button" data-t="tienich" onclick="doiTab('tienich')"><i class="fa-solid fa-toolbox"></i> Tiện ích PDF</button>
     </div>
   </div>
 </div>
@@ -505,10 +519,106 @@ input:focus,select:focus,textarea:focus{
       </div>
     </div></div>
   </div>
+
+  <!-- TIỆN ÍCH PDF - MỞ RỘNG -->
+  <div class="panel" id="p-tienich">
+    <div class="hint"><b>Tiện ích mở rộng:</b> Chọn PDF và thực hiện các thao tác bổ sung. Tài liệu được xử lý ngay trên trình duyệt; không tự động tải lên máy chủ. Riêng thư viện bảo mật QPDF-WASM được tải khi người dùng chọn khóa/mở khóa/nén PDF.</div>
+    <div class="card">
+      <div class="card-h">Tài liệu nguồn</div>
+      <div class="card-b">
+        <div class="drop" id="dropUtil" onclick="document.getElementById('inpUtil').click()">
+          <i class="fa-solid fa-file-pdf"></i><p>Chọn PDF cần xử lý</p><span>Hỗ trợ một file PDF mỗi lần</span>
+        </div>
+        <input type="file" id="inpUtil" accept="application/pdf,.pdf" hidden>
+        <div class="file-list" id="listUtil"></div>
+      </div>
+    </div>
+
+    <div class="utility-grid">
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-image"></i> Chèn hình ảnh / chữ ký</h3>
+        <p>Chèn ảnh PNG hoặc JPG vào các trang PDF, chọn vị trí và kích thước tương đối.</p>
+        <div class="row"><label class="field">Ảnh cần chèn</label><input type="file" id="utilImage" accept="image/png,image/jpeg"></div>
+        <div class="row"><label class="field">Trang áp dụng</label><input type="text" id="insertPages" value="all" placeholder="all hoặc 1,3,5-7"></div>
+        <div class="row"><label class="field">Vị trí đặt ảnh</label><select id="insertPosition" onchange="toggleInsertCustomPosition()"><option value="br">Góc dưới bên phải</option><option value="bl">Góc dưới bên trái</option><option value="tr">Góc trên bên phải</option><option value="tl">Góc trên bên trái</option><option value="center">Giữa trang</option><option value="custom">Tùy chỉnh tọa độ</option></select></div>
+        <div id="insertCustomPosition" style="display:none">
+          <div class="row"><label class="field">Tọa độ X (điểm PDF)</label><input type="number" id="insertX" value="50" min="0" step="1"></div>
+          <div class="row"><label class="field">Tọa độ Y (điểm PDF)</label><input type="number" id="insertY" value="50" min="0" step="1"></div>
+          <div class="hint">Tọa độ tính từ góc dưới bên trái trang PDF. X tăng từ trái sang phải; Y tăng từ dưới lên trên. 72 điểm = 1 inch.</div>
+        </div>
+        <div class="row"><label class="field">Chiều rộng (điểm PDF)</label><input type="number" id="insertWidth" value="120" min="20" max="500"></div>
+        <button class="btn btn-v btn-sm" onclick="utilInsertImage()">Chèn ảnh và tải PDF</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-lock"></i> Khóa PDF bằng mật khẩu</h3>
+        <p>Mã hóa PDF bằng QPDF (AES-256). Người nhận phải nhập mật khẩu mới mở được tài liệu.</p>
+        <div class="row"><label class="field">Mật khẩu mở file</label><input type="password" id="lockUser" autocomplete="new-password" placeholder="Nhập mật khẩu mở PDF"></div>
+        <div class="row"><label class="field">Mật khẩu chủ sở hữu</label><input type="password" id="lockOwner" autocomplete="new-password" placeholder="Mật khẩu quản trị (khác mật khẩu mở file)"></div>
+        <div class="row"><label class="field">Quyền in</label><select id="lockPrint"><option value="full">Cho phép in</option><option value="low">In chất lượng thấp</option><option value="none">Không cho phép in</option></select></div>
+        <div class="row"><label class="field">Quyền chỉnh sửa</label><select id="lockModify"><option value="none">Không cho phép</option><option value="annotate">Chú thích / điền biểu mẫu</option><option value="all">Cho phép chỉnh sửa</option></select></div>
+        <button class="btn btn-v btn-sm" onclick="utilLockPdf()">Mã hóa và tải PDF</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-lock-open"></i> Mở khóa PDF</h3>
+        <p>Gỡ mã hóa khi có mật khẩu hợp lệ. Không hỗ trợ phá hoặc dò mật khẩu.</p>
+        <div class="row"><label class="field">Mật khẩu hiện tại</label><input type="password" id="unlockPassword" autocomplete="current-password" placeholder="Nhập mật khẩu PDF"></div>
+        <button class="btn btn-g btn-sm" onclick="utilUnlockPdf()">Mở khóa và tải PDF</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-stamp"></i> Đóng dấu / Watermark</h3>
+        <p>Thêm chữ lên tài liệu theo dạng dấu xác nhận hoặc watermark mờ trên các trang.</p>
+        <div class="row"><label class="field">Nội dung</label><input type="text" id="stampText" value="BẢN SAO"></div>
+        <div class="row"><label class="field">Kiểu hiển thị</label><select id="stampMode"><option value="stamp">Dấu góc dưới bên phải</option><option value="watermark">Watermark chéo giữa trang</option></select></div>
+        <div class="row"><label class="field">Độ mờ (%)</label><input type="number" id="stampOpacity" value="25" min="5" max="100"></div>
+        <div class="row"><label class="field">Cỡ chữ</label><input type="number" id="stampSize" value="30" min="8" max="100"></div>
+        <div class="row"><label class="field">Trang áp dụng</label><input type="text" id="stampPages" value="all" placeholder="all hoặc 1,3-5"></div>
+        <button class="btn btn-v btn-sm" onclick="utilStamp()">Đóng dấu / Watermark và tải</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-list-ol"></i> Đánh số trang</h3>
+        <p>Thêm số trang vào chân trang PDF.</p>
+        <div class="row"><label class="field">Định dạng</label><select id="numberFormat"><option value="plain">{n}</option><option value="total">{n}/{total}</option><option value="page">Trang {n}</option></select></div>
+        <div class="row"><label class="field">Bắt đầu từ số</label><input type="number" id="numberStart" value="1" min="0"></div>
+        <div class="row"><label class="field">Trang áp dụng</label><input type="text" id="numberPages" value="all"></div>
+        <button class="btn btn-v btn-sm" onclick="utilNumberPages()">Đánh số và tải PDF</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-compress"></i> Nén / giảm dung lượng PDF</h3>
+        <p>Tối ưu cấu trúc và nén các luồng PDF không mất dữ liệu. Mức giảm tùy tài liệu; không tự giảm độ phân giải ảnh.</p>
+        <button class="btn btn-v btn-sm" onclick="utilCompressPdf()">Nén PDF và tải về</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-images"></i> Trích xuất ảnh / PDF sang JPG</h3>
+        <p>Xuất từng trang PDF thành ảnh JPG hoặc PNG. Đây là ảnh chụp toàn trang, không phải tách riêng từng ảnh nhúng trong cấu trúc PDF.</p>
+        <div class="row"><label class="field">Định dạng</label><select id="pageImageFormat"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select></div>
+        <div class="row"><label class="field">Độ phân giải</label><select id="pageImageScale"><option value="1.5">Tiêu chuẩn</option><option value="2">Cao</option><option value="3">Rất cao</option></select></div>
+        <button class="btn btn-v btn-sm" onclick="utilExportPagesAsImages()">Xuất ảnh từng trang</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-file-image"></i> Hình ảnh sang PDF</h3>
+        <p>Gộp nhiều ảnh JPG/PNG thành một file PDF, mỗi ảnh nằm trên một trang.</p>
+        <div class="row"><label class="field">Chọn hình ảnh</label><input type="file" id="imagesToPdf" accept="image/png,image/jpeg" multiple></div>
+        <button class="btn btn-v btn-sm" onclick="utilImagesToPdf()">Tạo PDF từ ảnh</button>
+      </section>
+
+      <section class="utility-card">
+        <h3><i class="fa-solid fa-file-word"></i> PDF sang Word</h3>
+        <p>Để tạo Word có thể chỉnh sửa, hãy chạy OCR ở tab OCR rồi chọn “Xuất Word”. PDF có văn bản chọn được cũng có thể sao chép nội dung qua OCR/đọc văn bản.</p>
+        <button class="btn btn-b btn-sm" onclick="doiTab('ocr')">Mở công cụ OCR / Xuất Word</button>
+        <div class="utility-note">Lưu ý: chuyển PDF sang Word giữ nguyên bố cục phức tạp không được đảm bảo bằng xử lý thuần trình duyệt.</div>
+      </section>
+    </div>
+    <div class="utility-note" style="margin-top:14px"><b>Riêng tư và bảo mật:</b> Chỉ xử lý tài liệu mà bạn có quyền truy cập. Mở khóa yêu cầu mật khẩu hợp lệ; không có chức năng phá mật khẩu. Việc hạn chế in/sao chép trong PDF phụ thuộc phần mềm đọc PDF của người nhận.</div>
+  </div>
 </div>
 
-
-</div>
 
 <div class="foot">BQLRPH Xuân Lộc · PDF trên trình duyệt</div>
 <div id="toast" class="toast"></div>
@@ -659,10 +769,11 @@ function updateKpi(){
   else if(tab==='sua'&&fileSua){n=1;pages=orderSua.length;size=fileSua.size;}
   else if(tab==='xoay'&&fileXoay){n=1;pages=fileXoay.pageCount;size=fileXoay.size;}
   else if(tab==='ocr'&&fileOcr){n=1;pages=fileOcr.pageCount;size=fileOcr.size;}
+  else if(tab==='tienich'&&fileUtil){n=1;pages=fileUtil.pageCount;size=fileUtil.size;}
   document.getElementById('kFiles').textContent=n;document.getElementById('kPages').textContent=pages;
-  document.getElementById('kSize').textContent=fmtSize(size);document.getElementById('kTab').textContent={noi:'Nối',tach:'Tách',sua:'Sửa',xoay:'Xoay',ocr:'OCR'}[tab];
+  document.getElementById('kSize').textContent=fmtSize(size);document.getElementById('kTab').textContent={noi:'Nối',tach:'Tách',sua:'Sửa',xoay:'Xoay',ocr:'OCR',tienich:'Tiện ích'}[tab];
 }
-function doiTab(t){tab=t;['noi','tach','sua','xoay','ocr'].forEach(function(x){var el=document.getElementById('p-'+x);if(el)el.classList.toggle('on',x===t);});document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});updateKpi();}
+function doiTab(t){tab=t;['noi','tach','sua','xoay','ocr','tienich'].forEach(function(x){var el=document.getElementById('p-'+x);if(el)el.classList.toggle('on',x===t);});document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});updateKpi();}
 function bindDrop(el,inp,onFiles){el.addEventListener('dragover',function(e){e.preventDefault();el.classList.add('over');});el.addEventListener('dragleave',function(){el.classList.remove('over');});el.addEventListener('drop',function(e){e.preventDefault();el.classList.remove('over');if(e.dataTransfer.files&&e.dataTransfer.files.length)onFiles(e.dataTransfer.files);});inp.addEventListener('change',function(){if(inp.files&&inp.files.length)onFiles(inp.files);inp.value='';});}
 
 async function openPv(bytes,pdfjsDoc,pageIndex,title){pv.bytes=bytes;pv.pdfjs=pdfjsDoc;pv.page=pageIndex;pv.total=pdfjsDoc.numPages;pv.scale=1.3;pv.title=title||'Xem trước';document.getElementById('pvTitle').textContent=pv.title;document.getElementById('pvOcrBox').style.display='none';document.getElementById('modalPv').classList.add('on');await drawPv();}
@@ -945,7 +1056,194 @@ function taiOcrWord(){
   downloadWord(body,(fileOcr?baseName(fileOcr.name):'ocr')+'-OCR.doc');
   toast('Đã xuất Word (.doc)');
 }
-function xoaHet(){filesNoi=[];fileTach=null;pdfjsTach=null;fileSua=null;pdfjsSua=null;orderSua=[];selSua={};fileXoay=null;pdfjsXoay=null;selXoay={};fileOcr=null;pdfjsOcr=null;huyPvNoi();huyPvTach();huyPvXoay();workingXoay={bytes:null,pdfjs:null};['listNoi','listTach','listSua','listXoay','listOcr','thumbsTach','thumbsSua','thumbsXoay','thumbsOcr'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML='';});document.getElementById('btnNoi').disabled=true;document.getElementById('btnTach').disabled=true;document.getElementById('toolSua').style.display='none';document.getElementById('toolXoay').style.display='none';document.getElementById('toolOcr').style.display='none';document.getElementById('ocrResultBox').style.display='none';updateKpi();toast('Đã xóa hết');}
+
+/* ===== TIỆN ÍCH PDF MỞ RỘNG ===== */
+var fileUtil=null,pdfjsUtil=null,qpdfPromise=null;
+bindDrop(document.getElementById('dropUtil'),document.getElementById('inpUtil'),async function(fl){
+  var f=fl[0];if(!f)return;setProg(15);
+  try{
+    var meta=await readPdfMeta(f);
+    fileUtil=meta;pdfjsUtil=await loadPdfjs(meta.bytes);
+    document.getElementById('listUtil').innerHTML='<div class="file-row"><div class="ico"><i class="fa-solid fa-file-pdf"></i></div><div class="meta"><b>'+esc(f.name)+'</b><span>'+meta.pageCount+' trang · '+fmtSize(meta.size)+'</span></div></div>';
+    updateKpi();toast('Đã chọn PDF cho tiện ích');
+  }catch(e){fileUtil=null;pdfjsUtil=null;toast('Không đọc được PDF: '+(e.message||e));}
+  setProg(null);
+});
+function utilNeedFile(){if(!fileUtil){toast('Vui lòng chọn PDF nguồn trước');return false;}return true;}
+function utilPages(spec,total){
+  var s=String(spec||'all').trim().toLowerCase();if(!s||s==='all')return Array.from({length:total},(_,i)=>i);
+  var out=[];
+  s.split(/[,;]+/).forEach(function(part){
+    part=part.trim();var m=part.match(/^(\d+)\s*[-–]\s*(\d+)$/);
+    if(m){var a=+m[1],b=+m[2];if(a>b){var t=a;a=b;b=t;}for(var n=a;n<=b;n++)if(n>=1&&n<=total&&out.indexOf(n-1)<0)out.push(n-1);}
+    else if(/^\d+$/.test(part)){var n=+part;if(n>=1&&n<=total&&out.indexOf(n-1)<0)out.push(n-1);}
+  });
+  return out;
+}
+async function utilSavePdf(bytes,suffix){
+  var name=baseName(fileUtil.name)+(suffix||'-ket-qua')+'.pdf';downloadBytes(bytes,name);toast('Đã tạo '+name);
+}
+function utilImageBytes(file){return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(){resolve(new Uint8Array(r.result));};r.onerror=reject;r.readAsArrayBuffer(file);});}
+function toggleInsertCustomPosition(){
+  var custom=document.getElementById('insertPosition').value==='custom';
+  document.getElementById('insertCustomPosition').style.display=custom?'block':'none';
+}
+async function utilInsertImage(){
+  if(!utilNeedFile())return;var f=document.getElementById('utilImage').files[0];if(!f){toast('Chọn ảnh PNG hoặc JPG');return;}
+  setProg(20);
+  try{
+    var doc=await PDFDocument.load(fileUtil.bytes);var imgBytes=await utilImageBytes(f);
+    var img=f.type==='image/png'?await doc.embedPng(imgBytes):await doc.embedJpg(imgBytes);
+    var w=Math.max(20,Math.min(500,+document.getElementById('insertWidth').value||120));
+    var h=w*img.height/img.width,where=document.getElementById('insertPosition').value;
+    var ids=utilPages(document.getElementById('insertPages').value,doc.getPageCount());
+    if(!ids.length)throw new Error('Khoảng trang không hợp lệ');
+    ids.forEach(function(i){var p=doc.getPage(i),sz=p.getSize(),x=20,y=20;
+      var scale=Math.min(1,(sz.width-40)/w,(sz.height-40)/h);
+      var drawW=w*scale,drawH=h*scale;
+      if(where==='br'){x=sz.width-drawW-20;y=20;}
+      if(where==='bl'){x=20;y=20;}
+      if(where==='tr'){x=sz.width-drawW-20;y=sz.height-drawH-20;}
+      if(where==='tl'){x=20;y=sz.height-drawH-20;}
+      if(where==='center'){x=(sz.width-drawW)/2;y=(sz.height-drawH)/2;}
+      if(where==='custom'){
+        x=Math.max(0,Math.min(sz.width-drawW,+document.getElementById('insertX').value||0));
+        y=Math.max(0,Math.min(sz.height-drawH,+document.getElementById('insertY').value||0));
+      }
+      p.drawImage(img,{x:x,y:y,width:drawW,height:drawH,opacity:1});
+    });
+    await utilSavePdf(await doc.save(),'-chen-anh');setProg(100);
+  }catch(e){toast('Lỗi chèn ảnh: '+(e.message||e));}setProg(null);
+}
+function makeStampCanvas(text,size,mode){
+  var scale=3,canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+  var fontSize=Math.max(8,Math.min(100,size))*scale;
+  ctx.font='bold '+fontSize+'px Arial, "DejaVu Sans", sans-serif';
+  var metrics=ctx.measureText(text),pad=mode==='watermark'?fontSize*.18:fontSize*.42;
+  canvas.width=Math.ceil(metrics.width+pad*2);canvas.height=Math.ceil(fontSize*1.55+pad*2);
+  ctx=canvas.getContext('2d');ctx.font='bold '+fontSize+'px Arial, "DejaVu Sans", sans-serif';
+  ctx.textBaseline='middle';ctx.textAlign='center';
+  if(mode==='stamp'){
+    ctx.strokeStyle='#b91c1c';ctx.lineWidth=Math.max(2,scale*1.2);
+    ctx.strokeRect(scale,scale,canvas.width-2*scale,canvas.height-2*scale);
+  }
+  ctx.fillStyle='#b91c1c';ctx.fillText(text,canvas.width/2,canvas.height/2);
+  return canvas;
+}
+async function utilStamp(){
+  if(!utilNeedFile())return;var text=document.getElementById('stampText').value.trim();if(!text){toast('Nhập nội dung dấu');return;}
+  setProg(20);
+  try{
+    var doc=await PDFDocument.load(fileUtil.bytes),pages=doc.getPages();
+    var mode=document.getElementById('stampMode').value;
+    var opacity=Math.max(5,Math.min(100,+document.getElementById('stampOpacity').value||25))/100;
+    var size=Math.max(8,Math.min(100,+document.getElementById('stampSize').value||30));
+    var ids=utilPages(document.getElementById('stampPages').value,pages.length);
+    if(!ids.length)throw new Error('Khoảng trang không hợp lệ');
+    var canvas=makeStampCanvas(text,size,mode),dataUrl=canvas.toDataURL('image/png');
+    var raw=atob(dataUrl.split(',')[1]),png=new Uint8Array(raw.length);
+    for(var j=0;j<raw.length;j++)png[j]=raw.charCodeAt(j);
+    var image=await doc.embedPng(png),baseW=canvas.width/3,baseH=canvas.height/3;
+    ids.forEach(function(i){
+      var p=pages[i],sz=p.getSize(),factor=Math.min(1,(sz.width-24)/baseW,(sz.height-24)/baseH);
+      var w=baseW*factor,h=baseH*factor,x,y;
+      if(mode==='watermark'){
+        x=(sz.width-w)/2;y=(sz.height-h)/2;
+        p.drawImage(image,{x:x,y:y,width:w,height:h,opacity:opacity,rotate:PDFLib.degrees(35)});
+      }else{
+        x=Math.max(8,sz.width-w-22);y=22;
+        p.drawImage(image,{x:x,y:y,width:w,height:h,opacity:opacity});
+      }
+    });
+    await utilSavePdf(await doc.save(),mode==='watermark'?'-watermark':'-dong-dau');
+  }catch(e){toast('Lỗi đóng dấu: '+(e.message||e));}setProg(null);
+}
+async function utilNumberPages(){
+  if(!utilNeedFile())return;setProg(20);
+  try{
+    var doc=await PDFDocument.load(fileUtil.bytes),pages=doc.getPages(),font=await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+    var start=+document.getElementById('numberStart').value||1,fmt=document.getElementById('numberFormat').value,ids=utilPages(document.getElementById('numberPages').value,pages.length);
+    if(!ids.length)throw new Error('Khoảng trang không hợp lệ');
+    ids.forEach(function(i){var p=pages[i],sz=p.getSize(),n=start+i,txt=fmt==='total'?(n+'/'+(start+pages.length-1)):fmt==='page'?('Page '+n):String(n),s=10,w=font.widthOfTextAtSize(txt,s);p.drawText(txt,{x:(sz.width-w)/2,y:18,size:s,font:font,color:PDFLib.rgb(.25,.25,.25)});});
+    await utilSavePdf(await doc.save(),'-danh-so-trang');
+  }catch(e){toast('Lỗi đánh số: '+(e.message||e));}setProg(null);
+}
+async function loadQpdf(){
+  if(!qpdfPromise)qpdfPromise=(async function(){
+    var mod=await import('https://esm.sh/@wasm-zoo/qpdf@0.1.1?bundle');
+    if(!mod||typeof mod.load!=='function')throw new Error('Không tải được mô-đun QPDF. Hãy kiểm tra kết nối Internet hoặc CDN.');
+    return await mod.load();
+  })().catch(function(e){qpdfPromise=null;throw e;});
+  return await qpdfPromise;
+}
+async function qpdfProcess(args,inputBytes,inputName,outputName){
+  var q=await loadQpdf();
+  try{
+    var res=await q.exec(args,{files:[{name:inputName,data:new Uint8Array(inputBytes)}],outputs:[outputName]});
+    var files=(res&&res.files)||[];
+    var found=files.find(function(x){return String(x.name||'').replace(/^\//,'')===String(outputName).replace(/^\//,'');})||files.find(function(x){return x.data;});
+    if(!found||!found.data){
+      var detail=[].concat((res&&res.stderr)||[],(res&&res.stdout)||[]).join(' ');
+      throw new Error(detail||'QPDF không tạo được file kết quả.');
+    }
+    return found.data instanceof Uint8Array?new Uint8Array(found.data):new Uint8Array(found.data);
+  }finally{
+    if(q&&typeof q.dispose==='function'){q.dispose();qpdfPromise=null;}
+  }
+}
+async function utilLockPdf(){
+  if(!utilNeedFile())return;var user=document.getElementById('lockUser').value,owner=document.getElementById('lockOwner').value;
+  if(!user||!owner){toast('Phải nhập cả mật khẩu mở file và mật khẩu chủ sở hữu');return;}
+  if(user===owner){toast('Nên đặt hai mật khẩu khác nhau');return;}
+  setProg(15);
+  try{
+    var input='/input.pdf',output='/locked.pdf',args=['--encrypt',user,owner,'256','--print='+document.getElementById('lockPrint').value,'--modify='+document.getElementById('lockModify').value,'--extract=n','--',input,output];
+    var bytes=await qpdfProcess(args,fileUtil.bytes,input,output);await utilSavePdf(bytes,'-da-khoa');
+    document.getElementById('lockUser').value='';document.getElementById('lockOwner').value='';
+  }catch(e){toast('Không khóa được PDF: '+(e.message||e));}setProg(null);
+}
+async function utilUnlockPdf(){
+  if(!utilNeedFile())return;var pw=document.getElementById('unlockPassword').value;if(!pw){toast('Nhập mật khẩu PDF');return;}setProg(15);
+  try{
+    var input='/input.pdf',output='/unlocked.pdf',bytes=await qpdfProcess(['--password='+pw,input,'--decrypt',output],fileUtil.bytes,input,output);
+    await utilSavePdf(bytes,'-da-mo-khoa');document.getElementById('unlockPassword').value='';
+  }catch(e){toast('Không mở khóa được. Kiểm tra mật khẩu và thử lại. '+(e.message||e));}setProg(null);
+}
+async function utilCompressPdf(){
+  if(!utilNeedFile())return;setProg(15);
+  try{
+    var input='/input.pdf',output='/compressed.pdf',bytes=await qpdfProcess(['--object-streams=generate','--compress-streams=y','--recompress-flate','--compression-level=9',input,output],fileUtil.bytes,input,output);
+    var before=fileUtil.size,after=bytes.byteLength;await utilSavePdf(bytes,'-nen');
+    toast('Dung lượng: '+fmtSize(before)+' → '+fmtSize(after)+(after<before?' (giảm '+Math.round((before-after)*100/before)+'%)':' (không giảm thêm)'));
+  }catch(e){toast('Lỗi nén PDF: '+(e.message||e));}setProg(null);
+}
+async function utilExportPagesAsImages(){
+  if(!utilNeedFile())return;setProg(10);
+  try{
+    var doc=pdfjsUtil||await loadPdfjs(fileUtil.bytes),scale=+document.getElementById('pageImageScale').value||1.5,mime=document.getElementById('pageImageFormat').value;
+    for(var i=1;i<=doc.numPages;i++){
+      var page=await doc.getPage(i),vp=page.getViewport({scale:scale}),canvas=document.createElement('canvas');canvas.width=vp.width;canvas.height=vp.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+      var blob=await new Promise(function(resolve){canvas.toBlob(resolve,mime,mime==='image/jpeg'?.92:undefined);});
+      var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=baseName(fileUtil.name)+'-trang-'+i+(mime==='image/jpeg'?'.jpg':'.png');document.body.appendChild(a);a.click();a.remove();setTimeout((function(u){return function(){URL.revokeObjectURL(u);};})(url),3000);
+      setProg(10+85*i/doc.numPages);
+    }
+    toast('Đã xuất '+doc.numPages+' ảnh trang PDF');
+  }catch(e){toast('Lỗi xuất ảnh: '+(e.message||e));}setProg(null);
+}
+async function utilImagesToPdf(){
+  var files=Array.from(document.getElementById('imagesToPdf').files||[]);if(!files.length){toast('Chọn ít nhất một ảnh');return;}setProg(15);
+  try{
+    var doc=await PDFDocument.create();
+    for(var i=0;i<files.length;i++){
+      var f=files[i],b=await utilImageBytes(f),img=f.type==='image/png'?await doc.embedPng(b):await doc.embedJpg(b),page=doc.addPage([img.width,img.height]);
+      page.drawImage(img,{x:0,y:0,width:img.width,height:img.height});setProg(15+80*(i+1)/files.length);
+    }
+    var bytes=await doc.save();downloadBytes(bytes,'hinh-anh-gop-thanh-pdf.pdf');toast('Đã tạo PDF từ '+files.length+' ảnh');
+  }catch(e){toast('Lỗi tạo PDF: '+(e.message||e));}setProg(null);
+}
+
+function xoaHet(){filesNoi=[];fileUtil=null;pdfjsUtil=null;document.getElementById('listUtil').innerHTML='';document.getElementById('inpUtil').value='';fileTach=null;pdfjsTach=null;fileSua=null;pdfjsSua=null;orderSua=[];selSua={};fileXoay=null;pdfjsXoay=null;selXoay={};fileOcr=null;pdfjsOcr=null;huyPvNoi();huyPvTach();huyPvXoay();workingXoay={bytes:null,pdfjs:null};['listNoi','listTach','listSua','listXoay','listOcr','thumbsTach','thumbsSua','thumbsXoay','thumbsOcr'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML='';});document.getElementById('btnNoi').disabled=true;document.getElementById('btnTach').disabled=true;document.getElementById('toolSua').style.display='none';document.getElementById('toolXoay').style.display='none';document.getElementById('toolOcr').style.display='none';document.getElementById('ocrResultBox').style.display='none';updateKpi();toast('Đã xóa hết');}
 
 window.doiTab=doiTab;window.taoXemTruocNoi=taoXemTruocNoi;window.taiKetQuaNoi=taiKetQuaNoi;window.huyPvNoi=huyPvNoi;
 window.taoXemTruocTach=taoXemTruocTach;window.taiKetQuaTach=taiKetQuaTach;window.huyPvTach=huyPvTach;
@@ -953,6 +1251,7 @@ window.moveNoi=moveNoi;window.xoaNoi=xoaNoi;window.xemNoi=xemNoi;window.xoaListN
 window.chonTat=chonTat;window.xoaTrangDaChon=xoaTrangDaChon;window.trichTrangDaChon=trichTrangDaChon;window.luuThuTu=luuThuTu;
 window.chonTatXoay=chonTatXoay;window.xoayMotTrang=xoayMotTrang;window.taiBanXoayHienTai=taiBanXoayHienTai;window.resetXoay=resetXoay;window.taoXemTruocXoay=taoXemTruocXoay;window.taiKetQuaXoay=taiKetQuaXoay;window.huyPvXoay=huyPvXoay;window.ocrTrang=ocrTrang;window.ocrTatCa=ocrTatCa;
 window.ocrTrongModal=ocrTrongModal;window.copyOcr=copyOcr;window.taiOcrTxt=taiOcrTxt;window.taiOcrWord=taiOcrWord;
+window.utilInsertImage=utilInsertImage;window.utilLockPdf=utilLockPdf;window.utilUnlockPdf=utilUnlockPdf;window.utilStamp=utilStamp;window.utilNumberPages=utilNumberPages;window.utilCompressPdf=utilCompressPdf;window.utilExportPagesAsImages=utilExportPagesAsImages;window.utilImagesToPdf=utilImagesToPdf;
 window.xoaHet=xoaHet;window.openPv=openPv;window.pvNav=pvNav;window.pvZoom=pvZoom;window.dongPv=dongPv;
 document.addEventListener('keydown',function(e){if(e.key==='Escape')dongPv();});
 updateKpi();
