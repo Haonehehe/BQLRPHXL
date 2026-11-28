@@ -1049,11 +1049,11 @@ function loadUsers(){
 
   if(!requireAdmin()) return;
   shell('<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách…</div>');
-  // Đồng bộ nguồn sheet từ cloud trước khi vẽ form
-  fetchSheetSourcesCloud().then(function(){}).catch(function(){});
+  // Đồng bộ nguồn Sheet từ cloud trước khi dựng form quản trị.
   Promise.all([
     listUsers(),
-    fetchOnlineUsers().catch(function(){ return { online:[], recent:[], offline:true }; })
+    fetchOnlineUsers().catch(function(){ return { online:[], recent:[], offline:true }; }),
+    fetchSheetSourcesCloud().catch(function(){ return getSheetSources(); })
   ]).then(function(pair){
     var users=pair[0];
     var pres=pair[1]||{online:[],recent:[]};
