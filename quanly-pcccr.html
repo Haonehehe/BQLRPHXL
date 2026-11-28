@@ -69,7 +69,7 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 .fire-sign{
   position:relative;isolation:isolate;overflow:hidden;
   display:grid;grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr);
-  grid-template-areas:"head head" "sub sub" "date date" "dial name" "dial desc" "dial foot" "legend legend";
+  grid-template-areas:"head head" "sub sub" "date date" "dial name" "dial desc" "dial foot" "legend legend" "tools tools";
   align-items:center;column-gap:clamp(12px,2.5vw,28px);
   max-width:900px;margin:14px auto 18px;padding:clamp(16px,2.6vw,28px);
   border:1px solid #b7d3c2;border-radius:22px;
@@ -109,7 +109,7 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 #view-cap>.notice:not(#recommend){display:none}
 @media(max-width:640px){
  #view-cap{padding:12px 9px}
- .fire-sign{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "sub" "date" "dial" "name" "desc" "foot" "legend";gap:8px;padding:17px 12px;border-radius:17px}
+ .fire-sign{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "sub" "date" "dial" "name" "desc" "foot" "legend" "tools";gap:8px;padding:17px 12px;border-radius:17px}
  .fire-sign-head{font-size:16px}
  .fire-sign-sub{font-size:9px;letter-spacing:.1em}
  .fire-dial{max-width:420px}
@@ -122,6 +122,7 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 }
 
 
+.zalo-notice-tools{grid-area:tools;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.zalo-notice-tools .btn{font-weight:800;letter-spacing:.02em}.zalo-notice-tools .status{font-weight:700;color:#166534}
 .cap-today-date{grid-area:date;justify-self:center;margin:4px 0 7px;padding:7px 15px;border:1px solid #d6e5d9;border-radius:999px;background:#f0f7f1;color:#245638;font-size:12px;font-weight:900;letter-spacing:.04em}
 .cap-history{max-width:900px;margin:0 auto;border:1px solid #dce8df;border-radius:13px;overflow:auto;background:#fff;box-shadow:0 5px 16px rgba(20,60,35,.04)}
 .cap-history table{width:100%;min-width:600px;font-size:12px}
