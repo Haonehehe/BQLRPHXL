@@ -252,7 +252,8 @@ var DEFAULT_SHEET_SOURCES={
   mocgioi:{sid:'1XOz-KdIhtWIyocSrV8ZvpOgusTLUOGCX',gid:'1646240187',label:'Mốc giới'},
   trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'},
   tasks:{sid:'1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe',gid:'1800611191',label:'Nhiệm vụ / Gantt'},
-  tonghop:{sid:'1nP0UPmkija86oqcjHh66uoO77zKcawTB',gid:'688529358',label:'Tổng hợp đường dẫn'}
+  tonghop:{sid:'1nP0UPmkija86oqcjHh66uoO77zKcawTB',gid:'688529358',label:'Tổng hợp đường dẫn'},
+  pcccr:{sid:'',gid:'',label:'PCCCR — Tiến độ thi công'}
 };
 function loadSheetSourcesLocal(){
   try{
@@ -316,8 +317,8 @@ function pushSheetSourcesCloud(cfg){
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pcccr', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pcccr: 'Phòng cháy chữa cháy rừng', pdf: 'Công cụ PDF' };
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pcccr', 'qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pcccr: 'Phòng cháy chữa cháy rừng', qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf: 'Công cụ PDF' };
 
 function useCloud() {
   return !!(CONFIG.SCRIPT_URL && CONFIG.SCRIPT_URL.indexOf('http') === 0);
@@ -357,7 +358,7 @@ function setSession(s){if(s){var j=JSON.stringify(s);sessionStorage.setItem(SESS
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
 function canAccess(mod) {
-  if (mod === 'pdf') return true;
+  if (mod === 'qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') return true;
   var s = getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
@@ -402,7 +403,7 @@ function registerUser(name, email, pass) {
   if (db.users.some(function (u) { return u.email === email; })) throw new Error('Email đã được đăng ký');
   db.users.push({
     id: 'u_' + Date.now(), email: email, name: name, pass: pass,
-    status: 'pending', role: 'user', perms: ['pdf'],
+    status: 'pending', role: 'user', perms: ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'],
     created: new Date().toISOString(), approvedAt: null
   });
   _saveDB(db);
@@ -419,7 +420,7 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
+        perms: u.perms || ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'], loginAt: new Date().toISOString(),
         token: res.token || '',
         _pass: pass
       };
@@ -436,7 +437,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
+    perms: u.perms || ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'], loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -476,12 +477,12 @@ function normalizePerms(p){
     x = String(x||'').trim().toLowerCase();
     if(valid.indexOf(x)>=0 && out.indexOf(x)<0) out.push(x);
   });
-  if(out.indexOf('pdf')<0) out.push('pdf');
+  if(out.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf')<0) out.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   return out;
 }
 function looksLikePermList(v){
   var s = String(v==null?'':v).toLowerCase();
-  return /\b(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pdf)\b/.test(s);
+  return /\b(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf)\b/.test(s);
 }
 function extractPermsFromUser(u){
   u = u || {};
@@ -539,8 +540,8 @@ function approveUser(email, perms, asAdmin) {
   if (!u) return Promise.reject(new Error('Không tìm thấy user'));
   u.status = 'approved';
   u.approvedAt = new Date().toISOString();
-  u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['pdf'];
-  if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
+  u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'];
+  if (u.perms.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   if (asAdmin) { u.role = 'admin'; u.perms = ALL_PERMS.slice(); }
   _saveDB(db);
   return Promise.resolve(true);
@@ -560,7 +561,7 @@ function rejectUser(email) {
   var u = db.users.find(function (x) { return x.email === email; });
   if (!u) return Promise.reject(new Error('Không tìm thấy user'));
   if (u.email === DEFAULT_ADMIN.email) return Promise.reject(new Error('Không thể từ chối admin gốc'));
-  u.status = 'rejected'; u.perms = ['pdf']; u.role = 'user';
+  u.status = 'rejected'; u.perms = ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf']; u.role = 'user';
   _saveDB(db);
   return Promise.resolve(true);
 }
@@ -599,7 +600,7 @@ function updatePerms(email, perms) {
   var u = db.users.find(function (x) { return x.email === email; });
   if (!u) return Promise.reject(new Error('Không tìm thấy'));
   u.perms = perms.slice();
-  if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
+  if (u.perms.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   _saveDB(db);
   return Promise.resolve(true);
 }
@@ -706,7 +707,7 @@ function thongbaoAdminCard(){
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tiêu đề *</label><input id="tbTitle" type="text" placeholder="Tiêu đề / trích yếu" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Nội dung</label><textarea id="tbBody" rows="4" style="width:100%;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:4px;font:inherit"></textarea></div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải văn bản / PDF từ máy</label><input id="tbFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,image/*" style="width:100%;margin-top:6px;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải văn bản / PDF từ máy</label><input id="tbFile" type="file" accept=".qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf,.doc,.docx,.xls,.xlsx,.zip,image/*" style="width:100%;margin-top:6px;font-size:12px"></div>';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải hình ảnh từ máy</label><input id="tbImgFile" type="file" accept="image/*" style="width:100%;margin-top:6px;font-size:12px"></div></div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Hoặc dán link file (nếu đã có trên Drive)</label><input id="tbLink" type="url" placeholder="https://drive.google.com/..." style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
@@ -806,7 +807,7 @@ function sheetSourcesCardInner(){
     {k:'trongrung', title:'Trồng & chăm sóc rừng', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'tasks', title:'Nhiệm vụ / Gantt', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
     {k:'tonghop', title:'Tổng hợp đường dẫn', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]},
-    {k:'pcccr', title:'PCCCR — dữ liệu riêng (để trống dùng Sheet hệ thống)', fields:[{f:'sid',l:'Spreadsheet ID (không bắt buộc)'}]},
+    {k:'pcccr', title:'PCCCR — Tiến độ thi công (01 tab dùng chung 06 phân trường)', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID tab Tiến độ PCCCR'}]},
     {k:'thongbao', title:'Thông báo / Niêm yết (công khai)', fields:[{f:'sid',l:'Spreadsheet ID'},{f:'gid',l:'GID sheet'}]}
   ];
   var h='';
@@ -1095,8 +1096,8 @@ function userRow(u,id){
   var permsHtml='<div class="perms" id="perms_'+id+'">';
   ALL_PERMS.forEach(function(p){
     var ck=(u.perms||[]).indexOf(p)>=0?'checked':'';
-    if(p==='pdf') ck='checked';
-    var dis=p==='pdf'?' onclick="return false"':'';
+    if(p==='qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') ck='checked';
+    var dis=p==='qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'?' onclick="return false"':'';
     permsHtml+='<label><input type="checkbox" data-p="'+p+'" '+ck+dis+'> '+PERM_LABEL[p]+'</label>';
   });
   permsHtml+='</div>';
@@ -1118,9 +1119,9 @@ function userRow(u,id){
 }
 function readPerms(id){
   var box=document.getElementById('perms_'+id),out=[];
-  if(!box) return ['pdf'];
+  if(!box) return ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'];
   box.querySelectorAll('input[type=checkbox]').forEach(function(inp){if(inp.checked)out.push(inp.getAttribute('data-p'));});
-  if(out.indexOf('pdf')<0) out.push('pdf');
+  if(out.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf')<0) out.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   return out;
 }
 function doApprove(email,id){approveUser(email,readPerms(id),false).then(function(){toast('Đã duyệt');loadUsers();}).catch(function(e){toast(e.message||e);});}
