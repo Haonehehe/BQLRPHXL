@@ -890,14 +890,9 @@ function pcccrUser_(data) {
   if (user.role !== 'admin' && perms.indexOf('pcccr') < 0) throw new Error('Tài khoản chưa được cấp quyền PCCCR.');
   return user;
 }
-function pcccrSpreadsheet_() {
-  var cfg = {};
-  try { cfg = JSON.parse(PropertiesService.getScriptProperties().getProperty('SHEET_SOURCES') || '{}') || {}; } catch(e) {}
-  var sid = cfg.pcccr && String(cfg.pcccr.sid || '').trim();
-  return sid ? SpreadsheetApp.openById(sid) : ss_();
-}
 function pcccrSheet_(name, headers) {
-  var ss = pcccrSpreadsheet_();
+  // Lưu cấp cháy trong bảng tính dữ liệu nội bộ của hệ thống, không lưu vào Sheet tiến độ chia sẻ.
+  var ss = ss_();
   var sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
