@@ -24,7 +24,8 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
  const key='bqlrph_session_v1';
  let s=null;try{s=JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(e){}
  if(!s||(!s.token&&s.role!=='admin')){location.href='menu.html';return}
- if(s.role!=='admin'&&!(Array.isArray(s.perms)&&s.perms.includes('pcccr'))){document.addEventListener('DOMContentLoaded',()=>{document.body.innerHTML='<main><h2>Không có quyền truy cập module PCCCR</h2><a href="menu.html">Quay lại menu</a></main>'});return}
+ var perms=Array.isArray(s&&s.perms)?s.perms:String((s&&s.perms)||'').split(/[,;|]/).map(x=>x.trim());
+ if(s.role!=='admin'&&perms.indexOf('pcccr')<0){document.addEventListener('DOMContentLoaded',()=>{document.body.innerHTML='<main><h2>Không có quyền truy cập module PCCCR</h2><a href="menu.html">Quay lại menu</a></main>'});return}
  window.PCCCR_SESSION=s;
 })();
 </script>
@@ -55,7 +56,7 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 const API=(function(){try{return localStorage.getItem('bqlrph_script_url')||'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec'}catch(e){return ''}})();
 const codes=['GH','NL','TT','LC','GP','DV'], names=['Gia Huynh','Núi Le','Trản Táo','Lán Cát','Gia Phu','Đầm Voi'];
 let progress=[];
-const today=()=>new Date().toLocaleDateString('en-CA');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const $=id=>document.getElementById(id);
 function api(action,extra={}){return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,token:(window.PCCCR_SESSION||{}).token,...extra})}).then(r=>r.json()).then(x=>{if(!x||!x.ok)throw Error(x&&x.error||'Lỗi máy chủ');return x})}
 function switchTab(t){$('view-cap').classList.toggle('hidden',t!=='cap');$('view-tiendo').classList.toggle('hidden',t!=='tiendo');$('tab-cap').classList.toggle('on',t==='cap');$('tab-tiendo').classList.toggle('on',t==='tiendo')}
