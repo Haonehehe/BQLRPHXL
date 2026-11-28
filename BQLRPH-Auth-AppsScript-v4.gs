@@ -930,6 +930,7 @@ function pcccrSheet_(name, headers) {
       ['CẤP IV — NGUY HIỂM','15.001 – 20.000','Có khả năng xảy ra cháy rừng lớn'],
       ['CẤP V — CỰC KỲ NGUY HIỂM','> 20.000','Có khả năng cháy lớn ở tất cả các loại rừng, tốc độ lửa lan nhanh']
     ];
+    sh.getRange(2,10,7,3).clearContent();
     sh.getRange(1,10,ref.length,3).setValues(ref);
     sh.getRange(1,10,1,3).setFontWeight('bold').setWrap(true).setBackground('#1e3a5f').setFontColor('#ffffff');
     sh.getRange(2,10,5,3).setWrap(true).setVerticalAlignment('middle');
