@@ -931,7 +931,7 @@ function pcccrSaveCap_(data) {
   var x = data.capChay || {};
   var ngay = String(x.ngay || '');
   var cap = Number(x.cap);
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(ngay) || cap < 1 || cap > 5) throw new Error('Ngày hoặc cấp cháy không hợp lệ.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(ngay) || cap < 1 || cap > 5) throw new Error('Ngày hoặc cấp cháy không hợp lệ.');
   var sh = pcccrSheet_('PCCCR_CapChay', ['Ngày','Cấp cháy','Nhiệt độ','Độ ẩm','Tốc độ gió','Nguồn','Người cập nhật','Thời điểm cập nhật']);
   var values = [ngay,cap,Number(x.nhietDo)||0,Number(x.doAmKK)||0,Number(x.tocDoGio)||0,String(x.nguon||''),String(user.name||user.email),new Date().toISOString()];
   var last = sh.getLastRow(), found = 0;
