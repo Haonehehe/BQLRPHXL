@@ -245,7 +245,7 @@ var CONFIG = {
 /* ===== Nguồn Google Sheet dùng chung (admin cấu hình → mọi user) ===== */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
 var DEFAULT_SHEET_SOURCES={
-  qlbvr:{sid:'1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU',gid:'528762373',label:'QLBVR'},
+  qlbvr:{sid:'12m9jCn_TWUDEoX0JpElHhGSQzaZ7xb7Z',gid:'1984739044',label:'QLBVR'},
   lamba:{sid:'1CnlGELkhVjLEa7jQwVg4kIeyiXxqmOTR',gidDN:'1710752621',gidLD:'516720069',gidTH:'149303770',label:'Lâm bạ'},
   nhao:{sid:'1oQEEMiTMYZwrsoIXZdNtat4cjoaku5NT',label:'Nhà ở'},
   mocgioi:{sid:'1XOz-KdIhtWIyocSrV8ZvpOgusTLUOGCX',gid:'1646240187',label:'Mốc giới'},
@@ -366,8 +366,18 @@ function logoutUser() { setSession(null); }
 
 function adminCred() {
   var s = getSession();
-  if (!s || s.role !== 'admin') throw new Error('Cần đăng nhập admin');
-  var out = { adminEmail: s.email, adminPass: s._pass || '' };
+  if (!s || s.role !== 'admin') throw new Error('Cần đăng nhập admin trên Menu trước');
+  var pass = s._pass || s.pass || s.password || '';
+  // Fallback admin gốc nếu session mất mật khẩu (F5 / tab khác)
+  if (!pass && s.email && String(s.email).toLowerCase() === String(DEFAULT_ADMIN.email).toLowerCase()) {
+    pass = DEFAULT_ADMIN.pass;
+  }
+  if (!pass) {
+    pass = prompt('Nhập lại mật khẩu admin để thao tác trên máy chủ:') || '';
+    if (pass) { s._pass = pass; setSession(s); }
+  }
+  if (!pass) throw new Error('Thiếu mật khẩu admin — đăng nhập lại trên Menu');
+  var out = { adminEmail: s.email, adminPass: pass };
   if (s.token) out.token = s.token;
   return out;
 }
