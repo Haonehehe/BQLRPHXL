@@ -907,6 +907,29 @@ function pcccrSheet_(name, headers) {
     sh.getRange(1,1,1,headers.length).setValues([headers]);
     sh.setFrozenRows(1);
   }
+  // Bổ sung bảng tra cấp dự báo cháy rừng theo QĐ 47/2026/QĐ-UBND
+  // tại cột J:L; không ghi đè nhật ký cập nhật hằng ngày ở cột A:H.
+  if (name === 'PCCCR_CapChay') {
+    var ref = [
+      ['BẢNG TRA CẤP DỰ BÁO CHÁY RỪNG — ĐỒNG NAI','CHỈ TIÊU P NESTEROV','ĐẶC TRƯNG CẤP DỰ BÁO'],
+      ['CẤP I — THẤP','< 5.000','Ít có khả năng xảy ra cháy rừng'],
+      ['CẤP II — TRUNG BÌNH','5.001 – 10.000','Có khả năng xảy ra cháy rừng'],
+      ['CẤP III — CAO','10.001 – 15.000','Có khả năng dễ xảy ra cháy rừng'],
+      ['CẤP IV — NGUY HIỂM','15.001 – 20.000','Có khả năng xảy ra cháy rừng lớn'],
+      ['CẤP V — CỰC KỲ NGUY HIỂM','> 20.000','Có khả năng cháy lớn ở tất cả các loại rừng, tốc độ lửa lan nhanh']
+    ];
+    sh.getRange(1,10,ref.length,3).setValues(ref);
+    sh.getRange(1,10,1,3).setFontWeight('bold').setWrap(true).setBackground('#1e3a5f').setFontColor('#ffffff');
+    sh.getRange(2,10,5,3).setWrap(true).setVerticalAlignment('middle');
+    sh.setColumnWidth(10,220);
+    sh.setColumnWidth(11,170);
+    sh.setColumnWidth(12,430);
+    sh.setRowHeights(1,6,38);
+    sh.getRange(8,10,1,3).merge();
+    sh.getRange(8,10).setValue('CÔNG THỨC: P = K × Σ(T13 × D13). K = 1 khi lượng mưa ngày < 5 mm; K = 0 khi lượng mưa ngày > 5 mm hoặc có mưa phùn kéo dài 3–5 ngày theo quy định. T13: nhiệt độ lúc 13 giờ (°C); D13: độ chênh lệch bão hòa lúc 13 giờ (hPa).');
+    sh.getRange(8,10,1,3).setWrap(true).setBackground('#fff7ed').setFontColor('#7c2d12');
+    sh.setRowHeight(8,70);
+  }
   return sh;
 }
 function pcccrGet_(data) {
