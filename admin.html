@@ -253,7 +253,7 @@ var DEFAULT_SHEET_SOURCES={
   trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'},
   tasks:{sid:'1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe',gid:'1800611191',label:'Nhiệm vụ / Gantt'},
   tonghop:{sid:'1nP0UPmkija86oqcjHh66uoO77zKcawTB',gid:'688529358',label:'Tổng hợp đường dẫn'},
-  pcccr:{sid:'',gid:'',label:'PCCCR — Tiến độ thi công'}
+  pcccr:{sid:'14PBA0_FRiUZ_an0-ZUkKLfa5jXkcJYR0tXtvvsCEw5E',gid:'593990287',label:'PCCCR — Tiến độ thi công và cấp cháy'}
 };
 function loadSheetSourcesLocal(){
   try{
@@ -796,6 +796,36 @@ function clearThongbaoForm(){
   var f=document.getElementById('tbFile'); if(f) f.value='';
   var i=document.getElementById('tbImgFile'); if(i) i.value='';
 }
+function pcccrAdminCard(){
+  return '<div class="card" style="padding:16px;margin-bottom:14px">'+
+    '<div style="font-weight:800;font-size:14px;margin-bottom:6px;color:#0f172a"><i class="fa-solid fa-fire" style="color:#dc2626"></i> Biển báo cấp cháy rừng — cập nhật hằng ngày</div>'+
+    '<div style="font-size:12px;color:#64748b;margin-bottom:12px">Chỉ Admin được cập nhật. Dữ liệu lưu vào tab PCCCR_CapChay trong Google Sheets nguồn; module PCCCR chỉ hiển thị.</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px">'+
+    '<div><label>Ngày cập nhật</label><input id="adm-cap-date" type="date" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"></div>'+
+    '<div><label>Cấp cháy</label><select id="adm-cap-level" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"><option value="1">Cấp I — Ít nguy hiểm</option><option value="2">Cấp II — Trung bình</option><option value="3">Cấp III — Cao</option><option value="4">Cấp IV — Nguy hiểm</option><option value="5">Cấp V — Cực kỳ nguy hiểm</option></select></div>'+
+    '<div><label>Nhiệt độ (°C)</label><input id="adm-cap-temp" type="number" step=".1" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"></div>'+
+    '<div><label>Độ ẩm không khí (%)</label><input id="adm-cap-hum" type="number" min="0" max="100" step=".1" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"></div>'+
+    '<div><label>Tốc độ gió (m/s)</label><input id="adm-cap-wind" type="number" step=".1" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"></div>'+
+    '<div><label>Nguồn / ghi chú</label><input id="adm-cap-source" type="text" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"></div></div>'+
+    '<div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap"><button type="button" class="btn btn-g" onclick="savePcccrAdminCap()"><i class="fa-solid fa-floppy-disk"></i> Lưu biển báo cấp cháy</button><span id="adm-cap-status" style="font-size:12px;color:#64748b"></span></div>'+
+    '</div>';
+}
+function loadPcccrAdminCap(){
+  var d=document.getElementById('adm-cap-date'); if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+  apiCall(Object.assign({action:'pcccr_get'},adminCred())).then(function(r){
+    if(!r||!r.ok)throw new Error(r&&r.error||'Không tải được cấp cháy');
+    var c=r.capChay||{}; if(d&&c.ngay)d.value=String(c.ngay).slice(0,10);
+    var vals={level:c.cap||1,temp:c.nhietDo,hum:c.doAmKK,wind:c.tocDoGio,source:c.nguon};
+    Object.keys(vals).forEach(function(k){var e=document.getElementById('adm-cap-'+k);if(e)e.value=vals[k]==null?'':vals[k];});
+    var st=document.getElementById('adm-cap-status');if(st)st.textContent=c.cap?'Đang hiển thị cấp '+c.cap+' · cập nhật '+(c.capNhatLuc||''):'Chưa có dữ liệu cấp cháy';
+  }).catch(function(e){var st=document.getElementById('adm-cap-status');if(st)st.textContent=e.message||String(e);});
+}
+function savePcccrAdminCap(){
+  var v=id=>{var e=document.getElementById('adm-cap-'+id);return e?e.value:'';};
+  var payload={action:'pcccr_save_cap',capChay:{ngay:v('date'),cap:Number(v('level')),nhietDo:v('temp'),doAmKK:v('hum'),tocDoGio:v('wind'),nguon:v('source')}};
+  var st=document.getElementById('adm-cap-status');if(st)st.textContent='Đang lưu...';
+  apiCall(Object.assign(payload,adminCred())).then(function(r){if(!r||!r.ok)throw new Error(r&&r.error||'Không lưu được dữ liệu');if(st)st.textContent=r.message||'Đã cập nhật biển báo cấp cháy';}).catch(function(e){if(st)st.textContent=e.message||String(e);});
+}
 function sheetSourcesCardInner(){
   var cfg=getSheetSources();
   var fields=[
@@ -1064,6 +1094,8 @@ function loadUsers(){
 
     // ===== ZONE: Nội dung =====
     html+='<div class="zone">';
+    html+='<div class="zone-h"><div class="zone-ico z-red"><i class="fa-solid fa-fire"></i></div><div><div class="zone-t">Phòng cháy, chữa cháy rừng</div><div class="zone-d">Admin cập nhật biển báo cấp cháy hằng ngày</div></div></div>';
+    html+=pcccrAdminCard();
     html+='<div class="zone-h"><div class="zone-ico z-sky"><i class="fa-solid fa-bullhorn"></i></div><div><div class="zone-t">Thông báo · Niêm yết</div><div class="zone-d">Đăng tin công khai · quản lý tin đã đăng</div></div></div>';
     html+=thongbaoAdminCard();
     html+='<div class="panel open" id="acc-posts">';
@@ -1084,6 +1116,7 @@ function loadUsers(){
 
     shell(html);
     loadThongbaoPosts();
+    loadPcccrAdminCap();
   }).catch(function(e){
     shell('<div class="note" style="background:#fff1f2;border-color:#fecdd3;color:#9f1239"><b>Lỗi tải:</b> '+esc(e.message||e)+'</div>');
   });
