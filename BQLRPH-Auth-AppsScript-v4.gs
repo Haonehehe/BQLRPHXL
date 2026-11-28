@@ -945,38 +945,41 @@ function pcccrSheet_(name, headers) {
   return sh;
 }
 function pcccrGet_(data) {
-  // Đọc cấp cháy là dữ liệu hiển thị; không kiểm tra lại phiên tại API này.
-  // Quyền Admin vẫn được kiểm tra riêng khi ghi/cập nhật cấp cháy.
+  // Dữ liệu cấp cháy được công khai để các đơn vị tra cứu; quyền ghi vẫn chỉ dành cho Admin.
   var user = null;
   try {
     var token = String(data.token || data.sessionToken || '');
     var sess = token ? getSession_(token) : null;
     if (sess) user = findUser_(sess.email);
   } catch (e) { user = null; }
+  var tz = 'Asia/Ho_Chi_Minh';
+  var todayKey = Utilities.formatDate(new Date(), tz, 'yyyyMMdd');
   var capSh = pcccrSheet_('PCCCR_CapChay', ['Ngày','Cấp cháy','Nhiệt độ','Độ ẩm','Tốc độ gió','Nguồn','Người cập nhật','Thời điểm cập nhật']);
   var capRows = capSh.getLastRow() > 1 ? capSh.getRange(2,1,capSh.getLastRow()-1,8).getValues() : [];
-  var cap = null;
-  if (capRows.length) {
-    // Chuẩn hóa ngày vì Google Sheets có thể trả về Date thay vì chuỗi yyyy-MM-dd.
-    function dateKey_(v) {
-      if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())) {
-        return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyyMMdd');
-      }
-      var s = String(v || '').trim();
-      var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (m) return m[1] + m[2] + m[3];
-      var d = new Date(s);
-      return isNaN(d.getTime()) ? '' : Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyyMMdd');
-    }
-    capRows.sort(function(a,b) {
-      var ka = dateKey_(a[0]), kb = dateKey_(b[0]);
-      if (ka !== kb) return kb.localeCompare(ka);
-      return String(b[7] || '').localeCompare(String(a[7] || ''));
-    });
-    var r = capRows[0], key = dateKey_(r[0]);
-    cap = {ngay:key ? key.slice(0,4)+'-'+key.slice(4,6)+'-'+key.slice(6,8) : String(r[0] || ''),cap:r[1],nhietDo:r[2],doAmKK:r[3],tocDoGio:r[4],nguon:r[5],nguoiCapNhat:r[6],capNhatLuc:r[7]};
+  function dateKey_(v) {
+    if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())) return Utilities.formatDate(v, tz, 'yyyyMMdd');
+    var s = String(v || '').trim(), m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (m) return m[1] + ('0'+m[2]).slice(-2) + ('0'+m[3]).slice(-2);
+    m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+    if (m) return m[3] + ('0'+m[2]).slice(-2) + ('0'+m[1]).slice(-2);
+    var d = new Date(s);
+    return isNaN(d.getTime()) ? '' : Utilities.formatDate(d, tz, 'yyyyMMdd');
   }
-  return {ok:true,capChay:cap,user:user ? {name:user.name,email:user.email,role:user.role} : null};
+  capRows.sort(function(a,b) {
+    var ka = dateKey_(a[0]), kb = dateKey_(b[0]);
+    if (ka !== kb) return kb.localeCompare(ka);
+    return String(b[7] || '').localeCompare(String(a[7] || ''));
+  });
+  var history = [], seen = {};
+  capRows.forEach(function(r) {
+    var key = dateKey_(r[0]);
+    if (!key || seen[key]) return;
+    seen[key] = true;
+    history.push({ngay:key.slice(0,4)+'-'+key.slice(4,6)+'-'+key.slice(6,8),cap:r[1],nhietDo:r[2],doAmKK:r[3],tocDoGio:r[4],nguon:r[5],nguoiCapNhat:r[6],capNhatLuc:r[7]});
+  });
+  var todayCap = null;
+  for (var i=0;i<history.length;i++) if (history[i].ngay.replace(/-/g,'') === todayKey) { todayCap = history[i]; break; }
+  return {ok:true,ngayHienTai:Utilities.formatDate(new Date(),tz,'yyyy-MM-dd'),capChay:todayCap,lichSu:history,user:user ? {name:user.name,email:user.email,role:user.role} : null};
 }
 function pcccrSaveCap_(data) {
   var user = requireAdmin_(data);
