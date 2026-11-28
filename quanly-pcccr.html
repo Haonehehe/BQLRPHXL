@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PCCCR · Ban Quản lý rừng phòng hộ Xuân Lộc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--g:#047857;--g2:#059669;--bg:#f1f5f9;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#ecfdf5,#f8fafc 55%,#eff6ff);font:14px 'Be Vietnam Pro',sans-serif;color:var(--ink)}
+main{max-width:1180px;margin:auto;padding:22px 16px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:clamp(20px,3vw,28px);margin:0;color:#064e3b}.sub{color:var(--muted);font-size:12px;margin-top:5px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font:600 12px inherit;cursor:pointer}.primary{background:var(--g);color:white}.soft{background:#e2e8f0;color:#334155}
+.tabs{display:flex;gap:8px;margin:16px 0}.tab{padding:10px 15px;border:1px solid var(--line);background:white;border-radius:11px;cursor:pointer;font-weight:700;color:#475569}.tab.on{background:#065f46;color:white;border-color:#065f46}
+.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 24px #0f172a0a;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;height:40px;border:1px solid #cbd5e1;border-radius:9px;padding:0 10px;font:inherit}
+.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.level{padding:13px 5px;border-radius:11px;text-align:center;background:#f1f5f9;border:2px solid transparent;font-weight:800}.level small{display:block;font-weight:500;font-size:10px;margin-top:3px}.level.on{border-color:#0f766e;background:#ccfbf1;color:#064e3b}
+.notice{padding:13px;border-radius:12px;background:#ecfdf5;color:#065f46;line-height:1.55;margin:12px 0}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:760px;font-size:12px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}th{background:#f0fdf4;color:#065f46}td:first-child,th:first-child{text-align:left}
+input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text-align:right}.hidden{display:none!important}.status{color:var(--muted);font-size:12px}.danger{background:#fff1f2;color:#9f1239}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.tabs{flex-wrap:wrap}}
+</style>
+<script>
+(function(){
+ const key='bqlrph_session_v1';
+ let s=null;try{s=JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(e){}
+ if(!s||(!s.token&&s.role!=='admin')){location.href='menu.html';return}
+ if(s.role!=='admin'&&!(Array.isArray(s.perms)&&s.perms.includes('pcccr'))){document.addEventListener('DOMContentLoaded',()=>{document.body.innerHTML='<main><h2>Không có quyền truy cập module PCCCR</h2><a href="menu.html">Quay lại menu</a></main>'});return}
+ window.PCCCR_SESSION=s;
+})();
+</script>
+</head>
+<body><main>
+<div class="top"><div><h1><i class="fa-solid fa-fire-flame-curved"></i> PHÒNG CHÁY, CHỮA CHÁY RỪNG</h1><div class="sub">Theo dõi biển báo cấp cháy và tiến độ thực hiện công tác PCCCR toàn lâm phần</div></div><div><button class="btn soft" onclick="location.href='menu.html'"><i class="fa fa-arrow-left"></i> Menu</button> <button class="btn soft" onclick="loadAll()"><i class="fa fa-rotate"></i> Làm mới</button></div></div>
+<div class="tabs"><button class="tab on" id="tab-cap" onclick="switchTab('cap')"> <i class="fa fa-gauge-high"></i> Biển báo cấp cháy</button><button class="tab" id="tab-tiendo" onclick="switchTab('tiendo')"><i class="fa fa-list-check"></i> Tiến độ thi công</button></div>
+<section id="view-cap" class="panel">
+<h2>Biển báo cấp cháy rừng toàn lâm phần</h2><div class="sub">Cập nhật hằng ngày · Thông tin hiển thị dùng chung cho toàn đơn vị</div>
+<div class="levels" id="levels"></div>
+<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy. Vui lòng cập nhật thông tin trong ngày.</div>
+<div class="grid">
+<div class="field"><label>Ngày cập nhật</label><input id="cap-ngay" type="date"></div>
+<div class="field"><label>Cấp cháy rừng</label><select id="cap-level"><option value="1">Cấp I — Ít nguy hiểm</option><option value="2">Cấp II — Trung bình</option><option value="3">Cấp III — Cao</option><option value="4">Cấp IV — Nguy hiểm</option><option value="5">Cấp V — Cực kỳ nguy hiểm</option></select></div>
+<div class="field"><label>Nhiệt độ (°C)</label><input id="cap-temp" type="number" step=".1"></div>
+<div class="field"><label>Độ ẩm không khí (%)</label><input id="cap-hum" type="number" min="0" max="100" step=".1"></div>
+<div class="field"><label>Tốc độ gió (m/s)</label><input id="cap-wind" type="number" step=".1"></div>
+<div class="field" style="grid-column:span 2"><label>Nguồn thông tin / ghi chú</label><input id="cap-source" placeholder="Nguồn số liệu, trạm quan trắc..."></div>
+<div class="field" style="display:flex;align-items:end"><button class="btn primary" onclick="saveCap()"><i class="fa fa-floppy-disk"></i> Lưu cấp cháy</button></div>
+</div><p class="status" id="cap-meta"></p></section>
+<section id="view-tiendo" class="panel hidden">
+<div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Cập nhật kế hoạch và khối lượng thực hiện theo từng phân trường</div></div><button class="btn primary" onclick="addRow()"><i class="fa fa-plus"></i> Thêm hạng mục</button></div>
+<div class="table-wrap"><table><thead><tr><th rowspan="2">STT / Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">Tổng</th><th colspan="3">Gia Huynh</th><th colspan="3">Núi Le</th><th colspan="3">Trản Táo</th><th colspan="3">Lán Cát</th><th colspan="3">Gia Phu</th><th colspan="3">Đầm Voi</th><th rowspan="2">Xóa</th></tr><tr><th>KH</th><th>TH</th><th>%</th><th>KH</th><th>TH</th><th>%</th><th>KH</th><th>TH</th><th>%</th><th>KH</th><th>TH</th><th>%</th><th>KH</th><th>TH</th><th>%</th><th>KH</th><th>TH</th><th>%</th><th>KH</th><th>TH</th><th>%</th></tr></thead><tbody id="progress-body"></tbody></table></div>
+<div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="btn primary" onclick="saveProgress()"><i class="fa fa-cloud-arrow-up"></i> Lưu tiến độ</button><span class="status" id="progress-meta"></span></div></section>
+<div class="status" id="app-status"></div>
+</main>
+<script>
+const API=(function(){try{return localStorage.getItem('bqlrph_script_url')||'https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec'}catch(e){return ''}})();
+const codes=['GH','NL','TT','LC','GP','DV'], names=['Gia Huynh','Núi Le','Trản Táo','Lán Cát','Gia Phu','Đầm Voi'];
+let progress=[];
+const today=()=>new Date().toLocaleDateString('en-CA');
+const $=id=>document.getElementById(id);
+function api(action,extra={}){return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,token:(window.PCCCR_SESSION||{}).token,...extra})}).then(r=>r.json()).then(x=>{if(!x||!x.ok)throw Error(x&&x.error||'Lỗi máy chủ');return x})}
+function switchTab(t){$('view-cap').classList.toggle('hidden',t!=='cap');$('view-tiendo').classList.toggle('hidden',t!=='tiendo');$('tab-cap').classList.toggle('on',t==='cap');$('tab-tiendo').classList.toggle('on',t==='tiendo')}
+function advice(n){return ['Ít nguy hiểm: duy trì trực, kiểm tra phương tiện và theo dõi diễn biến thời tiết.','Trung bình: tăng cường kiểm tra khu vực có nguy cơ, nhắc nhở người dân sử dụng lửa an toàn.','Cao: bố trí lực lượng trực, tuần tra các khu vực trọng điểm và sẵn sàng phương tiện chữa cháy.','Nguy hiểm: tăng cường trực PCCCR, kiểm soát chặt việc dùng lửa, hạn chế hoạt động có nguy cơ gây cháy.','Cực kỳ nguy hiểm: tổ chức trực 24/24, kiểm soát người ra vào khu vực rừng và triển khai phương án ứng phó khi có cháy.'][n-1]}
+function drawLevel(n){$('levels').innerHTML=Array.from({length:5},(_,i)=>'<div class="level '+(i+1===Number(n)?'on':'')+'">CẤP '+(i+1)+'<small>'+['Ít nguy hiểm','Trung bình','Cao','Nguy hiểm','Cực kỳ nguy hiểm'][i]+'</small></div>').join('');$('recommend').textContent='Khuyến cáo: '+advice(Number(n))}
+function fillCap(c){if(!c)return;$('cap-ngay').value=String(c.ngay||today()).slice(0,10);$('cap-level').value=c.cap||1;$('cap-temp').value=c.nhietDo??'';$('cap-hum').value=c.doAmKK??'';$('cap-wind').value=c.tocDoGio??'';$('cap-source').value=c.nguon||'';drawLevel(c.cap||1);$('cap-meta').textContent='Cập nhật: '+(c.capNhatLuc||'')+' · '+(c.nguoiCapNhat||'')}
+function addRow(item={}){const idx=progress.length;progress.push({hangMuc:item.hangMuc||'',dvt:item.dvt||'',tong:item.tong||{},phanTruong:item.phanTruong||{}});renderProgress()}
+function renderProgress(){$('progress-body').innerHTML=progress.map((r,i)=>{let cells='';function cell(key,field){const o=key==='tong'?(r.tong||{}):((r.phanTruong||{})[key]||{});return '<td><input class="num" type="number" step=".01" data-i="'+i+'" data-k="'+key+'" data-f="'+field+'" value="'+(o[field]??'')+'" '+(field==='tyLe'?'readonly':'')+'></td>'}cells+=cell('tong','kh')+cell('tong','th')+cell('tong','tyLe');codes.forEach(k=>{cells+=cell(k,'kh')+cell(k,'th')+cell(k,'tyLe')});return '<tr><td><input style="width:190px" data-i="'+i+'" data-f="hangMuc" value="'+String(r.hangMuc||'').replace(/"/g,'&quot;')+'" placeholder="Tên hạng mục"></td><td><input style="width:65px" data-i="'+i+'" data-f="dvt" value="'+(r.dvt||'')+'" placeholder="ha"></td>'+cells+'<td><button class="btn danger" onclick="removeRow('+i+')">×</button></td></tr>'}).join('');}
+function collectProgress(){document.querySelectorAll('#progress-body input').forEach(el=>{let i=+el.dataset.i,r=progress[i];if(!r)return;let f=el.dataset.f;if(f==='hangMuc'||f==='dvt')r[f]=el.value;else{let k=el.dataset.k;r[k]=r[k]||{};r[k][f]=el.value===''?'':Number(el.value)}});progress.forEach(r=>{function pct(o){o=o||{};let kh=Number(o.kh)||0,th=Number(o.th)||0;o.tyLe=kh?Math.round(th/kh*1000)/10:0}pct(r.tong);codes.forEach(k=>{r.phanTruong=r.phanTruong||{};pct(r.phanTruong[k])})})}
+function removeRow(i){progress.splice(i,1);renderProgress()}
+function renderProgress(){const body=$('progress-body');body.innerHTML=progress.map((r,i)=>{const cell=(k,f)=>{const o=k==='tong'?(r.tong||{}):((r.phanTruong||{})[k]||{});return '<td><input class="num" type="number" step=".01" data-i="'+i+'" data-k="'+k+'" data-f="'+f+'" value="'+(o[f]??'')+'" '+(f==='tyLe'?'readonly':'')+'></td>'};return '<tr><td><input style="width:190px" data-i="'+i+'" data-f="hangMuc" value="'+String(r.hangMuc||'').replace(/"/g,'&quot;')+'" placeholder="Tên hạng mục"></td><td><input style="width:65px" data-i="'+i+'" data-f="dvt" value="'+(r.dvt||'')+'" placeholder="ha"></td>'+cell('tong','kh')+cell('tong','th')+cell('tong','tyLe')+codes.map(k=>cell(k,'kh')+cell(k,'th')+cell(k,'tyLe')).join('')+'<td><button class="btn danger" onclick="removeRow('+i+')">×</button></td></tr>'}).join('')}
+function removeRow(i){collectProgress();progress.splice(i,1);renderProgress()}
+function addRow(){collectProgress();progress.push({hangMuc:'',dvt:'',tong:{},phanTruong:{}});renderProgress()}
+async function loadAll(){try{$('app-status').textContent='Đang tải dữ liệu...';let x=await api('pcccr_get');if(x.capChay)fillCap(x.capChay);else{$('cap-ngay').value=today();drawLevel(1)}progress=x.tienDo||[];renderProgress();$('app-status').textContent='Đã đồng bộ dữ liệu PCCCR.'}catch(e){$('app-status').textContent=e.message}}
+async function saveCap(){try{const capChay={ngay:$('cap-ngay').value,cap:+$('cap-level').value,nhietDo:$('cap-temp').value,doAmKK:$('cap-hum').value,tocDoGio:$('cap-wind').value,nguon:$('cap-source').value};let x=await api('pcccr_save_cap',{capChay});$('app-status').textContent=x.message;drawLevel(capChay.cap);await loadAll()}catch(e){alert(e.message)}}
+async function saveProgress(){try{collectProgress();let x=await api('pcccr_save_progress',{ngay:today(),tienDo:progress});$('progress-meta').textContent=x.message}catch(e){alert(e.message)}}
+$('cap-level').addEventListener('change',e=>drawLevel(e.target.value));$('cap-ngay').value=today();loadAll();
+</script></body></html>
