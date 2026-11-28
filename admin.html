@@ -826,7 +826,7 @@ function savePcccrAdminCap(){
   var v=id=>{var e=document.getElementById('adm-cap-'+id);return e?e.value:'';};
   var payload={action:'pcccr_save_cap',capChay:{ngay:v('date'),cap:Number(v('level')),nhietDo:v('temp'),doAmKK:v('hum'),tocDoGio:v('wind'),nguon:v('source')}};
   var st=document.getElementById('adm-cap-status');if(st)st.textContent='Đang lưu...';
-  apiCall(Object.assign(payload,adminCred())).then(function(r){if(!r||!r.ok)throw new Error(r&&r.error||'Không lưu được dữ liệu');if(st)st.textContent=r.message||'Đã cập nhật biển báo cấp cháy';}).catch(function(e){if(st)st.textContent=e.message||String(e);});
+  apiCall(Object.assign(payload,adminCred())).then(function(r){if(!r||!r.ok)throw new Error(r&&r.error||'Không lưu được dữ liệu');if(st)st.textContent=r.message||'Đã cập nhật biển báo cấp cháy';try{localStorage.setItem('bqlrph_pcccr_cap_updated',String(Date.now()));}catch(e){}try{if(typeof BroadcastChannel!=='undefined'){var bc=new BroadcastChannel('bqlrph_pcccr');bc.postMessage({type:'cap-updated',at:Date.now()});bc.close();}}catch(e){}}).catch(function(e){if(st)st.textContent=e.message||String(e);});
 }
 function sheetSourcesCardInner(){
   var cfg=getSheetSources();
