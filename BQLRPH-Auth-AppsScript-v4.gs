@@ -70,6 +70,9 @@ function doPost(e) {
     if (action === 'listlog') return jsonOut(listLog_(data));
     if (action === 'logout') return jsonOut(logout_(data));
     if (action === 'validatesession') return jsonOut(validateSession_(data));
+    if (action === 'pcccr_get') return jsonOut(pcccrGet_(data));
+    if (action === 'pcccr_save_cap') return jsonOut(pcccrSaveCap_(data));
+    if (action === 'pcccr_save_progress') return jsonOut(pcccrSaveProgress_(data));
 
     return jsonOut({ ok: false, error: 'Unknown action: ' + action });
   } catch (err) {
@@ -875,4 +878,80 @@ function listLog_(data) {
     });
   }
   return { ok: true, logs: logs };
+}
+
+
+/* ===================== Module PCCCR ===================== */
+function pcccrUser_(data) {
+  var sess = getSession_(data.token);
+  if (!sess) throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+  var user = findUser_(sess.email);
+  if (!user || user.status !== 'approved') throw new Error('Tài khoản chưa được duyệt hoặc đã bị khóa.');
+  var perms = String(user.perms || '').split(/[,;|]/).map(function(x){return x.trim();});
+  if (user.role !== 'admin' && perms.indexOf('pcccr') < 0) throw new Error('Tài khoản chưa được cấp quyền PCCCR.');
+  return user;
+}
+function pcccrSpreadsheet_() {
+  var cfg = {};
+  try { cfg = JSON.parse(PropertiesService.getScriptProperties().getProperty('SHEET_SOURCES') || '{}') || {}; } catch(e) {}
+  var sid = cfg.pcccr && String(cfg.pcccr.sid || '').trim();
+  return sid ? SpreadsheetApp.openById(sid) : ss_();
+}
+function pcccrSheet_(name, headers) {
+  var ss = pcccrSpreadsheet_();
+  var sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    sh.getRange(1,1,1,headers.length).setValues([headers]);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+function pcccrGet_(data) {
+  var user = pcccrUser_(data);
+  var capSh = pcccrSheet_('PCCCR_CapChay', ['Ngày','Cấp cháy','Nhiệt độ','Độ ẩm','Tốc độ gió','Nguồn','Người cập nhật','Thời điểm cập nhật']);
+  var progressSh = pcccrSheet_('PCCCR_TienDo', ['Ngày cập nhật','Dữ liệu JSON','Người cập nhật','Thời điểm cập nhật']);
+  var capRows = capSh.getLastRow() > 1 ? capSh.getRange(2,1,capSh.getLastRow()-1,8).getValues() : [];
+  var cap = null;
+  if (capRows.length) {
+    capRows.sort(function(a,b){return String(b[0]).localeCompare(String(a[0]));});
+    var r = capRows[0];
+    cap = {ngay:r[0],cap:r[1],nhietDo:r[2],doAmKK:r[3],tocDoGio:r[4],nguon:r[5],nguoiCapNhat:r[6],capNhatLuc:r[7]};
+  }
+  var pRows = progressSh.getLastRow() > 1 ? progressSh.getRange(2,1,progressSh.getLastRow()-1,4).getValues() : [];
+  var progress = [];
+  if (pRows.length) {
+    pRows.sort(function(a,b){return String(b[0]).localeCompare(String(a[0]));});
+    try { progress = JSON.parse(String(pRows[0][1] || '[]')) || []; } catch(e) {}
+  }
+  return {ok:true,capChay:cap,tienDo:progress,user:{name:user.name,email:user.email}};
+}
+function pcccrSaveCap_(data) {
+  var user = pcccrUser_(data);
+  var x = data.capChay || {};
+  var ngay = String(x.ngay || '');
+  var cap = Number(x.cap);
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(ngay) || cap < 1 || cap > 5) throw new Error('Ngày hoặc cấp cháy không hợp lệ.');
+  var sh = pcccrSheet_('PCCCR_CapChay', ['Ngày','Cấp cháy','Nhiệt độ','Độ ẩm','Tốc độ gió','Nguồn','Người cập nhật','Thời điểm cập nhật']);
+  var values = [ngay,cap,Number(x.nhietDo)||0,Number(x.doAmKK)||0,Number(x.tocDoGio)||0,String(x.nguon||''),String(user.name||user.email),new Date().toISOString()];
+  var last = sh.getLastRow(), found = 0;
+  if (last > 1) {
+    var dates = sh.getRange(2,1,last-1,1).getDisplayValues();
+    for (var i=0;i<dates.length;i++) if (String(dates[i][0])===ngay) { found=i+2; break; }
+  }
+  if (found) sh.getRange(found,1,1,8).setValues([values]); else sh.appendRow(values);
+  return {ok:true,message:'Đã cập nhật biển báo cấp cháy.'};
+}
+function pcccrSaveProgress_(data) {
+  var user = pcccrUser_(data);
+  var rows = Array.isArray(data.tienDo) ? data.tienDo : [];
+  if (rows.length > 100) throw new Error('Số hạng mục vượt giới hạn.');
+  var ngay = String(data.ngay || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd'));
+  var sh = pcccrSheet_('PCCCR_TienDo', ['Ngày cập nhật','Dữ liệu JSON','Người cập nhật','Thời điểm cập nhật']);
+  var json = JSON.stringify(rows);
+  var last=sh.getLastRow(), found=0;
+  if(last>1){var dates=sh.getRange(2,1,last-1,1).getDisplayValues();for(var i=0;i<dates.length;i++)if(String(dates[i][0])===ngay){found=i+2;break;}}
+  var values=[ngay,json,String(user.name||user.email),new Date().toISOString()];
+  if(found) sh.getRange(found,1,1,4).setValues([values]); else sh.appendRow(values);
+  return {ok:true,message:'Đã lưu tiến độ PCCCR.'};
 }
