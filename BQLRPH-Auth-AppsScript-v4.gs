@@ -912,6 +912,13 @@ function pcccrSheet_(name, headers) {
     sh.getRange(1,1,1,headers.length).setValues([headers]);
     sh.setFrozenRows(1);
   }
+  if (name === 'PCCCR_CapChay') {
+    var firstCell = String(sh.getRange(1,1).getDisplayValue() || '').trim();
+    // Nếu trước đây bản ghi đầu tiên bị ghi đè lên dòng tiêu đề, chèn lại dòng tiêu đề nhưng giữ nguyên dữ liệu.
+    if (/^\\d{4}-\\d{1,2}-\\d{1,2}$/.test(firstCell)) sh.insertRowBefore(1);
+    var currentHeader = String(sh.getRange(1,1).getDisplayValue() || '').trim();
+    if (currentHeader !== 'Ngày') sh.getRange(1,1,1,headers.length).setValues([headers]);
+  }
   // Bổ sung bảng tra cấp dự báo cháy rừng theo QĐ 47/2026/QĐ-UBND
   // tại cột J:L; không ghi đè nhật ký cập nhật hằng ngày ở cột A:H.
   if (name === 'PCCCR_CapChay') {
@@ -977,7 +984,7 @@ function pcccrSaveCap_(data) {
   var cap = Number(x.cap);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(ngay) || cap < 1 || cap > 5) throw new Error('Ngày hoặc cấp cháy không hợp lệ.');
   var sh = pcccrSheet_('PCCCR_CapChay', ['Ngày','Cấp cháy','Nhiệt độ','Độ ẩm','Tốc độ gió','Nguồn','Người cập nhật','Thời điểm cập nhật']);
-  var values = [ngay,cap,Number(x.nhietDo)||0,Number(x.doAmKK)||0,Number(x.tocDoGio)||0,String(x.nguon||''),String(user.name||user.email),new Date().toISOString()];
+  var values = [ngay,cap,x.nhietDo === '' || x.nhietDo == null ? '' : Number(x.nhietDo),x.doAmKK === '' || x.doAmKK == null ? '' : Number(x.doAmKK),x.tocDoGio === '' || x.tocDoGio == null ? '' : Number(x.tocDoGio),String(x.nguon||''),String(user.name||user.email),new Date().toISOString()];
   var last = sh.getLastRow(), found = 0;
   if (last > 1) {
     var dates = sh.getRange(2,1,last-1,1).getDisplayValues();
