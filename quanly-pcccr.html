@@ -86,4 +86,4 @@ async function loadProgress(){try{$('progress-meta').textContent='Đang đồng 
 async function loadAll(){try{$('app-status').textContent='Đang tải biển báo cấp cháy...';const x=await api('pcccr_get');if(x.capChay)fillCap(x.capChay);else{$('cap-ngay').value=today();drawLevel(1)}$('app-status').textContent='Đã tải biển báo cấp cháy.';if(!$('view-tiendo').classList.contains('hidden'))loadProgress()}catch(e){$('app-status').textContent=e.message}}
 async function saveCap(){if(!isAdmin){alert('Chỉ Admin được cập nhật cấp cháy rừng.');return}try{const capChay={ngay:$('cap-ngay').value,cap:+$('cap-level').value,nhietDo:$('cap-temp').value,doAmKK:$('cap-hum').value,tocDoGio:$('cap-wind').value,nguon:$('cap-source').value};const x=await api('pcccr_save_cap',{capChay});$('app-status').textContent=x.message;await loadAll()}catch(e){alert(e.message)}}
 $('cap-level').addEventListener('change',e=>drawLevel(e.target.value));$('cap-ngay').value=today();setupCapPermissions();loadAll();setInterval(()=>{if(!$('view-tiendo').classList.contains('hidden'))loadProgress()},120000);
-</script></body></html></body></html>
+</script></body></html>
