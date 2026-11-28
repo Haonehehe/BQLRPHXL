@@ -253,7 +253,7 @@ var DEFAULT_SHEET_SOURCES={
   trongrung:{sid:'10ATqYxnFgsL1z7_QgOO4Ilt3oVGyHGk7',gid:'1027488994',label:'Trồng & chăm sóc rừng'},
   tasks:{sid:'1rJwDYJQQP6JBhjBLlZqnCCy7AD8z3bUe',gid:'1800611191',label:'Nhiệm vụ / Gantt'},
   tonghop:{sid:'1nP0UPmkija86oqcjHh66uoO77zKcawTB',gid:'688529358',label:'Tổng hợp đường dẫn'},
-  pcccr:{sid:'14PBA0_FRiUZ_an0-ZUkKLfa5jXkcJYR0tXtvvsCEw5E',gid:'593990287',label:'PCCCR — Tiến độ thi công và cấp cháy'}
+  pcccr:{sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'581631532',label:'BQLRPH-Auth — Tiến độ PCCCR'}
 };
 function loadSheetSourcesLocal(){
   try{
@@ -279,7 +279,7 @@ function mergeSheetSources(remote){
   });
   return base;
 }
-function getSheetSources(){ return mergeSheetSources(null); }
+function getSheetSources(){ var cfg=mergeSheetSources(null); cfg.pcccr={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'581631532',label:'BQLRPH-Auth — Tiến độ PCCCR'}; return cfg; }
 function fetchSheetSourcesCloud(){
   if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
     return apiCall({action:'getsheets'}).then(function(res){
@@ -799,7 +799,7 @@ function clearThongbaoForm(){
 function pcccrAdminCard(){
   return '<div class="card" style="padding:16px;margin-bottom:14px">'+
     '<div style="font-weight:800;font-size:14px;margin-bottom:6px;color:#0f172a"><i class="fa-solid fa-fire" style="color:#dc2626"></i> Biển báo cấp cháy rừng — cập nhật hằng ngày</div>'+
-    '<div style="font-size:12px;color:#64748b;margin-bottom:12px">Chỉ Admin được cập nhật. Dữ liệu lưu vào tab PCCCR_CapChay trong Google Sheets nguồn; module PCCCR chỉ hiển thị.</div>'+
+    '<div style="font-size:12px;color:#64748b;margin-bottom:12px">Chỉ Admin được cập nhật. Dữ liệu cấp cháy được lưu trong cùng tệp Google Sheets BQLRPH-Auth; module PCCCR tự đồng bộ và chỉ hiển thị.</div>'+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px">'+
     '<div><label>Ngày cập nhật</label><input id="adm-cap-date" type="date" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"></div>'+
     '<div><label>Cấp cháy</label><select id="adm-cap-level" style="width:100%;height:38px;border:1px solid #dbe2ea;border-radius:9px;padding:0 9px"><option value="1">Cấp I — Ít nguy hiểm</option><option value="2">Cấp II — Trung bình</option><option value="3">Cấp III — Cao</option><option value="4">Cấp IV — Nguy hiểm</option><option value="5">Cấp V — Cực kỳ nguy hiểm</option></select></div>'+
