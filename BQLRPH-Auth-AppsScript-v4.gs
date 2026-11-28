@@ -937,7 +937,14 @@ function pcccrSheet_(name, headers) {
   return sh;
 }
 function pcccrGet_(data) {
-  var user = pcccrUser_(data);
+  // Đọc cấp cháy là dữ liệu hiển thị; không kiểm tra lại phiên tại API này.
+  // Quyền Admin vẫn được kiểm tra riêng khi ghi/cập nhật cấp cháy.
+  var user = null;
+  try {
+    var token = String(data.token || data.sessionToken || '');
+    var sess = token ? getSession_(token) : null;
+    if (sess) user = findUser_(sess.email);
+  } catch (e) { user = null; }
   var capSh = pcccrSheet_('PCCCR_CapChay', ['Ngày','Cấp cháy','Nhiệt độ','Độ ẩm','Tốc độ gió','Nguồn','Người cập nhật','Thời điểm cập nhật']);
   var capRows = capSh.getLastRow() > 1 ? capSh.getRange(2,1,capSh.getLastRow()-1,8).getValues() : [];
   var cap = null;
@@ -961,7 +968,7 @@ function pcccrGet_(data) {
     var r = capRows[0], key = dateKey_(r[0]);
     cap = {ngay:key ? key.slice(0,4)+'-'+key.slice(4,6)+'-'+key.slice(6,8) : String(r[0] || ''),cap:r[1],nhietDo:r[2],doAmKK:r[3],tocDoGio:r[4],nguon:r[5],nguoiCapNhat:r[6],capNhatLuc:r[7]};
   }
-  return {ok:true,capChay:cap,user:{name:user.name,email:user.email,role:user.role}};
+  return {ok:true,capChay:cap,user:user ? {name:user.name,email:user.email,role:user.role} : null};
 }
 function pcccrSaveCap_(data) {
   var user = requireAdmin_(data);
