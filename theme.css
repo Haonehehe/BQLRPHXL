@@ -98,3 +98,131 @@ body.bq-lively .tab{
 }
 body.bq-lively .tab:hover{background:#d1fae5}
 body.bq-lively .tab.on{background:#fff;color:#064e3b;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+
+
+/* ===== BQLRPH UI SYSTEM 2026 · nền tảng dùng chung =====
+   Các class bq-ui-* là thành phần opt-in: chỉ trang đã tích hợp mới chịu tác động.
+   Không ghi đè cấu trúc dữ liệu, selector nghiệp vụ hoặc màu nhận diện riêng của module. */
+:root{
+  color-scheme:light;
+  --bq-font:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bq-green:#047857;
+  --bq-green-strong:#065f46;
+  --bq-green-bright:#059669;
+  --bq-page:#f5f8f6;
+  --bq-surface:#ffffff;
+  --bq-surface-soft:#f8fbf9;
+  --bq-text:#17251f;
+  --bq-text-muted:#64746b;
+  --bq-border:#dfe9e3;
+  --bq-border-strong:#c8d8ce;
+  --bq-focus:#0f9f6e;
+  --bq-radius-sm:9px;
+  --bq-radius:14px;
+  --bq-radius-lg:18px;
+  --bq-shadow-sm:0 1px 3px rgba(16,36,26,.05);
+  --bq-shadow:0 8px 24px rgba(16,36,26,.07);
+  --bq-shadow-lg:0 16px 42px rgba(16,36,26,.11);
+}
+html{font-family:var(--bq-font)}
+body.bq-ui{background:var(--bq-page);color:var(--bq-text);font-family:var(--bq-font)}
+body.bq-ui *{box-sizing:border-box}
+body.bq-ui :focus-visible{outline:3px solid color-mix(in srgb,var(--bq-focus) 55%,transparent);outline-offset:2px}
+body.bq-ui .bq-ui-header{
+  position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);
+  border-bottom:1px solid var(--bq-border);box-shadow:var(--bq-shadow-sm);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)
+}
+body.bq-ui .bq-ui-header-inner{
+  width:min(100% - 32px,1440px);min-height:64px;margin-inline:auto;
+  display:flex;align-items:center;gap:12px;padding:10px 0
+}
+body.bq-ui .bq-ui-brand{display:flex;align-items:center;gap:11px;min-width:0;margin-right:auto}
+body.bq-ui .bq-ui-brand-mark{
+  width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;
+  color:#fff;background:linear-gradient(145deg,#10a875,#047857)
+}
+body.bq-ui .bq-ui-brand-title{font-size:14px;line-height:1.35;font-weight:800;color:var(--bq-text)}
+body.bq-ui .bq-ui-brand-subtitle{font-size:11px;line-height:1.4;color:var(--bq-text-muted);margin-top:2px}
+body.bq-ui .bq-ui-header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+body.bq-ui .bq-ui-back,body.bq-ui .bq-ui-icon-button{
+  min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:0 12px;border:1px solid var(--bq-border);border-radius:11px;
+  color:var(--bq-text);background:var(--bq-surface);font:600 12px var(--bq-font);
+  text-decoration:none;cursor:pointer;transition:background .16s,border-color .16s,transform .16s
+}
+body.bq-ui .bq-ui-back:hover,body.bq-ui .bq-ui-icon-button:hover{background:var(--bq-surface-soft);border-color:var(--bq-border-strong)}
+body.bq-ui .bq-ui-back:active,body.bq-ui .bq-ui-icon-button:active{transform:scale(.98)}
+body.bq-ui .bq-ui-page{width:min(100% - 32px,1440px);margin:0 auto;padding:22px 0 48px}
+body.bq-ui .bq-ui-page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin:0 0 20px}
+body.bq-ui .bq-ui-page-title{font-size:clamp(20px,2.2vw,28px);line-height:1.25;font-weight:800;letter-spacing:-.025em;color:var(--bq-text)}
+body.bq-ui .bq-ui-page-description{font-size:13px;line-height:1.65;color:var(--bq-text-muted);margin-top:6px;max-width:760px}
+body.bq-ui .bq-ui-card{
+  min-width:0;background:var(--bq-surface);border:1px solid var(--bq-border);
+  border-radius:var(--bq-radius-lg);box-shadow:var(--bq-shadow-sm)
+}
+body.bq-ui .bq-ui-kpi{padding:16px;display:flex;align-items:center;gap:12px}
+body.bq-ui .bq-ui-kpi-icon{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;background:#e9f8f0;color:var(--bq-green)}
+body.bq-ui .bq-ui-kpi-label{font-size:11px;font-weight:700;color:var(--bq-text-muted)}
+body.bq-ui .bq-ui-kpi-value{font-size:clamp(20px,2vw,27px);font-weight:800;line-height:1.25;color:var(--bq-text);font-variant-numeric:tabular-nums}
+body.bq-ui .bq-ui-kpi-note{font-size:10px;color:var(--bq-text-muted);margin-top:3px}
+body.bq-ui .bq-ui-section{margin-top:20px}
+body.bq-ui .bq-ui-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+body.bq-ui .bq-ui-section-title{font-size:15px;font-weight:800;color:var(--bq-text)}
+body.bq-ui .bq-ui-section-description{font-size:11px;color:var(--bq-text-muted);margin-top:3px}
+body.bq-ui .bq-ui-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+body.bq-ui .bq-ui-field{
+  min-height:40px;max-width:100%;padding:8px 11px;border:1px solid var(--bq-border-strong);
+  border-radius:10px;background:var(--bq-surface);color:var(--bq-text);font:500 12px var(--bq-font)
+}
+body.bq-ui .bq-ui-table-wrap{width:100%;overflow:auto;border:1px solid var(--bq-border);border-radius:var(--bq-radius);background:var(--bq-surface);-webkit-overflow-scrolling:touch}
+body.bq-ui .bq-ui-table-wrap table{width:100%;border-collapse:separate;border-spacing:0}
+body.bq-ui .bq-ui-table-wrap th{background:var(--bq-surface-soft);color:var(--bq-text-muted);font-size:10px;font-weight:800;white-space:nowrap}
+body.bq-ui .bq-ui-table-wrap th,body.bq-ui .bq-ui-table-wrap td{padding:11px 12px;border-bottom:1px solid var(--bq-border);text-align:left}
+body.bq-ui .bq-ui-table-wrap td{font-size:12px;color:var(--bq-text)}
+body.bq-ui .bq-ui-table-wrap tr:last-child td{border-bottom:0}
+body.bq-ui .bq-ui-status{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
+body.bq-ui .bq-ui-status-success{background:#e8f7ef;color:#087443}
+body.bq-ui .bq-ui-status-warning{background:#fff6df;color:#9a5b00}
+body.bq-ui .bq-ui-status-danger{background:#fff0f0;color:#b42318}
+body.bq-ui .bq-ui-status-neutral{background:#eef2f0;color:#526158}
+body.bq-ui .bq-ui-empty{padding:28px 16px;text-align:center;color:var(--bq-text-muted);font-size:12px}
+body.bq-ui .bq-ui-loading{display:flex;align-items:center;justify-content:center;gap:9px;padding:24px;color:var(--bq-text-muted);font-size:12px}
+body.bq-ui .bq-ui-btn-primary{
+  min-height:40px;padding:0 15px;border:1px solid var(--bq-green);border-radius:10px;
+  background:var(--bq-green);color:#fff;font:700 12px var(--bq-font);cursor:pointer
+}
+body.bq-ui .bq-ui-btn-primary:hover{background:var(--bq-green-strong)}
+/* Chế độ tối: bật bằng class bq-dark trên body, không tự ép các trang chưa tích hợp. */
+body.bq-ui.bq-dark{
+  color-scheme:dark;--bq-page:#101a16;--bq-surface:#17231d;--bq-surface-soft:#1d2d25;
+  --bq-text:#e7f1eb;--bq-text-muted:#a1b5a8;--bq-border:#2b4034;--bq-border-strong:#3b5646;
+  --bq-focus:#34d399;--bq-shadow-sm:0 1px 3px rgba(0,0,0,.18);--bq-shadow:0 8px 24px rgba(0,0,0,.2)
+}
+body.bq-ui.bq-dark .bq-ui-header{background:rgba(23,35,29,.94)}
+body.bq-ui.bq-dark .bq-ui-brand-mark{background:linear-gradient(145deg,#059669,#065f46)}
+body.bq-ui.bq-dark .bq-ui-back,body.bq-ui.bq-dark .bq-ui-icon-button{background:var(--bq-surface);color:var(--bq-text)}
+body.bq-ui.bq-dark .bq-ui-kpi-icon{background:#183c2b;color:#6ee7b7}
+body.bq-ui.bq-dark .bq-ui-status-success{background:#153c2b;color:#86efac}
+body.bq-ui.bq-dark .bq-ui-status-warning{background:#493719;color:#fcd34d}
+body.bq-ui.bq-dark .bq-ui-status-danger{background:#4b2222;color:#fca5a5}
+body.bq-ui.bq-dark .bq-ui-status-neutral{background:#29362f;color:#cbd5ce}
+body.bq-ui.bq-dark .bq-ui-table-wrap th{background:var(--bq-surface-soft)}
+@media(max-width:760px){
+  body.bq-ui .bq-ui-header-inner{width:min(100% - 24px,1440px);min-height:58px}
+  body.bq-ui .bq-ui-page{width:min(100% - 24px,1440px);padding-top:16px}
+  body.bq-ui .bq-ui-page-heading{display:block}
+  body.bq-ui .bq-ui-header-actions{gap:6px}
+  body.bq-ui .bq-ui-back{min-height:36px;padding:0 10px}
+}
+@media(max-width:420px){
+  body.bq-ui .bq-ui-brand-subtitle{display:none}
+  body.bq-ui .bq-ui-back .bq-ui-back-label{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  body.bq-ui *,body.bq-ui *::before,body.bq-ui *::after{scroll-behavior:auto!important;transition:none!important}
+}
+@media print{
+  body.bq-ui .bq-ui-header{position:static;box-shadow:none}
+  body.bq-ui .bq-ui-header-actions{display:none!important}
+}
