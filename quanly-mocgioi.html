@@ -74,7 +74,7 @@ input:focus,select:focus,textarea:focus{
   }
   if(!canAccess()){
     try{ window.stop(); }catch(e){}
-    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Mốc giới</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>mocgioi</b>.</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div><script src="ui-shell.js"></script>
+    var gate='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cần đăng nhập</title></head><body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;background:linear-gradient(160deg,#07111f,#064e3b);color:#f8fafc"><div style="max-width:420px;width:100%;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:28px;text-align:center"><div style="font-size:40px;margin-bottom:12px">🔒</div><h1 style="font-size:18px;margin:0 0 8px">Cần đăng nhập</h1><p style="font-size:13px;color:#94a3b8;line-height:1.55;margin:0 0 18px">Module <b>Mốc giới</b> chỉ mở khi đã đăng nhập trên Menu và được admin cấp quyền.<br><br>Nếu đã đăng nhập mà vẫn thấy trang này: vào Menu → kiểm tra quyền module, hoặc nhờ admin cấp quyền <b>mocgioi</b>.</p><a href="menu.html" style="display:inline-flex;align-items:center;justify-content:center;height:42px;padding:0 20px;border-radius:12px;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-weight:700;font-size:13px;text-decoration:none">Về Menu đăng nhập</a></div>
 </body></html>';
     document.open();
     document.write(gate);
@@ -764,5 +764,6 @@ window.taiLai=taiLai;window.xuatExcel=xuatExcel;window.inBaoCao=inBaoCao;window.
 <script>
 try { if (window.BQLRPHLog) BQLRPHLog.page('mocgioi'); } catch (e) {}
 </script>
+<script src="ui-shell.js"></script>
 </body>
 </html>
