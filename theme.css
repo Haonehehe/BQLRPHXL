@@ -226,3 +226,40 @@ body.bq-ui.bq-dark .bq-ui-table-wrap th{background:var(--bq-surface-soft)}
   body.bq-ui .bq-ui-header{position:static;box-shadow:none}
   body.bq-ui .bq-ui-header-actions{display:none!important}
 }
+
+
+/* ===== Đồng bộ chế độ tối cho các trang dùng chung BQLRPH UI Shell ===== */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101a16!important;--card:#17231d!important;--card2:#1d2d25!important;
+  --bd:#2b4034!important;--tx:#e7f1eb!important;--mu:#a1b5a8!important;
+  --g:#34d399!important;--g2:#10b981!important;--gs:#183c2b!important;
+  --sky:#38bdf8!important;--vio:#a78bfa!important;--amber:#fbbf24!important;
+}
+body.bq-ui{background:var(--bq-page);color:var(--bq-text)}
+body.bq-ui.bq-dark{background:var(--bq-page)!important;color:var(--bq-text)!important}
+body.bq-ui.bq-dark .top,
+body.bq-ui.bq-dark header.top,
+body.bq-ui.bq-dark .top-in{background:rgba(23,35,29,.96)!important;border-color:var(--bq-border)!important;color:var(--bq-text)!important}
+body.bq-ui.bq-dark .card,body.bq-ui.bq-dark .panel,body.bq-ui.bq-dark .kpi,
+body.bq-ui.bq-dark .box,body.bq-ui.bq-dark .zone,body.bq-ui.bq-dark .modal-content,
+body.bq-ui.bq-dark .mbox,body.bq-ui.bq-dark .table-wrap{
+  background:var(--bq-surface)!important;border-color:var(--bq-border)!important;color:var(--bq-text)!important
+}
+body.bq-ui.bq-dark input,body.bq-ui.bq-dark select,body.bq-ui.bq-dark textarea{
+  background:var(--bq-surface-soft)!important;border-color:var(--bq-border-strong)!important;color:var(--bq-text)!important
+}
+body.bq-ui.bq-dark th{background:var(--bq-surface-soft)!important;color:var(--bq-text-muted)!important}
+body.bq-ui.bq-dark td,body.bq-ui.bq-dark p,body.bq-ui.bq-dark label{color:inherit}
+body.bq-ui .bq-shell-actions{display:flex;align-items:center;gap:8px;flex:none}
+body.bq-ui .bq-ui-header-inner>.bq-shell-actions{margin-left:auto}
+body.bq-ui .bq-shell-actions .bq-ui-back,body.bq-ui .bq-shell-actions .bq-ui-icon-button{
+  min-height:36px;padding:0 11px;font-size:11px;white-space:nowrap
+}
+body.bq-ui.bq-dark .bq-shell-actions .bq-ui-back,
+body.bq-ui.bq-dark .bq-shell-actions .bq-ui-icon-button{background:var(--bq-surface);color:var(--bq-text);border-color:var(--bq-border)}
+@media(max-width:560px){
+  body.bq-ui .bq-shell-actions{gap:5px}
+  body.bq-ui .bq-shell-actions .bq-ui-back,
+  body.bq-ui .bq-shell-actions .bq-ui-icon-button{min-height:34px;padding:0 9px;font-size:10px}
+}
