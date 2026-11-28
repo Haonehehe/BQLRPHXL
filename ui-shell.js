@@ -28,10 +28,10 @@
     var b=document.querySelector('[data-bq-theme-toggle]');
     if(b){b.setAttribute('aria-label',t==='dark'?'Chuyển sang giao diện sáng':'Chuyển sang giao diện tối');b.innerHTML=t==='dark'?'<i class="fa-solid fa-sun" aria-hidden="true"></i><span>Giao diện sáng</span>':'<i class="fa-solid fa-moon" aria-hidden="true"></i><span>Giao diện tối</span>';}
   }
-  function makeControls(){
+  function makeControls(mod){
     var group=document.createElement('div');
     group.className='bq-shell-actions';
-    group.innerHTML='<a class="bq-ui-back" href="menu.html" aria-label="Quay lại menu"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span class="bq-ui-back-label">Quay lại Menu</span></a><button class="bq-ui-icon-button" type="button" data-bq-theme-toggle aria-label="Chuyển giao diện"></button>';
+    group.innerHTML=(mod==='admin'?'':'<a class="bq-ui-back" href="menu.html" aria-label="Quay lại menu"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span class="bq-ui-back-label">Quay lại Menu</span></a>')+'<button class="bq-ui-icon-button" type="button" data-bq-theme-toggle aria-label="Chuyển giao diện"></button>';
     group.querySelector('[data-bq-theme-toggle]').addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
     return group;
   }
@@ -60,10 +60,11 @@
     if(!mod||mod==='menu')return false;
     document.body.classList.add('bq-ui');
     if(document.querySelector('[data-bq-shell-mounted]')){applyTheme(getTheme(),false);return true;}
-    var controls=makeControls();
+    var controls=makeControls(mod);
     var existing=document.querySelector('.top-in');
     if(existing){
-      existing.appendChild(controls);
+      var target=mod==='admin'?(existing.querySelector('.top-actions')||existing):existing;
+      target.appendChild(controls);
     }else{
       var header=document.createElement('header');
       header.className='bq-ui-header';
