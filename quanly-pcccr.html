@@ -275,7 +275,7 @@ function percent(th,kh){return kh?Math.round(th/kh*1000)/10:0}
 function parseProgress(table){
  const cols=(table.cols||[]).map(c=>norm(c.label||c.id)),find=a=>{for(let i=0;i<cols.length;i++)if(a.some(x=>cols[i]===x))return i;for(let i=0;i<cols.length;i++)if(a.some(x=>cols[i].includes(x)||x.includes(cols[i])))return i;return -1};
  const ix={stt:find(['stt','so']),name:find(['hangmuc','noidung','congviec']),unit:find(['dvt','donvitinh'])};
- const totalKH=find(['tongkh','tongkehoach']),totalTH=find(['tongth','tongthuchien']);
+ const totalKH=find(['tongkh','tongkehoach','tongcongkh','khtong']),totalTH=find(['tongth','tongthuchien','tongcongth','thtong']);
  const aliases={GH:['giahuynh','gh'],NL:['nuile','nl'],TT:['trantao','tt'],LC:['lancat','lc'],GP:['giaphu','gp'],DV:['damvoi','dv']},map={};
  codes.forEach(k=>{const a=aliases[k];map[k]={kh:find(a.map(x=>x+'kh').concat(a.map(x=>'kh'+x))),th:find(a.map(x=>x+'th').concat(a.map(x=>'th'+x)))}});
  return (table.rows||[]).map((r,i)=>{const name=cell(r,ix.name);if(name==null||String(name).trim()==='')return null;let pt={},sumK=0,sumT=0;codes.forEach(k=>{let kh=num(cell(r,map[k].kh)),th=num(cell(r,map[k].th));sumK+=kh;sumT+=th;pt[k]={kh,th,tyLe:percent(th,kh)}});let kh=cell(r,totalKH),th=cell(r,totalTH);kh=kh==null||kh===''?sumK:num(kh);th=th==null||th===''?sumT:num(th);return{stt:cell(r,ix.stt)||i+1,hangMuc:String(name),dvt:String(cell(r,ix.unit)||''),tong:{kh,th,tyLe:percent(th,kh)},phanTruong:pt}}).filter(Boolean)
@@ -296,9 +296,8 @@ async function loadProgress(){try{
  $('progress-meta').textContent='Đang đồng bộ tiến độ PCCCR...';$('progress-table-wrap').classList.remove('raw-mode');
  const table=await loadGviz(PCCCR_PROGRESS_SOURCE.sid,PCCCR_PROGRESS_SOURCE.gid);
  const headers=(table.cols||[]).map(c=>norm(c.label||c.id));
- const hasWork=headers.some(h=>['hangmuc','noidung','congviec'].includes(h));
- const hasTotal=headers.some(h=>h==='tongkh')&&headers.some(h=>h==='tongth');
- if(hasWork&&hasTotal){const rows=parseProgress(table);renderProgress(rows);$('progress-meta').textContent='Đã đồng bộ '+rows.length+' hạng mục · '+new Date().toLocaleTimeString('vi-VN')}
+ const hasWork=headers.some(h=>['hangmuc','noidung','congviec'].some(k=>h.includes(k)));
+ if(hasWork){const rows=parseProgress(table);renderProgress(rows);$('progress-meta').textContent='Đã đồng bộ '+rows.length+' hạng mục · '+new Date().toLocaleTimeString('vi-VN')}
  else{renderRawProgress(table);$('progress-meta').textContent='Đã tải '+(table.rows||[]).length+' dòng dữ liệu · dạng bảng nguồn';}
  $('sheet-instruction').textContent='Nguồn dữ liệu: Google Sheets · GID '+PCCCR_PROGRESS_SOURCE.gid+' · Tự động đồng bộ khi mở tab.';
  }catch(e){$('progress-head').innerHTML='';$('progress-body').innerHTML='<tr><td colspan="24" style="padding:22px;text-align:center;color:#9f1239">'+esc(e.message)+'</td></tr>';$('progress-meta').textContent='Chưa đồng bộ được';$('sheet-instruction').textContent='Không đọc được Google Sheets. Kiểm tra quyền “Bất kỳ ai có đường liên kết – Người xem”, Spreadsheet ID và GID trong Quản trị.'}}
