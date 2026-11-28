@@ -18,6 +18,49 @@ h1{font-size:clamp(20px,3vw,28px);margin:0;color:#064e3b}.sub{color:var(--muted)
 .notice{padding:13px;border-radius:12px;background:#ecfdf5;color:#065f46;line-height:1.55;margin:12px 0}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:760px;font-size:12px}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}th{background:#f0fdf4;color:#065f46}td:first-child,th:first-child{text-align:left}
 input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text-align:right}.hidden{display:none!important}.status{color:var(--muted);font-size:12px}.danger{background:#fff1f2;color:#9f1239}
 @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.tabs{flex-wrap:wrap}}
+
+/* PCCCR refresh: compact sign, readable reference and progress tables */
+#view-cap,#view-tiendo{padding:clamp(12px,2.2vw,22px)}
+#view-cap>h2{font-size:18px;margin:0 0 5px;color:#064e3b}
+#view-cap>.sub{margin-bottom:12px}
+.fire-sign{max-width:760px;margin:12px auto 18px;padding:clamp(12px,2vw,20px);border:6px solid #991b1b;border-radius:12px;background:linear-gradient(180deg,#fff 0%,#fffafa 100%)}
+.fire-sign-head{font-size:clamp(15px,2.3vw,22px);line-height:1.35}
+.fire-sign-sub{font-size:10px}
+.fire-dial{max-width:620px;margin:3px auto 0}
+.fire-level-name{font-size:clamp(19px,3vw,27px);margin:0 0 3px}
+.fire-level-desc{font-size:12px;min-height:18px}
+.fire-sign-foot,.fire-legend{display:none}
+.level-table-title{font-size:15px;margin:16px 0 8px}
+#cap-reference-table{border:1px solid #dbe5df;border-radius:12px;overflow:auto;background:#fff}
+#cap-reference-table table{min-width:0;width:100%;font-size:12px}
+#cap-reference-table th{background:#e8f5ee;color:#14532d;font-weight:800}
+#cap-reference-table td,#cap-reference-table th{padding:10px 12px;text-align:left}
+#cap-reference-table tr:nth-child(even) td{background:#f8fbf9}
+#cap-reference-status{display:none}
+#recommend{margin:10px 0 4px;padding:10px 12px;border-left:4px solid #0f766e;background:#f0fdfa;color:#134e4a;font-size:12px}
+#view-cap>.notice:not(#recommend){display:none}
+#cap-meta{font-size:11px;margin:7px 0 0;color:#64748b}
+#app-status{font-size:11px;margin-top:8px}
+#view-tiendo .top{margin-bottom:10px}
+#view-tiendo h2{font-size:18px;margin:0;color:#064e3b}
+#view-tiendo .sub{font-size:11px}
+#view-tiendo>.notice{display:none}
+#view-tiendo .table-wrap{border:1px solid #dbe5df;border-radius:12px;background:#fff;max-height:70vh}
+#view-tiendo table{min-width:1050px;font-size:11px}
+#view-tiendo th{position:sticky;top:0;z-index:2;background:#e8f5ee;color:#14532d}
+#view-tiendo th:first-child,#view-tiendo td:first-child{position:sticky;left:0;z-index:3;background:#f8fafc}
+#view-tiendo th:nth-child(2),#view-tiendo td:nth-child(2){position:sticky;left:48px;z-index:3;background:#fff}
+#view-tiendo th,#view-tiendo td{padding:9px 8px;white-space:nowrap}
+#view-tiendo td:nth-child(2){text-align:left;min-width:180px;white-space:normal}
+#sheet-instruction{font-size:11px;margin-top:9px;color:#64748b}
+@media(max-width:640px){
+ .fire-sign{border-width:4px;padding:10px 8px}
+ .fire-dial{width:100%}
+ #cap-reference-table table{font-size:11px}
+ #cap-reference-table td,#cap-reference-table th{padding:8px 7px}
+ #view-tiendo .table-wrap{max-height:65vh}
+}
+
 </style>
 <script>
 (function(){
@@ -34,16 +77,14 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 <div class="top"><div><h1><i class="fa-solid fa-fire-flame-curved"></i> PHÒNG CHÁY, CHỮA CHÁY RỪNG</h1><div class="sub">Theo dõi biển báo cấp cháy và tiến độ thực hiện công tác PCCCR toàn lâm phần</div></div><div><button class="btn soft" onclick="location.href='menu.html'"><i class="fa fa-arrow-left"></i> Menu</button> <button class="btn soft" onclick="loadAll()"><i class="fa fa-rotate"></i> Làm mới</button></div></div>
 <div class="tabs"><button class="tab on" id="tab-cap" onclick="switchTab('cap')"> <i class="fa fa-gauge-high"></i> Biển báo cấp cháy</button><button class="tab" id="tab-tiendo" onclick="switchTab('tiendo')"><i class="fa fa-list-check"></i> Tiến độ thi công</button></div>
 <section id="view-cap" class="panel">
-<h2>Biển báo cấp cháy rừng toàn lâm phần</h2><div class="sub">Cập nhật hằng ngày · Thông tin hiển thị dùng chung cho toàn đơn vị</div>
-<div class="fire-sign" role="img" aria-label="Biển báo hiệu cấp dự báo cháy rừng gồm năm cấp, kim chỉ cấp hiện hành"><h3 class="fire-sign-head">BIỂN BÁO HIỆU CẤP DỰ BÁO CHÁY RỪNG</h3><div class="fire-sign-sub">BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</div><svg id="fire-dial" class="fire-dial" viewBox="0 0 500 285" aria-hidden="true"></svg><div id="fire-level-name" class="fire-level-name">CHƯA CẬP NHẬT</div><div id="fire-level-desc" class="fire-level-desc">Đang chờ dữ liệu cấp cháy từ Admin</div><div class="fire-sign-foot">CẤP DỰ BÁO CHÁY RỪNG</div><div class="fire-legend"><span><i class="fire-dot" style="background:#8fc9ad"></i>Cấp I</span><span><i class="fire-dot" style="background:#08734f"></i>Cấp II</span><span><i class="fire-dot" style="background:#f4d03f"></i>Cấp III</span><span><i class="fire-dot" style="background:#e53935"></i>Cấp IV</span><span><i class="fire-dot" style="background:#8b0000"></i>Cấp V</span></div></div>
+<h2>Biển báo cấp cháy rừng</h2><div class="sub">Cấp dự báo cháy rừng toàn lâm phần</div>
+<div class="fire-sign" role="img" aria-label="Biển báo hiệu cấp dự báo cháy rừng gồm năm cấp, kim chỉ cấp hiện hành"><h3 class="fire-sign-head">BIỂN BÁO HIỆU CẤP DỰ BÁO CHÁY RỪNG</h3><div class="fire-sign-sub">BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</div><svg id="fire-dial" class="fire-dial" viewBox="0 0 500 285" aria-hidden="true"></svg><div id="fire-level-name" class="fire-level-name">CHƯA CẬP NHẬT</div><div id="fire-level-desc" class="fire-level-desc">Chưa có dữ liệu cấp cháy</div><div class="fire-sign-foot">CẤP DỰ BÁO CHÁY RỪNG</div><div class="fire-legend"><span><i class="fire-dot" style="background:#8fc9ad"></i>Cấp I</span><span><i class="fire-dot" style="background:#08734f"></i>Cấp II</span><span><i class="fire-dot" style="background:#f4d03f"></i>Cấp III</span><span><i class="fire-dot" style="background:#e53935"></i>Cấp IV</span><span><i class="fire-dot" style="background:#8b0000"></i>Cấp V</span></div></div>
 <h3 class="level-table-title">BẢNG TRA CẤP DỰ BÁO CHÁY RỪNG</h3>
-<div class="table-wrap" id="cap-reference-table"><div class="status">Đang tải bảng tra từ Google Sheets...</div></div>
-<div class="status" id="cap-reference-status">Nguồn bảng tra: Google Sheets · GID 2014693680</div>
-<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy. Vui lòng cập nhật thông tin trong ngày.</div>
-<div class="notice">Biển báo cấp cháy được Admin cập nhật tại trang Quản trị → Phòng cháy, chữa cháy rừng. Dữ liệu lưu trong Google Sheets nguồn và hiển thị tại đây.</div><p class="status" id="cap-meta"></p></section>
+<div class="table-wrap" id="cap-reference-table"><div class="status">Đang tải bảng tra...</div></div>
+<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy.</div><p class="status" id="cap-meta"></p></section>
 <section id="view-tiendo" class="panel hidden">
 <div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Dữ liệu chỉ đọc, đồng bộ trực tiếp từ Google Sheets nguồn do Admin cấu hình</div></div><span class="status" id="progress-meta">Đang chờ đồng bộ...</span></div>
-<div class="notice">Các phân trường cập nhật trực tiếp trên cùng một tab Google Sheets. Module chỉ tổng hợp và hiển thị; không chỉnh sửa dữ liệu tại đây. Dòng tiêu đề cần có: STT, Hạng mục, ĐVT, Tổng KH, Tổng TH, Gia Huynh KH, Gia Huynh TH, Núi Le KH, Núi Le TH, Trản Táo KH, Trản Táo TH, Lán Cát KH, Lán Cát TH, Gia Phu KH, Gia Phu TH, Đầm Voi KH, Đầm Voi TH.</div>
+
 <div class="table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
 <div class="status" style="margin-top:12px" id="sheet-instruction">Nguồn Sheet chưa được cấu hình. Admin vào Quản trị → Nguồn Google Sheet → PCCCR để khai báo Spreadsheet ID và GID.</div>
 </section>
@@ -79,8 +120,18 @@ function parseProgress(table){
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(n){return Number(n||0).toLocaleString('vi-VN',{maximumFractionDigits:2})}
 function renderProgress(rows){$('progress-head').innerHTML='<tr><th rowspan="2">STT</th><th rowspan="2">Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">Tổng</th>'+names.map(n=>'<th colspan="3">'+n+'</th>').join('')+'</tr><tr>'+Array.from({length:7},()=>'<th>KH</th><th>TH</th><th>%</th>').join('')+'</tr>';if(!rows.length){$('progress-body').innerHTML='<tr><td colspan="24">Sheet chưa có dữ liệu hoặc chưa đúng cấu trúc cột.</td></tr>';return}const c=o=>'<td>'+fmt(o.kh)+'</td><td>'+fmt(o.th)+'</td><td>'+fmt(o.tyLe)+'%</td>';$('progress-body').innerHTML=rows.map(r=>'<tr><td>'+esc(r.stt)+'</td><td style="text-align:left">'+esc(r.hangMuc)+'</td><td>'+esc(r.dvt)+'</td>'+c(r.tong)+codes.map(k=>c(r.phanTruong[k])).join('')+'</tr>').join('')}
-let sheetCfg=null;
-async function loadProgress(){try{$('progress-meta').textContent='Đang đồng bộ...';if(!sheetCfg){const x=await api('getsheets');sheetCfg=x.sheets&&x.sheets.pcccr}if(!sheetCfg||!sheetCfg.sid||!sheetCfg.gid){$('progress-head').innerHTML='';$('progress-body').innerHTML='<tr><td colspan="24">Chưa cấu hình nguồn Google Sheets PCCCR.</td></tr>';$('sheet-instruction').textContent='Admin vào Quản trị → Nguồn Google Sheet → PCCCR, nhập Spreadsheet ID và GID của tab dùng chung.';$('progress-meta').textContent='Chưa có nguồn dữ liệu';return}const table=await loadGviz(sheetCfg.sid,sheetCfg.gid),rows=parseProgress(table);renderProgress(rows);$('progress-meta').textContent='Đã đồng bộ '+rows.length+' hạng mục lúc '+new Date().toLocaleTimeString('vi-VN');$('sheet-instruction').textContent='Nguồn: Google Sheets · GID '+sheetCfg.gid+' · Dữ liệu chỉ đọc.'}catch(e){$('progress-meta').textContent='Đồng bộ thất bại';$('sheet-instruction').textContent=e.message}}
+const PCCCR_PROGRESS_SOURCE={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'581631532'};
+async function loadProgress(){try{
+ $('progress-meta').textContent='Đang đồng bộ tiến độ PCCCR...';
+ const table=await loadGviz(PCCCR_PROGRESS_SOURCE.sid,PCCCR_PROGRESS_SOURCE.gid);
+ const headers=(table.cols||[]).map(c=>norm(c.label||c.id));
+ const hasWork=headers.some(h=>['hangmuc','noidung','congviec'].includes(h));
+ const hasTotal=headers.some(h=>h==='tongkh')&&headers.some(h=>h==='tongth');
+ if(!hasWork||!hasTotal)throw Error('Nguồn GID '+PCCCR_PROGRESS_SOURCE.gid+' không phải bảng Tiến độ PCCCR (có thể đang trỏ nhầm tab Thông báo). Chưa hiển thị dữ liệu để tránh lấy sai.');
+ const rows=parseProgress(table);renderProgress(rows);
+ $('progress-meta').textContent='Đã đồng bộ '+rows.length+' hạng mục · '+new Date().toLocaleTimeString('vi-VN');
+ $('sheet-instruction').textContent='Nguồn dữ liệu: tab Tiến độ PCCCR · GID '+PCCCR_PROGRESS_SOURCE.gid;
+ }catch(e){$('progress-head').innerHTML='';$('progress-body').innerHTML='<tr><td colspan="24" style="padding:18px;text-align:center;color:#9f1239">'+esc(e.message)+'</td></tr>';$('progress-meta').textContent='Chưa đồng bộ được';$('sheet-instruction').textContent='Kiểm tra đúng tab Tiến độ PCCCR trong Google Sheets.'}}
 let capLoading=false;
 async function loadAll(){if(capLoading)return;capLoading=true;try{$('app-status').textContent='Đang lấy cấp cháy mới nhất từ dữ liệu Admin...';const x=await api('pcccr_get');if(!x.capChay){fillCap(null);$('app-status').textContent='Chưa có bản ghi cấp cháy trong Google Sheets PCCCR_CapChay.'}else{fillCap(x.capChay);$('app-status').textContent='Đã đồng bộ cấp '+x.capChay.cap+' từ Admin · '+(x.capChay.capNhatLuc||'')+' · kiểm tra lúc '+new Date().toLocaleTimeString('vi-VN')}if(!$('view-tiendo').classList.contains('hidden'))loadProgress()}catch(e){$('app-status').textContent='Không lấy được cấp cháy từ Admin: '+(e.message||String(e));$('cap-meta').textContent='Lỗi đồng bộ dữ liệu cấp cháy: '+(e.message||String(e))}finally{capLoading=false}}
 function refreshCapFromAdmin(){loadAll()}
