@@ -925,7 +925,6 @@ function pcccrSheet_(name, headers) {
     sh.setColumnWidth(11,170);
     sh.setColumnWidth(12,430);
     sh.setRowHeights(1,6,38);
-    sh.getRange(8,10,1,3).merge();
     sh.getRange(8,10).setValue('CÔNG THỨC: P = K × Σ(T13 × D13). K = 1 khi lượng mưa ngày < 5 mm; K = 0 khi lượng mưa ngày > 5 mm hoặc có mưa phùn kéo dài 3–5 ngày theo quy định. T13: nhiệt độ lúc 13 giờ (°C); D13: độ chênh lệch bão hòa lúc 13 giờ (hPa).');
     sh.getRange(8,10,1,3).setWrap(true).setBackground('#fff7ed').setFontColor('#7c2d12');
     sh.setRowHeight(8,70);
