@@ -812,7 +812,9 @@ function pcccrAdminCard(){
 }
 function loadPcccrAdminCap(){
   var d=document.getElementById('adm-cap-date'); if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
-  apiCall(Object.assign({action:'pcccr_get'},adminCred())).then(function(r){
+  pushSheetSourcesCloud(getSheetSources()).then(function(){
+    return apiCall(Object.assign({action:'pcccr_get'},adminCred()));
+  }).then(function(r){
     if(!r||!r.ok)throw new Error(r&&r.error||'Không tải được cấp cháy');
     var c=r.capChay||{}; if(d&&c.ngay)d.value=String(c.ngay).slice(0,10);
     var vals={level:c.cap||1,temp:c.nhietDo,hum:c.doAmKK,wind:c.tocDoGio,source:c.nguon};
@@ -1129,8 +1131,8 @@ function userRow(u,id){
   var permsHtml='<div class="perms" id="perms_'+id+'">';
   ALL_PERMS.forEach(function(p){
     var ck=(u.perms||[]).indexOf(p)>=0?'checked':'';
-    if(p==='qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') ck='checked';
-    var dis=p==='qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'?' onclick="return false"':'';
+    if(p==='pdf') ck='checked';
+    var dis=p==='pdf'?' onclick="return false"':'';
     permsHtml+='<label><input type="checkbox" data-p="'+p+'" '+ck+dis+'> '+PERM_LABEL[p]+'</label>';
   });
   permsHtml+='</div>';
