@@ -558,6 +558,39 @@ main input:focus,main select:focus,main textarea:focus{border-color:var(--accent
   .flex.border-b.bg-slate-50\/50>button,.flex.border-b.bg-slate-50\/50>.qmenu>summary{padding:11px 12px!important}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== Tổng quan: giai đoạn & theo năm ===== */
+.dscope{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin:2px 0}
+.dseg{display:inline-flex;background:#eceff1;border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.dseg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .15s,color .15s}
+.dseg button:hover:not(:disabled):not(.on){color:var(--ink)}
+.dseg button b{font-weight:600;font-size:11.5px;background:rgba(27,42,51,.07);border-radius:999px;padding:1px 8px;color:var(--ink)}
+.dseg button.on{background:#fff;color:var(--accent);box-shadow:0 1px 2px rgba(27,42,51,.14)}
+.dseg button.on b{background:var(--accent-soft);color:var(--accent)}
+.dseg button:disabled{opacity:.45;cursor:not-allowed}
+.dyr{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted)}
+.dyr select{height:34px;padding:0 28px 0 10px;border:1px solid #d5dce0;border-radius:8px;background:#fff;color:var(--ink);font-family:inherit;font-size:13px}
+.dnote{font-size:12px;color:var(--muted)}
+.dyearcard{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dyearcard-head{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dyearcard-head h3{margin:0;font-size:14px;font-weight:600;color:var(--ink)}
+.dyearbody{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+.dyear-chart{position:relative;height:240px;padding:14px 18px;border-left:1px solid var(--line)}
+@media(max-width:900px){.dyearbody{grid-template-columns:1fr}.dyear-chart{border-left:0;border-top:1px solid var(--line)}}
+.dyear-table{width:100%;border-collapse:collapse;font-size:13px}
+.dyear-table th{padding:10px 14px;text-align:left;background:#f6f8f9;color:var(--muted);font-weight:600;font-size:12.5px;border-bottom:1px solid var(--line);white-space:nowrap}
+.dyear-table td{padding:9px 14px;border-top:1px solid #eef1f3;font-variant-numeric:tabular-nums}
+.dyear-table .r{text-align:right}
+.dyear-table tbody tr{cursor:pointer;transition:background .12s}
+.dyear-table tbody tr:hover{background:#f8faf9}
+.dyear-table tbody tr.sel{background:var(--accent-soft)}
+.dyear-table tfoot td{border-top:1px solid var(--line);background:#fafbfb}
+.dtag{display:inline-block;margin-left:6px;padding:0 7px;border-radius:999px;background:#eceff1;color:var(--muted);font-size:11px;font-weight:500}
+.dtag.cur{background:var(--accent-soft);color:var(--accent)}
+html.dark .dyearcard{background:#1e293b;border-color:#334155}
+html.dark .dseg{background:#1e293b}html.dark .dseg button.on{background:#334155;color:#6ee7b7}
+html.dark .dyear-table th,html.dark .dyear-table tfoot td{background:#0f172a}
+html.dark .dyr select{background:#1e293b;color:#e2e8f0;border-color:#334155}
 </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col" data-bqlrph-module="qlbvr">
@@ -650,7 +683,28 @@ main input:focus,main select:focus,main textarea:focus{border-color:var(--accent
                     </button>
                 </div>
             </div>
+            <div class="dscope" id="dashScopeBar">
+                <div class="dseg" role="tablist" aria-label="Giai đoạn dữ liệu">
+                    <button type="button" data-scope="current" onclick="setDashScope('current')">Hiện hành 2026 <b id="dashCntCur">–</b></button>
+                    <button type="button" data-scope="archive" onclick="setDashScope('archive')">Lưu trữ 2019–2025 <b id="dashCntArc">–</b></button>
+                    <button type="button" data-scope="all" onclick="setDashScope('all')">Tất cả giai đoạn <b id="dashCntAll">–</b></button>
+                </div>
+                <label class="dyr">Năm
+                    <select id="dashYear" onchange="setDashYear(this.value)"><option value="">Tất cả năm</option></select>
+                </label>
+                <span class="dnote" id="dashScopeNote"></span>
+            </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="dashKpiRow"></div>
+            <div class="dyearcard" id="dashYearCard">
+                <div class="dyearcard-head">
+                    <h3>Diễn biến theo năm</h3>
+                    <span class="dnote">Bấm vào một năm để lọc toàn bộ Tổng quan</span>
+                </div>
+                <div class="dyearbody">
+                    <div style="overflow-x:auto"><table class="dyear-table" id="dashYearTable"></table></div>
+                    <div class="dyear-chart"><canvas id="chartDashYear"></canvas></div>
+                </div>
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="bg-white rounded-xl border border-rose-200 shadow-card p-4 lg:col-span-1">
                     <h3 class="text-xs font-semibold text-rose-700 mb-2 flex items-center gap-1.5">
@@ -1077,6 +1131,10 @@ main input:focus,main select:focus,main textarea:focus{border-color:var(--accent
                     <label class="block font-semibold text-slate-700 mb-1">Link tab <span class="text-rose-600">Thu hồi HĐ</span> <span class="font-normal text-slate-500">(để trống = tự tìm sheet tên “Thu hồi HĐ”)</span>:</label>
                     <input type="url" id="sheetThuHoiUrl" value="https://docs.google.com/spreadsheets/d/1ph0E3aUEo10pxE7SAKHISgfSvl7OqHPt/edit?gid=1234509617#gid=1234509617" placeholder="Link sheet/tab Thu hồi HĐ (cùng file hoặc file khác)..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-400 outline-none text-xs">
                 </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Link sheet <span class="text-emerald-700">Lưu trữ 2019–2025</span> <span class="font-normal text-slate-500">(Admin cấu hình khóa <code>qlbvr_luutru</code>; trống = tab “VI PHAM 2019-2025” cùng file chính)</span>:</label>
+                    <input type="url" id="sheetArchiveUrl" value="https://docs.google.com/spreadsheets/d/1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU/edit?gid=563303191#gid=563303191" placeholder="Link sheet/tab lưu trữ 2019–2025..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 outline-none text-xs">
+                </div>
                 <div class="pt-1 flex justify-between items-center">
                     <button onclick="loadSampleData()" class="text-[11px] text-slate-500 hover:text-slate-800 underline">Khôi phục dữ liệu gốc</button>
                     <button onclick="fetchViaJSONP()" class="px-4 py-2 bg-sheets-800 hover:bg-sheets-900 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center">
@@ -1402,8 +1460,90 @@ let detailedCases = [
             });
         }
 
+        var archiveCases = [], archiveLoaded = false;
+        var ARCHIVE_GID = '563303191';
+        var dashScope = 'current', dashYear = '';
+        var chartDashYear = null;
+        function yearOfCase(c){ const d = parseFlexibleDate(c.ngayViPham); return d ? d.getFullYear() : ''; }
+        function dashAllCases(){ return (archiveCases || []).concat(detailedCases); }
+        function dashboardCases(){
+            let base = dashScope === 'current' ? detailedCases : (dashScope === 'archive' ? archiveCases : dashAllCases());
+            if (dashYear) base = base.filter(c => String(c.namViPham || yearOfCase(c)) === String(dashYear));
+            return base;
+        }
+        function setDashScope(s){
+            dashScope = s;
+            if (dashYear) { const y = +dashYear; if ((s === 'current' && y < 2026) || (s === 'archive' && y >= 2026)) dashYear = ''; }
+            renderDashboard();
+        }
+        function setDashYear(y){
+            dashYear = y || '';
+            if (dashYear) { const n = +dashYear; if ((n < 2026 && dashScope === 'current') || (n >= 2026 && dashScope === 'archive')) dashScope = 'all'; }
+            renderDashboard();
+        }
+        function earliestDateLabel(cases){
+            const ds = (cases || []).map(c => parseFlexibleDate(c.ngayViPham)).filter(Boolean);
+            if (!ds.length) return '01/01/2026';
+            const d = new Date(Math.min.apply(null, ds.map(x => x.getTime())));
+            return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+        }
+        function updateDashScopeUI(cases){
+            const bar = document.getElementById('dashScopeBar'); if (!bar) return;
+            const nCur = detailedCases.length, nArc = (archiveCases || []).length;
+            const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+            set('dashCntCur', nCur); set('dashCntArc', nArc || '–'); set('dashCntAll', nArc ? nCur + nArc : nCur);
+            bar.querySelectorAll('.dseg button').forEach(b => {
+                const sc = b.getAttribute('data-scope');
+                b.classList.toggle('on', sc === dashScope);
+                const off = (sc !== 'current' && !nArc);
+                b.disabled = off; b.title = off ? 'Chưa tải được dữ liệu lưu trữ 2019–2025' : '';
+            });
+            const sel = document.getElementById('dashYear');
+            if (sel) {
+                const years = Array.from(new Set(dashAllCases().map(c => c.namViPham || yearOfCase(c)).filter(Boolean))).sort((a,b) => b - a);
+                sel.innerHTML = '<option value="">Tất cả năm</option>' + years.map(y => '<option value="' + y + '">' + y + '</option>').join('');
+                sel.value = dashYear;
+            }
+            const names = { current: 'Giai đoạn hiện hành (sheet 2026)', archive: 'Giai đoạn lưu trữ 2019–2025', all: 'Toàn bộ giai đoạn (lưu trữ + hiện hành)' };
+            const lab = document.getElementById('dashPeriodLabel');
+            if (lab) lab.textContent = names[dashScope] + (dashYear ? ' · Năm ' + dashYear : '') + ' · ' + cases.length + ' hồ sơ';
+            const note = document.getElementById('dashScopeNote');
+            if (note) note.textContent = dashScope === 'current' ? 'Hồ sơ đang xử lý, có cảnh báo và việc cần làm' : 'Số liệu lưu trữ chỉ để tra cứu, thống kê; không tính vào việc cần xử lý';
+        }
+        function renderDashYearCard(){
+            const tbl = document.getElementById('dashYearTable'); if (!tbl) return;
+            const by = {};
+            dashAllCases().forEach(c => {
+                const y = c.namViPham || yearOfCase(c) || 'Chưa rõ';
+                const m = getReportMetrics(c);
+                const o = by[y] || (by[y] = { y: y, vu: 0, cay: 0, m3: 0, pha: 0, kt: 0, xd: 0 });
+                o.vu++; o.cay += m.cayGoLon || 0; o.m3 += m.khoiLuongM3 || 0;
+                if (m.isPhaHoai) o.pha++; if (m.isKhaiThac) o.kt++; if (m.isXayDung || m.isDaoMuc) o.xd++;
+            });
+            const rows = Object.values(by).sort((a,b) => String(a.y).localeCompare(String(b.y)));
+            const f0 = n => Number(n || 0).toLocaleString('vi-VN', { maximumFractionDigits: 0 });
+            const f2 = n => Number(n || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 });
+            const tot = rows.reduce((a, r) => ({ vu: a.vu + r.vu, cay: a.cay + r.cay, m3: a.m3 + r.m3, pha: a.pha + r.pha, kt: a.kt + r.kt, xd: a.xd + r.xd }), { vu: 0, cay: 0, m3: 0, pha: 0, kt: 0, xd: 0 });
+            const yv = r => (r.y === 'Chưa rõ' ? '' : r.y);
+            tbl.innerHTML = '<thead><tr><th>Năm</th><th class="r">Số vụ</th><th class="r">Phá hoại</th><th class="r">Khai thác</th><th class="r">Xây dựng / đào múc</th><th class="r">Cây gỗ lớn</th><th class="r">m³</th></tr></thead><tbody>' +
+                rows.map(r => '<tr class="' + (String(r.y) === String(dashYear) ? 'sel' : '') + '" onclick="setDashYear(\'' + yv(r) + '\')"><td><b>' + r.y + '</b>' + (+r.y >= 2026 ? ' <span class="dtag cur">hiện hành</span>' : (+r.y ? ' <span class="dtag">lưu trữ</span>' : '')) + '</td><td class="r"><b>' + f0(r.vu) + '</b></td><td class="r">' + f0(r.pha) + '</td><td class="r">' + f0(r.kt) + '</td><td class="r">' + f0(r.xd) + '</td><td class="r">' + f0(r.cay) + '</td><td class="r">' + f2(r.m3) + '</td></tr>').join('') +
+                '</tbody><tfoot><tr><td><b>Cộng</b></td><td class="r"><b>' + f0(tot.vu) + '</b></td><td class="r"><b>' + f0(tot.pha) + '</b></td><td class="r"><b>' + f0(tot.kt) + '</b></td><td class="r"><b>' + f0(tot.xd) + '</b></td><td class="r"><b>' + f0(tot.cay) + '</b></td><td class="r"><b>' + f2(tot.m3) + '</b></td></tr></tfoot>';
+            if (typeof Chart !== 'undefined') {
+                if (chartDashYear) chartDashYear.destroy();
+                const ctx = document.getElementById('chartDashYear');
+                if (ctx) {
+                    chartDashYear = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: rows.map(r => r.y), datasets: [{ label: 'Số vụ', data: rows.map(r => r.vu), borderRadius: 6, backgroundColor: rows.map(r => String(r.y) === String(dashYear) ? '#0b6b4f' : (+r.y >= 2026 ? '#3d9a7b' : '#b7c4cc')) }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.y + ' vụ' } } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#eef1f3' } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els && els.length) { const r = rows[els[0].index]; setDashYear(String(r.y) === String(dashYear) ? '' : yv(r)); } } }
+                    });
+                }
+            }
+        }
+
         function renderDashboard() {
-            const cases = detailedCases;
+            const cases = dashboardCases();
+            const live = cases.filter(c => !c.luuTru);
             const kpi = document.getElementById("dashKpiRow");
             const alertsEl = document.getElementById("dashAlertsList");
             if (!kpi) return;
@@ -1416,8 +1556,8 @@ let detailedCases = [
                 totalCay += m.cayGoLon || 0;
                 totalM3 += m.khoiLuongM3 || 0;
             });
-            const need = getActionNeededCases(cases);
-            const moi3 = cases.filter(c => {
+            const need = getActionNeededCases(live);
+            const moi3 = live.filter(c => {
                 const a = getAlertForCase(c);
                 return a && a.level === "danger";
             }).length;
@@ -1540,6 +1680,8 @@ let detailedCases = [
                 }
             }
             renderDashboardMonthTrend(cases);
+            updateDashScopeUI(cases);
+            renderDashYearCard();
         }
 
         // Chuẩn hóa ngày từ Google Sheets / dữ liệu dán: dd/MM/yyyy, dd-MM-yyyy, dd.MM.yyyy,
@@ -1578,7 +1720,7 @@ let detailedCases = [
         }
 
         function printDashboardReport() {
-            const cases = detailedCases;
+            const cases = dashboardCases();
             const need = getActionNeededCases(cases);
             let totalCay = 0, totalM3 = 0;
             cases.forEach(c => {
@@ -2555,6 +2697,7 @@ ${parts.join('\n')}
             try{
               (typeof bqlrphFetchSheetSources==='function'?bqlrphFetchSheetSources():Promise.resolve({})).then(function(all){
                 var sh=all&&all.qlbvr;
+                try{ applyArchiveCfg(all); }catch(e){}
                 if(sh&&typeof bqlrphOkId==='function'&&bqlrphOkId(sh.sid)){
                   var url='https://docs.google.com/spreadsheets/d/'+sh.sid+'/edit';
                   if(sh.gid) url+='?gid='+sh.gid+'#gid='+sh.gid;
@@ -2592,23 +2735,39 @@ ${parts.join('\n')}
             return { spreadsheetId: idMatch[1], gid };
         }
 
-        let archiveCases = [], archiveLoaded = false;
-        const ARCHIVE_GID = '563303191';
+        
         function statsSourceCases() { return archiveCases.length ? archiveCases.concat(detailedCases) : detailedCases; }
-        async function fetchArchiveSheet(spreadsheetId, silent) {
+        function applyArchiveCfg(all){
+            try {
+                const a = all && all.qlbvr_luutru;
+                if (a && typeof bqlrphOkId === 'function' && bqlrphOkId(a.sid)) {
+                    const g = (a.gid != null && String(a.gid).trim() !== '') ? a.gid : ARCHIVE_GID;
+                    const url = 'https://docs.google.com/spreadsheets/d/' + String(a.sid).trim() + '/edit?gid=' + g + '#gid=' + g;
+                    const el = document.getElementById('sheetArchiveUrl'); if (el) el.value = url;
+                }
+            } catch (e) {}
+        }
+        async function fetchArchiveSheet(mainSid, silent) {
+            let sid = mainSid, gid = ARCHIVE_GID;
+            try {
+                const el = document.getElementById('sheetArchiveUrl');
+                const v = (el && el.value || '').trim();
+                if (v) { const p = parseGoogleSheetParams(v); sid = p.spreadsheetId; gid = p.gid; }
+            } catch (e) {}
             try {
                 let table = null;
-                try { table = await executeJSONPQuery(spreadsheetId, ARCHIVE_GID); } catch (e) {}
-                if (!table || !table.rows || !table.rows.length) {
+                try { table = await executeJSONPQuery(sid, gid); } catch (e) {}
+                if ((!table || !table.rows || !table.rows.length) && sid === mainSid) {
                     for (const nm of ['VI PHAM 2019-2025', 'VI PHAM 2019 - 2025']) {
-                        try { table = await executeJSONPQuery(spreadsheetId, null, nm); if (table && table.rows && table.rows.length) break; } catch (e) {}
+                        try { table = await executeJSONPQuery(sid, null, nm); if (table && table.rows && table.rows.length) break; } catch (e) {}
                     }
                 }
-                if (!table || !table.rows || !table.rows.length) throw new Error('Không đọc được sheet 2019–2025');
+                if (!table || !table.rows || !table.rows.length) throw new Error('Không đọc được sheet 2019–2025 (kiểm tra quyền chia sẻ)');
                 archiveCases = parseGVizDataToRows(table, { archive: true });
                 archiveLoaded = true;
                 if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
                 if (typeof updateSyncBadge === 'function') updateSyncBadge();
+                if (typeof renderDashboard === 'function') renderDashboard();
                 if (!silent) showToast('Đã tích hợp ' + archiveCases.length + ' hồ sơ lưu trữ 2019–2025');
             } catch (err) {
                 console.warn('[Lưu trữ 2019–2025]', err.message);
@@ -3923,7 +4082,7 @@ function getFilteredCases() {
 
             // Nhãn thời gian linh hoạt theo bộ lọc
             const timeMode = document.getElementById('statsTimeMode')?.value || 'all';
-            let periodLabel = 'Từ ngày 01/01/2026 đến nay';
+            let periodLabel = 'Toàn bộ thời gian';
             if (timeMode === 'month') {
                 const ym = document.getElementById('statsMonth')?.value;
                 if (ym) {
@@ -3951,7 +4110,7 @@ function getFilteredCases() {
                 if (from || to) periodLabel = `Từ ngày ${fmt(from)} đến ${fmt(to)}`;
                 else periodLabel = 'Khoảng thời gian tùy chỉnh (chưa chọn ngày)';
             } else {
-                periodLabel = 'Toàn bộ thời gian (từ 01/01/2026 đến nay)';
+                periodLabel = 'Toàn bộ thời gian (từ ' + earliestDateLabel(cases) + ' đến nay)';
             }
 
             kpi.innerHTML = `
@@ -5671,6 +5830,7 @@ ${detailBlocks.details}
                             var el = document.getElementById('sheetCsvUrl');
                             if(el) el.value = url;
                         }
+                        try{ applyArchiveCfg(all); }catch(e){}
                         startApp();
                     }).catch(function(){ startApp(); });
                 } else {
