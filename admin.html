@@ -279,7 +279,7 @@ function mergeSheetSources(remote){
   });
   return base;
 }
-function getSheetSources(){ var cfg=mergeSheetSources(null); cfg.pcccr={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'1792946874',label:'Tiến độ thi công PCCCR'}; return cfg; }
+function getSheetSources(){ return mergeSheetSources(null); }
 function fetchSheetSourcesCloud(){
   if(typeof useCloud==='function' && useCloud() && typeof apiCall==='function'){
     return apiCall({action:'getsheets'}).then(function(res){
