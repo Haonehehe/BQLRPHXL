@@ -477,12 +477,12 @@ function normalizePerms(p){
     x = String(x||'').trim().toLowerCase();
     if(valid.indexOf(x)>=0 && out.indexOf(x)<0) out.push(x);
   });
-  if(out.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf')<0) out.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  if(out.indexOf('pdf')<0) out.push('pdf');
   return out;
 }
 function looksLikePermList(v){
   var s = String(v==null?'':v).toLowerCase();
-  return /\b(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf)\b/.test(s);
+  return /\b(qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf)\b/.test(s);
 }
 function extractPermsFromUser(u){
   u = u || {};
