@@ -445,6 +445,18 @@ html.dark .qlbvr-sep{background:#334155!important}
         }
     </style>
 
+<style id="qlbvr-clean-css">
+.qmenu{position:relative}.qmenu>summary{list-style:none;cursor:pointer}.qmenu>summary::-webkit-details-marker{display:none}
+.qmenu-pop{position:absolute;right:0;top:calc(100% + 6px);min-width:190px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.15);padding:6px;z-index:50;display:flex;flex-direction:column;gap:2px}
+.qmenu-left{display:flex;align-items:stretch}.qmenu-left .qmenu-pop{left:0;right:auto;top:100%}
+.qmenu-pop>button,.qmenu-pop>a{display:flex!important;align-items:center;gap:8px;width:100%;padding:8px 12px!important;border:0!important;border-radius:8px;background:transparent!important;font-size:12px;font-weight:500;color:#334155;text-decoration:none;cursor:pointer;text-align:left;white-space:nowrap}
+.qmenu-pop>button:hover,.qmenu-pop>a:hover{background:#f1f5f9!important}
+.qmenu-pop>button.font-bold{background:#ecfdf5!important;color:#047857!important}
+html.dark .qmenu-pop{background:#1e293b;border-color:#334155}
+html.dark .qmenu-pop>button,html.dark .qmenu-pop>a{color:#e2e8f0}
+html.dark .qmenu-pop>button:hover,html.dark .qmenu-pop>a:hover{background:#334155!important}
+#chartsSection{display:none!important}
+</style>
 <style id="upgrade-v3-css">
 .upgrade-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 4px 14px rgba(15,23,42,.05)}
 .upgrade-click{cursor:pointer;transition:transform .15s,box-shadow .15s}.upgrade-click:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(15,23,42,.08)}
@@ -454,6 +466,99 @@ html.dark .qlbvr-sep{background:#334155!important}
 </style>
 <link rel="icon" type="image/png" href="favicon-bqlrph.png">
 <meta name="theme-color" content="#047857">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="qlbvr-modern-css">
+/* ===== QLBVR v2 — trung tính, một màu nhấn xanh lục đậm, thang chữ và khoảng cách nhất quán ===== */
+:root{--ink:#1b2a33;--muted:#62707a;--line:#e3e7ea;--paper:#f6f7f8;--accent:#0b6b4f;--accent2:#08543e;--accent-soft:#e8f3ee;--danger:#b42318;--warn:#b54708;--info:#175cd3;--r:12px}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Be Vietnam Pro','Inter',system-ui,sans-serif!important;font-size:14px;line-height:1.5;font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased}
+html:not(.dark) body{background:var(--paper)!important;color:var(--ink)}
+.custom-scrollbar::-webkit-scrollbar-thumb{background:#c3ccd2}
+:focus-visible{outline:2px solid var(--accent)!important;outline-offset:2px}
+
+/* Thanh đầu trang: trắng, một đường kẻ, một nút chính */
+html:not(.dark) header.qlbvr-topbar{background:#fff!important;border-bottom:1px solid var(--line)!important;box-shadow:none!important;backdrop-filter:none!important}
+html:not(.dark) header.qlbvr-topbar h1{color:var(--ink)!important}
+html:not(.dark) header.qlbvr-topbar p{color:var(--muted)!important}
+header.qlbvr-topbar h1{font-size:15px!important;font-weight:600!important;letter-spacing:-.005em}
+header.qlbvr-topbar p{font-size:12px!important}
+.qlbvr-logo{width:34px!important;height:34px!important;border-radius:8px!important;box-shadow:none!important;background:var(--accent)!important;font-size:15px!important}
+.qlbvr-btn{height:32px!important;padding:0 12px!important;border-radius:8px!important;box-shadow:none!important;font-size:12.5px!important;font-weight:500!important;letter-spacing:0}
+html:not(.dark) .qlbvr-btn-ghost,html:not(.dark) .qlbvr-btn-slate,html:not(.dark) .qlbvr-btn-green{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+html:not(.dark) .qlbvr-btn-ghost:hover,html:not(.dark) .qlbvr-btn-slate:hover,html:not(.dark) .qlbvr-btn-green:hover{background:#f3f5f6!important;border-color:#d2d9dd!important}
+html:not(.dark) .qlbvr-btn-sky{background:var(--accent)!important;color:#fff!important;border:1px solid var(--accent)!important}
+html:not(.dark) .qlbvr-btn-sky:hover{background:var(--accent2)!important}
+.qlbvr-btn:hover{filter:none!important;transform:none!important}
+.qmenu-pop{border-radius:10px;border-color:var(--line);box-shadow:0 8px 24px rgba(27,42,51,.12)}
+.qmenu-pop>button,.qmenu-pop>a{font-size:13px;font-weight:500}
+.qmenu-pop>button:hover,.qmenu-pop>a:hover{background:#f3f5f6!important}
+
+/* Bố cục & khoảng cách */
+main{max-width:1280px!important;padding:24px 24px 40px!important}
+main.space-y-5>*+*{margin-top:20px!important}
+main .space-y-4>*+*{margin-top:16px!important}
+html:not(.dark) main .bg-white,html:not(.dark) .upgrade-card{background:#fff!important}
+main .rounded-xl,.upgrade-card{border-radius:var(--r)!important}
+main .shadow-card,.upgrade-card,.kpi{box-shadow:none!important}
+.card:hover,.kpi:hover,.stat-card:hover,.upgrade-click:hover{transform:none!important;box-shadow:none!important}
+html:not(.dark) main [class*="border-slate-200"],html:not(.dark) main [class*="border-rose-200"],html:not(.dark) main [class*="border-indigo-200"]{border-color:var(--line)!important}
+html:not(.dark) main .border-slate-100{border-color:#eef1f3!important}
+html:not(.dark) main [class*="bg-slate-50"]{background:#fafbfb!important}
+main .p-4{padding:16px 20px!important}
+
+/* Thang chữ */
+main h2{font-size:16px!important;font-weight:600!important;letter-spacing:-.01em;color:var(--ink)}
+main h3,main h3.text-xs{font-size:14px!important;font-weight:600!important;color:var(--ink)!important}
+main .text-slate-500,main .text-slate-400{color:var(--muted)!important}
+main .text-\[10px\]{font-size:12px!important}
+main .text-\[11px\]{font-size:12.5px!important}
+main .text-\[12px\]{font-size:13px!important}
+main .text-xs{font-size:13px!important}
+main .uppercase{text-transform:none!important;letter-spacing:0!important}
+
+/* Tab */
+html:not(.dark) .flex.border-b.bg-slate-50\/50{background:#fff!important;border-bottom:1px solid var(--line)!important;padding:0 8px}
+.flex.border-b.bg-slate-50\/50>button,.flex.border-b.bg-slate-50\/50>.qmenu>summary{padding:14px 16px!important;border-radius:0!important;font-size:13.5px!important;font-weight:500!important;color:var(--muted)}
+.flex.border-b.bg-slate-50\/50>button:hover,.flex.border-b.bg-slate-50\/50>.qmenu>summary:hover{color:var(--ink)!important}
+.flex.border-b.bg-slate-50\/50>button.font-bold{background:transparent!important;color:var(--accent)!important;font-weight:600!important;border-bottom:2px solid var(--accent)!important}
+
+/* Dải KPI: một khối phẳng, số là trọng tâm, không vạch nhiều màu */
+#dashKpiRow{gap:0!important;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+#dashKpiRow>div{border:0!important;border-right:1px solid var(--line)!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;padding:18px 20px!important}
+#dashKpiRow>div:last-child{border-right:0!important}
+#dashKpiRow p:first-child{font-size:12.5px!important;font-weight:500!important;color:var(--muted)!important}
+#dashKpiRow .text-2xl{font-size:28px!important;line-height:1.15;font-weight:600!important;margin-top:6px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+#dashKpiRow .text-slate-400{font-size:12px!important}
+#statsKpiCards>div,#detailGroupKpiRow>div,#actionSummaryCards>div,#dataQualityCards>div{border-radius:var(--r)!important;box-shadow:none!important}
+
+/* Nút trong trang: một màu chính, phụ trung tính */
+main button.bg-indigo-600,main button.bg-sheets-800,main button.bg-slate-800{background:var(--accent)!important;font-weight:500!important}
+main button.bg-indigo-600:hover,main button.bg-sheets-800:hover,main button.bg-slate-800:hover{background:var(--accent2)!important}
+main button.rounded-lg,main a.rounded-lg{border-radius:8px!important}
+
+/* Bảng */
+main table thead th{background:#f6f8f9!important;color:var(--muted)!important;font-size:12.5px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;border-bottom:1px solid var(--line)!important;padding:11px 14px!important}
+main table td{font-size:13px;padding:11px 14px!important;vertical-align:top}
+main table tbody tr+tr td{border-color:#eef1f3!important}
+html:not(.dark) main table tbody tr:hover{background:#f8faf9!important}
+
+/* Form */
+main input,main select,main textarea{border-color:#d5dce0!important;border-radius:8px!important;background:#fff;font-family:inherit;font-size:13px}
+main input:focus,main select:focus,main textarea:focus{border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(11,107,79,.14)!important}
+
+/* Hộp thoại */
+#rowModal>div,#syncModal>div,#caseDetailModal>div,.mbox{border-radius:14px!important}
+#rowModal,#syncModal,#caseDetailModal{backdrop-filter:blur(3px)}
+.toast{border-radius:10px!important}
+
+@media(max-width:640px){
+  main{padding:14px 12px 32px!important}
+  #dashKpiRow>div{padding:12px 14px!important;border-bottom:1px solid var(--line)!important}
+  #dashKpiRow .text-2xl{font-size:22px!important}
+  .flex.border-b.bg-slate-50\/50>button,.flex.border-b.bg-slate-50\/50>.qmenu>summary{padding:11px 12px!important}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 text-slate-800 font-sans antialiased min-h-screen flex flex-col" data-bqlrph-module="qlbvr">
 
@@ -470,37 +575,21 @@ html.dark .qlbvr-sep{background:#334155!important}
                         <p class="text-[10px] sm:text-[11px] text-slate-500 truncate mt-0.5">BQLRPH Xuân Lộc · Đồng bộ Google Sheets</p>
                     </div>
                 </div>
-                <div class="qlbvr-actions flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
-                    <button onclick="toggleDarkMode()" id="btnDarkMode" class="qlbvr-btn qlbvr-btn-ghost" title="Sáng / Tối">
-                        <i class="fa-solid fa-moon" id="darkModeIcon"></i>
-                    </button>
-                    <a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener"
-                       class="qlbvr-btn qlbvr-btn-ghost" title="Thư mục hồ sơ Drive">
-                        <i class="fa-solid fa-folder-tree text-amber-500"></i>
-                        <span class="hidden md:inline">Hồ sơ</span>
-                    </a>
-                    <button onclick="reloadData()" id="btnReload" class="qlbvr-btn qlbvr-btn-sky" title="Tải lại dữ liệu">
-                        <i class="fa-solid fa-arrows-rotate" id="reloadIcon"></i>
-                        <span class="hidden sm:inline">Làm mới</span>
-                    </button>
-                    <button onclick="openSyncModal()" class="qlbvr-btn qlbvr-btn-slate" title="Đồng bộ nguồn Sheet">
-                        <i class="fa-solid fa-cloud-arrow-down" id="syncIcon"></i>
-                        <span class="hidden lg:inline">Đồng bộ</span>
-                    </button>
-                    <button onclick="copyForGoogleSheets()" class="qlbvr-btn qlbvr-btn-green">
-                        <i class="fa-regular fa-copy"></i>
-                        <span class="hidden sm:inline">Chép Sheets</span>
-                    </button>
-                    <div class="qlbvr-sep hidden sm:block"></div>
-                    <a href="menu.html" class="qlbvr-btn qlbvr-btn-ghost" title="Menu chính">
-                        <i class="fa-solid fa-house text-[11px]"></i>
-                        <span class="hidden sm:inline">Menu</span>
-                    </a>
-                    <a href="quanly-datdai-lamba.html" class="qlbvr-btn qlbvr-btn-emerald" title="Lâm bạ">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                        <span class="hidden sm:inline">Lâm bạ</span>
-                    </a>
-                </div>
+<div class="qlbvr-actions flex items-center gap-1.5 sm:gap-2 justify-end">
+<button onclick="reloadData()" id="btnReload" class="qlbvr-btn qlbvr-btn-sky" title="Tải lại dữ liệu"><i class="fa-solid fa-arrows-rotate" id="reloadIcon"></i><span class="hidden sm:inline">Làm mới</span></button>
+<button onclick="openSyncModal()" class="qlbvr-btn qlbvr-btn-slate" title="Đồng bộ nguồn Sheet"><i class="fa-solid fa-cloud-arrow-down" id="syncIcon"></i><span class="hidden lg:inline">Đồng bộ</span></button>
+<details class="qmenu"><summary class="qlbvr-btn qlbvr-btn-green"><i class="fa-solid fa-file-export"></i><span class="hidden sm:inline">Xuất</span><i class="fa-solid fa-chevron-down text-[9px]"></i></summary><div class="qmenu-pop">
+<button onclick="copyForGoogleSheets()"><i class="fa-regular fa-copy"></i> Chép Sheets</button>
+<button onclick="exportToExcel()"><i class="fa-solid fa-file-excel text-emerald-500"></i> Excel</button>
+<button onclick="exportToCSV()"><i class="fa-solid fa-file-csv text-blue-500"></i> CSV</button>
+</div></details>
+<details class="qmenu"><summary class="qlbvr-btn qlbvr-btn-ghost" title="Thêm"><i class="fa-solid fa-ellipsis"></i></summary><div class="qmenu-pop">
+<button onclick="toggleDarkMode()" id="btnDarkMode"><i class="fa-solid fa-moon" id="darkModeIcon"></i> Sáng / Tối</button>
+<a href="https://drive.google.com/drive/folders/1_eCfCK5bLDPf23LT3rJ52ToSuhtf0vzQ" target="_blank" rel="noopener"><i class="fa-solid fa-folder-tree text-amber-500"></i> Hồ sơ Drive</a>
+<a href="quanly-datdai-lamba.html"><i class="fa-solid fa-map-location-dot text-emerald-600"></i> Lâm bạ</a>
+<a href="menu.html"><i class="fa-solid fa-house"></i> Menu chính</a>
+</div></details>
+</div>
             </div>
         </div>
     </header>
@@ -508,55 +597,37 @@ html.dark .qlbvr-sep{background:#334155!important}
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5">
 
         <!-- Control Panel -->
-        <div class="bg-white rounded-xl border border-slate-200/80 shadow-card overflow-hidden">
-            <div class="p-4 sm:p-5 border-b border-slate-100">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-sm font-semibold text-slate-800">Bảng tổng hợp theo dõi, thống kê và kết quả xử lý vi phạm Hợp đồng Khoán</h2>
-                        <p class="text-[11px] text-slate-500 mt-0.5">Dữ liệu chỉ đọc từ Google Sheets · phục vụ theo dõi, thống kê và lập báo cáo</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="copyForGoogleSheets()" class="px-3 py-1.5 bg-sheets-800 hover:bg-sheets-900 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
-                            <i class="fa-solid fa-copy mr-1.5"></i> Chép Sheets
-                        </button>
-                        <button onclick="exportToExcel()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
-                            <i class="fa-solid fa-file-excel mr-1.5 text-emerald-400"></i> Excel
-                        </button>
-                        <button onclick="exportToCSV()" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-sm transition flex items-center">
-                            <i class="fa-solid fa-file-csv mr-1.5 text-blue-500"></i> CSV
-                        </button>
-                        
-                    </div>
-                </div>
-            </div>
+        <div class="bg-white rounded-xl border border-slate-200/80 shadow-card">
 
             <!-- View Tabs -->
-            <div class="flex border-b border-slate-200 bg-slate-50/50 text-xs font-medium overflow-x-auto">
+            <div class="flex border-b border-slate-200 bg-slate-50/50 text-xs font-medium">
                 <button id="viewDashBtn" onclick="switchMainView('dashboard')" class="py-2.5 px-4 text-emerald-800 border-b-2 border-emerald-600 font-bold bg-white transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-gauge-high text-[11px]"></i>
                     <span>Tổng quan</span>
-                </button>
-                <button id="viewSummaryBtn" onclick="switchMainView('summary')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-layer-group text-[11px]"></i>
-                    <span>5 Nhóm xử lý</span>
                 </button>
                 <button id="viewDetailBtn" onclick="switchMainView('detail')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-table-list text-[11px]"></i>
                     <span>Chi tiết hồ sơ</span>
                 </button>
-                <button id="viewStatsBtn" onclick="switchMainView('stats')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-chart-line text-[11px]"></i>
-                    <span>Thống kê & Báo cáo</span>
-                </button>
                 <button id="viewActionBtn" onclick="switchMainView('action')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-triangle-exclamation text-[11px]"></i><span>Cần xử lý</span>
-                </button>
-                <button id="viewCheckBtn" onclick="switchMainView('check')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-shield-check text-[11px]"></i><span>Kiểm tra dữ liệu</span>
                 </button>
                 <button id="viewThuHoiBtn" onclick="switchMainView('thuhoi')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-file-contract text-[11px]"></i><span>Thu hồi HĐ</span>
                 </button>
+<details class="qmenu qmenu-left"><summary class="py-2.5 px-4 text-slate-600 hover:text-slate-900 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">Thêm <i class="fa-solid fa-chevron-down text-[9px]"></i></summary><div class="qmenu-pop">
+                <button id="viewSummaryBtn" onclick="switchMainView('summary')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-layer-group text-[11px]"></i>
+                    <span>5 Nhóm xử lý</span>
+                </button>
+                <button id="viewStatsBtn" onclick="switchMainView('stats')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-chart-line text-[11px]"></i>
+                    <span>Thống kê & Báo cáo</span>
+                </button>
+                <button id="viewCheckBtn" onclick="switchMainView('check')" class="py-2.5 px-4 text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-shield-check text-[11px]"></i><span>Kiểm tra dữ liệu</span>
+                </button>
+</div></details>
             </div>
         </div>
 
@@ -570,9 +641,6 @@ html.dark .qlbvr-sep{background:#334155!important}
                 <div class="flex gap-2">
                     <button onclick="printDashboardReport()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1.5">
                         <i class="fa-solid fa-print"></i> In / PDF báo cáo
-                    </button>
-                    <button onclick="switchMainView('stats')" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg">
-                        Chi tiết thống kê →
                     </button>
                     <button onclick="openQuickSearch()" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium rounded-lg flex items-center gap-1.5">
                         <i class="fa-solid fa-magnifying-glass"></i> Tra cứu nhanh
@@ -700,9 +768,13 @@ html.dark .qlbvr-sep{background:#334155!important}
                         </div>
                     </div>
                     <div class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-2 pt-1 border-t border-slate-100">
+                        <select id="statsFilterNhom" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả nhóm xử lý</option></select>
+                        <select id="statsFilterTieuKhu" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả tiểu khu</option></select>
+                        <select id="statsFilterXa" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả xã</option></select>
+                        <button onclick="clearStatsFilters()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs text-slate-600 bg-slate-50 hover:bg-slate-100"><i class="fa-solid fa-rotate-left mr-1"></i>Đặt lại bộ lọc</button>
+<details class="col-span-full"><summary class="text-xs text-slate-500 cursor-pointer py-1">Lọc nâng cao (hành vi, đối tượng, cơ quan, kết quả PL, phân trường)</summary><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-2">
                         <select id="statsFilterCoQuan" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả cơ quan thụ lý</option></select>
                         <select id="statsFilterKetQuaPL" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả KQ xử lý PL</option></select>
-                        <select id="statsFilterNhom" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả nhóm xử lý</option></select>
                         <select id="statsFilterHanhVi" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả hành vi</option></select>
                         <select id="statsFilterDoiTuong" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white" title="Đối tượng thực hiện hành vi">
                             <option value="">Tất cả đối tượng thực hiện</option>
@@ -710,10 +782,8 @@ html.dark .qlbvr-sep{background:#334155!important}
                             <option value="other">Người khác thực hiện (trên đất hộ nhận khoán)</option>
                             <option value="unknown">Không xác định đối tượng</option>
                         </select>
-                        <select id="statsFilterTieuKhu" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả tiểu khu</option></select>
                         <select id="statsFilterPhanTruong" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả phân trường</option></select>
-                        <select id="statsFilterXa" onchange="renderStats()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white"><option value="">Tất cả xã</option></select>
-                        <button onclick="clearStatsFilters()" class="px-2 py-2 border border-slate-200 rounded-lg text-xs text-slate-600 bg-slate-50 hover:bg-slate-100"><i class="fa-solid fa-rotate-left mr-1"></i>Đặt lại bộ lọc</button>
+</div></details>
                     </div>
                     <div class="ml-auto flex flex-wrap items-center gap-2">
                     <button type="button" onclick="exportStatsReport()" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:none;cursor:pointer;font:600 12px Inter,system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,#6366f1,#4338ca);box-shadow:0 4px 14px rgba(99,102,241,.35)">
@@ -722,6 +792,7 @@ html.dark .qlbvr-sep{background:#334155!important}
                     <button type="button" onclick="exportStatsExcel()" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:none;cursor:pointer;font:600 12px Inter,system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,#10b981,#047857);box-shadow:0 4px 14px rgba(16,185,129,.35)">
                         <i class="fa-solid fa-file-excel"></i> Excel
                     </button>
+<details class="qmenu"><summary class="qlbvr-btn qlbvr-btn-ghost">Xuất khác <i class="fa-solid fa-chevron-down text-[9px]"></i></summary><div class="qmenu-pop">
                     <button type="button" onclick="exportBaoCaoGiaiDoan()" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:none;cursor:pointer;font:600 12px Inter,system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,#8b5cf6,#6d28d9);box-shadow:0 4px 14px rgba(139,92,246,.35)">
                         <i class="fa-solid fa-file-lines"></i> BC giai đoạn
                     </button>
@@ -731,6 +802,7 @@ html.dark .qlbvr-sep{background:#334155!important}
                     <button type="button" onclick="printAllCaseDetails()" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:none;cursor:pointer;font:600 12px Inter,system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,#0f766e,#115e59);box-shadow:0 4px 14px rgba(15,118,110,.35)">
                         <i class="fa-solid fa-layer-group"></i> Xuất tất cả phiếu
                     </button>
+</div></details>
                     </div>
                 </div>
             </div>
@@ -1629,7 +1701,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
             const hasHDK = !!(c.soHDKhoan || c.ngayKyHDKhoan || c.dienTichHDKhoan);
             const hasHDTR = !!(c.soHDTrongRung || c.ngayKyHDTrongRung || c.dienTichHDTrongRung);
             const loaiStr = (c.species||[]).filter(s=>s.loai).map(s=>{
-                const parts=[s.loai];
+                const parts=[speciesLabel(s)];
                 if(s.soLuong) parts.push(fmt(s.soLuong)+' cây');
                 if(s.khoiLuongM3) parts.push(fmt(s.khoiLuongM3,2)+' m³');
                 if(s.dienTichHa) parts.push(fmt(s.dienTichHa,2)+' ha');
@@ -1710,6 +1782,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
                 return `<tr>
                   <td class="c">${i+1}</td>
                   <td>${esc(s.loai||'—')}</td>
+                  <td class="c">${esc(s.namTrong||'—')}</td>
                   <td class="r">${s.soLuong!=null&&s.soLuong!==''?esc(fmt(s.soLuong,0)):'—'}</td>
                   <td class="r">${s.khoiLuongM3?esc(fmt(s.khoiLuongM3,2)):'—'}</td>
                   <td class="r">${s.dienTichHa?esc(fmt(s.dienTichHa,2)):'—'}</td>
@@ -1771,7 +1844,7 @@ a{color:#0563c1;text-decoration:none} .footer{text-align:center;color:#94a3b8;fo
       <td class="r">${esc(fmt(m.dienTichM2||0,1))}</td>
     </tr></tbody>
   </table>
-  ${speciesRows ? `<table class="grid"><thead><tr><th class="c">STT</th><th>Loài / loại cây</th><th class="r">Số cây</th><th class="r">m³</th><th class="r">ha</th><th class="r">m²</th></tr></thead><tbody>${speciesRows}</tbody></table>` : ''}
+  ${speciesRows ? `<table class="grid"><thead><tr><th class="c">STT</th><th>Loài / loại cây</th><th class="c">Năm trồng</th><th class="r">Số cây</th><th class="r">m³</th><th class="r">ha</th><th class="r">m²</th></tr></thead><tbody>${speciesRows}</tbody></table>` : ''}
   <div class="sec">4. Tình trạng &amp; xử lý</div>
   <div class="block"><b>Tình trạng:</b> ${esc(c.tinhTrang || '—')}</div>
   <table class="info">
@@ -2726,7 +2799,60 @@ ${parts.join('\n')}
         // Chỉ lấy dòng có STT số; dòng phụ (cùng hộ, loài cây khác) được gộp metrics
         // AL(37)=nhóm, AM(38)=tình trạng, Y(24)=hành vi, AB(27)=m2, AC(28)=ha
         // AD(29)=loài cây, AF(31)=số lượng, AG(32)=khối lượng m3, V(21)=ngày BB
-        function parseNum(s) {
+        // ===== Địa danh vs đối tượng · Năm trồng =====
+const KNOWN_PLACES = ['xuân lộc','xuân hòa','xuân hoà','xuân thành','xuân bắc','xuân phú','xuân tâm','xuân trường','xuân thọ','xuân định','xuân hiệp','xuân đường','xuân đông','xuân tây','xuân quế','xuân mỹ','xuân hưng','xuân thạnh','suối cao','lang minh','bảo bình','bảo hòa','bảo hoà','sông ray','cẩm mỹ','long khánh','gia ray','trản táo','đồng nai'];
+let DYNAMIC_PLACES = new Set();
+function normPlace(s){
+    return String(s||'').toLowerCase().normalize('NFC')
+        .replace(/(^|\s)(xã|phường|thị trấn|tt|ấp|khu phố|huyện|thành phố|tp|tỉnh|tiểu khu|tk)\.?\s+/g,'$1')
+        .replace(/[.\s]+/g,' ').trim();
+}
+function isPlaceName(p){
+    const raw = String(p||'').trim();
+    if(!raw) return false;
+    const n = normPlace(raw);
+    return KNOWN_PLACES.includes(n) || DYNAMIC_PLACES.has(n)
+        || /^(xã|phường|thị trấn|ấp|khu phố|huyện|thành phố|tp\.?|tỉnh)\s+\S/i.test(raw)
+        || /^(tk|tiểu khu)\.?\s*\d/i.test(raw);
+}
+// Bỏ thành phần là địa danh; chỉ giữ tên người/đối tượng thật. Rỗng = chưa xác định.
+function sanitizeDoiTuong(v){
+    const s = String(v||'').replace(/\s*[\(\[]([^)\]]*)[\)\]]/g,(m,x)=> isPlaceName(x) ? '' : m);
+    return s.split(/[,;\n]+/).map(x=>x.trim()).filter(x=>x && !isPlaceName(x)).join(', ');
+}
+function parseNamTrong(){
+    const yMax = new Date().getFullYear();
+    for (const v of arguments){
+        const m = String(v||'').match(/(?:19[7-9]\d|20\d{2})/);
+        if (m && +m[0] <= yMax) return m[0];
+    }
+    return '';
+}
+function speciesLabel(s){
+    if(!s || !s.loai) return '';
+    return s.namTrong ? (s.loai + ' (trồng ' + s.namTrong + ')') : s.loai;
+}
+function postProcessCases(cases){
+    DYNAMIC_PLACES = new Set();
+    cases.forEach(c=>{
+        [c.xa, c.phanTruong].forEach(v=>{ const n=normPlace(v); if(n && n!=='—') DYNAMIC_PLACES.add(n); });
+        String(c.diaChi||'').split(/[,;]+/).forEach(v=>{ const n=normPlace(v); if(n && n.length>2) DYNAMIC_PLACES.add(n); });
+    });
+    cases.forEach(c=>{
+        const raw = c.doiTuong || '';
+        let clean = sanitizeDoiTuong(raw);
+        if(!clean) clean = sanitizeDoiTuong(c.hoHopDong || '');
+        if(raw && clean !== raw) c.doiTuongGoc = raw;
+        c.doiTuong = clean;
+        const txt = [c.nguonGocDat, c.quaTrinhCanhTac, c.tinhTrang].join(' ');
+        const mm = txt.match(/trồng[^.;\n]{0,40}?((?:19[7-9]\d|20\d{2}))/i);
+        const fb = mm ? parseNamTrong(mm[1]) : '';
+        (c.species||[]).forEach(s=>{ if(!s.namTrong && fb && s.loai) s.namTrong = fb; });
+    });
+    return cases;
+}
+
+function parseNum(s) {
             if (!s) return 0;
             const n = parseFloat(String(s).replace(/,/g, '.').replace(/[^\d.\-]/g, ''));
             return isNaN(n) ? 0 : n;
@@ -2827,7 +2953,8 @@ ${parts.join('\n')}
                 const colSoHDTrongRung = getVal(9); // J
                 const colNgayKyHDTrongRung = getVal(10); // K
                 const colDienTichHDTrongRung = getVal(11); // L
-                const colDoiTuong = getVal(40) || colHoHopDong || getVal(3);
+                const colDoiTuong = sanitizeDoiTuong(getVal(40)) || sanitizeDoiTuong(colHoHopDong) || sanitizeDoiTuong(getVal(3));
+        const colNamTrong = getVal(30); // AE - năm trồng (nếu có)
                 const colTieuKhu = getVal(14) || getVal(15);
                 const colPhanTruong = getVal(16);
                 const colXa = getVal(18);
@@ -2854,6 +2981,7 @@ ${parts.join('\n')}
                 const isNumbered = /^\d+$/.test(colSTT);
                 const speciesLine = {
                     loai: colLoai || "",
+namTrong: parseNamTrong(colNamTrong, colLoai),
                     soLuong: parseNum(colSL),
                     khoiLuongM3: parseNum(colM3),
                     dienTichHa: parseNum(colHa),
@@ -2939,6 +3067,7 @@ ${parts.join('\n')}
             // Giữ tab + bộ lọc đang dùng; chỉ cập nhật dữ liệu
             const uiState = (typeof snapshotUiState === 'function') ? snapshotUiState() : null;
             const keepMode = currentViewMode || (uiState && uiState.viewMode) || 'dashboard';
+            postProcessCases(newCases);
             detailedCases = newCases;
             if (typeof populateFilterOptions === 'function') populateFilterOptions();
             if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
@@ -3035,6 +3164,7 @@ function parsePastedTextData() {
                 if (current) newCases.push(current);
 
                 if (newCases.length === 0) { showToast("Không tìm thấy dòng có STT hợp lệ!", "error"); return; }
+                postProcessCases(newCases);
                 detailedCases = newCases;
                 renderTable();
                 renderCharts();
@@ -3822,7 +3952,7 @@ function getFilteredCases() {
                 const isXD = hv.includes("xây dựng") || hv.includes("đào") || hv.includes("múc hồ");
                 const isPH = hv.includes("phá hoại");
                 (c.species || []).forEach(s => {
-                    const k = s.loai || 'Không rõ';
+                    const k = speciesLabel(s) || 'Không rõ';
                     if (!loaiMap[k]) loaiMap[k] = { ha: 0, m2: 0, cay: 0, m3: 0 };
                     const crop = isCropSpecies(s.loai);
                     if (isXD) {
@@ -4022,7 +4152,7 @@ function getFilteredCases() {
                     const m = getReportMetrics(c);
                     const loaiStr = (c.species || []).filter(s => s.loai).map(s => {
                         const crop = isCropSpecies(s.loai);
-                        let parts = [s.loai];
+                        let parts = [speciesLabel(s)];
                         if (crop && s.dienTichHa) parts.push(fmtNum(s.dienTichHa) + ' ha');
                         else {
                             if (s.soLuong) parts.push(fmtNum(s.soLuong, 0) + ' cây');
@@ -4245,12 +4375,14 @@ function getFilteredCases() {
             var m5=cases.filter(function(c){return c.nhomId===5;}).length;
 
             var html='<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>BC QLBVR</title>'+
-                '<style>body{font-family:"Times New Roman",serif;font-size:13pt;line-height:1.45;max-width:900px;margin:24px auto;padding:12px}'+
+                '<style>@page{size:A4;margin:20mm 15mm 20mm 30mm}body{font-family:"Times New Roman",serif;font-size:13pt;line-height:1.35;max-width:900px;margin:24px auto;padding:12px}p{text-align:justify;margin:6pt 0}thead{display:table-header-group}tr{page-break-inside:avoid}th{background:#eee;text-align:center}table.vb td{border:0;text-align:center;padding:0 2pt;vertical-align:top}'+
                 'h1{font-size:14pt;text-align:center;text-transform:uppercase}table{border-collapse:collapse;width:100%}th,td{border:1px solid #000;padding:5px 6px}'+
                 '@media print{body{margin:12mm} .no-print{display:none}}</style></head><body>'+
                 '<p class="no-print"><button onclick="window.print()">In / PDF</button></p>'+
-                '<h1>Báo cáo tình hình vi phạm công tác QLBVR</h1>'+
-                '<p style="text-align:center">Ban Quản lý Rừng phòng hộ Xuân Lộc · Kỳ: <b>'+escapeHtml(periodLabel)+'</b></p>'+
+                (function(){var d=new Date();return '<table class="vb"><tr><td style="width:42%"><b>BQL RỪNG PHÒNG HỘ XUÂN LỘC</b><br><b>PHÒNG LÂM NGHIỆP</b><br>——————<br>Số:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/BC-PLN</td><td style="width:58%"><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b>Độc lập - Tự do - Hạnh phúc</b><br>——————————<br><i>Xuân Lộc, ngày '+d.getDate()+' tháng '+(d.getMonth()+1)+' năm '+d.getFullYear()+'</i></td></tr></table>';})()+
+                '<h1 style="margin:14pt 0 2pt">BÁO CÁO</h1>'+
+                '<p style="text-align:center;margin:0 0 10pt">Tình hình vi phạm công tác quản lý, bảo vệ rừng<br><i>(Kỳ báo cáo: '+escapeHtml(periodLabel)+')</i></p>'+
+                '<p>Kính gửi: Giám đốc Ban Quản lý rừng phòng hộ Xuân Lộc.</p>'+
                 '<p><b>2.9. Tình hình vi phạm pháp luật trên lâm phận quản lý:</b> '+summary+'</p>'+
                 agencyTable('Bảng chi tiết xử lý vi phạm của Hạt Kiểm lâm khu vực 2', function(a){ return /Hạt Kiểm lâm/i.test(a); })+
                 agencyTable('Bảng chi tiết xử lý vi phạm của UBND các xã, phường', function(a){ return /UBND/i.test(a); })+
@@ -4473,6 +4605,7 @@ function getFilteredCases() {
                     + td(esc(c.hoTen||''))
                     + td(esc(c.doiTuong||'')+akLab)
                     + td(esc(c.hanhVi||''))
+                    + td(esc((c.species||[]).map(speciesLabel).filter(Boolean).join('; ')||'—'),'font-size:10pt')
                     + td(esc(c.phanTruong||''))
                     + td(fmt(m.cayGoLon||0,0),'text-align:right')
                     + td(fmt(m.khoiLuongM3||0),'text-align:right')
@@ -4480,6 +4613,22 @@ function getFilteredCases() {
                     + td(esc(c.ngayViPham||''),'text-align:center')
                     + '</tr>';
             });
+
+            const nhomCnt = (id) => cases.filter(c => c.nhomId === id).length;
+            const nhomTen = (id) => (typeof NHOM_MAP !== 'undefined' && NHOM_MAP[id] && NHOM_MAP[id].ten) || ('Nhóm ' + id);
+            const unkCnt = cases.filter(c => !String(c.doiTuong||'').trim()).length;
+            const ptMap = {};
+            cases.forEach(c => { const k = c.phanTruong && c.phanTruong !== '—' ? c.phanTruong : ''; if (k) ptMap[k] = (ptMap[k]||0) + 1; });
+            const topPT = Object.entries(ptMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+            const recs = [];
+            if (nhomCnt(1)) recs.push('Tiếp tục mời làm việc, đôn đốc <b>' + nhomCnt(1) + '</b> hồ sơ thuộc nhóm “' + esc(nhomTen(1)) + '”; hồ sơ quá hạn không đến làm việc thì lập biên bản và chuyển sang bước niêm yết thông báo xác định trách nhiệm.');
+            if (nhomCnt(2)) recs.push('Theo dõi việc khắc phục hậu quả của <b>' + nhomCnt(2) + '</b> hộ đã chấp hành làm việc; kiểm tra thực tế, lập biên bản xác nhận khi hộ hoàn thành.');
+            if (nhomCnt(3)) recs.push('Hoàn tất thủ tục đối với <b>' + nhomCnt(3) + '</b> hồ sơ đã niêm yết thông báo xác định trách nhiệm; hết thời hạn niêm yết mà hộ không chấp hành thì tham mưu chấm dứt hợp đồng khoán.');
+            if (nhomCnt(4)) recs.push('Phối hợp chính quyền địa phương thu hồi diện tích, bàn giao hiện trạng đối với <b>' + nhomCnt(4) + '</b> hồ sơ đã có quyết định chấm dứt, thu hồi hợp đồng.');
+            if (unkCnt) recs.push('Rà soát, xác minh danh tính đối tượng thực hiện hành vi đối với <b>' + unkCnt + '</b> hồ sơ chưa xác định được đối tượng; phối hợp Kiểm lâm và chính quyền địa phương để làm rõ.');
+            if (topPT.length) recs.push('Tăng cường tuần tra, kiểm soát tại các phân trường có nhiều vi phạm: ' + topPT.map(x => esc(x[0]) + ' (' + x[1] + ' hồ sơ)').join('; ') + '.');
+            if (!recs.length) recs.push('Tiếp tục theo dõi, tuần tra, kiểm tra để phát hiện và xử lý kịp thời các vi phạm phát sinh.');
+            const recsHtml = recs.map((r,i) => '<p>' + (i+1) + '. ' + r + '</p>').join('\n');
 
             const narrativeHtml = (detailBlocks.narrative||'')
                 .replace(/<br\s*\/?>/gi,'</p><p style="text-align:justify">');
@@ -4493,7 +4642,10 @@ function getFilteredCases() {
 <style>
   @page { size: A4; margin: 2cm 1.5cm 2cm 3cm; }
   body { font-family: "Times New Roman", Times, serif; font-size: 13pt; color: #000; line-height: 1.3; }
-  p { margin: 6pt 0; text-align: justify; }
+  p { margin: 6pt 0; text-align: justify; text-indent: 0; line-height: 1.35; }
+  tr { page-break-inside: avoid; }
+  td, th { vertical-align: top; word-wrap: break-word; }
+  th { text-align: center; }
   table { border-collapse: collapse; }
   .national { font-weight: bold; text-transform: uppercase; font-size: 13pt; text-align: center; line-height: 1.3; }
   .slogan { font-weight: bold; font-size: 13pt; text-align: center; }
@@ -4539,17 +4691,16 @@ ${plainActors()}
 ${plainDetails()}
 
 <p><b>IV. DANH SÁCH TỔNG HỢP HỒ SƠ TRONG KỲ LỌC</b></p>
-<table width="100%" style="border-collapse:collapse;font-size:11pt;margin-top:6pt">
-<thead><tr>
-${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${th('Hành vi')}${th('Phân trường')}${th('Cây')}${th('m³')}${th('Diện tích')}${th('Ngày')}
+<table width="100%" style="border-collapse:collapse;font-size:11pt;margin-top:6pt;table-layout:fixed">
+<colgroup><col width="4%"><col width="14%"><col width="14%"><col width="13%"><col width="15%"><col width="10%"><col width="6%"><col width="7%"><col width="9%"><col width="8%"></colgroup>
+<thead style="display:table-header-group"><tr>
+${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${th('Hành vi')}${th('Loài cây (năm trồng)')}${th('Phân trường')}${th('Cây')}${th('m³')}${th('Diện tích')}${th('Ngày')}
 </tr></thead>
 <tbody>${allRows || '<tr>'+td('Không có hồ sơ','text-align:center')+'</tr>'}</tbody>
 </table>
 
 <p><b>V. ĐỀ XUẤT, KIẾN NGHỊ</b></p>
-<p>1. Tiếp tục đôn đốc các trường hợp chưa chấp hành đến làm việc, khắc phục hậu quả theo quy định.</p>
-<p>2. Đối với các vụ đủ điều kiện, phối hợp xử lý theo thẩm quyền hoặc chuyển cơ quan chức năng thụ lý.</p>
-<p>3. Tăng cường tuần tra, phối hợp Kiểm lâm và chính quyền địa phương để ngăn chặn vi phạm mới.</p>
+${recsHtml}
 
 <p>Trên đây là báo cáo tình hình vi phạm công tác QLBVR kỳ <b>${esc(periodLabel)}</b>, kính trình Giám đốc Ban xem xét, chỉ đạo./.</p>
 
@@ -4565,7 +4716,8 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
   <td width="55%" style="border:none;text-align:center;vertical-align:top">
     <div style="font-weight:bold">KT. TRƯỞNG PHÒNG</div>
     <div style="font-weight:bold">PHÓ TRƯỞNG PHÒNG</div>
-    <div style="height:72pt"></div>
+    <div style="font-style:italic;font-size:11pt">(Ký, ghi rõ họ tên)</div>
+    <div style="height:64pt"></div>
   </td>
 </tr>
 </table>
@@ -4644,7 +4796,7 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                     'Hộ nhận khoán': c.hoTen,
                     'Đối tượng': c.doiTuong || '',
                     'Hành vi': c.hanhVi,
-                    'Loài cây (chi tiết)': (c.species || []).map(s => s.loai).filter(Boolean).join('; '),
+                    'Loài cây (chi tiết)': (c.species || []).map(s => speciesLabel(s)).filter(Boolean).join('; '),
                     'Diện tích ha': m.dienTichHa || 0,
                     'Diện tích m2': m.dienTichM2 || 0,
                     'Số lượng cây': m.cayGoLon || 0,
@@ -5009,7 +5161,7 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                 if(!arr||!arr.length) return '<p style="font-size:12px;color:#64748b;margin:4px 0 10px">Không có hồ sơ.</p>';
                 let h='<table><thead><tr>'
                   +'<th class="center">STT</th><th>Hộ nhận khoán</th><th>Đối tượng thực hiện</th><th>Hành vi</th>'
-                  +'<th>Phân trường</th><th class="right">Cây</th><th class="right">m³</th><th class="right">m²/ha</th><th class="center">Ngày</th>'
+                  +'<th>Loài cây (năm trồng)</th><th>Phân trường</th><th class="right">Cây</th><th class="right">m³</th><th class="right">m²/ha</th><th class="center">Ngày</th>'
                   +'</tr></thead><tbody>';
                 arr.forEach((r,i)=>{
                     const c=r.c, m=r.m;
@@ -5021,6 +5173,7 @@ ${th('STT')}${th('Hộ nhận khoán')}${th('Đối tượng thực hiện')}${t
                       +'<td><b>'+esc(c.hoTen||'—')+'</b></td>'
                       +'<td style="font-size:10.5px">'+esc(dt)+'</td>'
                       +'<td style="font-size:10.5px">'+esc(c.hanhVi||'—')+'</td>'
+                      +'<td style="font-size:10.5px">'+esc((c.species||[]).map(speciesLabel).filter(Boolean).join('; ')||'—')+'</td>'
                       +'<td>'+esc(c.phanTruong||'—')+'</td>'
                       +'<td class="right">'+fmt(m.cayGoLon||0,0)+'</td>'
                       +'<td class="right">'+fmt(m.khoiLuongM3||0)+'</td>'
@@ -5268,43 +5421,37 @@ let details = '<div class="card">';
 
             const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>BC QLBVR — ${esc(periodLabel)}</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap');
-*{box-sizing:border-box} body{font-family:'Be Vietnam Pro',system-ui,sans-serif;margin:0;padding:28px;color:#0f172a;background:#f8fafc}
-.header{background:linear-gradient(135deg,#064e3b,#059669);color:#fff;padding:22px 26px;border-radius:16px;margin-bottom:18px}
-.header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.02em}
-.header .sub{margin:8px 0 0;font-size:13px;line-height:1.5;opacity:.95}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.tag{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);padding:4px 10px;border-radius:999px;font-size:11px}
-.tag.muted{opacity:.9}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.kpi{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px}
-.kpi .l{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase}
-.kpi .v{font-size:22px;font-weight:800;margin-top:4px}
-.kpi .s{font-size:11px;color:#64748b;margin-top:3px;line-height:1.35}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:14px;break-inside:avoid}
-.card h2{margin:0 0 10px;font-size:13px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px}
+*{box-sizing:border-box}
+@page{size:A4;margin:12mm}
+body{font-family:'Be Vietnam Pro','Segoe UI',Arial,sans-serif;margin:0;padding:20px;color:#0f172a;background:#fff;font-size:12px;line-height:1.5}
+.header{background:linear-gradient(135deg,#064e3b,#059669);color:#fff;padding:16px 20px;border-radius:12px;margin-bottom:12px}
+.header h1{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}
+.header .sub{margin:4px 0 0;font-size:12px;opacity:.95}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:2px 9px;border-radius:999px;font-size:10.5px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kpi{border:1px solid #e2e8f0;border-radius:10px;padding:9px 12px;break-inside:avoid}
+.kpi .l{font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+.kpi .v{font-size:20px;font-weight:800;margin-top:2px}
+.kpi .s{font-size:10.5px;color:#64748b;margin-top:2px;line-height:1.35}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;align-items:start}
+.card{border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.grid2 .card{margin-bottom:0}
+.card h2{margin:0 0 8px;font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:7px;break-after:avoid}
 .card h2:before{content:'';width:6px;height:6px;border-radius:50%;background:#059669}
-table{width:100%;border-collapse:collapse;font-size:11.5px}
-th{background:#f1f5f9;text-align:left;padding:7px 8px;font-weight:700;color:#334155;border-bottom:1px solid #e2e8f0}
-td{padding:7px 8px;border-top:1px solid #f1f5f9;vertical-align:top}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:#ecfdf5;color:#065f46;text-align:left;padding:6px 8px;font-weight:700;border-bottom:1.5px solid #a7f3d0}
+td{padding:6px 8px;border-top:1px solid #eef2f7;vertical-align:top}
+tbody tr:nth-child(even) td{background:#fafcfb}
+thead{display:table-header-group}tr{break-inside:avoid}
 .right{text-align:right}.center{text-align:center}
-.bar-row{display:grid;grid-template-columns:120px 1fr 36px;gap:8px;align-items:center;margin:5px 0}
-.bar-lab{font-size:11px;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-track{height:10px;background:#f1f5f9;border-radius:999px;overflow:hidden}
-.bar-fill{height:100%;border-radius:999px}
-.bar-val{font-size:11px;font-weight:700;text-align:right;color:#0f172a}
-.notes{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 14px;font-size:11.5px;color:#78350f;line-height:1.55}
-.notes b{color:#92400e}
-.notes ul{margin:6px 0 0;padding-left:18px}
-.footer{text-align:center;font-size:11px;color:#94a3b8;margin-top:20px}
+.notes{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:11px;color:#78350f;line-height:1.5}
+.footer{text-align:center;font-size:10.5px;color:#94a3b8;margin-top:14px;padding-top:8px;border-top:1px solid #e2e8f0}
 @media print{
-  body{padding:10mm;background:#fff}
-  .header,.kpi,.bar-fill,.notes{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  body{padding:0}
+  .header,.kpi,.notes,th{print-color-adjust:exact;-webkit-print-color-adjust:exact}
   .no-print{display:none!important}
-  .card{break-inside:avoid}
 }
-@media(max-width:900px){.kpis,.grid2{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <div class="no-print" style="margin-bottom:12px"><button onclick="window.print()" style="height:36px;padding:0 14px;border:none;border-radius:10px;background:#059669;color:#fff;font-weight:700;cursor:pointer">In / Lưu PDF</button></div>
 <div class="header">
@@ -5329,27 +5476,10 @@ ${detailBlocks.matrix}
 ${detailBlocks.actors||''}
 
 <div class="grid2">
-  <div class="card"><h2>Sơ đồ theo hành vi</h2>
-    ${Object.entries(hvRows).sort((a,b)=>b[1].n-a[1].n).map(([k,v],i)=>barRow(k,v.n,maxHV,colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
-  </div>
-  <div class="card"><h2>Sơ đồ theo cơ quan thụ lý</h2>
-    ${Object.entries(cqRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,maxCQ,colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
-  </div>
-  <div class="card"><h2>Sơ đồ kết quả xử lý PL</h2>
-    ${Object.entries(kqRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,maxKQ,colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
-  </div>
-  <div class="card"><h2>Sơ đồ theo phân trường</h2>
-    ${Object.entries(ptRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,maxPT,colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
-  </div>
-</div>
-
-<div class="grid2">
   <div class="card"><h2>Theo loại rừng (PH / SX)</h2>
-    ${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(lrRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
   <table style="margin-top:8px"><thead><tr><th>Loại rừng</th><th class="right">Số vụ</th></tr></thead>
   <tbody>${Object.entries(lrRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
   <div class="card"><h2>Theo nguồn vốn (VNN / TĐT)</h2>
-    ${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>barRow(k,v,Math.max(1,...Object.values(vnnRows),1),colors[i%colors.length])).join('')||'<p style="color:#94a3b8;font-size:12px">Không có dữ liệu</p>'}
   <table style="margin-top:8px"><thead><tr><th>Nguồn vốn</th><th class="right">Số vụ</th></tr></thead>
   <tbody>${Object.entries(vnnRows).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="right">${v}</td></tr>`).join('')}</tbody></table></div>
 </div>
@@ -5371,29 +5501,7 @@ ${detailBlocks.details}
 
 
 
-<div class="card"><h2>Danh sách tổng hợp theo kỳ lọc</h2>
-<table><thead><tr>
-<th class="center">STT</th><th>Hộ</th><th>Hành vi</th><th>Phân trường</th><th>TK</th>
-<th>Cơ quan thụ lý</th><th>KQ xử lý PL</th>
-<th class="right">Cây</th><th class="right">m³</th><th class="center">Ngày</th>
-</tr></thead>
-<tbody>${cases.map((c,i)=>{
-  const m=getReportMetrics(c);
-  return `<tr>
-    <td class="center">${i+1}</td>
-    <td><b>${esc(c.hoTen)}</b></td>
-    <td>${esc(c.hanhVi||'—')}</td>
-    <td>${esc(c.phanTruong||'—')}</td>
-    <td>${esc(c.tieuKhu||'—')}</td>
-    <td style="font-size:10.5px">${esc((typeof normalizeAgency==='function'?normalizeAgency(c.coQuanThuLy):c.coQuanThuLy)||'—')}</td>
-    <td style="font-size:10.5px">${esc((typeof normalizeKetQuaPL==='function'?normalizeKetQuaPL(c.ketQuaXuLyPL):c.ketQuaXuLyPL)||'—')}</td>
-    <td class="right">${fmt(m.cayGoLon||0,0)}</td>
-    <td class="right"><b>${fmt(m.khoiLuongM3||0)}</b></td>
-    <td class="center">${esc(c.ngayViPham||'—')}</td>
-  </tr>`;
-}).join('')||'<tr><td colspan="10" class="center" style="color:#94a3b8">Không có hồ sơ</td></tr>'}</tbody></table></div>
-
-<div class="footer">Ban Quản lý Rừng phòng hộ Xuân Lộc · Báo cáo thống kê theo kỳ lọc</div>
+<div class="footer">Ban Quản lý rừng phòng hộ Xuân Lộc · Báo cáo thống kê theo kỳ lọc · In ngày ${new Date().toLocaleDateString('vi-VN')}</div>
 <script>setTimeout(function(){ try{ window.print(); }catch(e){} }, 500);<\/script>
 </body></html>`;
 
@@ -5550,5 +5658,6 @@ ${detailBlocks.details}
 try { if (window.BQLRPHLog) BQLRPHLog.page('qlbvr'); } catch (e) {}
 </script>
 
+<script>document.addEventListener('click',function(e){document.querySelectorAll('details.qmenu[open]').forEach(function(d){if(!d.contains(e.target)||e.target.closest('.qmenu-pop button,.qmenu-pop a'))d.open=false})});</script>
 </body>
 </html>
