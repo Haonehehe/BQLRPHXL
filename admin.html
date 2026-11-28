@@ -878,7 +878,7 @@ function loadThongbaoPosts(){
     return;
   }
   var c=adminCred();
-  apiCall({action:'thongbao', adminEmail:c.adminEmail, adminPass:c.adminPass}).then(function(res){
+  apiCall({action:'listthongbao', adminEmail:c.adminEmail, adminPass:c.adminPass}).then(function(res){
     if(!res||!res.ok){
       box.innerHTML='<div class="empty">'+(res&&res.error?esc(res.error):'Không tải được danh sách tin — Deploy Script bản có thongbao')+'</div>';
       return;
