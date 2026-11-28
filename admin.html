@@ -358,7 +358,7 @@ function setSession(s){if(s){var j=JSON.stringify(s);sessionStorage.setItem(SESS
 function currentUser() { return getSession(); }
 function isAdmin() { var s = getSession(); return !!(s && s.role === 'admin'); }
 function canAccess(mod) {
-  if (mod === 'qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') return true;
+  if (mod === 'pdf' || mod === 'phapluat' || mod === 'congcu' || mod === 'thongbao' || mod === 'bando' || mod === 'lamnghiep') return true;
   var s = getSession();
   if (!s) return false;
   if (s.role === 'admin') return true;
@@ -403,7 +403,7 @@ function registerUser(name, email, pass) {
   if (db.users.some(function (u) { return u.email === email; })) throw new Error('Email đã được đăng ký');
   db.users.push({
     id: 'u_' + Date.now(), email: email, name: name, pass: pass,
-    status: 'pending', role: 'user', perms: ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'],
+    status: 'pending', role: 'user', perms: ['pdf'],
     created: new Date().toISOString(), approvedAt: null
   });
   _saveDB(db);
@@ -420,7 +420,7 @@ function loginUser(email, pass) {
       var u = res.user;
       var sess = {
         email: u.email, name: u.name, role: u.role || 'user',
-        perms: u.perms || ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'], loginAt: new Date().toISOString(),
+        perms: u.perms || ['pdf'], loginAt: new Date().toISOString(),
         token: res.token || '',
         _pass: pass
       };
@@ -437,7 +437,7 @@ function loginUser(email, pass) {
   if (u.status === 'disabled') return Promise.reject(new Error('Tài khoản đã bị khóa'));
   var sess = {
     email: u.email, name: u.name, role: u.role || 'user',
-    perms: u.perms || ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'], loginAt: new Date().toISOString(), _pass: pass
+    perms: u.perms || ['pdf'], loginAt: new Date().toISOString(), _pass: pass
   };
   setSession(sess);
   return Promise.resolve(sess);
@@ -540,8 +540,8 @@ function approveUser(email, perms, asAdmin) {
   if (!u) return Promise.reject(new Error('Không tìm thấy user'));
   u.status = 'approved';
   u.approvedAt = new Date().toISOString();
-  u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'];
-  if (u.perms.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['pdf'];
+  if (u.perms.indexOf('pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   if (asAdmin) { u.role = 'admin'; u.perms = ALL_PERMS.slice(); }
   _saveDB(db);
   return Promise.resolve(true);
@@ -561,7 +561,7 @@ function rejectUser(email) {
   var u = db.users.find(function (x) { return x.email === email; });
   if (!u) return Promise.reject(new Error('Không tìm thấy user'));
   if (u.email === DEFAULT_ADMIN.email) return Promise.reject(new Error('Không thể từ chối admin gốc'));
-  u.status = 'rejected'; u.perms = ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf']; u.role = 'user';
+  u.status = 'rejected'; u.perms = ['pdf']; u.role = 'user';
   _saveDB(db);
   return Promise.resolve(true);
 }
@@ -600,7 +600,7 @@ function updatePerms(email, perms) {
   var u = db.users.find(function (x) { return x.email === email; });
   if (!u) return Promise.reject(new Error('Không tìm thấy'));
   u.perms = perms.slice();
-  if (u.perms.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  if (u.perms.indexOf('pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   _saveDB(db);
   return Promise.resolve(true);
 }
@@ -707,7 +707,7 @@ function thongbaoAdminCard(){
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tiêu đề *</label><input id="tbTitle" type="text" placeholder="Tiêu đề / trích yếu" style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Nội dung</label><textarea id="tbBody" rows="4" style="width:100%;border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:4px;font:inherit"></textarea></div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải văn bản / PDF từ máy</label><input id="tbFile" type="file" accept=".qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf,.doc,.docx,.xls,.xlsx,.zip,image/*" style="width:100%;margin-top:6px;font-size:12px"></div>';
+  h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải văn bản / PDF từ máy</label><input id="tbFile" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,image/*" style="width:100%;margin-top:6px;font-size:12px"></div>';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Tải hình ảnh từ máy</label><input id="tbImgFile" type="file" accept="image/*" style="width:100%;margin-top:6px;font-size:12px"></div></div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
   h+='<div><label style="font-size:11px;font-weight:700;color:#64748b">Hoặc dán link file (nếu đã có trên Drive)</label><input id="tbLink" type="url" placeholder="https://drive.google.com/..." style="width:100%;height:36px;border:1px solid var(--bd);border-radius:10px;padding:0 10px;margin-top:4px"></div>';
@@ -1154,9 +1154,9 @@ function userRow(u,id){
 }
 function readPerms(id){
   var box=document.getElementById('perms_'+id),out=[];
-  if(!box) return ['qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf'];
+  if(!box) return ['pdf'];
   box.querySelectorAll('input[type=checkbox]').forEach(function(inp){if(inp.checked)out.push(inp.getAttribute('data-p'));});
-  if(out.indexOf('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf')<0) out.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  if(out.indexOf('pdf')<0) out.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
   return out;
 }
 function doApprove(email,id){approveUser(email,readPerms(id),false).then(function(){toast('Đã duyệt');loadUsers();}).catch(function(e){toast(e.message||e);});}
