@@ -69,7 +69,7 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 .fire-sign{
   position:relative;isolation:isolate;overflow:hidden;
   display:grid;grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr);
-  grid-template-areas:"head head" "sub sub" "dial name" "dial desc" "dial foot" "legend legend";
+  grid-template-areas:"head head" "sub sub" "date date" "dial name" "dial desc" "dial foot" "legend legend";
   align-items:center;column-gap:clamp(12px,2.5vw,28px);
   max-width:900px;margin:14px auto 18px;padding:clamp(16px,2.6vw,28px);
   border:1px solid #b7d3c2;border-radius:22px;
@@ -121,6 +121,18 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
  #cap-meta{font-size:10px}
 }
 
+
+.cap-today-date{grid-area:date;justify-self:center;margin:4px 0 7px;padding:7px 15px;border:1px solid #d6e5d9;border-radius:999px;background:#f0f7f1;color:#245638;font-size:12px;font-weight:900;letter-spacing:.04em}
+.cap-history{max-width:900px;margin:0 auto;border:1px solid #dce8df;border-radius:13px;overflow:auto;background:#fff;box-shadow:0 5px 16px rgba(20,60,35,.04)}
+.cap-history table{width:100%;min-width:600px;font-size:12px}
+.cap-history th{background:#eaf4ed;color:#1e5133;font-weight:800}
+.cap-history td,.cap-history th{padding:10px 12px;text-align:center;white-space:nowrap}
+.cap-history tr:nth-child(even) td{background:#f8fbf9}
+.cap-history .history-empty{padding:18px;text-align:center;color:#64748b}
+.cap-history .history-level{display:inline-block;min-width:75px;padding:5px 8px;border-radius:7px;font-weight:900}
+.cap-history .history-level.lv1{background:#dcfce7;color:#166534}.cap-history .history-level.lv2{background:#fef9c3;color:#854d0e}.cap-history .history-level.lv3{background:#fed7aa;color:#9a3412}.cap-history .history-level.lv4{background:#fecaca;color:#991b1b}.cap-history .history-level.lv5{background:#7f1d1d;color:#fff}
+@media(max-width:640px){.cap-today-date{font-size:11px;padding:6px 12px}.cap-history table{font-size:11px}.cap-history td,.cap-history th{padding:8px 9px}}
+
 </style>
 <script>
 (function(){
@@ -138,10 +150,10 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 <div class="tabs"><button class="tab on" id="tab-cap" onclick="switchTab('cap')"> <i class="fa fa-gauge-high"></i> Biển báo cấp cháy</button><button class="tab" id="tab-tiendo" onclick="switchTab('tiendo')"><i class="fa fa-list-check"></i> Tiến độ thi công</button></div>
 <section id="view-cap" class="panel">
 <h2>Biển báo cấp cháy rừng</h2><div class="sub">Cấp dự báo cháy rừng toàn lâm phần</div>
-<div class="fire-sign" role="img" aria-label="Biển báo hiệu cấp dự báo cháy rừng gồm năm cấp, kim chỉ cấp hiện hành"><h3 class="fire-sign-head">BIỂN BÁO HIỆU CẤP DỰ BÁO CHÁY RỪNG</h3><div class="fire-sign-sub">BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</div><svg id="fire-dial" class="fire-dial" viewBox="0 0 560 330" aria-hidden="true"></svg><div id="fire-level-name" class="fire-level-name">CHƯA CẬP NHẬT</div><div id="fire-level-desc" class="fire-level-desc">Chưa có dữ liệu cấp cháy</div><div class="fire-sign-foot">CẤP DỰ BÁO CHÁY RỪNG</div><div class="fire-legend"><span><i class="fire-dot" style="background:#8fc9ad"></i>Cấp I</span><span><i class="fire-dot" style="background:#08734f"></i>Cấp II</span><span><i class="fire-dot" style="background:#f4d03f"></i>Cấp III</span><span><i class="fire-dot" style="background:#e53935"></i>Cấp IV</span><span><i class="fire-dot" style="background:#8b0000"></i>Cấp V</span></div></div>
+<div class="fire-sign" role="img" aria-label="Biển báo hiệu cấp dự báo cháy rừng gồm năm cấp, kim chỉ cấp hiện hành"><h3 class="fire-sign-head">BIỂN BÁO HIỆU CẤP DỰ BÁO CHÁY RỪNG</h3><div class="fire-sign-sub">BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</div><div id="cap-today-date" class="cap-today-date">NGÀY THEO DÕI: ĐANG TẢI...</div><svg id="fire-dial" class="fire-dial" viewBox="0 0 560 330" aria-hidden="true"></svg><div id="fire-level-name" class="fire-level-name">CHƯA CẬP NHẬT</div><div id="fire-level-desc" class="fire-level-desc">Chưa có dữ liệu cấp cháy</div><div class="fire-sign-foot">CẤP DỰ BÁO CHÁY RỪNG</div><div class="fire-legend"><span><i class="fire-dot" style="background:#8fc9ad"></i>Cấp I</span><span><i class="fire-dot" style="background:#08734f"></i>Cấp II</span><span><i class="fire-dot" style="background:#f4d03f"></i>Cấp III</span><span><i class="fire-dot" style="background:#e53935"></i>Cấp IV</span><span><i class="fire-dot" style="background:#8b0000"></i>Cấp V</span></div></div>
 <h3 class="level-table-title">BẢNG TRA CẤP DỰ BÁO CHÁY RỪNG</h3>
 <div class="table-wrap" id="cap-reference-table"><div class="status">Đang tải bảng tra...</div></div><span id="cap-reference-status" hidden></span>
-<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy.</div><p class="status" id="cap-meta"></p></section>
+<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy.</div><p class="status" id="cap-meta"></p><h3 class="level-table-title">LỊCH SỬ CẤP DỰ BÁO CHÁY RỪNG THEO NGÀY</h3><div id="cap-history" class="cap-history"><div class="status">Đang tải lịch sử...</div></div></section>
 <section id="view-tiendo" class="panel hidden">
 <div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Dữ liệu chỉ đọc, đồng bộ trực tiếp từ Google Sheets nguồn do Admin cấu hình</div></div><span class="status" id="progress-meta">Đang chờ đồng bộ...</span></div>
 
@@ -194,7 +206,8 @@ async function loadProgress(){try{
  $('sheet-instruction').textContent='Nguồn dữ liệu: tab Tiến độ PCCCR · GID '+PCCCR_PROGRESS_SOURCE.gid;
  }catch(e){$('progress-head').innerHTML='';$('progress-body').innerHTML='<tr><td colspan="24" style="padding:18px;text-align:center;color:#9f1239">'+esc(e.message)+'</td></tr>';$('progress-meta').textContent='Chưa đồng bộ được';$('sheet-instruction').textContent='Kiểm tra đúng tab Tiến độ PCCCR trong Google Sheets.'}}
 let capLoading=false;
-async function loadAll(){if(capLoading)return;capLoading=true;try{$('app-status').textContent='Đang lấy cấp cháy mới nhất từ dữ liệu Admin...';const x=await api('pcccr_get');if(!x.capChay){fillCap(null);$('app-status').textContent='Chưa có bản ghi cấp cháy trong Google Sheets PCCCR_CapChay.'}else{fillCap(x.capChay);$('app-status').textContent='Đã đồng bộ cấp '+x.capChay.cap+' từ Admin · '+(x.capChay.capNhatLuc||'')+' · kiểm tra lúc '+new Date().toLocaleTimeString('vi-VN')}if(!$('view-tiendo').classList.contains('hidden'))loadProgress()}catch(e){$('app-status').textContent='Không lấy được cấp cháy từ Admin: '+(e.message||String(e));$('cap-meta').textContent='Lỗi đồng bộ dữ liệu cấp cháy: '+(e.message||String(e))}finally{capLoading=false}}
+function renderCapHistory(rows){const box=$('cap-history');if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="history-empty">Chưa có dữ liệu lịch sử cấp cháy.</div>';return}let h='<table><thead><tr><th>Ngày</th><th>Cấp cháy</th><th>Nhiệt độ</th><th>Độ ẩm</th><th>Tốc độ gió</th><th>Thời điểm cập nhật</th></tr></thead><tbody>';rows.forEach(r=>{const n=Number(r.cap),roman=['I','II','III','IV','V'][n-1]||'—';h+='<tr><td><b>'+formatDateTimeVi(r.ngay,false)+'</b></td><td><span class="history-level lv'+n+'">CẤP '+roman+'</span></td><td>'+(r.nhietDo===''||r.nhietDo==null?'—':esc(r.nhietDo+' °C'))+'</td><td>'+(r.doAmKK===''||r.doAmKK==null?'—':esc(r.doAmKK+'%'))+'</td><td>'+(r.tocDoGio===''||r.tocDoGio==null?'—':esc(r.tocDoGio+' m/s'))+'</td><td>'+formatDateTimeVi(r.capNhatLuc,true)+'</td></tr>'});h+='</tbody></table>';$('cap-history').innerHTML=h}
+async function loadAll(){if(capLoading)return;capLoading=true;try{$('app-status').textContent='Đang lấy cấp cháy trong ngày và lịch sử...';const x=await api('pcccr_get');$('cap-today-date').textContent='NGÀY THEO DÕI: '+formatDateTimeVi(x.ngayHienTai||today(),false);renderCapHistory(x.lichSu||[]);if(!x.capChay){fillCap(null);$('app-status').textContent='Hôm nay chưa được Admin cập nhật cấp dự báo cháy.'}else{fillCap(x.capChay);$('app-status').textContent='Đã đồng bộ cấp '+x.capChay.cap+' của ngày '+formatDateTimeVi(x.capChay.ngay,false)+' · '+(x.capChay.capNhatLuc||'')}if(!$('view-tiendo').classList.contains('hidden'))loadProgress()}catch(e){$('app-status').textContent='Không lấy được dữ liệu cấp cháy: '+(e.message||String(e));$('cap-meta').textContent='Lỗi đồng bộ dữ liệu cấp cháy: '+(e.message||String(e))}finally{capLoading=false}}
 function refreshCapFromAdmin(){loadAll()}
 window.addEventListener('storage',e=>{if(e.key==='bqlrph_pcccr_cap_updated')refreshCapFromAdmin()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshCapFromAdmin()});
