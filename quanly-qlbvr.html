@@ -1071,7 +1071,7 @@ main input:focus,main select:focus,main textarea:focus{border-color:var(--accent
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Link sheet chính (do Admin cấu hình):</label>
-                    <input type="url" id="sheetCsvUrl" readonly title="Chỉ Admin đổi tại trang Admin → Nguồn Google Sheet" value="https://docs.google.com/spreadsheets/d/12m9jCn_TWUDEoX0JpElHhGSQzaZ7xb7Z/edit?gid=1984739044#gid=1984739044" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none text-xs">
+                    <input type="url" id="sheetCsvUrl" readonly title="Chỉ Admin đổi tại trang Admin → Nguồn Google Sheet" value="https://docs.google.com/spreadsheets/d/1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU/edit?gid=528762373#gid=528762373" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sheets-500 outline-none text-xs">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Link tab <span class="text-rose-600">Thu hồi HĐ</span> <span class="font-normal text-slate-500">(để trống = tự tìm sheet tên “Thu hồi HĐ”)</span>:</label>
@@ -1121,19 +1121,6 @@ main input:focus,main select:focus,main textarea:focus{border-color:var(--accent
         
 /* Nguồn Sheet dùng chung (admin) */
 var SHEET_CFG_KEY='bqlrph_sheet_sources_v1';
-
-/* Nguồn kép: lịch sử 2019-2025 (có địa bàn cũ/mới) + sheet hiện hành 2026 */
-var QLBVR_SHEET_LICHSU = {
-  sid: '12m9jCn_TWUDEoX0JpElHhGSQzaZ7xb7Z',
-  gid: '1984739044',
-  label: 'Vi phạm 2019-2025'
-};
-var QLBVR_SHEET_HIENTAI = {
-  sid: '1b_Ij0xiVztYMMofozsG95etHC3qdOS36n1fnTbKX5bU',
-  gid: '528762373',
-  label: 'Vi phạm 2026'
-};
-
 function readSharedSheet(mod){
   try{
     var raw=localStorage.getItem(SHEET_CFG_KEY);
@@ -2606,94 +2593,29 @@ ${parts.join('\n')}
         }
 
         async function fetchViaJSONP(silent = false) {
+            const rawUrl = document.getElementById('sheetCsvUrl').value.trim();
+            if (!rawUrl) {
+                if (!silent) showToast("Vui lòng nhập link Google Sheets!", "error");
+                return;
+            }
             const icon = document.getElementById('syncIcon');
             if (icon) icon.classList.add('fa-spin');
             try {
-                // 1) Nguồn từ admin/cloud (nếu có) — ưu tiên
-                let primaryUrl = (document.getElementById('sheetCsvUrl')?.value || '').trim();
-                let sources = [];
-                try {
-                    if (typeof bqlrphFetchSheetSources === 'function') {
-                        const all = await bqlrphFetchSheetSources();
-                        const sh = all && all.qlbvr;
-                        if (sh && sh.sid) {
-                            let u = 'https://docs.google.com/spreadsheets/d/' + String(sh.sid).trim() + '/edit';
-                            if (sh.gid) u += '?gid=' + sh.gid + '#gid=' + sh.gid;
-                            primaryUrl = u;
-                            const el = document.getElementById('sheetCsvUrl');
-                            if (el) el.value = u;
-                        }
-                    }
-                } catch (e) {}
-
-                // 2) Luôn tải cả sheet lịch sử (2019-2025) + sheet hiện tại (2026) rồi gộp
-                const list = [];
-                const seen = new Set();
-                function addSrc(sid, gid, label) {
-                    if (!sid) return;
-                    const key = sid + '|' + (gid || '0');
-                    if (seen.has(key)) return;
-                    seen.add(key);
-                    list.push({ sid, gid: gid || '0', label: label || sid });
-                }
-                // primary from input
-                try {
-                    const p = parseGoogleSheetParams(primaryUrl);
-                    if (p.spreadsheetId) addSrc(p.spreadsheetId, p.gid, 'Chính');
-                } catch (e) {}
-                // dual defaults
-                if (typeof QLBVR_SHEET_LICHSU !== 'undefined') addSrc(QLBVR_SHEET_LICHSU.sid, QLBVR_SHEET_LICHSU.gid, QLBVR_SHEET_LICHSU.label);
-                if (typeof QLBVR_SHEET_HIENTAI !== 'undefined') addSrc(QLBVR_SHEET_HIENTAI.sid, QLBVR_SHEET_HIENTAI.gid, QLBVR_SHEET_HIENTAI.label);
-
-                if (!list.length) throw new Error('Chưa cấu hình nguồn Google Sheet');
-
-                let merged = [];
-                let loaded = 0;
-                for (const src of list) {
-                    try {
-                        const table = await executeJSONPQuery(src.sid, src.gid);
-                        const rows = parseGVizDataToRowsArray(table, src.label);
-                        merged = merged.concat(rows);
-                        loaded++;
-                    } catch (err) {
-                        console.warn('Không tải được', src.label, err);
-                    }
-                }
-                if (!merged.length) throw new Error('Không tải được dữ liệu từ các nguồn Sheet');
-
-                // Khử trùng theo khóa: họ tên + ngày BB + hành vi + tiểu khu
-                const uniq = [];
-                const uk = new Set();
-                merged.forEach(c => {
-                    const k = [c.hoTen, c.ngayBB || c.ngay, c.hanhVi, c.tieuKhu, c.soHDKhoan || c.soHD].map(x => String(x||'').toLowerCase().trim()).join('|');
-                    if (uk.has(k)) return;
-                    uk.add(k);
-                    uniq.push(c);
-                });
-                // Đánh lại STT
-                uniq.sort((a,b) => {
-                    const da = Date.parse(a.ngayBB || a.ngay || 0) || 0;
-                    const db = Date.parse(b.ngayBB || b.ngay || 0) || 0;
-                    return db - da;
-                });
-                uniq.forEach((c,i) => { c.stt = i+1; });
-
-                postProcessCases(uniq);
-                detailedCases = uniq;
-                if (typeof renderTable === 'function') renderTable();
-                if (typeof renderCharts === 'function') renderCharts();
-                if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
+                const { spreadsheetId, gid } = parseGoogleSheetParams(rawUrl);
+                const table = await executeJSONPQuery(spreadsheetId, gid);
+                parseGVizDataToRows(table);
+                // Đồng bộ tab Thu hồi HĐ (sheet riêng)
+                await fetchThuHoiSheet(spreadsheetId, silent);
                 lastSyncTime = new Date();
                 updateSyncBadge();
-                try { await fetchThuHoiSheet(list[0].sid, silent); } catch(e) {}
                 if (typeof renderThuHoiPanel === 'function') renderThuHoiPanel();
                 if (!silent) {
-                    showToast('Đã đồng bộ ' + uniq.length + ' hồ sơ từ ' + loaded + ' nguồn (2019 → nay)');
-                    if (typeof closeSyncModal === 'function') closeSyncModal();
+                    showToast("Đã đồng bộ thành công từ Google Sheets!");
+                    closeSyncModal();
                 }
             } catch (err) {
-                if (!silent) showToast(err.message || 'Không thể truy cập. Kiểm tra quyền chia sẻ!', 'error');
-                console.warn('Sync error:', err);
+                if (!silent) showToast(err.message || "Không thể truy cập. Kiểm tra quyền chia sẻ!", "error");
+                console.warn("Sync error:", err.message);
                 const badge = document.getElementById('syncStatusBadge');
                 if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span> Lỗi đồng bộ · ${escapeHtml(err.message||'Thử Làm mới')}`;
             } finally {
@@ -2851,7 +2773,7 @@ ${parts.join('\n')}
                     delete window[cb];
                     if (script.parentNode) script.parentNode.removeChild(script);
                     reject(new Error("Hết thời gian chờ. Kiểm tra quyền 'Anyone with the link can view'!"));
-                }, 25000);
+                }, 12000);
                 window[cb] = function(resp) {
                     clearTimeout(timeout);
                     delete window[cb];
@@ -2913,9 +2835,7 @@ function speciesLabel(s){
 function postProcessCases(cases){
     DYNAMIC_PLACES = new Set();
     cases.forEach(c=>{
-        [c.xa, c.xaCu, c.xaMoi, c.phanTruong].forEach(v=>{ const n=normPlace(v); if(n && n!=='—') DYNAMIC_PLACES.add(n); });
-        // Chuẩn hoá xã hiển thị: ưu tiên địa bàn mới (sau sáp nhập)
-        if(!c.xa) c.xa = c.xaMoi || c.xaCu || '—';
+        [c.xa, c.phanTruong].forEach(v=>{ const n=normPlace(v); if(n && n!=='—') DYNAMIC_PLACES.add(n); });
         String(c.diaChi||'').split(/[,;]+/).forEach(v=>{ const n=normPlace(v); if(n && n.length>2) DYNAMIC_PLACES.add(n); });
     });
     cases.forEach(c=>{
@@ -3010,175 +2930,176 @@ function parseNum(s) {
             return c?.hoTen || c?.doiTuong || "Không xác định";
         }
 
-        
-        /** Tự nhận diện layout cột:
-         *  - Lịch sử 2019-2025: có Địa bàn CŨ (col18) + Địa bàn MỚI (col19) → loại rừng ở 20
-         *  - Hiện hành 2026: chỉ Địa bàn MỚI (col18) → loại rừng ở 19
-         */
-        function detectQlbvrSchema(getVal) {
-            const c18 = String(getVal(18) || '').trim();
-            const c19 = String(getVal(19) || '').trim();
-            const c20 = String(getVal(20) || '').trim();
-            const isLoai = (s) => /^(PH|SX|phòng hộ|sản xuất)/i.test(s) || s === 'PH' || s === 'SX';
-            // Nếu col19 là loại rừng → layout 2026 (1 địa bàn)
-            if (isLoai(c19) && !isLoai(c18)) return 'hientai';
-            // Nếu col20 là loại rừng → layout lịch sử (2 địa bàn)
-            if (isLoai(c20)) return 'lichsu';
-            // Heuristic: cả 18 và 19 đều giống tên địa danh (không phải PH/SX)
-            if (c18 && c19 && !isLoai(c18) && !isLoai(c19)) return 'lichsu';
-            return 'hientai';
-        }
-
-        function parseGVizDataToRowsArray(table, sourceLabel) {
-            if (!table || !table.rows || !table.rows.length) return [];
-            const out = [];
-            let schemaGuess = null;
-            table.rows.forEach((r, idx) => {
-                if (!r || !r.c) return;
-                const getVal = (i) => (r.c[i] ? (r.c[i].f || r.c[i].v || '') : '').toString().trim();
-                const sttRaw = getVal(0);
-                // bỏ header / dòng số thứ tự cột
-                if (!/^\d+$/.test(String(sttRaw).replace(/[^\d]/g, '')) && idx < 12) {
-                    // vẫn thử nếu có họ tên ở col1
-                }
-                const sttNum = parseInt(String(sttRaw).replace(/[^\d]/g, ''), 10);
-                const ho1 = getVal(1), ho2 = getVal(2);
-                const hoTen = (ho1 || ho2 || '').trim();
-                if (!hoTen || hoTen.length < 2) return;
-                if (/^stt$/i.test(hoTen) || /hộ canh tác/i.test(hoTen)) return;
-                if (!sttNum && idx < 8) return;
-
-                // Xác định schema từ dòng dữ liệu đầu
-                if (!schemaGuess) schemaGuess = detectQlbvrSchema(getVal);
-                const schema = detectQlbvrSchema(getVal) || schemaGuess || 'hientai';
-
-                let xaCu = '', xaMoi = '', loaiRung = '', nguonVon = '';
-                let ngayBB = '', hanhVi = '', hanhViCT = '';
-                let m2 = '', ha = '', loaiCay = '', namTrong = '', sl = '', m3 = '';
-                let coQuan = '', ketQuaPL = '', moiLV = '', ketQuaHD = '';
-                let tieuKhu = '', phanTruong = '', thua = '';
-                let doiTuong = '';
-
-                const soHD = getVal(6), ngayKyHD = getVal(7), dtHD = getVal(8);
-                const soHDTR = getVal(9), ngayKyTR = getVal(10), dtTR = getVal(11);
-                const loKK = getVal(12), khoanh = getVal(13);
-                tieuKhu = getVal(14) || getVal(15);
-                phanTruong = getVal(16);
-                thua = getVal(17);
-
-                if (schema === 'lichsu') {
-                    xaCu = getVal(18);
-                    xaMoi = getVal(19);
-                    loaiRung = getVal(20);
-                    nguonVon = getVal(21);
-                    ngayBB = getVal(22);
-                    hanhVi = getVal(25);
-                    hanhViCT = getVal(26);
-                    // một số dòng mức độ ở 27
-                    m2 = getVal(28) || getVal(27);
-                    ha = getVal(29) || getVal(28);
-                    loaiCay = getVal(30) || getVal(29);
-                    namTrong = getVal(31) || getVal(30);
-                    sl = getVal(32) || getVal(31);
-                    m3 = getVal(33) || getVal(32);
-                    coQuan = getVal(36) || getVal(35);
-                    ketQuaPL = getVal(37) || getVal(36);
-                    moiLV = getVal(38) || getVal(37);
-                    ketQuaHD = getVal(39) || getVal(38);
-                    doiTuong = getVal(40) || getVal(3);
-                } else {
-                    // 2026: một địa bàn mới
-                    xaCu = '';
-                    xaMoi = getVal(18);
-                    loaiRung = getVal(19);
-                    nguonVon = getVal(20);
-                    ngayBB = getVal(21) || getVal(22);
-                    hanhVi = getVal(24) || getVal(25);
-                    hanhViCT = getVal(25) || getVal(26);
-                    m2 = getVal(27);
-                    ha = getVal(28);
-                    loaiCay = getVal(29);
-                    namTrong = getVal(30);
-                    sl = getVal(31);
-                    m3 = getVal(32);
-                    coQuan = getVal(35);
-                    ketQuaPL = getVal(36);
-                    moiLV = getVal(37);
-                    ketQuaHD = getVal(38);
-                    doiTuong = getVal(40) || getVal(3);
-                }
-
-                const xa = xaMoi || xaCu || '';
-                const yearMatch = String(ngayBB).match(/(20\d{2})/);
-                const nam = yearMatch ? parseInt(yearMatch[1], 10) : null;
-
-                // Nhóm xử lý sơ bộ từ kết quả
-                let nhomId = 1;
-                const blob = (ketQuaHD + ' ' + ketQuaPL + ' ' + moiLV).toLowerCase();
-                if (/chấm dứt|thu hồi|qđ/.test(blob)) nhomId = 5;
-                else if (/niêm yết/.test(blob)) nhomId = 4;
-                else if (/chấp hành|khắc phục|đã làm việc|cam kết/.test(blob)) nhomId = 3;
-                else if (/mời|giấy mời|lần [123]/.test(blob)) nhomId = 2;
-
-                const NH = (typeof NHOM_MAP !== 'undefined') ? NHOM_MAP : {};
-                out.push({
-                    stt: sttNum || (out.length + 1),
-                    hoTen: hoTen,
-                    doiTuong: (typeof sanitizeDoiTuong === 'function' ? sanitizeDoiTuong(doiTuong) : doiTuong) || hoTen,
-                    diaChi: getVal(4),
-                    soHDKhoan: soHD,
-                    soHD: soHD,
-                    ngayKyHD: ngayKyHD,
-                    dienTichHD: dtHD,
-                    soHDTrongRung: soHDTR,
-                    loKK: loKK,
-                    khoanh: khoanh,
-                    tieuKhu: tieuKhu,
-                    phanTruong: phanTruong,
-                    thuaTo: thua,
-                    xaCu: xaCu,
-                    xaMoi: xaMoi,
-                    xa: xa,
-                    loaiRung: loaiRung,
-                    nguonVon: nguonVon,
-                    ngayBB: ngayBB,
-                    ngay: ngayBB,
-                    nam: nam,
-                    hanhVi: hanhVi || hanhViCT || '—',
-                    hanhViCT: hanhViCT,
-                    dienTichM2: (typeof parseNum === 'function' ? parseNum(m2) : parseFloat(String(m2).replace(',','.')) ) || 0,
-                    dienTichHa: (typeof parseNum === 'function' ? parseNum(ha) : parseFloat(String(ha).replace(',','.')) ) || 0,
-                    loaiCay: loaiCay,
-                    namTrong: namTrong,
-                    cayGoLon: (typeof parseNum === 'function' ? parseNum(sl) : parseFloat(String(sl).replace(',','.')) ) || 0,
-                    khoiLuongM3: (typeof parseNum === 'function' ? parseNum(m3) : parseFloat(String(m3).replace(',','.')) ) || 0,
-                    coQuanThuLy: coQuan,
-                    ketQuaXuLyPL: ketQuaPL,
-                    moiLamViec: moiLV,
-                    ketQuaHD: ketQuaHD,
-                    tinhTrang: ketQuaHD || ketQuaPL || moiLV || '—',
-                    nhomId: nhomId,
-                    nhomTen: (NH[nhomId] && NH[nhomId].ten) || '',
-                    source: sourceLabel || schema,
-                    schema: schema
-                });
-            });
-            return out;
-        }
-
         function parseGVizDataToRows(table) {
-            const rows = parseGVizDataToRowsArray(table, 'Sheet');
-            if (!rows.length) {
-                if (typeof showToast === 'function') showToast('Không tìm thấy dòng dữ liệu hợp lệ!', 'error');
-                return;
-            }
-            if (typeof postProcessCases === 'function') postProcessCases(rows);
-            detailedCases = rows;
-            if (typeof renderTable === 'function') renderTable();
-            if (typeof renderCharts === 'function') renderCharts();
-            if (typeof showToast === 'function') showToast('Đã nhập thành công ' + rows.length + ' hồ sơ');
-        }
+            if (!table?.rows?.length) throw new Error("Không tìm thấy dữ liệu!");
+            const newCases = [];
+            let current = null;
+            const hasWideCols = (table.cols && table.cols.length > 38);
 
+            table.rows.forEach((r, idx) => {
+                if (!r.c) return;
+                const getVal = (i) => (r.c[i] ? (r.c[i].f || r.c[i].v || "") : "").toString().trim();
+
+                const colSTT = getVal(0);
+                const colHo1 = getVal(1);
+                const colHo2 = getVal(2);
+                // F=nguồn gốc đất; G,H,I = HĐ giao khoán (số, ngày ký, DT); J,K,L = HĐ trồng rừng
+                const colHoHopDong = getVal(3);
+                const colDiaChi = getVal(4);
+                const colNguonGocDat = getVal(5); // cột F
+                const colSoHDKhoan = getVal(6);   // G
+                const colNgayKyHDKhoan = getVal(7); // H
+                const colDienTichHDKhoan = getVal(8); // I
+                const colSoHDTrongRung = getVal(9); // J
+                const colNgayKyHDTrongRung = getVal(10); // K
+                const colDienTichHDTrongRung = getVal(11); // L
+                const colDoiTuong = sanitizeDoiTuong(getVal(40)) || sanitizeDoiTuong(colHoHopDong) || sanitizeDoiTuong(getVal(3));
+        const colNamTrong = getVal(30); // AE - năm trồng (nếu có)
+                const colTieuKhu = getVal(14) || getVal(15);
+                const colPhanTruong = getVal(16);
+                const colXa = getVal(18);
+                const colNgay = getVal(21);
+                const colHanhVi = getVal(24);
+                const colHanhViCT = getVal(25);
+                const colM2 = getVal(27);
+                const colHa = getVal(28);
+                const colLoai = getVal(29);
+                const colSL = getVal(31);
+                const colM3 = getVal(32);
+                const colAL = hasWideCols ? getVal(37) : (getVal(3) || getVal(4));
+                const colAM = hasWideCols ? getVal(38) : (getVal(4) || getVal(3));
+                const colCoQuan = hasWideCols ? getVal(35) : ''; // Cơ quan thụ lý
+                const colKetQuaPL = hasWideCols ? getVal(36) : ''; // Kết quả xử lý theo pháp luật
+                const colLoaiRung = getVal(19); // T - Phòng hộ / Sản xuất
+                const colNguonVon = getVal(20); // U - VNN / Tự đầu tư (TĐT)
+                const colTuiHoSo = getVal(43); // AR - tên túi hồ sơ
+                const colLinkHoSo = getVal(44); // AS - link Drive trực tiếp
+
+                if (idx === 0 && (colSTT.toUpperCase() === 'STT' || colSTT === '3' || colHo1.toLowerCase().includes('hộ') || colHo1 === '2')) return;
+                if (!colSTT && !colHo1 && !colHo2 && !colAL && !colAM && !colLoai && !colSL && !colM3 && !colHa && !colM2) return;
+
+                const isNumbered = /^\d+$/.test(colSTT);
+                const speciesLine = {
+                    loai: colLoai || "",
+namTrong: parseNamTrong(colNamTrong, colLoai),
+                    soLuong: parseNum(colSL),
+                    khoiLuongM3: parseNum(colM3),
+                    dienTichHa: parseNum(colHa),
+                    dienTichM2: parseNum(colM2)
+                };
+
+                if (isNumbered) {
+                    if (current) newCases.push(current);
+                    const hoTen = colHo1 || colHo2 || ("Hộ #" + colSTT);
+                    const nhomId = detectNhom(colAL, colAM);
+                    current = {
+                        id: newCases.length + 1,
+                        hoTen: hoTen,
+                        doiTuong: colDoiTuong || '',
+                        nhomId: nhomId,
+                        nhomTen: NHOM_MAP[nhomId]?.ten || NHOM_MAP[1].ten,
+                        tinhTrang: colAM || colAL || "Vi phạm mới – chưa có kết quả xử lý (đang mời / theo dõi).",
+                        alRaw: colAL || "",
+                        amRaw: colAM || "",
+                        tieuKhu: colTieuKhu || "—",
+                        phanTruong: colPhanTruong || "—",
+                        xa: colXa || "—",
+                        hanhVi: colHanhVi || colHanhViCT || "—",
+                        ngayViPham: colNgay || "",
+                        tuiHoSo: colTuiHoSo || "",
+                        linkHoSo: colLinkHoSo || "",
+                        hoHopDong: colHoHopDong || "",
+                        diaChi: colDiaChi || "",
+                        nguonGocDat: colNguonGocDat || "",
+                        loaiRung: colLoaiRung || "",
+                        nguonVon: colNguonVon || "",
+                        quaTrinhCanhTac: colNguonGocDat || "", // alias cũ
+                        soHDKhoan: colSoHDKhoan || "",
+                        ngayKyHDKhoan: colNgayKyHDKhoan || "",
+                        dienTichHDKhoan: colDienTichHDKhoan || "",
+                        soHDTrongRung: colSoHDTrongRung || "",
+                        ngayKyHDTrongRung: colNgayKyHDTrongRung || "",
+                        dienTichHDTrongRung: colDienTichHDTrongRung || "",
+                        species: (colLoai || colSL || colM3 || colHa || colM2) ? [speciesLine] : [],
+                        soLuong: speciesLine.soLuong,
+                        khoiLuongM3: speciesLine.khoiLuongM3,
+                        dienTichHa: speciesLine.dienTichHa,
+                        dienTichM2: speciesLine.dienTichM2,
+                        coQuanThuLy: (typeof colCoQuan!=='undefined' ? colCoQuan : '') || '',
+                        ketQuaXuLyPL: (typeof colKetQuaPL!=='undefined' ? colKetQuaPL : '') || ''
+                    };
+                } else if (current) {
+                    // Dòng phụ: chỉ gộp khi cùng hộ (tên trống hoặc trùng tên).
+                    // Bỏ qua dòng tổng/cộng cuối sheet (tên là số, hoặc không liên quan hộ đang mở).
+                    const subName = (colHo1 || colHo2 || "").trim();
+                    // Dòng tổng cuối sheet (số cây ~1010, m³ ~1250, m² hàng trăm…) không gắn tên hộ thật
+                    const looksLikeSheetTotal = !colLoai && (
+                        speciesLine.soLuong >= 100 ||
+                        speciesLine.khoiLuongM3 >= 100 ||
+                        speciesLine.dienTichM2 >= 500 ||
+                        speciesLine.dienTichHa >= 10
+                    );
+                    const isJunkTotal = /^\d+([.,]\d+)?$/.test(subName)
+                        || (subName && subName !== current.hoTen && !subName.includes(current.hoTen) && !current.hoTen.includes(subName))
+                        || looksLikeSheetTotal;
+                    if (isJunkTotal) {
+                        // Bỏ qua dòng tổng hợp / rác cuối sheet
+                    } else {
+                        if (colLoai || colSL || colM3 || colHa || colM2) {
+                            current.species.push(speciesLine);
+                            current.soLuong += speciesLine.soLuong;
+                            current.khoiLuongM3 += speciesLine.khoiLuongM3;
+                            current.dienTichHa += speciesLine.dienTichHa;
+                            current.dienTichM2 += speciesLine.dienTichM2;
+                        }
+                        const extras = [colHo1, colHo2, colAL, colAM].filter(v => v && v !== current.hoTen);
+                        if (extras.length) current.tinhTrang += (current.tinhTrang ? "\n" : "") + extras.join(" | ");
+                        if (colPhanTruong && current.phanTruong === "—") current.phanTruong = colPhanTruong;
+                        if (colXa && current.xa === "—") current.xa = colXa;
+                        if (colHanhVi && current.hanhVi === "—") current.hanhVi = colHanhVi;
+                        if (colNgay && !current.ngayViPham) current.ngayViPham = colNgay;
+                    }
+                }
+            });
+            if (current) newCases.push(current);
+
+            if (newCases.length === 0) throw new Error("Không trích xuất được dòng có STT hợp lệ!");
+            // Giữ tab + bộ lọc đang dùng; chỉ cập nhật dữ liệu
+            const uiState = (typeof snapshotUiState === 'function') ? snapshotUiState() : null;
+            const keepMode = currentViewMode || (uiState && uiState.viewMode) || 'dashboard';
+            postProcessCases(newCases);
+            detailedCases = newCases;
+            if (typeof populateFilterOptions === 'function') populateFilterOptions();
+            if (typeof populateStatsFilterOptions === 'function') populateStatsFilterOptions();
+            if (typeof restoreUiState === 'function') restoreUiState(uiState);
+            currentViewMode = keepMode;
+
+            if (keepMode === 'dashboard') renderDashboard();
+            else if (keepMode === 'stats') renderStats();
+            else if (keepMode === 'summary') {
+                renderTable();
+                requestAnimationFrame(() => setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 80));
+            } else if (keepMode === 'detail') {
+                renderTable();
+                // Áp lại lọc sau khi vẽ bảng mới
+                requestAnimationFrame(() => {
+                    if (typeof filterTable === 'function') filterTable();
+                    setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 80);
+                });
+            } else {
+                // action / check / khác
+                if (typeof renderTable === 'function' && (keepMode === 'action' || keepMode === 'check')) {
+                    // các view tự render trong switchMainView — gọi lại cho đúng tab
+                    if (typeof switchMainView === 'function') switchMainView(keepMode);
+                } else {
+                    renderTable();
+                    requestAnimationFrame(() => { if (typeof filterTable === 'function') filterTable(); });
+                }
+            }
+            if (keepMode === 'summary') {
+                requestAnimationFrame(() => setTimeout(() => { if (typeof renderCharts === 'function') renderCharts(); }, 100));
+            }
+        }
 
 function parsePastedTextData() {
             const text = document.getElementById('pastedDataInput').value.trim();
