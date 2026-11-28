@@ -172,6 +172,28 @@ main{max-width:1240px;padding-top:26px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
+
+/* Progress dashboard: clean hierarchy, readable grouped columns */
+#view-tiendo{padding:clamp(14px,2vw,24px)}
+#view-tiendo>.top{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #dce9df;border-radius:14px;background:linear-gradient(120deg,#f4fbf6,#fff);box-shadow:none}
+#view-tiendo h2{font-size:20px;font-weight:900;letter-spacing:-.025em;color:#174b32}
+#progress-meta{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;background:#eaf6ee;color:#17613c;font-weight:800;white-space:nowrap}
+#view-tiendo .table-wrap{margin-top:14px;max-height:68vh;overflow:auto;border:1px solid #d9e6dc;border-radius:13px;background:#fff;box-shadow:0 8px 24px rgba(20,55,35,.05)}
+#view-tiendo table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+#view-tiendo th{padding:11px 10px;background:#eaf4ed;color:#174b32;font-size:11px;font-weight:900;letter-spacing:.02em;border-bottom:1px solid #d7e5da}
+#view-tiendo thead tr:first-child th{background:#dcefe2;color:#14532d}
+#view-tiendo td{padding:10px 9px;border-bottom:1px solid #edf2ee;color:#33463a;font-variant-numeric:tabular-nums}
+#view-tiendo tbody tr:nth-child(even) td{background:#f8fbf9}
+#view-tiendo tbody tr:hover td{background:#eef8f0}
+#view-tiendo td:first-child,#view-tiendo th:first-child{position:sticky;left:0;z-index:4;min-width:48px;background:#f2f8f4}
+#view-tiendo td.progress-work{position:sticky;left:48px;z-index:3;min-width:190px;max-width:280px;text-align:left;white-space:normal;background:#fff;font-weight:700;color:#244b34}
+#view-tiendo th:nth-child(2){position:sticky;left:48px;z-index:5;min-width:190px}
+.progress-percent{display:inline-block;min-width:48px;padding:4px 6px;border-radius:7px;background:#edf7ef;color:#17613c;font-weight:900}
+#view-tiendo .raw-mode table{width:max-content;min-width:100%}
+#view-tiendo .raw-mode td{white-space:pre-wrap;min-width:90px;text-align:left}
+#view-tiendo .raw-mode td:first-child{white-space:nowrap}
+#sheet-instruction{padding:10px 12px;border-radius:9px;background:#f7faf8;color:#607568;line-height:1.6}
+@media(max-width:640px){#view-tiendo{padding:10px 8px}#view-tiendo>.top{align-items:flex-start;flex-direction:column;padding:12px}#view-tiendo h2{font-size:17px}#progress-meta{font-size:10px}#view-tiendo .table-wrap{max-height:65vh}#view-tiendo table{font-size:11px}#view-tiendo th,#view-tiendo td{padding:8px 7px}}
 </style>
 <script>
 (function(){
@@ -196,7 +218,7 @@ main{max-width:1240px;padding-top:26px}
 <section id="view-tiendo" class="panel hidden">
 <div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Dữ liệu chỉ đọc, đồng bộ trực tiếp từ Google Sheets nguồn do Admin cấu hình</div></div><span class="status" id="progress-meta">Đang chờ đồng bộ...</span></div>
 
-<div class="table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
+<div class="table-wrap" id="progress-table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
 <div class="status" style="margin-top:12px" id="sheet-instruction">Nguồn Sheet chưa được cấu hình. Admin vào Quản trị → Nguồn Google Sheet → PCCCR để khai báo Spreadsheet ID và GID.</div>
 </section>
 <div class="status" id="app-status"></div>
@@ -231,19 +253,19 @@ function parseProgress(table){
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(n){return Number(n||0).toLocaleString('vi-VN',{maximumFractionDigits:2})}
-function renderProgress(rows){$('progress-head').innerHTML='<tr><th rowspan="2">STT</th><th rowspan="2">Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">Tổng</th>'+names.map(n=>'<th colspan="3">'+n+'</th>').join('')+'</tr><tr>'+Array.from({length:7},()=>'<th>KH</th><th>TH</th><th>%</th>').join('')+'</tr>';if(!rows.length){$('progress-body').innerHTML='<tr><td colspan="24">Sheet chưa có dữ liệu hoặc chưa đúng cấu trúc cột.</td></tr>';return}const c=o=>'<td>'+fmt(o.kh)+'</td><td>'+fmt(o.th)+'</td><td>'+fmt(o.tyLe)+'%</td>';$('progress-body').innerHTML=rows.map(r=>'<tr><td>'+esc(r.stt)+'</td><td style="text-align:left">'+esc(r.hangMuc)+'</td><td>'+esc(r.dvt)+'</td>'+c(r.tong)+codes.map(k=>c(r.phanTruong[k])).join('')+'</tr>').join('')}
+function renderProgress(rows){$('progress-head').innerHTML='<tr><th rowspan="2">STT</th><th rowspan="2">Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">TỔNG CỘNG</th>'+names.map(n=>'<th colspan="3">'+n.toUpperCase()+'</th>').join('')+'</tr><tr>'+Array.from({length:7},()=>'<th>KH</th><th>TH</th><th>%</th>').join('')+'</tr>';if(!rows.length){$('progress-body').innerHTML='<tr><td colspan="24">Google Sheets chưa có dòng dữ liệu.</td></tr>';return}const c=o=>'<td>'+fmt(o.kh)+'</td><td>'+fmt(o.th)+'</td><td><span class="progress-percent">'+fmt(o.tyLe)+'%</span></td>';$('progress-body').innerHTML=rows.map(r=>'<tr><td>'+esc(r.stt)+'</td><td class="progress-work">'+esc(r.hangMuc)+'</td><td>'+esc(r.dvt)+'</td>'+c(r.tong)+codes.map(k=>c(r.phanTruong[k])).join('')+'</tr>').join('')}
+function renderRawProgress(table){const cols=table.cols||[],rows=table.rows||[];if(!cols.length)throw Error('Tab Google Sheets không trả về tiêu đề cột. Kiểm tra GID và quyền xem.');const headers=cols.map((c,i)=>String(c.label||c.id||('Cột '+(i+1))));$('progress-head').innerHTML='<tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>';$('progress-body').innerHTML=rows.length?rows.map(r=>'<tr>'+cols.map((_,i)=>{const x=r.c&&r.c[i],v=x?(x.f!=null?x.f:x.v):'';return '<td>'+esc(v==null?'':v)+'</td>'}).join('')+'</tr>').join(''):'<tr><td colspan="'+cols.length+'">Google Sheets chưa có dòng dữ liệu.</td></tr>';$('progress-table-wrap').classList.add('raw-mode')}
 const PCCCR_PROGRESS_SOURCE={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'1792946874'};
 async function loadProgress(){try{
- $('progress-meta').textContent='Đang đồng bộ tiến độ PCCCR...';
+ $('progress-meta').textContent='Đang đồng bộ tiến độ PCCCR...';$('progress-table-wrap').classList.remove('raw-mode');
  const table=await loadGviz(PCCCR_PROGRESS_SOURCE.sid,PCCCR_PROGRESS_SOURCE.gid);
  const headers=(table.cols||[]).map(c=>norm(c.label||c.id));
  const hasWork=headers.some(h=>['hangmuc','noidung','congviec'].includes(h));
  const hasTotal=headers.some(h=>h==='tongkh')&&headers.some(h=>h==='tongth');
- if(!hasWork||!hasTotal)throw Error('Nguồn GID '+PCCCR_PROGRESS_SOURCE.gid+' không phải bảng Tiến độ PCCCR (có thể đang trỏ nhầm tab Thông báo). Chưa hiển thị dữ liệu để tránh lấy sai.');
- const rows=parseProgress(table);renderProgress(rows);
- $('progress-meta').textContent='Đã đồng bộ '+rows.length+' hạng mục · '+new Date().toLocaleTimeString('vi-VN');
- $('sheet-instruction').textContent='Nguồn dữ liệu: tab Tiến độ PCCCR · GID '+PCCCR_PROGRESS_SOURCE.gid;
- }catch(e){$('progress-head').innerHTML='';$('progress-body').innerHTML='<tr><td colspan="24" style="padding:18px;text-align:center;color:#9f1239">'+esc(e.message)+'</td></tr>';$('progress-meta').textContent='Chưa đồng bộ được';$('sheet-instruction').textContent='Kiểm tra đúng tab Tiến độ PCCCR trong Google Sheets.'}}
+ if(hasWork&&hasTotal){const rows=parseProgress(table);renderProgress(rows);$('progress-meta').textContent='Đã đồng bộ '+rows.length+' hạng mục · '+new Date().toLocaleTimeString('vi-VN')}
+ else{renderRawProgress(table);$('progress-meta').textContent='Đã tải '+(table.rows||[]).length+' dòng dữ liệu · dạng bảng nguồn';}
+ $('sheet-instruction').textContent='Nguồn dữ liệu: Google Sheets · GID '+PCCCR_PROGRESS_SOURCE.gid+' · Tự động đồng bộ khi mở tab.';
+ }catch(e){$('progress-head').innerHTML='';$('progress-body').innerHTML='<tr><td colspan="24" style="padding:22px;text-align:center;color:#9f1239">'+esc(e.message)+'</td></tr>';$('progress-meta').textContent='Chưa đồng bộ được';$('sheet-instruction').textContent='Không đọc được Google Sheets. Kiểm tra quyền “Bất kỳ ai có đường liên kết – Người xem”, Spreadsheet ID và GID trong Quản trị.'}}
 let capLoading=false;
 function renderCapHistory(rows){const box=$('cap-history');if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="history-empty">Chưa có dữ liệu lịch sử cấp cháy.</div>';return}let h='<table><thead><tr><th>Ngày</th><th>Cấp cháy</th><th>Nhiệt độ</th><th>Độ ẩm</th><th>Tốc độ gió</th><th>Thời điểm cập nhật</th></tr></thead><tbody>';rows.forEach(r=>{const n=Number(r.cap),roman=['I','II','III','IV','V'][n-1]||'—',label=fireShort[n-1]||'CHƯA RÕ';h+='<tr><td><b>'+formatDateTimeVi(r.ngay,false)+'</b></td><td><span class="history-level lv'+n+'">CẤP '+roman+' – '+label+'</span></td><td>'+(r.nhietDo===''||r.nhietDo==null?'—':esc(r.nhietDo+' °C'))+'</td><td>'+(r.doAmKK===''||r.doAmKK==null?'—':esc(r.doAmKK+'%'))+'</td><td>'+(r.tocDoGio===''||r.tocDoGio==null?'—':esc(r.tocDoGio+' m/s'))+'</td><td>'+formatDateTimeVi(r.capNhatLuc,true)+'</td></tr>'});h+='</tbody></table>';$('cap-history').innerHTML=h}
 async function loadAll(){if(capLoading)return;capLoading=true;try{$('app-status').textContent='Đang lấy cấp cháy trong ngày và lịch sử...';const x=await api('pcccr_get');$('cap-today-date').textContent='NGÀY THEO DÕI: '+formatDateTimeVi(x.ngayHienTai||today(),false);renderCapHistory(x.lichSu||[]);if(!x.capChay){currentCapData=null;fillCap(null);$('app-status').textContent='Hôm nay chưa được Admin cập nhật cấp dự báo cháy.'}else{currentCapData=x.capChay;fillCap(x.capChay);$('app-status').textContent='Đã đồng bộ cấp '+x.capChay.cap+' của ngày '+formatDateTimeVi(x.capChay.ngay,false)+' · '+(x.capChay.capNhatLuc||'')}if(!$('view-tiendo').classList.contains('hidden'))loadProgress()}catch(e){$('app-status').textContent='Không lấy được dữ liệu cấp cháy: '+(e.message||String(e));$('cap-meta').textContent='Lỗi đồng bộ dữ liệu cấp cháy: '+(e.message||String(e))}finally{capLoading=false}}
