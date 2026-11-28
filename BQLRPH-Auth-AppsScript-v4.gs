@@ -891,8 +891,11 @@ function pcccrUser_(data) {
   return user;
 }
 function pcccrSheet_(name, headers) {
-  // Lưu cấp cháy trong bảng tính dữ liệu nội bộ của hệ thống, không lưu vào Sheet tiến độ chia sẻ.
-  var ss = ss_();
+  var cfg = {};
+  try { cfg = JSON.parse(PropertiesService.getScriptProperties().getProperty('SHEET_SOURCES') || '{}') || {}; } catch(e) {}
+  var sid = cfg.pcccr && String(cfg.pcccr.sid || '').trim();
+  if (!sid) throw new Error('Chưa cấu hình Spreadsheet ID nguồn PCCCR trong trang Admin.');
+  var ss = SpreadsheetApp.openById(sid);
   var sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
