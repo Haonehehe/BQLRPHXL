@@ -910,9 +910,24 @@ function pcccrGet_(data) {
   var capRows = capSh.getLastRow() > 1 ? capSh.getRange(2,1,capSh.getLastRow()-1,8).getValues() : [];
   var cap = null;
   if (capRows.length) {
-    capRows.sort(function(a,b){return String(b[0]).localeCompare(String(a[0]));});
-    var r = capRows[0];
-    cap = {ngay:r[0],cap:r[1],nhietDo:r[2],doAmKK:r[3],tocDoGio:r[4],nguon:r[5],nguoiCapNhat:r[6],capNhatLuc:r[7]};
+    // Chuẩn hóa ngày vì Google Sheets có thể trả về Date thay vì chuỗi yyyy-MM-dd.
+    function dateKey_(v) {
+      if (Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime())) {
+        return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyyMMdd');
+      }
+      var s = String(v || '').trim();
+      var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return m[1] + m[2] + m[3];
+      var d = new Date(s);
+      return isNaN(d.getTime()) ? '' : Utilities.formatDate(d, Session.getScriptTimeZone(), 'yyyyMMdd');
+    }
+    capRows.sort(function(a,b) {
+      var ka = dateKey_(a[0]), kb = dateKey_(b[0]);
+      if (ka !== kb) return kb.localeCompare(ka);
+      return String(b[7] || '').localeCompare(String(a[7] || ''));
+    });
+    var r = capRows[0], key = dateKey_(r[0]);
+    cap = {ngay:key ? key.slice(0,4)+'-'+key.slice(4,6)+'-'+key.slice(6,8) : String(r[0] || ''),cap:r[1],nhietDo:r[2],doAmKK:r[3],tocDoGio:r[4],nguon:r[5],nguoiCapNhat:r[6],capNhatLuc:r[7]};
   }
   return {ok:true,capChay:cap,user:{name:user.name,email:user.email,role:user.role}};
 }
