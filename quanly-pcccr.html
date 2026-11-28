@@ -194,6 +194,35 @@ main{max-width:1240px;padding-top:26px}
 #view-tiendo .raw-mode td:first-child{white-space:nowrap}
 #sheet-instruction{padding:10px 12px;border-radius:9px;background:#f7faf8;color:#607568;line-height:1.6}
 @media(max-width:640px){#view-tiendo{padding:10px 8px}#view-tiendo>.top{align-items:flex-start;flex-direction:column;padding:12px}#view-tiendo h2{font-size:17px}#progress-meta{font-size:10px}#view-tiendo .table-wrap{max-height:65vh}#view-tiendo table{font-size:11px}#view-tiendo th,#view-tiendo td{padding:8px 7px}}
+
+/* PCCCR dashboard - đồng bộ phong cách Tiện ích lâm nghiệp */
+#view-tiendo{background:transparent;border:0;box-shadow:none;padding:0}
+#view-tiendo>.top{margin:0 0 13px;padding:15px 17px;border:1px solid #dce5e0;border-radius:15px;background:#fff;box-shadow:0 8px 24px rgba(15,23,42,.045)}
+#view-tiendo h2{font-size:16px;font-weight:800;color:#064e3b}
+#progress-meta{padding:6px 10px;border-radius:9px;background:#ecfdf5;color:#047857;font-size:11px;font-weight:800}
+.progress-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:0 0 12px}
+.progress-kpi{display:flex;align-items:center;gap:11px;padding:13px 14px;border:1px solid #e2e8f0;border-radius:13px;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.045);min-width:0}
+.progress-kpi-icon{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:11px;background:#ecfdf5;color:#047857;font-size:15px}
+.progress-kpi small{display:block;font-size:9px;letter-spacing:.04em;font-weight:800;color:#64748b}
+.progress-kpi b{display:block;margin-top:2px;font-size:18px;color:#0f172a;font-weight:800;overflow-wrap:anywhere}
+.station-dashboard{padding:15px;border:1px solid #e2e8f0;border-radius:15px;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.045);margin-bottom:13px}
+.station-dashboard-title{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:13px;color:#14532d;font-size:12px}
+.station-dashboard-title span{font-size:10px;color:#64748b;font-weight:500}
+.station-bars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px 18px}
+.station-bar{min-width:0}
+.station-bar-head{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:#334155;margin-bottom:6px}
+.station-bar-head b{font-weight:800}.station-bar-head strong{color:#047857;font-variant-numeric:tabular-nums}
+.station-track{height:8px;border-radius:99px;background:#edf2ef;overflow:hidden}
+.station-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#34d399,#047857);transition:width .5s ease}
+.station-bar small{display:block;margin-top:5px;color:#64748b;font-size:10px;font-variant-numeric:tabular-nums}
+#view-tiendo .table-wrap{margin-top:0;border:1px solid #e2e8f0;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.045)}
+#view-tiendo table{font-size:11px}
+#view-tiendo th{background:#f0fdf4;color:#166534}
+#view-tiendo thead tr:first-child th{background:#dcfce7;color:#14532d}
+#view-tiendo td.progress-work{font-weight:700}
+#sheet-instruction{margin-top:10px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px}
+@media(max-width:760px){.progress-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.station-bars{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.progress-kpi{padding:10px;gap:8px}.progress-kpi-icon{width:31px;height:31px}.progress-kpi b{font-size:15px}.station-dashboard{padding:11px}.station-dashboard-title{align-items:flex-start;flex-direction:column}.station-bars{gap:12px}}
 </style>
 <script>
 (function(){
@@ -218,7 +247,7 @@ main{max-width:1240px;padding-top:26px}
 <section id="view-tiendo" class="panel hidden">
 <div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Dữ liệu chỉ đọc, đồng bộ trực tiếp từ Google Sheets nguồn do Admin cấu hình</div></div><span class="status" id="progress-meta">Đang chờ đồng bộ...</span></div>
 
-<div class="table-wrap" id="progress-table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
+<div id="progress-dashboard"></div><div class="table-wrap" id="progress-table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
 <div class="status" style="margin-top:12px" id="sheet-instruction">Nguồn Sheet chưa được cấu hình. Admin vào Quản trị → Nguồn Google Sheet → PCCCR để khai báo Spreadsheet ID và GID.</div>
 </section>
 <div class="status" id="app-status"></div>
@@ -244,7 +273,7 @@ function cell(row,i){return i<0||!row.c||!row.c[i]?null:row.c[i].v}
 function num(v){if(v==null||v==='')return 0;if(typeof v==='number')return v;return Number(String(v).replace(/,/g,'.').replace(/[^0-9.-]/g,''))||0}
 function percent(th,kh){return kh?Math.round(th/kh*1000)/10:0}
 function parseProgress(table){
- const cols=(table.cols||[]).map(c=>norm(c.label||c.id)),find=a=>{for(let i=0;i<cols.length;i++)if(a.includes(cols[i]))return i;return -1};
+ const cols=(table.cols||[]).map(c=>norm(c.label||c.id)),find=a=>{for(let i=0;i<cols.length;i++)if(a.some(x=>cols[i]===x))return i;for(let i=0;i<cols.length;i++)if(a.some(x=>cols[i].includes(x)||x.includes(cols[i])))return i;return -1};
  const ix={stt:find(['stt','so']),name:find(['hangmuc','noidung','congviec']),unit:find(['dvt','donvitinh'])};
  const totalKH=find(['tongkh','tongkehoach']),totalTH=find(['tongth','tongthuchien']);
  const aliases={GH:['giahuynh','gh'],NL:['nuile','nl'],TT:['trantao','tt'],LC:['lancat','lc'],GP:['giaphu','gp'],DV:['damvoi','dv']},map={};
@@ -253,7 +282,14 @@ function parseProgress(table){
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(n){return Number(n||0).toLocaleString('vi-VN',{maximumFractionDigits:2})}
-function renderProgress(rows){$('progress-head').innerHTML='<tr><th rowspan="2">STT</th><th rowspan="2">Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">TỔNG CỘNG</th>'+names.map(n=>'<th colspan="3">'+n.toUpperCase()+'</th>').join('')+'</tr><tr>'+Array.from({length:7},()=>'<th>KH</th><th>TH</th><th>%</th>').join('')+'</tr>';if(!rows.length){$('progress-body').innerHTML='<tr><td colspan="24">Google Sheets chưa có dòng dữ liệu.</td></tr>';return}const c=o=>'<td>'+fmt(o.kh)+'</td><td>'+fmt(o.th)+'</td><td><span class="progress-percent">'+fmt(o.tyLe)+'%</span></td>';$('progress-body').innerHTML=rows.map(r=>'<tr><td>'+esc(r.stt)+'</td><td class="progress-work">'+esc(r.hangMuc)+'</td><td>'+esc(r.dvt)+'</td>'+c(r.tong)+codes.map(k=>c(r.phanTruong[k])).join('')+'</tr>').join('')}
+function renderProgressDashboard(rows){
+ const sum=(key)=>rows.reduce((a,r)=>a+(Number(r[key]&&r[key].kh)||0),0);
+ const sumTh=(key)=>rows.reduce((a,r)=>a+(Number(r[key]&&r[key].th)||0),0);
+ const totalKh=rows.reduce((a,r)=>a+(Number(r.tong.kh)||0),0),totalTh=rows.reduce((a,r)=>a+(Number(r.tong.th)||0),0),rate=totalKh?totalTh/totalKh*100:0;
+ const kpis=[['HẠNG MỤC',rows.length,'fa-list-check'],['TỔNG KẾ HOẠCH',fmt(totalKh),'fa-bullseye'],['ĐÃ THỰC HIỆN',fmt(totalTh),'fa-circle-check'],['TỶ LỆ HOÀN THÀNH',fmt(rate)+'%','fa-chart-line']];
+ $('progress-dashboard').innerHTML='<div class="progress-kpis">'+kpis.map(x=>'<div class="progress-kpi"><span class="progress-kpi-icon"><i class="fa-solid '+x[2]+'"></i></span><div><small>'+x[0]+'</small><b>'+x[1]+'</b></div></div>').join('')+'</div><div class="station-dashboard"><div class="station-dashboard-title"><b><i class="fa-solid fa-chart-column"></i> TIẾN ĐỘ THEO PHÂN TRƯỜNG</b><span>Khối lượng thực hiện / kế hoạch</span></div><div class="station-bars">'+codes.map((k,i)=>{const kh=sum('phanTruong')&&rows.reduce((a,r)=>a+(Number(r.phanTruong[k].kh)||0),0),th=rows.reduce((a,r)=>a+(Number(r.phanTruong[k].th)||0),0),p=kh?Math.min(100,th/kh*100):0;return '<div class="station-bar"><div class="station-bar-head"><b>'+names[i]+'</b><strong>'+fmt(p)+'%</strong></div><div class="station-track"><i style="width:'+p.toFixed(1)+'%"></i></div><small>'+fmt(th)+' / '+fmt(kh)+'</small></div>'}).join('')+'</div></div>';
+}
+function renderProgress(rows){renderProgressDashboard(rows);$('progress-head').innerHTML='<tr><th rowspan="2">STT</th><th rowspan="2">Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">TỔNG CỘNG</th>'+names.map(n=>'<th colspan="3">'+n.toUpperCase()+'</th>').join('')+'</tr><tr>'+Array.from({length:7},()=>'<th>KH</th><th>TH</th><th>%</th>').join('')+'</tr>';if(!rows.length){$('progress-body').innerHTML='<tr><td colspan="24">Google Sheets chưa có dòng dữ liệu.</td></tr>';return}const c=o=>'<td>'+fmt(o.kh)+'</td><td>'+fmt(o.th)+'</td><td><span class="progress-percent">'+fmt(o.tyLe)+'%</span></td>';$('progress-body').innerHTML=rows.map(r=>'<tr><td>'+esc(r.stt)+'</td><td class="progress-work">'+esc(r.hangMuc)+'</td><td>'+esc(r.dvt)+'</td>'+c(r.tong)+codes.map(k=>c(r.phanTruong[k])).join('')+'</tr>').join('')}
 function renderRawProgress(table){const cols=table.cols||[],rows=table.rows||[];if(!cols.length)throw Error('Tab Google Sheets không trả về tiêu đề cột. Kiểm tra GID và quyền xem.');const headers=cols.map((c,i)=>String(c.label||c.id||('Cột '+(i+1))));$('progress-head').innerHTML='<tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr>';$('progress-body').innerHTML=rows.length?rows.map(r=>'<tr>'+cols.map((_,i)=>{const x=r.c&&r.c[i],v=x?(x.f!=null?x.f:x.v):'';return '<td>'+esc(v==null?'':v)+'</td>'}).join('')+'</tr>').join(''):'<tr><td colspan="'+cols.length+'">Google Sheets chưa có dòng dữ liệu.</td></tr>';$('progress-table-wrap').classList.add('raw-mode')}
 const PCCCR_PROGRESS_SOURCE={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'1792946874'};
 async function loadProgress(){try{
