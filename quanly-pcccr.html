@@ -223,6 +223,109 @@ main{max-width:1240px;padding-top:26px}
 #sheet-instruction{margin-top:10px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px}
 @media(max-width:760px){.progress-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.station-bars{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.progress-kpi{padding:10px;gap:8px}.progress-kpi-icon{width:31px;height:31px}.progress-kpi b{font-size:15px}.station-dashboard{padding:11px}.station-dashboard-title{align-items:flex-start;flex-direction:column}.station-bars{gap:12px}}
+
+/* ===== FOREST COMMAND CENTER · visual system ===== */
+:root{--forest-950:#123b2b;--forest-900:#174b35;--forest-800:#176044;--forest-700:#047857;--forest-600:#059669;--forest-100:#e7f5ec;--forest-50:#f4faf6;--surface:#fff;--stroke:#dfe9e2;--muted:#718176;--shadow:0 10px 30px rgba(20,55,35,.065)}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 8% -5%,rgba(16,185,129,.12),transparent 32%),radial-gradient(ellipse at 100% 10%,rgba(52,120,84,.07),transparent 28%),#f3f7f4;color:#17251d}
+main{max-width:1320px;padding:24px 22px 54px}
+.top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 20px;margin-bottom:15px;border:1px solid rgba(210,226,215,.95);border-radius:20px;background:rgba(255,255,255,.94);box-shadow:var(--shadow);backdrop-filter:blur(14px)}
+.top:before{content:"";position:absolute;left:0;top:17px;bottom:17px;width:4px;border-radius:0 5px 5px 0;background:linear-gradient(180deg,#34d399,#047857)}
+.brand-lockup{display:flex;align-items:center;gap:14px;min-width:0}
+.brand-mark{width:48px;height:48px;flex:none;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#34d399,#047857);color:#fff;font-size:21px;box-shadow:0 8px 18px rgba(4,120,87,.2)}
+.eyebrow{margin-bottom:4px;color:#0b8a61;font-size:9px;font-weight:900;letter-spacing:.17em}
+.top h1{font-size:clamp(17px,2.2vw,23px);line-height:1.25;letter-spacing:-.035em;color:var(--forest-950)}
+.top .sub{margin-top:5px;color:#718176;font-size:11px;line-height:1.5}
+.top-actions{display:flex;flex-direction:column;align-items:flex-end;gap:9px;min-width:0}
+.sync-indicator{display:flex;align-items:center;gap:7px;max-width:330px;padding:6px 10px;border:1px solid #e1eee5;border-radius:999px;background:#f7fbf8}
+.sync-indicator .status{font-size:10px;font-weight:700;color:#527060;line-height:1.35}
+.sync-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#10a66d;box-shadow:0 0 0 4px rgba(16,166,109,.11)}
+.top-buttons{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:37px;padding:0 13px;border:1px solid #dce8df;border-radius:11px;background:#fff;color:#365443;font-size:11px;font-weight:800}
+.btn.primary{border:0;background:linear-gradient(135deg,#0a9667,#056447);color:#fff}
+.btn.soft{background:#f8fbf9;color:#365443}
+.tabs{display:flex;gap:8px;margin:0 0 15px;padding:5px;border:1px solid #e0eae3;border-radius:15px;background:#eaf2ec}
+.tab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:41px;padding:0 18px;border:1px solid transparent;border-radius:11px;background:transparent;color:#567062;font-size:11px;font-weight:800}
+.tab.on{background:#fff;color:#08734f;border-color:#dce9df;box-shadow:0 3px 10px rgba(28,75,48,.08)}
+.panel{padding:20px;border:1px solid var(--stroke);border-radius:19px;background:rgba(255,255,255,.88);box-shadow:var(--shadow)}
+#view-cap{padding:clamp(15px,2.3vw,26px)}
+#view-cap>h2{display:flex;align-items:center;gap:9px;margin:0;color:var(--forest-950);font-size:17px;font-weight:900;letter-spacing:-.025em}
+#view-cap>h2:before{content:"";width:5px;height:20px;border-radius:5px;background:#10a66d}
+#view-cap>.sub{margin:6px 0 13px 14px;color:#7a8a80;font-size:11px}
+.fire-sign{grid-template-areas:"head head" "sub sub" "date date" "dial name" "dial desc" "dial metrics" "foot foot" "legend legend" "tools tools";grid-template-columns:minmax(0,1.2fr) minmax(245px,.8fr);column-gap:clamp(16px,3vw,36px);max-width:1040px;margin:15px auto 19px;padding:clamp(19px,3vw,30px);border:1px solid #cfe1d4;border-radius:22px;background:linear-gradient(145deg,#fff 0%,#f8fcf9 65%,#eff8f1 100%);box-shadow:0 18px 45px rgba(18,61,43,.10),inset 0 0 0 5px rgba(255,255,255,.72)}
+.fire-sign:before{height:7px}
+.fire-sign-head{font-size:clamp(17px,2.4vw,23px);letter-spacing:.015em;color:#174b35}
+.fire-sign-sub{font-size:9px;letter-spacing:.19em;color:#809187}
+.cap-today-date{margin:5px 0 8px;padding:7px 15px;border-color:#d7e9dc;background:#f1f8f3;color:#286044;font-size:10px;letter-spacing:.1em}
+.fire-dial{max-width:690px;align-self:center;filter:drop-shadow(0 8px 9px rgba(24,67,43,.10))}
+.fire-level-name{min-height:78px;border-radius:16px;font-size:clamp(21px,2.8vw,30px);box-shadow:0 10px 22px rgba(18,61,43,.15)}
+.fire-level-desc{border-color:#e0ebe3;border-radius:13px;color:#456351;font-size:12px}
+#cap-meta{grid-area:metrics;width:100%;max-width:none;margin:0;padding:12px 14px;border:1px solid #e0ebe3;border-radius:13px;background:#fff;color:#5d7465;font-size:10px;line-height:1.8;box-shadow:0 4px 12px rgba(20,55,35,.035)}
+.fire-sign-foot{padding-top:11px;color:#557564;font-size:10px;letter-spacing:.16em}
+.fire-legend{gap:7px 9px;padding-top:12px}
+.fire-legend span{padding:6px 10px;border-color:#e4ede6;background:#fff;font-size:10px}
+#recommend{max-width:1040px;margin:0 auto 16px;padding:13px 16px;border:1px solid #d4e9da;border-left:4px solid #0b9665;border-radius:13px;background:#f0f9f2;color:#28563b;font-size:11px;line-height:1.7}
+.level-table-title{max-width:1040px;margin:22px auto 10px;font-size:11px;font-weight:900;letter-spacing:.09em;color:#345e45}
+#cap-reference-table,#cap-history{max-width:1040px;border:1px solid #e0eae3;border-radius:14px;box-shadow:0 6px 20px rgba(20,55,35,.04)}
+#cap-reference-table th,#cap-history th{background:#edf6ef;color:#315c42;font-size:10px;letter-spacing:.035em}
+#cap-reference-table td,#cap-reference-table th,#cap-history td,#cap-history th{padding:12px 14px}
+#cap-reference-table tr:nth-child(even) td,#cap-history tr:nth-child(even) td{background:#fafcfb}
+#cap-reference-table tbody tr:hover td,#cap-history tbody tr:hover td{background:#eff8f1}
+#cap-reference-table table{font-size:11px}
+.cap-history table{font-size:11px}
+#view-tiendo{padding:0}
+#view-tiendo>.top{border:1px solid #dfe9e2;border-radius:16px;box-shadow:0 5px 18px rgba(20,55,35,.045)}
+#view-tiendo .table-wrap{border-color:#dfe9e2;border-radius:15px;box-shadow:0 7px 22px rgba(20,55,35,.045)}
+.progress-kpi{padding:15px;border-color:#e0eae3;border-radius:15px;box-shadow:0 5px 17px rgba(20,55,35,.045);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.progress-kpi:hover{transform:translateY(-3px);border-color:#b8d9c3;box-shadow:0 10px 23px rgba(20,75,45,.08)}
+.progress-kpi-icon{width:39px;height:39px;border-radius:12px;background:#edf8f0;color:#07845a}
+.progress-kpi small{font-size:9px;letter-spacing:.08em}
+.progress-kpi b{font-size:clamp(17px,2vw,21px);color:#183c2a;font-variant-numeric:tabular-nums}
+.station-dashboard{padding:18px;border-color:#e0eae3;border-radius:16px;box-shadow:0 5px 17px rgba(20,55,35,.045)}
+.station-dashboard-title{font-size:12px;color:#234f36}
+.station-dashboard-title b{display:flex;align-items:center;gap:8px}
+.station-dashboard-title b i{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:#edf8f0;color:#07845a}
+.station-bar-head{font-size:11px}
+.station-track{height:9px;background:#edf3ef}
+.station-track i{background:linear-gradient(90deg,#52c995,#07845a)}
+#view-tiendo .table-wrap{margin-top:2px}
+#view-tiendo th{background:#edf6ef;color:#315c42;font-size:10px}
+#view-tiendo thead tr:first-child th{background:#dcefe2;color:#174b35}
+#view-tiendo td{font-size:11px}
+#sheet-instruction{font-size:10px;color:#687d70}
+.status{line-height:1.5}
+button:focus-visible{outline:3px solid rgba(16,166,109,.3);outline-offset:2px}
+@media(max-width:760px){
+ main{padding:12px 10px 35px}
+ .top{align-items:flex-start;padding:13px;border-radius:16px}
+ .brand-lockup{gap:10px}
+ .brand-mark{width:40px;height:40px;border-radius:12px;font-size:18px}
+ .top-actions{align-items:flex-start;width:100%}
+ .sync-indicator{max-width:100%}
+ .top-buttons{justify-content:flex-start}
+ .tabs{display:grid;grid-template-columns:1fr 1fr}
+ .tab{padding:0 9px;min-height:39px;font-size:10px}
+ .panel{padding:13px;border-radius:15px}
+ .fire-sign{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "sub" "date" "dial" "name" "desc" "metrics" "foot" "legend" "tools";gap:9px;padding:17px 12px;border-radius:17px}
+ .fire-dial{max-width:430px}
+ .fire-level-name{min-height:57px;font-size:21px}
+ #cap-meta{font-size:10px;text-align:left}
+}
+@media(max-width:480px){
+ main{padding-left:8px;padding-right:8px}
+ .top h1{font-size:16px}
+ .eyebrow{font-size:8px}
+ .top .sub{font-size:10px}
+ .top-buttons{width:100%}
+ .top-buttons .btn{flex:1}
+ .progress-kpis{gap:7px}
+ .progress-kpi{padding:10px}
+ .progress-kpi b{font-size:15px}
+ .station-bars{grid-template-columns:1fr}
+ #view-tiendo>.top{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fire-sign,.fire-sign:before{animation:none!important}}
+
 </style>
 <script>
 (function(){
@@ -236,21 +339,20 @@ main{max-width:1240px;padding-top:26px}
 </script>
 </head>
 <body><main>
-<div class="top"><div><h1><i class="fa-solid fa-fire-flame-curved"></i> PHÒNG CHÁY, CHỮA CHÁY RỪNG</h1><div class="sub">Theo dõi biển báo cấp cháy và tiến độ thực hiện công tác PCCCR toàn lâm phần</div></div><div><button class="btn soft" onclick="location.href='menu.html'"><i class="fa fa-arrow-left"></i> Menu</button> <button class="btn soft" onclick="loadAll()"><i class="fa fa-rotate"></i> Làm mới</button></div></div>
+<div class="top"><div class="brand-lockup"><div class="brand-mark"><i class="fa-solid fa-fire-flame-curved"></i></div><div><div class="eyebrow">FOREST COMMAND CENTER · XUÂN LỘC</div><h1>PHÒNG CHÁY, CHỮA CHÁY RỪNG</h1><div class="sub">Hệ thống theo dõi, giám sát và điều hành công tác PCCCR toàn lâm phần</div></div></div><div class="top-actions"><div class="sync-indicator"><span class="sync-dot"></span><span class="status" id="app-status">Đang kết nối dữ liệu...</span></div><div class="top-buttons"><button class="btn soft" onclick="location.href='menu.html'"><i class="fa fa-arrow-left"></i> Menu</button> <button class="btn soft" onclick="loadAll()"><i class="fa fa-rotate"></i> Làm mới</button></div></div></div>
 <div class="tabs"><button class="tab on" id="tab-cap" onclick="switchTab('cap')"> <i class="fa fa-gauge-high"></i> Biển báo cấp cháy</button><button class="tab" id="tab-tiendo" onclick="switchTab('tiendo')"><i class="fa fa-list-check"></i> Tiến độ thi công</button></div>
 <section id="view-cap" class="panel">
 <h2>Biển báo cấp cháy rừng</h2><div class="sub">Cấp dự báo cháy rừng toàn lâm phần</div>
-<div class="fire-sign" role="img" aria-label="Biển báo hiệu cấp dự báo cháy rừng gồm năm cấp, kim chỉ cấp hiện hành"><h3 class="fire-sign-head">BIỂN BÁO HIỆU CẤP DỰ BÁO CHÁY RỪNG</h3><div class="fire-sign-sub">BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</div><div id="cap-today-date" class="cap-today-date">NGÀY THEO DÕI: ĐANG TẢI...</div><svg id="fire-dial" class="fire-dial" viewBox="0 0 560 330" aria-hidden="true"></svg><div id="fire-level-name" class="fire-level-name">CHƯA CẬP NHẬT</div><div id="fire-level-desc" class="fire-level-desc">Chưa có dữ liệu cấp cháy</div><div class="fire-sign-foot">CẤP DỰ BÁO CHÁY RỪNG</div><div class="fire-legend"><span><i class="fire-dot" style="background:#8fc9ad"></i>I – THẤP</span><span><i class="fire-dot" style="background:#08734f"></i>II – TRUNG BÌNH</span><span><i class="fire-dot" style="background:#f4d03f"></i>III – CAO</span><span><i class="fire-dot" style="background:#e53935"></i>IV – NGUY HIỂM</span><span><i class="fire-dot" style="background:#8b0000"></i>V – CỰC KỲ NGUY HIỂM</span></div><div id="zalo-notice-tools" class="zalo-notice-tools" style="grid-area:legend;justify-self:center;margin-top:8px"><button id="btn-copy-zalo" class="btn primary" type="button" onclick="copyZaloNotice()" style="display:none"><i class="fa-brands fa-rocketchat"></i> SAO CHÉP THÔNG BÁO ZALO</button><span id="zalo-copy-status" class="status"></span></div></div>
+<div class="fire-sign" role="img" aria-label="Biển báo hiệu cấp dự báo cháy rừng gồm năm cấp, kim chỉ cấp hiện hành"><h3 class="fire-sign-head">BIỂN BÁO HIỆU CẤP DỰ BÁO CHÁY RỪNG</h3><div class="fire-sign-sub">BAN QUẢN LÝ RỪNG PHÒNG HỘ XUÂN LỘC</div><div id="cap-today-date" class="cap-today-date">NGÀY THEO DÕI: ĐANG TẢI...</div><svg id="fire-dial" class="fire-dial" viewBox="0 0 560 330" aria-hidden="true"></svg><div id="fire-level-name" class="fire-level-name">CHƯA CẬP NHẬT</div><div id="fire-level-desc" class="fire-level-desc">Chưa có dữ liệu cấp cháy</div><p class="status" id="cap-meta"></p><div class="fire-sign-foot">CẤP DỰ BÁO CHÁY RỪNG</div><div class="fire-legend"><span><i class="fire-dot" style="background:#8fc9ad"></i>I – THẤP</span><span><i class="fire-dot" style="background:#08734f"></i>II – TRUNG BÌNH</span><span><i class="fire-dot" style="background:#f4d03f"></i>III – CAO</span><span><i class="fire-dot" style="background:#e53935"></i>IV – NGUY HIỂM</span><span><i class="fire-dot" style="background:#8b0000"></i>V – CỰC KỲ NGUY HIỂM</span></div><div id="zalo-notice-tools" class="zalo-notice-tools" style="justify-self:center;margin-top:8px"><button id="btn-copy-zalo" class="btn primary" type="button" onclick="copyZaloNotice()" style="display:none"><i class="fa-brands fa-rocketchat"></i> SAO CHÉP THÔNG BÁO ZALO</button><span id="zalo-copy-status" class="status"></span></div></div>
 <h3 class="level-table-title">BẢNG TRA CẤP DỰ BÁO CHÁY RỪNG</h3>
 <div class="table-wrap" id="cap-reference-table"><div class="status">Đang tải bảng tra...</div></div><span id="cap-reference-status" hidden></span>
-<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy.</div><p class="status" id="cap-meta"></p><h3 class="level-table-title">LỊCH SỬ CẤP DỰ BÁO CHÁY RỪNG THEO NGÀY</h3><div id="cap-history" class="cap-history"><div class="status">Đang tải lịch sử...</div></div></section>
+<div class="notice" id="recommend">Chưa có dữ liệu cấp cháy.</div><h3 class="level-table-title">LỊCH SỬ CẤP DỰ BÁO CHÁY RỪNG THEO NGÀY</h3><div id="cap-history" class="cap-history"><div class="status">Đang tải lịch sử...</div></div></section>
 <section id="view-tiendo" class="panel hidden">
 <div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Dữ liệu chỉ đọc, đồng bộ trực tiếp từ Google Sheets nguồn do Admin cấu hình</div></div><span class="status" id="progress-meta">Đang chờ đồng bộ...</span></div>
 
 <div id="progress-dashboard"></div><div class="table-wrap" id="progress-table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
 <div class="status" style="margin-top:12px" id="sheet-instruction">Nguồn Sheet chưa được cấu hình. Admin vào Quản trị → Nguồn Google Sheet → PCCCR để khai báo Spreadsheet ID và GID.</div>
 </section>
-<div class="status" id="app-status"></div>
 </main>
 <script>
 const API='https://script.google.com/macros/s/AKfycbxuJbK3_-8105VI5dWHkQCiR6BKUMmrf1RM33fQ6hbl9OGh06hGBk62shVWX3h2lBJC7g/exec'; // Dùng thống nhất URL với trang Admin
