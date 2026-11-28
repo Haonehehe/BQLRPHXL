@@ -337,6 +337,7 @@ button:focus-visible{outline:3px solid rgba(16,166,109,.3);outline-offset:2px}
  window.PCCCR_SESSION=s;
 })();
 </script>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body><main>
 <div class="top"><div class="brand-lockup"><div class="brand-mark"><i class="fa-solid fa-fire-flame-curved"></i></div><div><div class="eyebrow">FOREST COMMAND CENTER · XUÂN LỘC</div><h1>PHÒNG CHÁY, CHỮA CHÁY RỪNG</h1><div class="sub">Hệ thống theo dõi, giám sát và điều hành công tác PCCCR toàn lâm phần</div></div></div><div class="top-actions"><div class="sync-indicator"><span class="sync-dot"></span><span class="status" id="app-status">Đang kết nối dữ liệu...</span></div><div class="top-buttons"><button class="btn soft" onclick="location.href='menu.html'"><i class="fa fa-arrow-left"></i> Menu</button> <button class="btn soft" onclick="loadAll()"><i class="fa fa-rotate"></i> Làm mới</button></div></div></div>
@@ -421,4 +422,6 @@ window.addEventListener('storage',e=>{if(e.key==='bqlrph_pcccr_cap_updated')refr
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshCapFromAdmin()});
 window.addEventListener('focus',refreshCapFromAdmin);
 setupCapPermissions();loadCapReference();loadAll();setInterval(()=>{loadAll();loadCapReference()},15000); // Đồng bộ cấp cháy định kỳ 15 giây
-</script></body></html>
+</script>
+<script src="ui-shell.js"></script>
+</body></html>

@@ -2541,7 +2541,8 @@ function baoCaoDocHtml(title,body){
     +'@media print{body{padding:0;margin:0}.report{padding:6mm}button{display:none!important}'
     +'.bd-a4{width:190mm;min-height:277mm}.bd-outer{min-height:277mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
 
-  return '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+css+'</style></head><body>'+body+'</body></html>';
+  return '<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title><style>'+css+'</style></head><body>'+body+'
+</body></html>';
 }
 
 function buildBaoCaoDongHtml(p){
@@ -3872,5 +3873,6 @@ var _veLai=null;
 <script>
 try { if (window.BQLRPHLog) BQLRPHLog.page('lamba'); } catch (e) {}
 </script>
+<script src="ui-shell.js"></script>
 </body>
 </html>
