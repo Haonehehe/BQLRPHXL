@@ -886,10 +886,15 @@ function listLog_(data) {
 
 /* ===================== Module PCCCR ===================== */
 function pcccrUser_(data) {
-  var sess = getSession_(data.token);
-  if (!sess) throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-  var user = findUser_(sess.email);
-  if (!user || user.status !== 'approved') throw new Error('Tài khoản chưa được duyệt hoặc đã bị khóa.');
+  var token = String(data.token || data.sessionToken || '');
+  var sess = token ? getSession_(token) : null;
+  var user = sess ? findUser_(sess.email) : null;
+  if ((!user || user.status !== 'approved') && (data.adminEmail || data.adminPass)) {
+    user = requireAdmin_(data);
+  }
+  if (!user || user.status !== 'approved') {
+    throw new Error('Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.');
+  }
   var perms = String(user.perms || '').split(/[,;|]/).map(function(x){return x.trim();});
   if (user.role !== 'admin' && perms.indexOf('pcccr') < 0) throw new Error('Tài khoản chưa được cấp quyền PCCCR.');
   return user;
