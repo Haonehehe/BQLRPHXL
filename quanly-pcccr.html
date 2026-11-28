@@ -120,7 +120,7 @@ function parseProgress(table){
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmt(n){return Number(n||0).toLocaleString('vi-VN',{maximumFractionDigits:2})}
 function renderProgress(rows){$('progress-head').innerHTML='<tr><th rowspan="2">STT</th><th rowspan="2">Hạng mục</th><th rowspan="2">ĐVT</th><th colspan="3">Tổng</th>'+names.map(n=>'<th colspan="3">'+n+'</th>').join('')+'</tr><tr>'+Array.from({length:7},()=>'<th>KH</th><th>TH</th><th>%</th>').join('')+'</tr>';if(!rows.length){$('progress-body').innerHTML='<tr><td colspan="24">Sheet chưa có dữ liệu hoặc chưa đúng cấu trúc cột.</td></tr>';return}const c=o=>'<td>'+fmt(o.kh)+'</td><td>'+fmt(o.th)+'</td><td>'+fmt(o.tyLe)+'%</td>';$('progress-body').innerHTML=rows.map(r=>'<tr><td>'+esc(r.stt)+'</td><td style="text-align:left">'+esc(r.hangMuc)+'</td><td>'+esc(r.dvt)+'</td>'+c(r.tong)+codes.map(k=>c(r.phanTruong[k])).join('')+'</tr>').join('')}
-const PCCCR_PROGRESS_SOURCE={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'581631532'};
+const PCCCR_PROGRESS_SOURCE={sid:'1XtE06-U5kUfsiOro4vxuik3uM7NslWDYg8wMPud-pRI',gid:'1792946874'};
 async function loadProgress(){try{
  $('progress-meta').textContent='Đang đồng bộ tiến độ PCCCR...';
  const table=await loadGviz(PCCCR_PROGRESS_SOURCE.sid,PCCCR_PROGRESS_SOURCE.gid);
