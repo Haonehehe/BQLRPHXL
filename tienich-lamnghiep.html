@@ -474,8 +474,7 @@ function wordHtml(title, body){
   var print = (typeof _pdf!=='undefined' && _pdf);
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+
     '<style>@page{size:A4;margin:20mm 20mm 20mm 25mm}body{font-family:"Times New Roman",Times,serif;font-size:13pt;line-height:1.3;color:#000}'+
-    'table{border-collapse:collapse}p{margin:4pt 0}</style></head><body'+(print?' onload="window.print()"':'')+'>'+body+'<script src="ui-shell.js"></script>
-</body></html>';
+    'table{border-collapse:collapse}p{margin:4pt 0}</style></head><body'+(print?' onload="window.print()"':'')+'>'+body+'</body></html>';
 }
 
 
@@ -694,5 +693,6 @@ bkAddRow();
 <script>
 try { if (window.BQLRPHLog) BQLRPHLog.page('lamnghiep'); } catch (e) {}
 </script>
+<script src="ui-shell.js"></script>
 </body>
 </html>
