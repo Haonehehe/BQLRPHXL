@@ -1191,7 +1191,8 @@ function xuatWord(){
     '<head><meta charset="utf-8"><title>Van ban</title>'+
     '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->'+
     '<style>@page{size:A4;margin:2cm 1.5cm 2cm 3cm} body{font-family:"Times New Roman",Times,serif;font-size:13pt;color:#000} table,td,th{border:none !important;border-width:0 !important} table{border-collapse:collapse}</style>'+
-    '</head><body>'+inner+'</body></html>';
+    '</head><body>'+inner+'<script src="ui-shell.js"></script>
+</body></html>';
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\ufeff',html],{type:'application/msword'}));
   a.download='VB_'+soKyHieu().replace(/[\\/]/g,'_')+'_'+Date.now()+'.doc';
