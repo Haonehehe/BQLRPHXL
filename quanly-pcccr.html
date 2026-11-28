@@ -134,6 +134,44 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 .cap-history .history-level.lv1{background:#8fc9ad;color:#123d2d}.cap-history .history-level.lv2{background:#08734f;color:#fff}.cap-history .history-level.lv3{background:#f4d03f;color:#172033}.cap-history .history-level.lv4{background:#e53935;color:#fff}.cap-history .history-level.lv5{background:#8b0000;color:#fff}
 @media(max-width:640px){.cap-today-date{font-size:11px;padding:6px 12px}.cap-history table{font-size:11px}.cap-history td,.cap-history th{padding:8px 9px}}
 
+
+/* PCCCR - professional interface polish */
+body{background:radial-gradient(ellipse at 12% 0%,rgba(16,185,129,.13),transparent 34%),radial-gradient(ellipse at 92% 12%,rgba(59,130,246,.08),transparent 30%),linear-gradient(145deg,#f4f8f5 0%,#eef4f1 48%,#f8fafc 100%);background-attachment:fixed}
+main{max-width:1240px;padding-top:26px}
+.top{padding:16px 19px;border:1px solid rgba(203,220,209,.85);border-radius:18px;background:rgba(255,255,255,.86);box-shadow:0 8px 28px rgba(15,55,35,.055);backdrop-filter:blur(12px)}
+.top h1{letter-spacing:-.035em}
+.btn{transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(15,23,42,.12)}
+.btn:active{transform:translateY(0) scale(.98)}
+.tab{transition:color .2s ease,background .2s ease,border-color .2s ease,transform .2s ease}
+.tab:hover{transform:translateY(-1px);border-color:#86b79a;color:#14532d}
+.tab.on{background:linear-gradient(135deg,#065f46,#0b805a);box-shadow:0 7px 17px rgba(6,95,70,.2)}
+.panel,.card{border-color:rgba(213,226,216,.95);box-shadow:0 12px 34px rgba(20,55,35,.055)}
+.fire-sign{animation:pcccr-enter .55s cubic-bezier(.2,.75,.25,1) both}
+.fire-sign:before{background-size:200% 100%;animation:pcccr-stripe 8s linear infinite}
+.fire-dial{filter:drop-shadow(0 7px 8px rgba(15,23,42,.10));transition:filter .25s ease}
+.fire-level-name{transition:background-color .3s ease,color .3s ease,box-shadow .3s ease,transform .3s ease}
+.cap-today-date{box-shadow:0 3px 12px rgba(20,70,40,.06);letter-spacing:.055em}
+#recommend{box-shadow:0 5px 16px rgba(20,70,40,.045);transition:background .2s ease}
+#cap-reference-table,#cap-history{box-shadow:0 8px 24px rgba(20,55,35,.045)}
+#cap-reference-table tbody tr:hover td,#cap-history tbody tr:hover td{background:#eef8f0}
+.zalo-notice-tools{width:100%;padding:5px 0 1px}
+#btn-copy-zalo{border-radius:999px;padding:11px 19px;background:linear-gradient(135deg,#08734f,#0b8a60);box-shadow:0 7px 17px rgba(8,115,79,.2)}
+#btn-copy-zalo:hover{background:linear-gradient(135deg,#065f46,#08734f)}
+#zalo-copy-status{min-height:18px}
+@keyframes pcccr-enter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pcccr-stripe{0%{background-position:0 0}100%{background-position:200% 0}}
+@media(max-width:640px){
+ main{padding:12px 9px 35px}
+ .top{padding:13px;border-radius:14px}
+ .top h1{font-size:19px}
+ .tabs{display:grid;grid-template-columns:1fr 1fr}
+ .tab{padding:10px 8px;font-size:11px}
+ .fire-sign{box-shadow:0 12px 28px rgba(15,55,35,.09),inset 0 0 0 4px rgba(255,255,255,.8)}
+ #btn-copy-zalo{width:100%;max-width:330px;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
 </style>
 <script>
 (function(){
