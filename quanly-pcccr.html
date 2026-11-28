@@ -37,7 +37,7 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 <h2>Biển báo cấp cháy rừng toàn lâm phần</h2><div class="sub">Cập nhật hằng ngày · Thông tin hiển thị dùng chung cho toàn đơn vị</div>
 <div class="levels" id="levels"></div>
 <div class="notice" id="recommend">Chưa có dữ liệu cấp cháy. Vui lòng cập nhật thông tin trong ngày.</div>
-<div class="grid" id="cap-admin-form"><div class="grid">
+<div class="grid" id="cap-admin-form">
 <div class="field"><label>Ngày cập nhật</label><input id="cap-ngay" type="date"></div>
 <div class="field"><label>Cấp cháy rừng</label><select id="cap-level"><option value="1">Cấp I — Ít nguy hiểm</option><option value="2">Cấp II — Trung bình</option><option value="3">Cấp III — Cao</option><option value="4">Cấp IV — Nguy hiểm</option><option value="5">Cấp V — Cực kỳ nguy hiểm</option></select></div>
 <div class="field"><label>Nhiệt độ (°C)</label><input id="cap-temp" type="number" step=".1"></div>
@@ -45,10 +45,10 @@ input.num{width:74px;padding:7px;border:1px solid #cbd5e1;border-radius:7px;text
 <div class="field"><label>Tốc độ gió (m/s)</label><input id="cap-wind" type="number" step=".1"></div>
 <div class="field" style="grid-column:span 2"><label>Nguồn thông tin / ghi chú</label><input id="cap-source" placeholder="Nguồn số liệu, trạm quan trắc..."></div>
 <div class="field" style="display:flex;align-items:end"><button class="btn primary" onclick="saveCap()"><i class="fa fa-floppy-disk"></i> Lưu cấp cháy</button></div>
-</div></div><p class="status" id="cap-meta"></p></section>
+</div><p class="status" id="cap-meta"></p></section>
 <section id="view-tiendo" class="panel hidden">
 <div class="top"><div><h2>Tiến độ thi công PCCCR</h2><div class="sub">Dữ liệu chỉ đọc, đồng bộ trực tiếp từ Google Sheets nguồn do Admin cấu hình</div></div><span class="status" id="progress-meta">Đang chờ đồng bộ...</span></div>
-<div class="notice">Các phân trường cập nhật trực tiếp trên cùng một tab Google Sheets. Module chỉ tổng hợp và hiển thị; không chỉnh sửa dữ liệu tại đây.</div>
+<div class="notice">Các phân trường cập nhật trực tiếp trên cùng một tab Google Sheets. Module chỉ tổng hợp và hiển thị; không chỉnh sửa dữ liệu tại đây. Dòng tiêu đề cần có: STT, Hạng mục, ĐVT, Tổng KH, Tổng TH, Gia Huynh KH, Gia Huynh TH, Núi Le KH, Núi Le TH, Trản Táo KH, Trản Táo TH, Lán Cát KH, Lán Cát TH, Gia Phu KH, Gia Phu TH, Đầm Voi KH, Đầm Voi TH.</div>
 <div class="table-wrap"><table><thead id="progress-head"></thead><tbody id="progress-body"></tbody></table></div>
 <div class="status" style="margin-top:12px" id="sheet-instruction">Nguồn Sheet chưa được cấu hình. Admin vào Quản trị → Nguồn Google Sheet → PCCCR để khai báo Spreadsheet ID và GID.</div>
 </section>
