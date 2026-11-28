@@ -106,6 +106,7 @@ table.data tbody tr{animation:rowIn .3s both}table.data tbody tr:hover td{backgr
 @media(max-width:720px){.hero{height:120px}.hero-t b{font-size:16px}.hero-t{max-width:70%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.ln-leaf{display:none}}
 </style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body data-bqlrph-module="lamnghiep">
 <div class="top"><div class="wrap top-in">
@@ -473,7 +474,8 @@ function wordHtml(title, body){
   var print = (typeof _pdf!=='undefined' && _pdf);
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+
     '<style>@page{size:A4;margin:20mm 20mm 20mm 25mm}body{font-family:"Times New Roman",Times,serif;font-size:13pt;line-height:1.3;color:#000}'+
-    'table{border-collapse:collapse}p{margin:4pt 0}</style></head><body'+(print?' onload="window.print()"':'')+'>'+body+'</body></html>';
+    'table{border-collapse:collapse}p{margin:4pt 0}</style></head><body'+(print?' onload="window.print()"':'')+'>'+body+'<script src="ui-shell.js"></script>
+</body></html>';
 }
 
 
