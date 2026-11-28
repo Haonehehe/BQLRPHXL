@@ -541,7 +541,7 @@ function approveUser(email, perms, asAdmin) {
   u.status = 'approved';
   u.approvedAt = new Date().toISOString();
   u.perms = Array.isArray(perms) && perms.length ? perms.slice() : ['pdf'];
-  if (u.perms.indexOf('pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
   if (asAdmin) { u.role = 'admin'; u.perms = ALL_PERMS.slice(); }
   _saveDB(db);
   return Promise.resolve(true);
@@ -600,7 +600,7 @@ function updatePerms(email, perms) {
   var u = db.users.find(function (x) { return x.email === email; });
   if (!u) return Promise.reject(new Error('Không tìm thấy'));
   u.perms = perms.slice();
-  if (u.perms.indexOf('pdf') < 0) u.perms.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  if (u.perms.indexOf('pdf') < 0) u.perms.push('pdf');
   _saveDB(db);
   return Promise.resolve(true);
 }
@@ -1156,7 +1156,7 @@ function readPerms(id){
   var box=document.getElementById('perms_'+id),out=[];
   if(!box) return ['pdf'];
   box.querySelectorAll('input[type=checkbox]').forEach(function(inp){if(inp.checked)out.push(inp.getAttribute('data-p'));});
-  if(out.indexOf('pdf')<0) out.push('qlbvr|lamba|nhao|mocgioi|trongrung|tasks|tonghop|lamnghiep|pcccr|pdf');
+  if(out.indexOf('pdf')<0) out.push('pdf');
   return out;
 }
 function doApprove(email,id){approveUser(email,readPerms(id),false).then(function(){toast('Đã duyệt');loadUsers();}).catch(function(e){toast(e.message||e);});}
