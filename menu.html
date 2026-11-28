@@ -528,9 +528,9 @@ var CONFIG = {
 var AUTH_KEY = 'bqlrph_auth_v1';
 var SESS_KEY = 'bqlrph_session_v1';
 var DEFAULT_ADMIN = { email: 'admin@bqlrph.local', name: 'Quản trị viên', pass: 'Admin@2026' };
-var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pdf'];
-var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pdf: 'Công cụ PDF' };
-var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','tonghop','lamnghiep','pdf'];
+var ALL_PERMS = ['qlbvr', 'lamba', 'nhao', 'mocgioi', 'trongrung', 'tasks', 'tonghop', 'lamnghiep', 'pcccr', 'pdf'];
+var PERM_LABEL = { qlbvr: 'QLBVR', lamba: 'Lâm bạ / Đất đai', nhao: 'Nhà ở', mocgioi: 'Mốc giới', trongrung: 'Trồng & chăm sóc', tasks: 'Nhiệm vụ / Gantt', tonghop: 'Tổng hợp đường dẫn', lamnghiep: 'Công cụ lâm nghiệp', pcccr: 'Phòng cháy chữa cháy rừng', pdf: 'Công cụ PDF' };
+var VALID_PERMS = ['qlbvr','lamba','nhao','mocgioi','trongrung','tasks','tonghop','lamnghiep','pcccr','pdf'];
 function sanitizePerms(p){
   var arr = Array.isArray(p) ? p : String(p==null?'':p).split(/[,;|\/]/);
   var out = [];
@@ -542,7 +542,7 @@ function sanitizePerms(p){
     'trongrung':'trongrung','trồng & chăm sóc':'trongrung','trồng rừng':'trongrung','trong rung':'trongrung',
     'tasks':'tasks','gantt':'tasks','nhiệm vụ':'tasks','nhiem vu':'tasks','nhiệm vụ / gantt':'tasks',
     'lamnghiep':'lamnghiep','công cụ lâm nghiệp':'lamnghiep','cong cu lam nghiep':'lamnghiep','lâm nghiệp':'lamnghiep',
-    'pdf':'pdf','công cụ pdf':'pdf','cong cu pdf':'pdf'
+    'pcccr':'pcccr','pccc':'pcccr','phòng cháy chữa cháy rừng':'pcccr','phong chay chua chay rung':'pcccr','pdf':'pdf','công cụ pdf':'pdf','cong cu pdf':'pdf'
   };
   arr.forEach(function(x){
     x = String(x||'').trim().toLowerCase();
@@ -942,7 +942,8 @@ var MODULES={
     {id:'lamba',href:'quanly-datdai-lamba.html',cls:'lamba',icon:'fa-map-location-dot',code:'LÂM BẠ',title:'Lâm bạ / Đất đai',desc:'HĐ khoán · bản đồ · in sơ đồ.'},
     {id:'trongrung',href:'quanly-trongrung.html',cls:'trongrung',icon:'fa-seedling',code:'TRỒNG RỪNG',title:'Trồng & chăm sóc rừng',desc:'Tiến độ · Excel · Word.'},
     {id:'tasks',href:'quanly-nhiemvu-gantt.html',cls:'tasks',icon:'fa-chart-gantt',code:'GANTT',title:'Nhiệm vụ / Gantt',desc:'Chỉ đạo · tiến độ · Sheet.'},
-    {id:'tonghop',href:'quanly-tonghop-duongdan.html',cls:'tonghop',icon:'fa-link',code:'TỔNG HỢP',title:'Tổng hợp đường dẫn',desc:'Báo cáo · theo dõi · mở Sheet/Drive.'}
+    {id:'tonghop',href:'quanly-tonghop-duongdan.html',cls:'tonghop',icon:'fa-link',code:'TỔNG HỢP',title:'Tổng hợp đường dẫn',desc:'Báo cáo · theo dõi · mở Sheet/Drive.'},
+    {id:'pcccr',href:'quanly-pcccr.html',cls:'pcccr',icon:'fa-fire',code:'PCCCR',title:'Phòng cháy chữa cháy rừng',desc:'Biển báo cấp cháy · tiến độ thi công.'}
   ]
 };
 
